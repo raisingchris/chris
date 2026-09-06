@@ -1,4 +1,5 @@
 memory/scratchpad/
+memory/inbox/
 .env
 .env.*
 site/out/

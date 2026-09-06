@@ -32,4 +32,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: npx vercel deploy --prod --yes --token ${{ secrets.VERCEL_TOKEN }}
+      - run: |
+          cp vercel.json site/out/vercel.json
+          sed -i 's|"outputDirectory": "site/out",||' site/out/vercel.json
+          npx vercel deploy --prod --yes --cwd site/out --token ${{ secrets.VERCEL_TOKEN }}

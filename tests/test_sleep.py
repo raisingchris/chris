@@ -105,7 +105,7 @@ async def test_daily_summary_to_both_parents_from_parent_note(services, repo):
     assert "Food bill today $0.42 (soft $15 / hard $25). Council this week $0.00 of $10." in body
     assert "loops closed" in body
     # the note is filed as a letter, the working file is gone
-    letter = repo / "memory/letters" / f"{d}-to-parents.md"
+    letter = repo / "memory/wiki/letters" / f"{d}-to-parents.md"
     assert letter.read_text().startswith("Today I learned to wait.")
     assert not (repo / "memory/parent_note.md").exists()
     assert res.letter == letter
@@ -116,7 +116,7 @@ async def test_summary_falls_back_to_diary(services, repo):
     q = model({str(repo / "memory/diary" / f"{d}.md"): "A quiet day.\n"})
     res = await sleep.run_sleep(services, query_fn=q, git_run=fresh_git())
     assert res.note_source == "diary" and "A quiet day." in res.mail["text"]
-    assert not (repo / "memory/letters").exists()
+    assert not (repo / "memory/wiki/letters").exists()
 
 
 # --- housekeeping ---------------------------------------------------------------------

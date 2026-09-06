@@ -1,0 +1,16 @@
+# Deploys Chris's body (agent/, scripts/, Dockerfile) to Fly.
+# Manual trigger only for now: a parent runs it after reviewing a proposal in governance/proposals/.
+# When the "later graduation" opens, add `push: paths: [agent/**]` here so her own commits deploy her.
+# Secret needed: FLY_API_TOKEN (a deploy-only token for app chris-brain).
+name: deploy
+on:
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only --ha=false -a chris-brain
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

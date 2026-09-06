@@ -9,7 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends git curl ca-cer
 # CLI — and so her terminal — runs as. brain may become chris; chris may become nobody.
 RUN groupadd -g 1000 chris && useradd -m -u 1000 -g chris chris \
     && useradd -m -u 1001 -G chris brain \
-    && echo "brain ALL=(chris) NOPASSWD:SETENV: /usr/local/bin/claude" > /etc/sudoers.d/brain \
+    && printf '%s\n' \
+         "Defaults:brain umask_override" \
+         "Defaults:brain umask=0002" \
+         "brain ALL=(chris) NOPASSWD:SETENV: /usr/local/bin/claude" > /etc/sudoers.d/brain \
     && chmod 0440 /etc/sudoers.d/brain
 
 WORKDIR /app

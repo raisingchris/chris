@@ -21,6 +21,8 @@ from typing import Any, Callable
 import frontmatter
 import yaml
 
+from agent.paths import UnsafePath, safe_path
+
 MEMBERS_SUBDIR = Path("council") / "members"
 PUBLIC_MINUTES_SUBDIR = Path("council") / "minutes"
 UNSEAL_AFTER = timedelta(days=30)
@@ -29,6 +31,7 @@ UNSEAL_AFTER = timedelta(days=30)
 PRICE_PER_M: dict[str, tuple[float, float]] = {
     "gpt-5": (1.25, 10.0),
 }
+CLAUDE_PRICE_PER_M = (5.0, 25.0)  # any claude-* model: a sibling seat on the council
 QWEN_FREE_UNTIL = datetime(2026, 9, 30, 23, 59, 59, tzinfo=timezone.utc)
 QWEN_PRICE_PER_M = (1.6, 6.4)
 UNKNOWN_PRICE_PER_M = (5.0, 15.0)
@@ -41,7 +44,7 @@ class CouncilBudgetExceeded(RuntimeError):
 @dataclass(frozen=True)
 class Member:
     name: str
-    provider: str  # openai | qwen | none
+    provider: str  # openai | qwen | anthropic | none
     model: str
     system_prompt: str
     empty: bool = False
@@ -55,10 +58,19 @@ class Deliberation:
     minutes_path: Path
 
 
-def load_members(repo_dir: Path) -> list[Member]:
-    """Every chair, in filename order. Chairs with ``provider: none`` are flagged empty."""
+def load_members(repo_dir: Path, archive_append: Callable[[str, dict], str] | None = None) -> list[Member]:
+    """Every chair, in filename order. Chairs with ``provider: none`` are flagged empty.
+
+    Symlinked chair files are skipped (and archived as ``unsafe_path`` when an archive is given).
+    """
     members: list[Member] = []
     for path in sorted((repo_dir / MEMBERS_SUBDIR).glob("*.md")):
+        try:
+            path = safe_path(repo_dir, path)
+        except UnsafePath as exc:
+            if archive_append is not None:
+                archive_append("unsafe_path", {"kind": "unsafe_path", "path": str(path), "error": str(exc)})
+            continue
         post = frontmatter.load(path)
         provider = str(post.get("provider", "none")).strip().lower()
         members.append(
@@ -77,6 +89,8 @@ def load_members(repo_dir: Path) -> list[Member]:
 def estimate_cost_usd(provider: str, model: str, prompt_tokens: int, completion_tokens: int, at: datetime) -> float:
     if provider == "qwen":
         price = (0.0, 0.0) if at <= QWEN_FREE_UNTIL else QWEN_PRICE_PER_M
+    elif provider == "anthropic" or model.startswith("claude"):
+        price = CLAUDE_PRICE_PER_M
     else:
         price = PRICE_PER_M.get(model, UNKNOWN_PRICE_PER_M)
     return (prompt_tokens * price[0] + completion_tokens * price[1]) / 1_000_000
@@ -97,6 +111,7 @@ class Council:
     openai_api_key: str = ""
     qwen_api_key: str = ""
     qwen_base_url: str = ""
+    anthropic_api_key: str = ""  # her own key: a "sibling Claude" seat bills her food money
     now: Callable[[], datetime] = field(default=lambda: datetime.now(timezone.utc))
     client_factory: Callable[[str], Any] | None = None
 
@@ -107,6 +122,10 @@ class Council:
     # --- providers -------------------------------------------------------
 
     def _default_client_factory(self, provider: str):
+        if provider == "anthropic":
+            from anthropic import AsyncAnthropic
+
+            return AsyncAnthropic(api_key=self.anthropic_api_key)
         from openai import AsyncOpenAI
 
         if provider == "openai":
@@ -116,15 +135,34 @@ class Council:
         raise ValueError(f"unknown council provider: {provider!r}")
 
     def members(self) -> list[Member]:
-        return load_members(self.repo_dir)
+        return load_members(self.repo_dir, self.archive_append)
 
     def seated(self) -> list[Member]:
         return [m for m in self.members() if not m.empty]
 
     # --- deliberation ----------------------------------------------------
 
+    async def _ask_anthropic(self, client, member: Member, user_text: str, at: datetime) -> tuple[str, float]:
+        response = await client.messages.create(
+            model=member.model,
+            max_tokens=4096,
+            system=member.system_prompt,
+            messages=[{"role": "user", "content": user_text}],
+        )
+        answer = "".join(getattr(b, "text", "") for b in getattr(response, "content", []) or []).strip()
+        usage = getattr(response, "usage", None)
+        cost = estimate_cost_usd(
+            member.provider, member.model,
+            int(getattr(usage, "input_tokens", 0) or 0),
+            int(getattr(usage, "output_tokens", 0) or 0),
+            at,
+        )
+        return answer, cost
+
     async def _ask(self, member: Member, user_text: str, at: datetime) -> tuple[str, float]:
         client = self.client_factory(member.provider)  # type: ignore[misc]
+        if member.provider == "anthropic":
+            return await self._ask_anthropic(client, member, user_text, at)
         response = await client.chat.completions.create(
             model=member.model,
             messages=[
@@ -153,7 +191,15 @@ class Council:
         seated = self.seated()
         user_text = f"{context.strip()}\n\n{question.strip()}" if context.strip() else question.strip()
 
-        results = await asyncio.gather(*(self._ask(m, user_text, asked) for m in seated))
+        async def seat(m: Member) -> tuple[str, float]:
+            try:
+                return await self._ask(m, user_text, asked)
+            except Exception as exc:  # noqa: BLE001 — one silent seat must not empty the room
+                self.archive_append("council_seat_failed",
+                                    {"kind": "council_seat_failed", "member": m.name, "error": type(exc).__name__})
+                return f"(seat did not answer: {type(exc).__name__}: {str(exc)[:200]})", 0.0
+
+        results = await asyncio.gather(*(seat(m) for m in seated))
         answers = {m.name: answer for m, (answer, _) in zip(seated, results)}
         cost = round(sum(c for _, c in results), 6)
         self.meter.add_usd(cost, f"council: {question[:60]}")

@@ -36,6 +36,8 @@ async def run_once(services, kind: str) -> None:
 
 
 def main() -> None:
+    # Files brain writes into the shared repo must stay group-writable (chris is the group).
+    os.umask(0o002)
     _setup_logging()
     log = logging.getLogger("chris.main")
 

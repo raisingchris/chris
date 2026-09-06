@@ -6,10 +6,14 @@ Kinds: birth (first ever), wake, sitting, sunday. Sleep lives in sleep.py.
 from __future__ import annotations
 
 import json
+import logging
 from datetime import datetime
 from pathlib import Path
 
-from agent import gitops, redaction, session
+from agent import gitops, redaction, session, wiring
+from agent.paths import UnsafePath, safe_path
+
+log = logging.getLogger("chris.loop")
 
 PROMPTS = Path(__file__).parent / "prompts"
 KINDS = ("birth", "wake", "sitting", "sunday")
@@ -17,8 +21,25 @@ KINDS = ("birth", "wake", "sitting", "sunday")
 PROMPT_FILE = {"birth": "birth.md", "wake": "sitting.md", "sitting": "sitting.md", "sunday": "sunday.md"}
 
 
-def _read(path: Path) -> str:
-    return path.read_text(encoding="utf-8") if path.exists() else ""
+def _read(path: Path, repo: Path | None = None, archive=None) -> str:
+    """Read a text file, or "" if missing. Repo files go through ``safe_path`` (symlinks refused)."""
+    if repo is not None:
+        try:
+            path = safe_path(repo, path)
+        except UnsafePath as exc:
+            log.warning("unsafe path skipped: %s", exc)
+            if archive is not None:
+                archive.append("unsafe_path", {"kind": "unsafe_path", "path": str(path), "error": str(exc)})
+            return ""
+    try:
+        return path.read_text(encoding="utf-8") if path.exists() else ""
+    except OSError:
+        return ""
+
+
+def _rread(services, path: Path) -> str:
+    """``_read`` for a file inside her repo."""
+    return _read(path, services.repo_dir, services.archive)
 
 
 def diary_entries(repo: Path) -> list[Path]:
@@ -30,7 +51,7 @@ def inbox_subjects(mail) -> list[str]:
     subjects = []
     for p in mail.list_unread():
         subject = p.name
-        for line in _read(p).splitlines()[:8]:
+        for line in _read(p).splitlines()[:8]:  # list_unread already refused symlinks
             if line.startswith("subject:"):
                 subject = line[len("subject:"):].strip().strip('"')
                 break
@@ -43,14 +64,14 @@ def compose_user_prompt(services, kind: str) -> str:
     parts = [_read(PROMPTS / PROMPT_FILE[kind]).rstrip(), "---"]
     self_dir = repo / "memory" / "wiki" / "self"
     if (self_dir / "character.md").exists():
-        parts.append("## memory/wiki/self/character.md\n" + _read(self_dir / "character.md").rstrip())
+        parts.append("## memory/wiki/self/character.md\n" + _rread(services, self_dir / "character.md").rstrip())
     if (self_dir / "today.md").exists():
-        parts.append("## memory/wiki/self/today.md\n" + _read(self_dir / "today.md").rstrip())
+        parts.append("## memory/wiki/self/today.md\n" + _rread(services, self_dir / "today.md").rstrip())
     for p in diary_entries(repo)[-3:]:
-        parts.append(f"## memory/diary/{p.name}\n" + _read(p).rstrip())
+        parts.append(f"## memory/diary/{p.name}\n" + _rread(services, p).rstrip())
     handoff = repo / "memory" / "handoff.md"
     if handoff.exists():
-        parts.append("## memory/handoff.md\n" + _read(handoff).rstrip())
+        parts.append("## memory/handoff.md\n" + _rread(services, handoff).rstrip())
     subjects = inbox_subjects(services.mail)
     parts.append("## Unread mail\n" + ("\n".join(subjects) if subjects else "(none)"))
     parts.append("## Meters\n" + services.meters_line())
@@ -62,11 +83,29 @@ def sitting_number(services, today: str) -> int:
     return 1 + sum(1 for r in day if r.get("kind") == "session_start" and r.get("payload", {}).get("kind") != "sleep")
 
 
-def _note_handoff(repo: Path, line: str) -> None:
-    path = repo / "memory" / "handoff.md"
+def _note_handoff(repo: Path, line: str, archive=None) -> None:
+    try:
+        path = safe_path(repo, Path("memory") / "handoff.md")
+    except UnsafePath as exc:
+        log.warning("handoff not written: %s", exc)
+        if archive is not None:
+            archive.append("unsafe_path", {"kind": "unsafe_path", "path": "memory/handoff.md", "error": str(exc)})
+        return
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "a", encoding="utf-8") as f:
         f.write(("\n" if path.exists() and path.stat().st_size else "") + line + "\n")
+
+
+def _short(exc: BaseException, limit: int = 300) -> str:
+    return f"{type(exc).__name__}: {str(exc)[:limit]}"
+
+
+def push_failed_hook(services):
+    """``on_push_failed`` for commit_all: archive the stderr excerpt, never raise."""
+    def hook(err: str) -> None:
+        log.warning("git push failed: %s", err)
+        services.archive.append("push_failed", {"kind": "push_failed", "stderr": err[:500]})
+    return hook
 
 
 def redact_and_log(services, ts: str) -> list[dict]:
@@ -80,10 +119,12 @@ def redact_and_log(services, ts: str) -> list[dict]:
     return report
 
 
-async def run_sitting(services, kind: str = "sitting", query_fn=None, git_run=None, max_turns: int = 80):
+async def run_sitting(services, kind: str = "sitting", query_fn=None, git_run=None, max_turns: int | None = None):
     if kind not in KINDS:
         raise ValueError(f"unknown sitting kind {kind!r}")
     cfg = services.cfg
+    if max_turns is None:
+        max_turns = getattr(cfg, "max_turns", 80)
     repo = services.repo_dir
     archive = services.archive
     now = datetime.now(archive.tz)
@@ -107,14 +148,33 @@ async def run_sitting(services, kind: str = "sitting", query_fn=None, git_run=No
     system_prompt = _read(PROMPTS / "fixed.md")
     user_prompt = compose_user_prompt(services, kind)
 
-    result = await session.run_session(
-        services, kind, system_prompt, user_prompt, tools_allowed=session.BUILTIN_TOOLS,
-        max_turns=max_turns, query_fn=query_fn,
-    )
+    result = None
+    failure: BaseException | None = None
+    try:
+        result = await session.run_session(
+            services, kind, system_prompt, user_prompt, tools_allowed=session.BUILTIN_TOOLS,
+            max_turns=max_turns, query_fn=query_fn,
+        )
+    except Exception as exc:  # noqa: BLE001 — a failed sitting must still be visible, redacted and committed
+        failure = exc
+        log.exception("%s sitting failed", kind)
+        archive.append("sitting_failed", {"kind": kind, "n": n, "error": type(exc).__name__,
+                                          "message": str(exc)[:500]})
+        _note_handoff(repo, f"Your {kind} at {now.strftime('%H:%M')} failed: {_short(exc)}", archive)
+    else:
+        if result.soft_failed:
+            archive.append("sitting_incomplete", {"kind": kind, "n": n, "subtype": result.subtype,
+                                                  "turns": result.turns, "cost_usd": result.cost_usd})
+            _note_handoff(repo, f"Your {kind} at {now.strftime('%H:%M')} stopped at the turn limit "
+                                f"before finishing ({result.subtype}).", archive)
 
     redact_and_log(services, now.strftime("%Y%m%dT%H%M%S"))
     run = git_run or gitops.git
-    sha = gitops.commit_all(repo, f"{kind}: {today} sitting {n}", push=not cfg.dry_run, run=run)
-    archive.append("sitting_done", {"kind": kind, "n": n, "cost_usd": result.cost_usd, "turns": result.turns,
-                                    "commit": sha, "transcript": result.transcript_ref})
+    sha = gitops.commit_all(repo, f"{kind}: {today} sitting {n}", push=not cfg.dry_run, run=run,
+                            on_push_failed=push_failed_hook(services))
+    if failure is None:
+        archive.append("sitting_done", {"kind": kind, "n": n, "cost_usd": result.cost_usd, "turns": result.turns,
+                                        "commit": sha, "transcript": result.transcript_ref})
+    wiring.note_last_run(services.state_dir, "last_sitting_done", tz=archive.tz, kind=kind,
+                         ok=failure is None and not result.soft_failed)
     return result

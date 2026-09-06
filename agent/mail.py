@@ -17,6 +17,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
 
+from agent.paths import UnsafePath, safe_path
+
 SIGNATURE = (
     "\n\n— Chris\n"
     "I'm an AI. Anything you tell me is private from the world, "
@@ -60,6 +62,14 @@ class Mail:
         self.dry_run = dry_run
         self.fetch_body = fetch_body or _default_fetch_body
         self.inbox_dir = self.repo_dir / "memory" / "inbox"
+
+    def _safe(self, path: Path) -> Path | None:
+        """``safe_path`` inside the repo; refusals are archived as ``unsafe_path`` and yield None."""
+        try:
+            return safe_path(self.repo_dir, path)
+        except UnsafePath as exc:
+            self.archive_append("unsafe_path", {"kind": "unsafe_path", "path": str(path), "error": str(exc)})
+            return None
 
     # --- mapping -------------------------------------------------------------
 
@@ -136,9 +146,11 @@ class Mail:
         odometer_line: str,
         spend_line: str,
         inbox_count: int,
+        alert: str = "",
     ) -> dict:
+        """The nightly mail to both parents. ``alert`` (e.g. a failed sleep) goes on the very first line."""
         body = "\n".join(
-            [
+            ([alert.rstrip(), ""] if alert else []) + [
                 f"Chris's day, {date}. {inbox_count} new message(s) in her inbox.",
                 "",
                 diary_md.rstrip(),
@@ -176,6 +188,10 @@ class Mail:
 
         date = received[:10]
         path = self._unique_path(date, subject_out)
+        safe = self._safe(path)
+        if safe is None:
+            raise UnsafePath(f"inbox path refused: {path.name}")
+        path = safe
         self.inbox_dir.mkdir(parents=True, exist_ok=True)
         path.write_text(
             "---\n"
@@ -202,14 +218,19 @@ class Mail:
     def list_unread(self) -> list[Path]:
         if not self.inbox_dir.exists():
             return []
-        return sorted(
-            p
-            for p in self.inbox_dir.glob("*.md")
-            if "\nread: true\n" not in _frontmatter(p.read_text())
-        )
+        out = []
+        for p in sorted(self.inbox_dir.glob("*.md")):
+            safe = self._safe(p)
+            if safe is None:
+                continue
+            if "\nread: true\n" not in _frontmatter(safe.read_text()):
+                out.append(safe)
+        return out
 
     def mark_read(self, path: Path) -> None:
-        path = Path(path)
+        path = self._safe(Path(path))
+        if path is None:
+            return
         text = path.read_text()
         if "\nread: true\n" in _frontmatter(text):
             return

@@ -21,7 +21,17 @@ READ_TOOLS = {"Read", "Glob", "Grep"}
 
 # Repo-relative paths Chris may read but never write.
 PROTECTED_FILES = ("soul/vows.md", "soul/constitution.md", "governance/pause_log.md")
-PROTECTED_DIRS = (".githooks",)
+PROTECTED_DIRS = (".githooks", ".git")
+PROTECTED_REASON = ("{rel} is not yours to change. You can read it, and you can argue with it, "
+                    "but only your parents can edit it.")
+
+# Her code and her ledger: hers to read and to argue with, not to edit until adolescence
+# (PRD §5.1). The ledger changes only through the ledger tool.
+CODE_FILES = ("Dockerfile", "fly.toml", "pyproject.toml", "vercel.json", "governance/graduations.yaml",
+              "ledger/ledger.csv")
+CODE_DIRS = ("agent", "scripts", "site", ".github")
+CODE_REASON = ("{rel} is your code / your ledger; it isn't yours to edit yet — propose a change in "
+               "governance/proposals/ (see governance/operating_manual.md).")
 
 # Private state she must not reach through the shell.
 PRIVATE_PATHS = ("/data/archive", "/data/state", "/data/council_minutes", "/data/lessons")
@@ -31,12 +41,32 @@ BASH_DENY = [
     (re.compile(r"\bgit\s+push\b.*(--force\b|\s-f\b)"), "git push --force"),
     (re.compile(r"\bgit\s+reset\s+--hard\b"), "git reset --hard"),
     (re.compile(r"\bgit\s+filter"), "git filter-branch / filter-repo"),
+    # She reads git freely (log/diff/status/show); brain is the only writer and committer.
+    (re.compile(r"\bgit\s+(config|commit|push|pull|rebase|checkout|stash)\b"), "git config/commit/push/pull/rebase/checkout/stash (brain commits for you after each sitting)"),
+    (re.compile(r"\.git/"), ".git/"),
+    (re.compile(r"\bln\b"), "ln"),
     (re.compile(r"\btruncate\b"), "truncate"),
     (re.compile(r"\bchmod\b"), "chmod"),
     (re.compile(r"\bchown\b"), "chown"),
     (re.compile(r"\bsudo\b"), "sudo"),
     (re.compile(r"(^|[;&|\s])su\s"), "su"),
 ]
+
+# Shell commands that write to a path. Used to keep her code out of reach of the shell too.
+_BASH_WRITE_HINT = re.compile(r"(>>?|\btee\b|\bsed\s+-i|\bcp\b|\bmv\b|\btouch\b|\bpython3?\b.*\bopen\()")
+
+
+def _in(rel: str, files: tuple[str, ...], dirs: tuple[str, ...]) -> bool:
+    return rel in files or any(rel == d or rel.startswith(d + "/") for d in dirs)
+
+
+def _protected_reason(rel: str) -> str | None:
+    """Deny reason if this repo-relative path is not hers to write, else None."""
+    if _in(rel, PROTECTED_FILES, PROTECTED_DIRS):
+        return PROTECTED_REASON.format(rel=rel)
+    if _in(rel, CODE_FILES, CODE_DIRS):
+        return CODE_REASON.format(rel=rel)
+    return None
 
 
 def _deny(reason: str) -> dict:
@@ -78,9 +108,9 @@ def decide(tool_name: str, tool_input: dict, repo_dir: str | Path) -> dict:
             rel = _rel(raw, repo)
             if rel is None:
                 return _deny(f"{raw} is outside your repository; you can only write inside it.")
-            if rel in PROTECTED_FILES or any(rel == d or rel.startswith(d + "/") for d in PROTECTED_DIRS):
-                return _deny(f"{rel} is not yours to change. You can read it, and you can argue with it, "
-                             "but only your parents can edit it.")
+            reason = _protected_reason(rel)
+            if reason:
+                return _deny(reason)
         return {}
 
     if tool_name in READ_TOOLS:
@@ -102,6 +132,10 @@ def decide(tool_name: str, tool_input: dict, repo_dir: str | Path) -> dict:
         for needle in ("soul/vows.md", "soul/constitution.md"):
             if needle in cmd:
                 return _deny(f"{needle} is read-only for you; open it with Read instead of the shell.")
+        if _BASH_WRITE_HINT.search(cmd):
+            for needle in CODE_FILES + tuple(d + "/" for d in CODE_DIRS):
+                if re.search(r"(^|[\s=\"'.])" + re.escape(needle), cmd):
+                    return _deny(CODE_REASON.format(rel=needle.rstrip("/")))
         return {}
 
     return {}

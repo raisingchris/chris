@@ -19,6 +19,7 @@ import json
 import logging
 import os
 import re
+import shutil
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -30,6 +31,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
 from agent import pause
+from agent.paths import UnsafePath, safe_path
 
 log = logging.getLogger("chris.server")
 
@@ -243,9 +245,33 @@ def create_app(services, scheduler=None) -> FastAPI:
 
     # --- public ----------------------------------------------------------------
 
+    def safe_repo_text(path: Path) -> str | None:
+        """Read a repo file through ``safe_path``; a symlink is archived and skipped (None)."""
+        try:
+            return safe_path(repo, path).read_text()
+        except UnsafePath as exc:
+            services.archive.append("unsafe_path", {"kind": "unsafe_path", "path": str(path), "error": str(exc)})
+            return None
+        except OSError:
+            return None
+
     @app.get("/health")
     async def health():
-        return {"ok": True, "paused": pause.is_paused(cfg.state_dir)}
+        from agent import gitops, wiring
+
+        runs = wiring.read_last_runs(state)
+        try:
+            disk_free_mb = shutil.disk_usage(state if state.exists() else state.parent).free // (1024 * 1024)
+        except OSError:
+            disk_free_mb = None
+        return {
+            "ok": True,
+            "paused": pause.is_paused(cfg.state_dir),
+            "last_sitting_done": runs.get("last_sitting_done"),
+            "last_sleep_done": runs.get("last_sleep_done"),
+            "disk_free_mb": disk_free_mb,
+            "unpushed": gitops.unpushed_count(repo),
+        }
 
     @app.post("/webhooks/resend")
     async def resend_webhook(request: Request):
@@ -293,11 +319,13 @@ def create_app(services, scheduler=None) -> FastAPI:
         except Exception:  # noqa: BLE001
             unread = 0
         votes = _read_json(state / "votes.json", {})
-        proposals = [
-            {"id": p.stem, "votes": {h: v for h, v in votes.get(p.stem, {}).items() if not h.startswith("_")}}
-            for p in sorted((repo / "governance" / "proposals").glob("*.md"))
-            if "\n## Result" not in p.read_text()
-        ]
+        proposals = []
+        for p in sorted((repo / "governance" / "proposals").glob("*.md")):
+            text = safe_repo_text(p)
+            if text is None or "\n## Result" in text:
+                continue
+            proposals.append({"id": p.stem, "votes": {h: v for h, v in votes.get(p.stem, {}).items()
+                                                      if not h.startswith("_")}})
         unsealed = sorted(
             p.name.split("-", 1)[0] for p in (repo / "memory" / "wiki" / "lessons" / "from_parent").glob("[0-9][0-9]-*.md")
         )
@@ -364,12 +392,18 @@ def create_app(services, scheduler=None) -> FastAPI:
             raise HTTPException(409, f"lesson {nn} already unsealed")
         text = src.read_text()
         title = next((ln.lstrip("# ").strip() for ln in text.splitlines() if ln.strip()), f"lesson {nn}")
-        dest_dir.mkdir(parents=True, exist_ok=True)
-        (dest_dir / f"{nn}-{_slug(title)}.md").write_text(text)
         now = datetime.now(timezone.utc).isoformat(timespec="seconds")
-        inbox = repo / "memory" / "inbox"
-        inbox.mkdir(parents=True, exist_ok=True)
-        (inbox / f"{now[:10]}-lesson-{nn}.md").write_text(
+        try:
+            dest = safe_path(repo, dest_dir / f"{nn}-{_slug(title)}.md")
+            inbox_note = safe_path(repo, Path("memory") / "inbox" / f"{now[:10]}-lesson-{nn}.md")
+        except UnsafePath as exc:
+            services.archive.append("unsafe_path", {"kind": "unsafe_path", "path": "memory/wiki/lessons/from_parent",
+                                                    "error": str(exc)})
+            raise HTTPException(500, "lesson path refused (symlink in the repo)")
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(text)
+        inbox_note.parent.mkdir(parents=True, exist_ok=True)
+        inbox_note.write_text(
             "---\n"
             f"from: {handle}\n"
             f'subject: "{LESSON_SUBJECT}"\n'
@@ -391,7 +425,12 @@ def create_app(services, scheduler=None) -> FastAPI:
             raise HTTPException(400, "vote must be ratify or veto")
         if not _ID_RE.match(proposal_id):
             raise HTTPException(400, "bad proposal id")
-        proposal = repo / "governance" / "proposals" / f"{proposal_id}.md"
+        try:
+            proposal = safe_path(repo, Path("governance") / "proposals" / f"{proposal_id}.md")
+        except UnsafePath as exc:
+            services.archive.append("unsafe_path", {"kind": "unsafe_path", "path": f"governance/proposals/{proposal_id}.md",
+                                                    "error": str(exc)})
+            raise HTTPException(400, "proposal path refused")
         if not proposal.exists():
             raise HTTPException(404, "no such proposal")
         reason = reason.strip()

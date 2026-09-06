@@ -35,14 +35,32 @@ def _hm(s: str) -> tuple[int, int]:
     return int(h), int(m)
 
 
+# One sitting or sleep at a time: two sessions editing the same repo would corrupt each other.
+RUN_LOCK = asyncio.Lock()
+
+
 def guarded(services, fn: Callable[..., Awaitable], *args, name: str = "") -> Callable[[], Awaitable[None]]:
-    """Wrap a coroutine function so it is skipped while paused."""
+    """Wrap a coroutine function so it is skipped while paused or while another session is still running."""
 
     async def run() -> None:
+        job = name or getattr(fn, "__name__", "job")
         if pause.is_paused(services.cfg.state_dir):
-            log.info("paused; skipping %s", name or getattr(fn, "__name__", "job"))
+            log.info("paused; skipping %s", job)
             return
-        await fn(*args)
+        if RUN_LOCK.locked():
+            log.warning("another session is still running; skipping %s", job)
+            services.archive.append("sitting_skipped", {"kind": "sitting_skipped", "reason": "overlap", "job": job})
+            try:
+                from agent import loop
+
+                loop._note_handoff(Path(services.cfg.repo_dir),
+                                   f"Your {job} was skipped: the previous session was still running.",
+                                   services.archive)
+            except Exception as exc:  # noqa: BLE001
+                log.warning("handoff note failed: %s", exc)
+            return
+        async with RUN_LOCK:
+            await fn(*args)
 
     run.__name__ = name or getattr(fn, "__name__", "job")
     return run
@@ -71,6 +89,16 @@ def make_scheduler(services, run_sitting, run_sleep) -> AsyncIOScheduler:
         sched.add_job(fn, trigger, id=id, name=name, **JOB_DEFAULTS)
 
     add(guarded(services, run_sitting, services, "wake", name="wake"), cron(cfg.wake, WEEKDAYS), "wake", "wake")
+
+    # Birth-day exception: if she was born on a Sunday, she still wakes at 07:00 that day.
+    # Once a diary exists this job is a no-op forever.
+    async def sunday_birth() -> None:
+        diary = Path(cfg.repo_dir) / "memory" / "diary"
+        if any(diary.glob("*.md")):
+            return
+        await guarded(services, run_sitting, services, "wake", name="birth")()
+
+    add(sunday_birth, cron(cfg.wake, "sun"), "sunday-birth", "sunday birth")
     for t in cfg.sittings:
         add(guarded(services, run_sitting, services, "sitting", name=f"sitting {t}"),
             cron(t, WEEKDAYS), f"sitting-{t}", f"sitting {t}")

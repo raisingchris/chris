@@ -9,7 +9,7 @@ ENV_KEYS = (
     "REPO_DIR", "ARCHIVE_DIR", "STATE_DIR", "TZ", "SITTINGS", "WAKE", "SLEEP",
     "SOFT_USD", "HARD_USD", "COUNCIL_WEEKLY_USD", "PARENT_A_EMAIL", "PARENT_B_EMAIL",
     "CHRIS_EMAIL", "PARENT_HANDLES", "CHRIS_DRY_RUN", "REDACT_CANARIES", "CHRIS_MODEL",
-    "STRIPE_WEBHOOK_SECRET", "CHRIS_BIRTHDAY",
+    "STRIPE_WEBHOOK_SECRET", "CHRIS_BIRTHDAY", "MAX_TURNS", "SLEEP_MAX_TURNS",
 )
 
 _TRUE = {"1", "true", "yes", "on"}
@@ -40,6 +40,8 @@ class Config:
     model: str = "claude-fable-5-1"
     stripe_webhook_secret: str = ""
     birthday: str = ""  # ISO date of her first day, or empty to infer from the first diary
+    max_turns: int = 80  # per sitting
+    sleep_max_turns: int = 60
 
     @classmethod
     def from_env(cls, env: dict[str, str] | None = None) -> "Config":
@@ -65,6 +67,8 @@ class Config:
             model=g("CHRIS_MODEL", "claude-fable-5-1"),
             stripe_webhook_secret=g("STRIPE_WEBHOOK_SECRET"),
             birthday=g("CHRIS_BIRTHDAY").strip(),
+            max_turns=int(g("MAX_TURNS", "80")),
+            sleep_max_turns=int(g("SLEEP_MAX_TURNS", "60")),
         )
 
 

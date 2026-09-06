@@ -45,7 +45,10 @@ def sign_in(client, handle, password=PASSWORD):
 
 
 def test_health(client, services):
-    assert client.get("/health").json() == {"ok": True, "paused": False}
+    body = client.get("/health").json()
+    assert body["ok"] is True and body["paused"] is False
+    assert body["last_sitting_done"] is None and body["last_sleep_done"] is None
+    assert isinstance(body["disk_free_mb"], int) and body["unpushed"] == 0
     pause.trigger(services, "Chris asked to be paused.", "parent-a")
     assert client.get("/health").json()["paused"] is True
 

@@ -104,7 +104,45 @@ class Services:
             parts.append(self.odometer.render_line(self.birthday()))
         except Exception as exc:
             parts.append(f"Odometer: unavailable ({type(exc).__name__}).")
-        return " ".join(parts)
+        line = " ".join(parts)
+        from agent import gitops
+
+        n = gitops.unpushed_count(self.repo_dir)
+        if n > 0:
+            line += f" · {n} commits unpushed"
+        return line
+
+
+
+LAST_RUNS = "last_runs.json"
+
+
+def note_last_run(state_dir: str | Path, key: str, tz: ZoneInfo | None = None, **extra) -> None:
+    """Record ``<key>: <now iso>`` (plus extras) in ``<state_dir>/last_runs.json``; never raises."""
+    import json
+
+    path = Path(state_dir) / LAST_RUNS
+    try:
+        data = json.loads(path.read_text()) if path.exists() else {}
+    except Exception:  # noqa: BLE001
+        data = {}
+    data[key] = datetime.now(tz).isoformat(timespec="seconds")
+    for k, v in extra.items():
+        data[f"{key}_{k}"] = v
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(data, indent=1))
+    except OSError:
+        pass
+
+
+def read_last_runs(state_dir: str | Path) -> dict:
+    import json
+
+    try:
+        return json.loads((Path(state_dir) / LAST_RUNS).read_text())
+    except Exception:  # noqa: BLE001
+        return {}
 
 
 def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | None = None) -> Services:
@@ -135,6 +173,7 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
         openai_api_key=secrets.openai_key,
         qwen_api_key=secrets.qwen_key,
         qwen_base_url=secrets.qwen_base_url,
+        anthropic_api_key=secrets.anthropic_key,
     )
 
     # Money modules are imported lazily so the loop still builds if one is

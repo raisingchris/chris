@@ -11,7 +11,7 @@ note to her parents. Afterwards, in this order and without the model:
 5. the odometer line is re-rendered;
 6. the repo is redacted, committed as Chris ("sleep: <date>") and pushed;
 7. the parent note (or the diary, if she wrote none) is mailed to both parents
-   and filed under ``memory/letters/<date>-to-parents.md``.
+   and filed under ``memory/wiki/letters/<date>-to-parents.md``.
 """
 
 from __future__ import annotations
@@ -22,14 +22,15 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from agent import character_diff, gitops, loop, pause, session, tools
+from agent import character_diff, gitops, loop, pause, session, tools, wiring
+from agent.paths import UnsafePath, safe_path
 
 log = logging.getLogger("chris.sleep")
 
 PROMPT_FILE = loop.PROMPTS / "sleep.md"
 SLEEP_TOOLS = ("recall", "scratch_read", "meters")
 SLEEP_EXCLUDED = tuple(t for t in tools.TOOL_NAMES if t not in SLEEP_TOOLS)
-MAX_TURNS = 60
+MAX_TURNS = 60  # default; Config.sleep_max_turns (SLEEP_MAX_TURNS) overrides
 
 PAYLOAD_CHARS = 600
 ARCHIVE_CHARS = 150_000
@@ -52,6 +53,17 @@ class SleepResult:
     note_source: str = ""
     letter: Path | None = None
     mail: dict | None = None
+    failed: str = ""  # "ErrorType: message" if the model session raised
+
+
+def _safe(services, rel: str) -> Path | None:
+    """Repo path through ``safe_path``; on refusal archive ``unsafe_path`` and return None."""
+    try:
+        return safe_path(services.repo_dir, rel)
+    except UnsafePath as exc:
+        log.warning("unsafe path skipped: %s", exc)
+        services.archive.append("unsafe_path", {"kind": "unsafe_path", "path": rel, "error": str(exc)})
+        return None
 
 
 # --- prompt --------------------------------------------------------------------
@@ -100,9 +112,9 @@ def compose_user_prompt(services, today: str) -> str:
              "## Today's archive\n" + render_archive(services.archive.read_day(today))]
     character = repo / "memory" / "wiki" / "self" / "character.md"
     if character.exists():
-        parts.append("## memory/wiki/self/character.md\n" + loop._read(character).rstrip())
+        parts.append("## memory/wiki/self/character.md\n" + loop._rread(services, character).rstrip())
     for p in loop.diary_entries(repo)[-3:]:
-        parts.append(f"## memory/diary/{p.name}\n" + loop._read(p).rstrip())
+        parts.append(f"## memory/diary/{p.name}\n" + loop._rread(services, p).rstrip())
     return "\n\n".join(parts) + "\n"
 
 
@@ -111,7 +123,9 @@ def compose_user_prompt(services, today: str) -> str:
 
 def enforce_character(services, before: str, today: str) -> list[str]:
     """Write back character.md minus uncited new diffs; return the rejected lines."""
-    path = services.repo_dir / "memory" / "wiki" / "self" / "character.md"
+    path = _safe(services, "memory/wiki/self/character.md")
+    if path is None:
+        return []
     after = loop._read(path)
     today_refs = {r["ref"] for r in services.archive.read_day(today) if r.get("ref")}
     accepted = character_diff.enforce(before, after, services.archive.get, today_refs)
@@ -127,7 +141,9 @@ def enforce_character(services, before: str, today: str) -> list[str]:
 def ensure_diary(services, today: str, agent: bool) -> bool:
     """Write a one-line stub if the model left no diary; True if stubbed."""
     name = f"{today}.agent.md" if agent else f"{today}.md"
-    path = services.repo_dir / "memory" / "diary" / name
+    path = _safe(services, f"memory/diary/{name}")
+    if path is None:
+        return False
     if path.exists() and path.read_text(encoding="utf-8").strip():
         return False
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -168,18 +184,20 @@ def spend_line(services) -> str:
 
 def parent_note(services, today: str) -> tuple[str, str]:
     """(text, source): her note if she wrote one, else the human diary."""
-    note = services.repo_dir / "memory" / "parent_note.md"
-    if note.exists() and note.read_text(encoding="utf-8").strip():
+    note = _safe(services, "memory/parent_note.md")
+    if note is not None and note.exists() and note.read_text(encoding="utf-8").strip():
         return note.read_text(encoding="utf-8"), "parent_note"
-    return loop._read(services.repo_dir / "memory" / "diary" / f"{today}.md"), "diary"
+    return loop._rread(services, services.repo_dir / "memory" / "diary" / f"{today}.md"), "diary"
 
 
 def file_parent_note(services, today: str) -> Path | None:
-    """Move memory/parent_note.md to memory/letters/<date>-to-parents.md (it is her working file, not the archive)."""
-    note = services.repo_dir / "memory" / "parent_note.md"
-    if not note.exists():
+    """Move memory/parent_note.md to memory/wiki/letters/<date>-to-parents.md (the site reads that folder)."""
+    note = _safe(services, "memory/parent_note.md")
+    if note is None or not note.exists():
         return None
-    dest = services.repo_dir / "memory" / "letters" / f"{today}-to-parents.md"
+    dest = _safe(services, f"memory/wiki/letters/{today}-to-parents.md")
+    if dest is None:
+        return None
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(note.read_text(encoding="utf-8"), encoding="utf-8")
     note.unlink()
@@ -203,14 +221,26 @@ async def run_sleep(services, query_fn=None, git_run=None) -> SleepResult:
         return result
 
     character = repo / "memory" / "wiki" / "self" / "character.md"
-    before = loop._read(character)
+    before = loop._rread(services, character)
 
     system_prompt = loop._read(loop.PROMPTS / "fixed.md")
     user_prompt = compose_user_prompt(services, today)
-    result.session = await session.run_session(
-        services, "sleep", system_prompt, user_prompt, tools_allowed=session.BUILTIN_TOOLS,
-        max_turns=MAX_TURNS, excluded=SLEEP_EXCLUDED, query_fn=query_fn,
-    )
+    try:
+        result.session = await session.run_session(
+            services, "sleep", system_prompt, user_prompt, tools_allowed=session.BUILTIN_TOOLS,
+            max_turns=getattr(cfg, "sleep_max_turns", MAX_TURNS), excluded=SLEEP_EXCLUDED, query_fn=query_fn,
+        )
+    except Exception as exc:  # noqa: BLE001 — the housekeeping below must still run, and the parents must hear
+        result.failed = loop._short(exc)
+        log.exception("sleep failed")
+        archive.append("sleep_failed", {"date": today, "error": type(exc).__name__, "message": str(exc)[:500]})
+        loop._note_handoff(repo, f"Your sleep at {now.strftime('%H:%M')} failed: {result.failed}", archive)
+    else:
+        if result.session.soft_failed:
+            archive.append("sleep_incomplete", {"date": today, "subtype": result.session.subtype,
+                                                "turns": result.session.turns})
+            loop._note_handoff(repo, f"Your sleep at {now.strftime('%H:%M')} stopped at the turn limit "
+                                     f"before finishing ({result.session.subtype}).", archive)
 
     result.rejected_diffs = enforce_character(services, before, today)
     result.diary_stubbed = ensure_diary(services, today, agent=False)
@@ -235,21 +265,26 @@ async def run_sleep(services, query_fn=None, git_run=None) -> SleepResult:
     result.letter = file_parent_note(services, today)
 
     run = git_run or gitops.git
-    result.commit = gitops.commit_all(repo, f"sleep: {today}", push=not cfg.dry_run, run=run)
+    result.commit = gitops.commit_all(repo, f"sleep: {today}", push=not cfg.dry_run, run=run,
+                                      on_push_failed=loop.push_failed_hook(services))
 
     spend = spend_line(services)
     inbox_count = len(services.mail.list_unread())
+    alert = f"Sleep failed tonight: {result.failed}" if result.failed else ""
     try:
-        result.mail = services.mail.daily_summary(today, note_md, result.odometer_line, spend, inbox_count)
+        result.mail = services.mail.daily_summary(today, note_md, result.odometer_line, spend, inbox_count,
+                                                  alert=alert)
     except Exception as exc:  # noqa: BLE001 — the day is saved; mail is best effort
         log.warning("daily_summary failed: %s", exc)
         archive.append("mail_failed", {"kind": "daily_summary", "error": type(exc).__name__})
 
+    sess = result.session
     archive.append("sleep_done", {
-        "date": today, "cost_usd": result.session.cost_usd, "turns": result.session.turns,
+        "date": today, "cost_usd": sess.cost_usd if sess else 0.0, "turns": sess.turns if sess else 0,
         "rejected_diffs": len(result.rejected_diffs), "diary_stubbed": result.diary_stubbed,
         "agent_diary_stubbed": result.agent_diary_stubbed, "unsealed": result.unsealed,
         "ledger_rows": result.ledger_rows, "commit": result.commit, "note_source": result.note_source,
-        "transcript": result.session.transcript_ref,
+        "transcript": sess.transcript_ref if sess else None, "failed": result.failed or None,
     })
+    wiring.note_last_run(services.state_dir, "last_sleep_done", tz=archive.tz, ok=not result.failed)
     return result

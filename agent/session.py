@@ -22,6 +22,12 @@ class SessionResult:
     transcript_ref: str
     final_text: str
     is_error: bool = False
+    subtype: str = ""  # SDK ResultMessage subtype: "success", "error_max_turns", ...
+
+    @property
+    def soft_failed(self) -> bool:
+        """The run ended on an error subtype (turn limit, etc.) rather than finishing."""
+        return self.is_error or self.subtype.startswith("error")
 
 
 def allowed_tools(tools_allowed: list[str], excluded: list[str] | tuple[str, ...] = ()) -> list[str]:
@@ -97,6 +103,7 @@ async def run_session(
     cost = 0.0
     turns = 0
     is_error = False
+    subtype = ""
     result_text = ""
     async for msg in query_fn(user_prompt, options):
         name = type(msg).__name__
@@ -108,6 +115,7 @@ async def run_session(
             cost = float(getattr(msg, "total_cost_usd", None) or 0.0)
             turns = int(getattr(msg, "num_turns", 0) or 0)
             is_error = bool(getattr(msg, "is_error", False))
+            subtype = str(getattr(msg, "subtype", "") or "")
             result_text = getattr(msg, "result", None) or ""
             archive.append("session_result", {
                 "kind": kind, "subtype": getattr(msg, "subtype", ""), "cost_usd": cost, "turns": turns,
@@ -119,4 +127,4 @@ async def run_session(
         services.inference.add_usd(cost, f"{kind} session")
     final_text = result_text or (texts[-1] if texts else "")
     return SessionResult(cost_usd=cost, turns=turns, transcript_ref=start_ref,
-                         final_text=final_text, is_error=is_error)
+                         final_text=final_text, is_error=is_error, subtype=subtype)

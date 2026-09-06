@@ -1,3 +1,4 @@
+from pathlib import Path
 """Scheduler: weekday vs Sunday job sets, pause guard, next_runs."""
 
 from datetime import date
@@ -45,7 +46,7 @@ def test_weekday_jobs(sched):
 
 def test_sunday_jobs(sched):
     # 2026-09-06 is a Sunday: no wake, no ordinary sittings — one letter home and sleep.
-    assert due_on(sched, date(2026, 9, 6)) == ["git-pull", "unseal", "sunday", "sleep"]
+    assert due_on(sched, date(2026, 9, 6)) == ["git-pull", "sunday-birth", "unseal", "sunday", "sleep"]
 
 
 def test_job_defaults(sched):
@@ -87,3 +88,25 @@ def test_next_runs_before_start(sched):
     runs = next_runs(sched)
     assert runs and all(t is not None for _, t in runs)
     assert [t for _, t in runs] == sorted(t for _, t in runs)
+
+
+def test_sunday_birth_job_exists_and_noops_after_first_diary(services):
+    from agent.scheduler import make_scheduler
+    import asyncio
+    calls = []
+
+    async def fake_sitting(_services, kind):
+        calls.append(kind)
+
+    async def fake_sleep(_services):
+        pass
+
+    sched = make_scheduler(services, fake_sitting, fake_sleep)
+    job = sched.get_job("sunday-birth")
+    assert job is not None
+    asyncio.run(job.func())
+    assert calls == ["wake"]
+    (Path(services.cfg.repo_dir) / "memory" / "diary").mkdir(parents=True, exist_ok=True)
+    (Path(services.cfg.repo_dir) / "memory" / "diary" / "2026-09-06.md").write_text("born")
+    asyncio.run(job.func())
+    assert calls == ["wake"]
