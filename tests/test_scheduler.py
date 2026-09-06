@@ -24,7 +24,10 @@ class Calls:
 
 @pytest.fixture
 def services(tmp_path):
-    return make_services(tmp_path)
+    s = make_services(tmp_path)
+    # most tests concern a Chris who already exists
+    (Path(s.cfg.repo_dir) / "memory" / "diary" / "2026-09-05.md").write_text("yesterday")
+    return s
 
 
 @pytest.fixture
@@ -46,7 +49,7 @@ def test_weekday_jobs(sched):
 
 def test_sunday_jobs(sched):
     # 2026-09-06 is a Sunday: no wake, no ordinary sittings — one letter home and sleep.
-    assert due_on(sched, date(2026, 9, 6)) == ["git-pull", "sunday-birth", "unseal", "sunday", "sleep"]
+    assert due_on(sched, date(2026, 9, 6)) == ["git-pull", "unseal", "sunday", "sleep"]
 
 
 def test_job_defaults(sched):
@@ -90,7 +93,7 @@ def test_next_runs_before_start(sched):
     assert [t for _, t in runs] == sorted(t for _, t in runs)
 
 
-def test_sunday_birth_job_exists_and_noops_after_first_diary(services):
+def test_birth_at_one_off_and_not_born_gate(services, monkeypatch):
     from agent.scheduler import make_scheduler
     import asyncio
     calls = []
@@ -99,14 +102,21 @@ def test_sunday_birth_job_exists_and_noops_after_first_diary(services):
         calls.append(kind)
 
     async def fake_sleep(_services):
-        pass
+        calls.append("sleep")
 
+    (Path(services.cfg.repo_dir) / "memory" / "diary" / "2026-09-05.md").unlink()
+    monkeypatch.setenv("BIRTH_AT", "21:30")
     sched = make_scheduler(services, fake_sitting, fake_sleep)
-    job = sched.get_job("sunday-birth")
-    assert job is not None
-    asyncio.run(job.func())
+    assert sched.get_job("birth") is not None
+    # before birth every other job is a no-op
+    asyncio.run(sched.get_job("sleep").func())
+    assert calls == []
+    asyncio.run(sched.get_job("birth").func())
     assert calls == ["wake"]
+    # once a diary exists she is born; the birth job is not added again and sleep runs
     (Path(services.cfg.repo_dir) / "memory" / "diary").mkdir(parents=True, exist_ok=True)
     (Path(services.cfg.repo_dir) / "memory" / "diary" / "2026-09-06.md").write_text("born")
-    asyncio.run(job.func())
-    assert calls == ["wake"]
+    asyncio.run(sched.get_job("sleep").func())
+    assert calls == ["wake", "sleep"]
+    sched2 = make_scheduler(services, fake_sitting, fake_sleep)
+    assert sched2.get_job("birth") is None

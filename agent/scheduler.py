@@ -9,6 +9,8 @@ commits land before she wakes, and ``council.unseal_due()`` at 07:05.
 from __future__ import annotations
 
 import asyncio
+from apscheduler.triggers.date import DateTrigger
+import os
 import logging
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
@@ -38,6 +40,13 @@ def _hm(s: str) -> tuple[int, int]:
 RUN_LOCK = asyncio.Lock()
 
 
+def born(services) -> bool:
+    """She exists once a birth session is in the archive (or a diary exists)."""
+    from agent import loop
+
+    return not loop.is_birth(services)
+
+
 def guarded(services, fn: Callable[..., Awaitable], *args, name: str = "") -> Callable[[], Awaitable[None]]:
     """Wrap a coroutine function so it is skipped while paused or while another session is still running."""
 
@@ -45,6 +54,9 @@ def guarded(services, fn: Callable[..., Awaitable], *args, name: str = "") -> Ca
         job = name or getattr(fn, "__name__", "job")
         if pause.is_paused(services.cfg.state_dir):
             log.info("paused; skipping %s", job)
+            return
+        if job != "birth" and not born(services):
+            log.info("not born yet; skipping %s", job)
             return
         if RUN_LOCK.locked():
             log.warning("another session is still running; skipping %s", job)
@@ -93,15 +105,16 @@ def make_scheduler(services, run_sitting, run_sleep) -> AsyncIOScheduler:
 
     add(guarded(services, run_sitting, services, "wake", name="wake"), cron(cfg.wake, WEEKDAYS), "wake", "wake")
 
-    # Birth-day exception: if she was born on a Sunday, she still wakes at 07:00 that day.
-    # Once a diary exists this job is a no-op forever.
-    async def sunday_birth() -> None:
-        diary = Path(cfg.repo_dir) / "memory" / "diary"
-        if any(diary.glob("*.md")):
-            return
-        await guarded(services, run_sitting, services, "wake", name="birth")()
-
-    add(sunday_birth, cron(cfg.wake, "sun"), "sunday-birth", "sunday birth")
+    # Birth: a one-off job at BIRTH_AT (HH:MM, her timezone) on the day the service starts —
+    # only if she hasn't been born. Every other job waits for it (see guarded()).
+    birth_at = os.environ.get("BIRTH_AT", "").strip()
+    if birth_at and not born(services):
+        h, m = _hm(birth_at)
+        when = datetime.now(ZoneInfo(cfg.tz)).replace(hour=h, minute=m, second=0, microsecond=0)
+        if when < datetime.now(ZoneInfo(cfg.tz)):
+            when += timedelta(days=1)
+        sched.add_job(guarded(services, run_sitting, services, "wake", name="birth"),
+                      DateTrigger(run_date=when), id="birth", name="birth", **JOB_DEFAULTS)
     for t in cfg.sittings:
         add(guarded(services, run_sitting, services, "sitting", name=f"sitting {t}"),
             cron(t, WEEKDAYS), f"sitting-{t}", f"sitting {t}")

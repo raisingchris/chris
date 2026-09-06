@@ -9,6 +9,9 @@ from agent.config import Config
 
 
 class FakeArchive:
+    def any(self, kind, payload_kind=None):
+        return any(r[0] == kind and (payload_kind is None or r[1].get('kind') == payload_kind) for r in self.entries)
+
     def __init__(self):
         self.entries: list[tuple[str, dict]] = []
 
@@ -112,6 +115,8 @@ def make_services(tmp_path: Path, **cfg_overrides) -> SimpleNamespace:
     )
     return SimpleNamespace(
         cfg=cfg,
+        repo_dir=repo,
+        state_dir=state,
         archive=FakeArchive(),
         card=FakeCard(),
         mail=FakeMail(),

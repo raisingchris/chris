@@ -190,6 +190,7 @@ async def test_sleep_uses_configured_max_turns(services, repo):
 
 async def test_guarded_skips_overlapping_session(tmp_path):
     services = make_services(tmp_path)
+    (Path(services.cfg.repo_dir) / "memory" / "diary" / "2026-09-05.md").write_text("born")
     started = asyncio.Event()
     release = asyncio.Event()
     ran = []
