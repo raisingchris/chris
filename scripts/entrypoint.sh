@@ -18,7 +18,7 @@ if [ ! -d /data/repo/.git ]; then
   chmod -R g+w /data/repo; find /data/repo -type d -exec chmod g+s {} +
 fi
 su brain -c "cd /data/repo && git config user.name Chris && git config user.email chris@raisingchris.com && git config --global --add safe.directory /data/repo"
-su chris -c "git config --global --add safe.directory /data/repo"
+su chris -c "git config --global --add safe.directory /data/repo && git config --global user.name Chris && git config --global user.email chris@raisingchris.com"
 
 # Invariant: vows and constitution are not hers to change. Root-owned, read-only, every boot.
 for f in soul/vows.md soul/constitution.md; do
