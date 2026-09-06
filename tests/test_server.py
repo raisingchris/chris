@@ -1,4 +1,4 @@
-"""HTTP: health, webhooks, parent admin (sign-in restricted to parents, handle-only session)."""
+"""HTTP: health, webhooks, parent admin (shared-password sign-in, handle-only session)."""
 
 import base64
 import json
@@ -13,24 +13,7 @@ from agent import pause
 from agent.server import create_app, record_vote, sign_svix, verify_svix
 
 SECRET = "whsec_" + base64.b64encode(b"0123456789abcdef0123456789abcdef").decode()
-
-
-class FakeGoogle:
-    def __init__(self, email):
-        self.email = email
-
-    async def authorize_redirect(self, request, redirect_uri):
-        from fastapi.responses import RedirectResponse
-
-        return RedirectResponse("https://accounts.google.com/o/oauth2/auth?fake=1")
-
-    async def authorize_access_token(self, request):
-        return {"userinfo": {"email": self.email, "email_verified": True}}
-
-
-class FakeOAuth:
-    def __init__(self, email):
-        self.google = FakeGoogle(email)
+PASSWORD = "correct horse battery staple"
 
 
 @pytest.fixture
@@ -44,7 +27,7 @@ def env(monkeypatch, tmp_path):
     monkeypatch.setenv("RESEND_WEBHOOK_SECRET", SECRET)
     monkeypatch.setenv("STRIPE_WEBHOOK_SECRET", "whsec_stripe")
     monkeypatch.setenv("LESSONS_DIR", str(tmp_path / "lessons"))
-    monkeypatch.delenv("GOOGLE_CLIENT_ID", raising=False)
+    monkeypatch.setenv("PARENT_PASSWORD", PASSWORD)
 
 
 @pytest.fixture
@@ -53,10 +36,9 @@ def client(services, env):
     return TestClient(app)
 
 
-def sign_in(client, email):
-    """Drive the OAuth callback with a fake Google that returns ``email``."""
-    client.app.state.oauth = FakeOAuth(email)
-    return client.get("/parent/auth", follow_redirects=False)
+def sign_in(client, handle, password=PASSWORD):
+    """Post the shared password as ``handle``."""
+    return client.post("/parent/login", data={"handle": handle, "password": password}, follow_redirects=False)
 
 
 # --- health ---------------------------------------------------------------------
@@ -129,17 +111,33 @@ def test_admin_redirects_to_login_when_signed_out(client):
     assert client.post("/parent/pause", data={"reason": "x" * 20}, follow_redirects=False).status_code == 303
 
 
-def test_login_unconfigured_is_503(client):
-    assert client.get("/parent/login", follow_redirects=False).status_code == 503
+def test_login_form_renders(client):
+    r = client.get("/parent/login")
+    assert r.status_code == 200
+    assert 'name="handle"' in r.text and 'name="password"' in r.text
+    assert 'value="parent-a"' in r.text and 'value="parent-b"' in r.text
 
 
-def test_admin_403_for_non_parent_email(client):
-    assert sign_in(client, "stranger@example.com").status_code == 403
+def test_login_unconfigured_is_503(client, monkeypatch):
+    monkeypatch.delenv("PARENT_PASSWORD")
+    assert client.get("/parent/login").status_code == 503
+    assert sign_in(client, "parent-a").status_code == 503
+
+
+def test_wrong_password_is_401_and_stays_signed_out(client):
+    r = sign_in(client, "parent-a", "nope")
+    assert r.status_code == 401
+    assert "Wrong password." in r.text
     assert client.get("/parent", follow_redirects=False).status_code == 303  # still signed out
 
 
-def test_parent_signs_in_and_session_holds_handle_not_email(client):
-    r = sign_in(client, "BOB.real@example.com")  # case-insensitive match against parent-b
+def test_unknown_handle_is_400(client):
+    assert sign_in(client, "stranger").status_code == 400
+    assert client.get("/parent", follow_redirects=False).status_code == 303
+
+
+def test_parent_signs_in_and_session_holds_handle(client):
+    r = sign_in(client, "parent-b")
     assert r.status_code == 303 and r.headers["location"] == "/parent"
     cookie = client.cookies.get("parent_session")
     assert cookie
@@ -148,7 +146,21 @@ def test_parent_signs_in_and_session_holds_handle_not_email(client):
     page = client.get("/parent")
     assert page.status_code == 200
     assert "Signed in as parent-b" in page.text
-    assert "example.com" not in page.text
+
+    client.get("/parent/logout")
+    assert client.get("/parent", follow_redirects=False).status_code == 303
+
+
+def test_login_locks_out_after_five_failures(client):
+    for _ in range(5):
+        assert sign_in(client, "parent-a", "nope").status_code == 401
+    assert sign_in(client, "parent-a", "nope").status_code == 429
+    assert sign_in(client, "parent-a").status_code == 429  # even the right password, while locked
+    assert client.get("/parent", follow_redirects=False).status_code == 303
+
+    limiter = client.app.state.login_limiter
+    limiter._locked["testclient"] = time.time() - 1  # lockout expired
+    assert sign_in(client, "parent-a").status_code == 303
 
 
 # --- status page --------------------------------------------------------------------
@@ -160,7 +172,7 @@ def test_status_page_renders(client, services, tmp_path):
     (repo / "memory" / "wiki" / "self" / "odometer.md").write_text("# Odometer\n\n1 in world-days, 3 loops closed, 37 loops to Explore.\n")
     (repo / "governance" / "proposals" / "p-1.md").write_text("# Proposal 1\n")
     services.mail.unread = ["a.md", "b.md"]
-    sign_in(client, "alice.real@example.com")
+    sign_in(client, "parent-a")
     page = client.get("/parent").text
     assert "Running" in page
     assert "$4.20 of $15 soft / $25 hard" in page
@@ -179,7 +191,7 @@ def test_status_page_shows_next_runs_with_scheduler(services, env):
         pass
 
     client = TestClient(create_app(services, make_scheduler(services, noop, noop)))
-    sign_in(client, "alice.real@example.com")
+    sign_in(client, "parent-a")
     page = client.get("/parent").text
     assert "sitting 09:00" in page and "sleep" in page
 
@@ -188,7 +200,7 @@ def test_status_page_shows_next_runs_with_scheduler(services, env):
 
 
 def test_pause_requires_reason(client, services):
-    sign_in(client, "alice.real@example.com")
+    sign_in(client, "parent-a")
     r = client.post("/parent/pause", data={"reason": "short"})
     assert r.status_code == 400
     assert "at least ten characters" in r.text
@@ -223,14 +235,14 @@ def test_vote_endpoint_both_needed_and_either_vetoes(client, services):
     for pid in ("p-1", "p-2"):
         (repo / "governance" / "proposals" / f"{pid}.md").write_text(f"# {pid}\n")
 
-    sign_in(client, "alice.real@example.com")
+    sign_in(client, "parent-a")
     client.post("/parent/vote", data={"proposal_id": "p-1", "vote": "ratify"})
     assert "## Result" not in (repo / "governance" / "proposals" / "p-1.md").read_text()
     client.post("/parent/vote", data={"proposal_id": "p-2", "vote": "veto", "reason": "Not yet; too expensive."})
     assert "Vetoed by a parent. Reason: Not yet; too expensive." in (repo / "governance" / "proposals" / "p-2.md").read_text()
 
     client.get("/parent/logout")
-    sign_in(client, "bob.real@example.com")
+    sign_in(client, "parent-b")
     client.post("/parent/vote", data={"proposal_id": "p-1", "vote": "ratify"})
     assert "Ratified by both parents." in (repo / "governance" / "proposals" / "p-1.md").read_text()
     assert client.post("/parent/vote", data={"proposal_id": "nope", "vote": "ratify"}).status_code == 404
@@ -246,7 +258,7 @@ def test_unseal_lesson(client, services, tmp_path):
     lessons.mkdir()
     (lessons / "03.md").write_text("# On being wrong in public\n\nSay so.\n")
     repo = Path(services.cfg.repo_dir)
-    sign_in(client, "bob.real@example.com")
+    sign_in(client, "parent-b")
 
     assert client.post("/parent/unseal", data={"n": "4"}).status_code == 404
     r = client.post("/parent/unseal", data={"n": "3"}, follow_redirects=False)
@@ -262,7 +274,7 @@ def test_unseal_lesson(client, services, tmp_path):
 
 
 def test_allowance(client, services):
-    sign_in(client, "alice.real@example.com")
+    sign_in(client, "parent-a")
     r = client.post("/parent/allowance", data={"weekly_usd": "80", "per_txn_usd": "25"}, follow_redirects=False)
     assert r.status_code == 303
     assert ("set_limits", 80.0, 25.0) in services.card.calls
@@ -276,7 +288,7 @@ def test_veto_requires_reason_ratify_does_not(client, services):
     repo = Path(services.cfg.repo_dir)
     for pid in ("v-1", "v-2"):
         (repo / "governance" / "proposals" / f"{pid}.md").write_text(f"# {pid}\n")
-    sign_in(client, "alice.real@example.com")
+    sign_in(client, "parent-a")
 
     r = client.post("/parent/vote", data={"proposal_id": "v-1", "vote": "veto"})
     assert r.status_code == 400 and "reason" in r.text

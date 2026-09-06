@@ -62,7 +62,7 @@ def main() -> None:
     app = create_app(services, scheduler)  # lifespan starts/stops the scheduler
     port = int(os.environ.get("PORT", "8080"))
     log.info("serving on :%d, tz %s", port, cfg.tz)
-    uvicorn.run(app, host="0.0.0.0", port=port, log_config=None)
+    uvicorn.run(app, host="0.0.0.0", port=port, log_config=None, proxy_headers=True, forwarded_allow_ips="*")
 
 
 if __name__ == "__main__":

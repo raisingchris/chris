@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}parent sign-in{% endblock %}
+{% block body %}
+<h1>Parent sign-in</h1>
+{% if error %}<p class="err">{{ error }}</p>{% endif %}
+<form method="post" action="/parent/login">
+  <label>Who are you?</label>
+  <select name="handle" required>
+    {% for h in handles %}<option value="{{ h }}"{% if h == handle %} selected{% endif %}>{{ h }}</option>{% endfor %}
+  </select>
+  <label>Password</label>
+  <input type="password" name="password" autocomplete="current-password" required autofocus>
+  <button type="submit">Sign in</button>
+</form>
+{% endblock %}

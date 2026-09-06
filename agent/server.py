@@ -1,12 +1,13 @@
 """HTTP face of chris-brain: health, inbound webhooks, and the parents' page.
 
-``/parent`` is Google sign-in restricted to the two parent addresses. The
-session stores only the handle (``parent-a`` / ``parent-b``); the real address
-is compared once at login and never written anywhere. Every admin action is
-archived as ``parent_action`` with the handle.
+``/parent`` is a shared-password login: both parents know one password and
+each picks which handle (``parent-a`` / ``parent-b``) they are. The session
+stores only the handle. Every admin action is archived as ``parent_action``
+with the handle.
 
-Env: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, SESSION_SECRET, RESEND_WEBHOOK_SECRET,
-STRIPE_WEBHOOK_SECRET, LESSONS_DIR (default /data/lessons).
+Env: SESSION_SECRET, RESEND_WEBHOOK_SECRET, STRIPE_WEBHOOK_SECRET,
+LESSONS_DIR (default /data/lessons).
+Password: PARENT_PASSWORD — the shared parent login password; unset → /parent/login is 503.
 """
 
 from __future__ import annotations
@@ -88,15 +89,41 @@ def sign_svix(msg_id: str, ts: int, body: bytes | str, secret: str) -> str:
 # --- helpers -----------------------------------------------------------------
 
 
-def handle_for_email(cfg, email: str) -> str | None:
-    e = (email or "").strip().lower()
-    if not e:
-        return None
-    if e == (cfg.parent_a_email or "").strip().lower():
-        return "parent-a"
-    if e == (cfg.parent_b_email or "").strip().lower():
-        return "parent-b"
-    return None
+LOGIN_MAX_FAILURES = 5
+LOGIN_WINDOW_S = 10 * 60
+LOGIN_LOCKOUT_S = 10 * 60
+
+
+class LoginLimiter:
+    """Crude in-memory limiter: N failures from one IP within a window → locked out for a while."""
+
+    def __init__(self, max_failures=LOGIN_MAX_FAILURES, window_s=LOGIN_WINDOW_S, lockout_s=LOGIN_LOCKOUT_S):
+        self.max_failures, self.window_s, self.lockout_s = max_failures, window_s, lockout_s
+        self._failures: dict[str, list[float]] = {}
+        self._locked: dict[str, float] = {}
+
+    def is_locked(self, ip: str, now: float | None = None) -> bool:
+        now = time.time() if now is None else now
+        until = self._locked.get(ip)
+        if until is None:
+            return False
+        if now < until:
+            return True
+        del self._locked[ip]
+        return False
+
+    def fail(self, ip: str, now: float | None = None) -> None:
+        now = time.time() if now is None else now
+        recent = [t for t in self._failures.get(ip, []) if now - t < self.window_s]
+        recent.append(now)
+        self._failures[ip] = recent
+        if len(recent) >= self.max_failures:
+            self._locked[ip] = now + self.lockout_s
+            self._failures.pop(ip, None)
+
+    def reset(self, ip: str) -> None:
+        self._failures.pop(ip, None)
+        self._locked.pop(ip, None)
 
 
 def _slug(text: str, limit: int = 40) -> str:
@@ -150,22 +177,10 @@ def create_app(services, scheduler=None) -> FastAPI:
         session_cookie="parent_session",
         https_only=not cfg.dry_run,
         same_site="lax",
-        max_age=12 * 3600,
+        max_age=30 * 24 * 3600,
     )
 
-    # OAuth client; tests may replace app.state.oauth with a fake exposing .google
-    from authlib.integrations.starlette_client import OAuth
-
-    oauth = OAuth()
-    if os.environ.get("GOOGLE_CLIENT_ID"):
-        oauth.register(
-            "google",
-            server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-            client_id=os.environ["GOOGLE_CLIENT_ID"],
-            client_secret=os.environ.get("GOOGLE_CLIENT_SECRET", ""),
-            client_kwargs={"scope": "openid email"},
-        )
-    app.state.oauth = oauth
+    app.state.login_limiter = LoginLimiter()
     app.state.services = services
     app.state.scheduler = scheduler
 
@@ -186,29 +201,37 @@ def create_app(services, scheduler=None) -> FastAPI:
     async def _not_signed_in(request: Request, exc: NotSignedIn):
         return RedirectResponse("/parent/login", status_code=303)
 
-    @app.get("/parent/login")
-    async def login(request: Request):
-        google = getattr(request.app.state.oauth, "google", None)
-        if google is None:
-            raise HTTPException(503, "sign-in not configured")
-        redirect_uri = str(request.url_for("auth_callback"))
-        if not cfg.dry_run:
-            redirect_uri = redirect_uri.replace("http://", "https://", 1)
-        return await google.authorize_redirect(request, redirect_uri)
+    def login_page(request: Request, handle: str = "", error: str | None = None, status_code: int = 200):
+        return templates.TemplateResponse(
+            request, "login.html",
+            {"request": request, "handles": cfg.parent_handles, "handle": handle, "error": error},
+            status_code=status_code,
+        )
 
-    @app.get("/parent/auth", name="auth_callback")
-    async def auth_callback(request: Request):
-        google = getattr(request.app.state.oauth, "google", None)
-        if google is None:
-            raise HTTPException(503, "sign-in not configured")
-        token = await google.authorize_access_token(request)
-        info = token.get("userinfo") or {}
-        if not info and hasattr(google, "userinfo"):
-            info = await google.userinfo(token=token)
-        handle = handle_for_email(cfg, info.get("email", ""))
-        if handle is None or not info.get("email_verified", True):
-            request.session.clear()
-            raise HTTPException(403, "not a parent")
+    def _client_ip(request: Request) -> str:
+        return request.client.host if request.client else "?"
+
+    @app.get("/parent/login", response_class=HTMLResponse)
+    async def login(request: Request):
+        if not os.environ.get("PARENT_PASSWORD"):
+            raise HTTPException(503, "login not configured")
+        return login_page(request)
+
+    @app.post("/parent/login", response_class=HTMLResponse)
+    async def login_submit(request: Request, handle: str = Form(""), password: str = Form("")):
+        expected = os.environ.get("PARENT_PASSWORD")
+        if not expected:
+            raise HTTPException(503, "login not configured")
+        limiter: LoginLimiter = request.app.state.login_limiter
+        ip = _client_ip(request)
+        if limiter.is_locked(ip):
+            raise HTTPException(429, "too many failed logins; try again later")
+        if handle not in cfg.parent_handles:
+            raise HTTPException(400, "unknown handle")
+        if not hmac.compare_digest(password.encode(), expected.encode()):
+            limiter.fail(ip)
+            return login_page(request, handle=handle, error="Wrong password.", status_code=401)
+        limiter.reset(ip)
         request.session.clear()
         request.session["handle"] = handle
         return RedirectResponse("/parent", status_code=303)
