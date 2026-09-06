@@ -21,7 +21,6 @@ dependencies = [
   "python-frontmatter>=1.1",
   "pytz",
   "playwright>=1.47",
-  "PyJWT[crypto]>=2.8",
 ]
 
 [project.optional-dependencies]

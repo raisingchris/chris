@@ -1,40 +1,44 @@
-"""Nightly off-box backup of Chris's private state to a write-only GCS bucket.
+"""Nightly off-box backup of Chris's private state to a private git repo.
 
-Tars ``archive_dir``, ``state_dir`` and the council minutes into one gzip and
-uploads it, plus today's archive JSONL on its own, to an append-only bucket.
-Objects carry the time of day so nothing is ever overwritten.
+Copies ``archive_dir``, ``state_dir`` and the council minutes into a local
+clone (``<state_dir>/../backup-repo``, under ``archive/``, ``state/`` and
+``council_minutes/``), commits as Chris and pushes. Files are only ever added
+or updated in the clone, never deleted, so the history is append-only.
 
-Env (brain-only): ``GCS_ARCHIVE_BUCKET`` and ``GCS_ARCHIVE_SA_JSON`` — the
-service-account key as JSON. Without both the backup is skipped and archived
-as such. No Google SDK: a self-signed RS256 JWT is exchanged for a bearer
-token over plain HTTPS, then the bytes are posted to the JSON upload API.
-The key never appears in logs or the archive — only error *types* do.
+Env (brain-only): ``BACKUP_GIT_URL`` — the ssh URL of a private repo — and
+``BACKUP_DEPLOY_KEY`` — the private key text. Without both the backup is
+skipped and archived as such. The key is written once to
+``<state_dir>/../backup_key`` (mode 600) and handed to git only by path via
+``GIT_SSH_COMMAND``; its text never reaches a command line, a log line or an
+archive record — only error *types* and a scrubbed stderr excerpt do.
+
+Every git call goes through an injectable runner (``run=``, as in
+:mod:`agent.gitops`) built from :func:`agent.gitops.git_env`: a from-scratch
+environment with hooks disabled on the command line.
 """
 
 from __future__ import annotations
 
-import io
-import json
 import logging
 import os
-import tarfile
-import tempfile
-import time
+import shutil
+import subprocess
 from datetime import datetime
 from pathlib import Path
+from typing import Callable
 from zoneinfo import ZoneInfo
 
-import httpx
-import jwt
+from agent import gitops
 
 log = logging.getLogger("chris.backup")
 
-TOKEN_URL = "https://oauth2.googleapis.com/token"
-UPLOAD_URL = "https://storage.googleapis.com/upload/storage/v1/b/{bucket}/o"
-SCOPE = "https://www.googleapis.com/auth/devstorage.write_only"
-PREFIX = "chris"
-JWT_TTL_S = 3600
-HTTP_TIMEOUT_S = 120
+KEY_FILE = "backup_key"
+REPO_DIR = "backup-repo"
+BRANCH = "main"
+GIT_TIMEOUT_S = 600
+STDERR_EXCERPT = 300
+
+Runner = Callable[..., subprocess.CompletedProcess]
 
 
 def backup_dirs(cfg) -> list[Path]:
@@ -44,111 +48,146 @@ def backup_dirs(cfg) -> list[Path]:
     return [Path(cfg.archive_dir), state, minutes]
 
 
-def make_tarball(dirs: list[Path], out: Path) -> int:
-    """Write a gzip tar of every existing directory in ``dirs`` (each under its own basename); return its size."""
-    with tarfile.open(out, "w:gz") as tar:
-        for d in dirs:
-            if d.is_dir():
-                tar.add(d, arcname=d.name)
-    return out.stat().st_size
+def backup_paths(cfg) -> tuple[Path, Path]:
+    """(key file, clone dir), both siblings of ``state_dir``."""
+    base = Path(cfg.state_dir).parent
+    return base / KEY_FILE, base / REPO_DIR
 
 
-def build_jwt(sa: dict, now: float | None = None, scope: str = SCOPE) -> str:
-    """Self-signed RS256 assertion for the OAuth2 JWT-bearer grant."""
-    iat = int(now if now is not None else time.time())
-    claims = {
-        "iss": sa["client_email"],
-        "scope": scope,
-        "aud": TOKEN_URL,
-        "iat": iat,
-        "exp": iat + JWT_TTL_S,
-    }
-    headers = {"kid": sa["private_key_id"]} if sa.get("private_key_id") else None
-    return jwt.encode(claims, sa["private_key"], algorithm="RS256", headers=headers)
+def ssh_command(key_path: Path) -> str:
+    return f"ssh -i {key_path} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
 
 
-def fetch_access_token(http: httpx.Client, sa: dict) -> str:
-    r = http.post(
-        TOKEN_URL,
-        data={"grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer", "assertion": build_jwt(sa)},
-        timeout=HTTP_TIMEOUT_S,
-    )
-    if r.status_code != 200:
-        raise RuntimeError(f"token exchange returned {r.status_code}")
-    token = r.json().get("access_token")
-    if not token:
-        raise RuntimeError("token exchange returned no access_token")
-    return token
+def make_runner(key_path: Path) -> Runner:
+    """A git runner in the style of :func:`agent.gitops.git`, keyed to the backup deploy key."""
+
+    def run(repo_dir: str | Path, *args: str, check: bool = True) -> subprocess.CompletedProcess:
+        env = gitops.git_env(gitops.CHRIS)
+        env["GIT_SSH_COMMAND"] = ssh_command(key_path)
+        return subprocess.run(
+            ["git", *gitops.GIT_FLAGS, *args], cwd=str(repo_dir), env=env,
+            capture_output=True, text=True, check=check, timeout=GIT_TIMEOUT_S,
+        )
+
+    return run
 
 
-def upload_object(http: httpx.Client, token: str, bucket: str, name: str, data: bytes | io.IOBase,
-                  content_type: str = "application/octet-stream") -> None:
-    """Media upload of one object. Raises on any non-2xx (409 = already exists, i.e. append-only violated)."""
-    r = http.post(
-        UPLOAD_URL.format(bucket=bucket),
-        params={"uploadType": "media", "name": name},
-        headers={"Authorization": f"Bearer {token}", "Content-Type": content_type},
-        content=data,
-        timeout=HTTP_TIMEOUT_S,
-    )
-    if not (200 <= r.status_code < 300):
-        raise RuntimeError(f"upload of {name} returned {r.status_code}")
+def ensure_key(key_path: Path, key_text: str) -> bool:
+    """Write the deploy key (mode 600) if it is not there yet. Returns True if written."""
+    if key_path.exists():
+        return False
+    key_path.parent.mkdir(parents=True, exist_ok=True)
+    text = key_text if key_text.endswith("\n") else key_text + "\n"
+    fd = os.open(key_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(fd, "w") as f:
+        f.write(text)
+    os.chmod(key_path, 0o600)
+    return True
 
 
-def run_backup(services, http: httpx.Client | None = None, env: dict[str, str] | None = None) -> dict:
-    """Tar + upload; archives ``backup_skipped`` / ``backup_done`` / ``backup_failed``. Never raises."""
+def _stderr(r) -> str:
+    return str(getattr(r, "stderr", "") or "")
+
+
+def clone_repo(repo: Path, url: str, run: Runner) -> str:
+    """Clone into ``repo``; an empty remote becomes ``git init`` + ``remote add``. Returns "clone" or "init"."""
+    repo.parent.mkdir(parents=True, exist_ok=True)
+    r = run(repo.parent, "clone", url, str(repo), check=False)
+    if getattr(r, "returncode", 0) == 0:
+        return "clone"
+    if "empty repository" not in _stderr(r).lower():
+        raise subprocess.CalledProcessError(r.returncode, ["git", "clone"], r.stdout, r.stderr)
+    shutil.rmtree(repo, ignore_errors=True)
+    repo.mkdir(parents=True, exist_ok=True)
+    run(repo, "init")
+    run(repo, "symbolic-ref", "HEAD", f"refs/heads/{BRANCH}")
+    run(repo, "remote", "add", "origin", url)
+    return "init"
+
+
+def ensure_repo(repo: Path, url: str, run: Runner) -> str:
+    """Bring the clone up to date; a clone that will not pull is thrown away and cloned afresh."""
+    if not (repo / ".git").is_dir():
+        return clone_repo(repo, url, run)
+    r = run(repo, "pull", "--rebase", check=False)
+    if getattr(r, "returncode", 0) == 0:
+        return "pull"
+    log.warning("backup clone would not pull; re-cloning")
+    shutil.rmtree(repo, ignore_errors=True)
+    return "re" + clone_repo(repo, url, run)
+
+
+def sync_dir(src: Path, dst: Path) -> int:
+    """Copy new or changed files from ``src`` into ``dst`` (never deleting); returns the number copied."""
+    if not src.is_dir():
+        return 0
+    copied = 0
+    for path in sorted(src.rglob("*")):
+        if not path.is_file():
+            continue
+        target = dst / path.relative_to(src)
+        try:
+            same = target.is_file() and target.stat().st_size == path.stat().st_size \
+                and int(target.stat().st_mtime) >= int(path.stat().st_mtime)
+        except OSError:
+            same = False
+        if same:
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, target)
+        copied += 1
+    return copied
+
+
+def sync_all(cfg, repo: Path) -> int:
+    archive, state, minutes = backup_dirs(cfg)
+    return (sync_dir(archive, repo / "archive") + sync_dir(state, repo / "state")
+            + sync_dir(minutes, repo / "council_minutes"))
+
+
+def scrub(text: str, key_path: Path, key_text: str) -> str:
+    """Remove the key (and its path) from anything that might be stored."""
+    text = text.replace(key_text.strip(), "<key>") if key_text.strip() else text
+    return text.replace(str(key_path), "<key-path>")
+
+
+def run_backup(services, env: dict[str, str] | None = None, run: Runner | None = None) -> dict:
+    """Copy + commit + push; archives ``backup_skipped`` / ``backup_done`` / ``backup_failed``. Never raises."""
     e = os.environ if env is None else env
     cfg = services.cfg
-    bucket = e.get("GCS_ARCHIVE_BUCKET", "").strip()
-    sa_json = e.get("GCS_ARCHIVE_SA_JSON", "")
-    if not bucket or not sa_json:
-        missing = [k for k, v in (("GCS_ARCHIVE_BUCKET", bucket), ("GCS_ARCHIVE_SA_JSON", sa_json)) if not v]
+    url = e.get("BACKUP_GIT_URL", "").strip()
+    key_text = e.get("BACKUP_DEPLOY_KEY", "")
+    if not url or not key_text.strip():
+        missing = [k for k, v in (("BACKUP_GIT_URL", url), ("BACKUP_DEPLOY_KEY", key_text.strip())) if not v]
         log.info("backup skipped: %s not set", ", ".join(missing))
         payload = {"kind": "backup_skipped", "missing": missing}
         services.archive.append("backup", payload)
         return payload
 
-    now = datetime.now(ZoneInfo(cfg.tz))
-    day, hhmm = now.strftime("%Y-%m-%d"), now.strftime("%H%M")
-    tar_name = f"{PREFIX}/{day}/state-{hhmm}.tar.gz"
-    jsonl_name = f"{PREFIX}/{day}/archive-{day}.jsonl"
-    objects: list[str] = []
-    total = 0
-    own_client = http is None
-    tmp = None
+    key_path, repo = backup_paths(cfg)
     try:
-        sa = json.loads(sa_json)
-        if http is None:
-            http = httpx.Client()
-        with tempfile.NamedTemporaryFile(prefix="chris-backup-", suffix=".tar.gz", delete=False) as f:
-            tmp = Path(f.name)
-        size = make_tarball(backup_dirs(cfg), tmp)
-        token = fetch_access_token(http, sa)
-        with open(tmp, "rb") as f:
-            upload_object(http, token, bucket, tar_name, f, "application/gzip")
-        objects.append(tar_name)
-        total += size
-        jsonl = Path(cfg.archive_dir) / f"{day}.jsonl"
-        if jsonl.is_file():
-            data = jsonl.read_bytes()
-            upload_object(http, token, bucket, jsonl_name, data, "application/x-ndjson")
-            objects.append(jsonl_name)
-            total += len(data)
+        ensure_key(key_path, key_text)
+        if run is None:
+            run = make_runner(key_path)
+        ensure_repo(repo, url, run)
+        files = sync_all(cfg, repo)
+        run(repo, "add", "-A")
+        if not gitops.has_changes(repo, run):
+            payload = {"kind": "backup_done", "changed": False, "commit": None, "files": files}
+        else:
+            ts = datetime.now(ZoneInfo(cfg.tz)).isoformat(timespec="seconds")
+            run(repo, "commit", "-m", f"backup {ts}")
+            sha = str(run(repo, "rev-parse", "HEAD").stdout).strip()[:7]
+            run(repo, "push", "-u", "origin", "HEAD")
+            payload = {"kind": "backup_done", "changed": True, "commit": sha, "files": files}
     except Exception as exc:  # noqa: BLE001 — never let the key or its errors escape
         err = type(exc).__name__
+        raw = _stderr(exc) if isinstance(exc, subprocess.CalledProcessError) else str(exc)
         log.warning("backup failed: %s", err)
-        payload = {"kind": "backup_failed", "error": err, "objects": objects, "bytes": total}
+        payload = {"kind": "backup_failed", "error": err,
+                   "stderr": scrub(raw, key_path, key_text).strip()[:STDERR_EXCERPT]}
         services.archive.append("backup", payload)
         return payload
-    finally:
-        if tmp is not None:
-            try:
-                tmp.unlink()
-            except OSError:
-                pass
-        if own_client and http is not None:
-            http.close()
-    log.info("backup done: %d object(s), %d bytes", len(objects), total)
-    payload = {"kind": "backup_done", "bucket": bucket, "objects": objects, "bytes": total}
+    log.info("backup done: changed=%s files=%d commit=%s", payload["changed"], files, payload["commit"])
     services.archive.append("backup", payload)
     return payload

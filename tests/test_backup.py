@@ -1,167 +1,235 @@
-"""Nightly GCS backup: skip path, JWT-signed token exchange, object names, failure without leaking the key."""
+"""Nightly git backup: skip path, first-run clone, copy+commit+push, nothing-changed, failure without the key."""
 
-import io
 import json
-import tarfile
+import os
+import stat
+import subprocess
 from pathlib import Path
 
-import httpx
-import jwt
 import pytest
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
 from fake_services import make_services
 from freezegun import freeze_time
 
 from agent import backup
-from agent.backup import SCOPE, TOKEN_URL, run_backup
+from agent.backup import run_backup
 
-BUCKET = "chris-private-archive"
-
-
-@pytest.fixture(scope="module")
-def keypair():
-    key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-    pem = key.private_bytes(
-        serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()
-    ).decode()
-    pub = key.public_key().public_bytes(
-        serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo
-    ).decode()
-    return pem, pub
+URL = "git@github.com:raisingchris/chris-private.git"
+KEY = "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAAsecretsecretsecret\n-----END OPENSSH PRIVATE KEY-----\n"
+SHA = "0123456789abcdef0123456789abcdef01234567"
 
 
 @pytest.fixture
-def sa(keypair):
-    pem, _ = keypair
-    return {
-        "type": "service_account",
-        "client_email": "chris-backup@example.iam.gserviceaccount.com",
-        "private_key_id": "kid-123",
-        "private_key": pem,
-    }
+def env():
+    return {"BACKUP_GIT_URL": URL, "BACKUP_DEPLOY_KEY": KEY}
 
 
 @pytest.fixture
-def env(sa):
-    return {"GCS_ARCHIVE_BUCKET": BUCKET, "GCS_ARCHIVE_SA_JSON": json.dumps(sa)}
-
-
-@pytest.fixture
-def services(tmp_path):
+def services(tmp_path, monkeypatch):
     s = make_services(tmp_path)
-    (Path(s.cfg.archive_dir)).mkdir(parents=True, exist_ok=True)
+    Path(s.cfg.archive_dir).mkdir(parents=True, exist_ok=True)
     (Path(s.cfg.archive_dir) / "2026-09-06.jsonl").write_text('{"kind":"x"}\n')
     (Path(s.cfg.state_dir) / "last_runs.json").write_text("{}")
-    minutes = tmp_path / "council_minutes"
+    minutes = Path(s.cfg.state_dir).parent / "council_minutes"
     minutes.mkdir()
     (minutes / "2026-09-01.md").write_text("minutes")
+    monkeypatch.setenv("COUNCIL_MINUTES_DIR", str(minutes))
     return s
 
 
-class Recorder:
-    """MockTransport handler that records every request and plays a scripted response."""
+class FakeGit:
+    """Records every git command; plays scripted results. ``clone``/``init`` create the ``.git`` marker."""
 
-    def __init__(self, token_status=200, upload_status=200):
-        self.requests: list[httpx.Request] = []
-        self.token_status, self.upload_status = token_status, upload_status
+    def __init__(self, *, clone_stderr=None, pull_rc=0, dirty=True, fail=None):
+        self.calls: list[tuple[str, tuple[str, ...]]] = []
+        self.clone_stderr, self.pull_rc, self.dirty, self.fail = clone_stderr, pull_rc, dirty, fail
 
-    def __call__(self, request: httpx.Request) -> httpx.Response:
-        self.requests.append(request)
-        if request.url.host == "oauth2.googleapis.com":
-            return httpx.Response(self.token_status, json={"access_token": "ya29.test", "expires_in": 3599})
-        return httpx.Response(self.upload_status, json={"name": request.url.params.get("name")})
+    def __call__(self, repo_dir, *args, check=True):
+        self.calls.append((str(repo_dir), args))
+        cmd = args[0]
+        rc, out, err = 0, "", ""
+        if cmd == "clone":
+            if self.clone_stderr is not None:
+                rc, err = 128, self.clone_stderr
+            else:
+                (Path(args[2]) / ".git").mkdir(parents=True)
+        elif cmd == "init":
+            (Path(repo_dir) / ".git").mkdir(parents=True)
+        elif cmd == "pull":
+            rc = self.pull_rc
+        elif cmd == "status":
+            out = " M state/last_runs.json\n" if self.dirty else ""
+        elif cmd == "rev-parse":
+            out = SHA + "\n"
+        if self.fail and cmd == self.fail[0]:
+            rc, err = 1, self.fail[1]
+        if rc and check:
+            raise subprocess.CalledProcessError(rc, ["git", *args], out, err)
+        return subprocess.CompletedProcess(["git", *args], rc, out, err)
 
-    def client(self) -> httpx.Client:
-        return httpx.Client(transport=httpx.MockTransport(self))
+    def commands(self) -> list[str]:
+        return [a[0] for _, a in self.calls]
+
+    def lines(self) -> str:
+        return "\n".join(" ".join(a) for _, a in self.calls)
 
 
 def test_skipped_without_config(services):
     result = run_backup(services, env={})
     assert result["kind"] == "backup_skipped"
-    assert result["missing"] == ["GCS_ARCHIVE_BUCKET", "GCS_ARCHIVE_SA_JSON"]
+    assert result["missing"] == ["BACKUP_GIT_URL", "BACKUP_DEPLOY_KEY"]
     assert services.archive.entries == [("backup", result)]
 
     services.archive.entries.clear()
-    result = run_backup(services, env={"GCS_ARCHIVE_BUCKET": BUCKET})
-    assert result["kind"] == "backup_skipped" and result["missing"] == ["GCS_ARCHIVE_SA_JSON"]
+    result = run_backup(services, env={"BACKUP_GIT_URL": URL, "BACKUP_DEPLOY_KEY": "  "})
+    assert result["kind"] == "backup_skipped" and result["missing"] == ["BACKUP_DEPLOY_KEY"]
+    key_path, repo = backup.backup_paths(services.cfg)
+    assert not key_path.exists() and not repo.exists()
 
 
 @freeze_time("2026-09-07 02:45:10")  # 22:45 on 2026-09-06 in America/New_York (EDT)
-def test_upload_names_and_jwt(services, env, sa, keypair, monkeypatch):
-    monkeypatch.setenv("COUNCIL_MINUTES_DIR", str(Path(services.cfg.state_dir).parent / "council_minutes"))
-    rec = Recorder()
-    result = run_backup(services, http=rec.client(), env=env)
+def test_first_run_clones_copies_commits_pushes(services, env):
+    git = FakeGit()
+    result = run_backup(services, env=env, run=git)
+    key_path, repo = backup.backup_paths(services.cfg)
 
-    assert result["kind"] == "backup_done"
-    assert result["objects"] == [
-        "chris/2026-09-06/state-2245.tar.gz",
-        "chris/2026-09-06/archive-2026-09-06.jsonl",
-    ]
-    assert result["bytes"] > 0
+    assert result == {"kind": "backup_done", "changed": True, "commit": SHA[:7], "files": 3}
     assert services.archive.entries == [("backup", result)]
 
-    token_req, tar_req, jsonl_req = rec.requests
-    # token exchange: JWT-bearer grant, signed with the SA key, verifiable with its public half
-    assert str(token_req.url) == TOKEN_URL and token_req.method == "POST"
-    form = dict(httpx.QueryParams(token_req.content.decode()))
-    assert form["grant_type"] == "urn:ietf:params:oauth:grant-type:jwt-bearer"
-    _, pub = keypair
-    header = jwt.get_unverified_header(form["assertion"])
-    assert header["alg"] == "RS256" and header["kid"] == "kid-123"
-    claims = jwt.decode(form["assertion"], pub, algorithms=["RS256"], audience=TOKEN_URL)
-    assert claims["iss"] == sa["client_email"] and claims["scope"] == SCOPE
-    assert claims["exp"] - claims["iat"] == 3600
+    # the key landed next to state/, mode 600, and only its *path* is ever handed to git
+    assert key_path.read_text() == KEY
+    assert stat.S_IMODE(key_path.stat().st_mode) == 0o600
+    assert "BEGIN OPENSSH" not in git.lines() and "secretsecret" not in git.lines()
+    assert "secretsecret" not in json.dumps(services.archive.entries)
 
-    # uploads: media upload to the bucket, bearer token, right object names
-    for req, name in ((tar_req, result["objects"][0]), (jsonl_req, result["objects"][1])):
-        assert req.method == "POST"
-        assert req.url.host == "storage.googleapis.com"
-        assert req.url.path == f"/upload/storage/v1/b/{BUCKET}/o"
-        assert req.url.params["uploadType"] == "media" and req.url.params["name"] == name
-        assert req.headers["authorization"] == "Bearer ya29.test"
-    assert jsonl_req.content == b'{"kind":"x"}\n'
+    # the git sequence
+    assert git.calls[0] == (str(repo.parent), ("clone", URL, str(repo)))
+    assert git.commands() == ["clone", "add", "status", "commit", "rev-parse", "push"]
+    assert all(cwd == str(repo) for cwd, _ in git.calls[1:])
+    assert git.calls[1][1] == ("add", "-A")
+    assert git.calls[3][1] == ("commit", "-m", "backup 2026-09-06T22:45:10-04:00")
+    assert git.calls[5][1] == ("push", "-u", "origin", "HEAD")
 
-    # the tarball holds all three private dirs under their basenames
-    with tarfile.open(fileobj=io.BytesIO(tar_req.read()), mode="r:gz") as tar:
-        names = set(tar.getnames())
-    assert {"archive/2026-09-06.jsonl", "state/last_runs.json", "council_minutes/2026-09-01.md"} <= names
-    assert result["bytes"] == len(tar_req.content) + len(jsonl_req.content)
+    # the copy: every private dir under its own top-level name
+    assert (repo / "archive" / "2026-09-06.jsonl").read_text() == '{"kind":"x"}\n'
+    assert (repo / "state" / "last_runs.json").read_text() == "{}"
+    assert (repo / "council_minutes" / "2026-09-01.md").read_text() == "minutes"
 
 
-@freeze_time("2026-09-07 02:45:10")
-def test_no_archive_file_today_uploads_tar_only(services, env):
-    (Path(services.cfg.archive_dir) / "2026-09-06.jsonl").unlink()
-    rec = Recorder()
-    result = run_backup(services, http=rec.client(), env=env)
+def test_default_runner_uses_key_by_path_and_minimal_env(services, monkeypatch):
+    key_path, _ = backup.backup_paths(services.cfg)
+    seen = {}
+
+    def fake_run(argv, **kw):
+        seen.update(argv=argv, **kw)
+        return subprocess.CompletedProcess(argv, 0, "", "")
+
+    monkeypatch.setattr(backup.subprocess, "run", fake_run)
+    backup.make_runner(key_path)("/somewhere", "status", "--porcelain")
+    assert seen["argv"] == ["git", "-c", "core.hooksPath=/dev/null", "-c", "core.fsmonitor=false",
+                            "status", "--porcelain"]
+    assert seen["cwd"] == "/somewhere" and seen["check"] is True
+    env = seen["env"]
+    assert env["GIT_SSH_COMMAND"] == (
+        f"ssh -i {key_path} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new")
+    assert env["GIT_AUTHOR_NAME"] == "Chris" and env["GIT_COMMITTER_EMAIL"] == "chris@raisingchris.com"
+    assert env["GIT_CONFIG_NOSYSTEM"] == "1" and env["GIT_TERMINAL_PROMPT"] == "0"
+    assert set(env) <= {"PATH", "HOME", "TZ", "GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL", "GIT_COMMITTER_NAME",
+                        "GIT_COMMITTER_EMAIL", "GIT_CONFIG_NOSYSTEM", "GIT_TERMINAL_PROMPT", "GIT_SSH_COMMAND"}
+
+
+def test_empty_remote_is_initialised(services, env):
+    git = FakeGit(clone_stderr="warning: You appear to have cloned an empty repository.\nfatal: ...")
+    result = run_backup(services, env=env, run=git)
+    _, repo = backup.backup_paths(services.cfg)
+    assert result["kind"] == "backup_done" and result["changed"] is True
+    assert git.commands()[:4] == ["clone", "init", "symbolic-ref", "remote"]
+    assert git.calls[2][1] == ("symbolic-ref", "HEAD", "refs/heads/main")
+    assert git.calls[3][1] == ("remote", "add", "origin", URL)
+    assert git.commands()[-1] == "push" and (repo / ".git").is_dir()
+
+
+def test_clone_failure_other_than_empty_is_a_failure(services, env):
+    git = FakeGit(clone_stderr="fatal: Could not read from remote repository.")
+    result = run_backup(services, env=env, run=git)
+    assert result["kind"] == "backup_failed" and result["error"] == "CalledProcessError"
+    assert "Could not read" in result["stderr"]
+    assert git.commands() == ["clone"]
+
+
+def test_second_run_pulls_and_keeps_existing_key(services, env):
+    key_path, repo = backup.backup_paths(services.cfg)
+    (repo / ".git").mkdir(parents=True)
+    key_path.write_text("already-there\n")
+    key_path.chmod(0o600)
+    git = FakeGit()
+    result = run_backup(services, env=env, run=git)
+    assert result["kind"] == "backup_done" and result["changed"] is True
+    assert git.commands() == ["pull", "add", "status", "commit", "rev-parse", "push"]
+    assert git.calls[0] == (str(repo), ("pull", "--rebase"))
+    assert key_path.read_text() == "already-there\n"
+
+
+def test_pull_failure_reclones_fresh(services, env):
+    _, repo = backup.backup_paths(services.cfg)
+    (repo / ".git").mkdir(parents=True)
+    (repo / "stale.txt").write_text("stale")
+    git = FakeGit(pull_rc=1)
+    result = run_backup(services, env=env, run=git)
     assert result["kind"] == "backup_done"
-    assert result["objects"] == ["chris/2026-09-06/state-2245.tar.gz"]
-    assert len(rec.requests) == 2
+    assert git.commands() == ["pull", "clone", "add", "status", "commit", "rev-parse", "push"]
+    assert not (repo / "stale.txt").exists() and (repo / "state" / "last_runs.json").exists()
 
 
-def test_failure_archived_without_the_key(services, env, sa):
-    rec = Recorder(upload_status=403)
-    result = run_backup(services, http=rec.client(), env=env)
-    assert result["kind"] == "backup_failed" and result["error"] == "RuntimeError"
-    assert result["objects"] == []
+def test_nothing_changed_still_done(services, env):
+    _, repo = backup.backup_paths(services.cfg)
+    (repo / ".git").mkdir(parents=True)
+    git = FakeGit(dirty=False)
+    result = run_backup(services, env=env, run=git)
+    assert result == {"kind": "backup_done", "changed": False, "commit": None, "files": 3}
+    assert git.commands() == ["pull", "add", "status"]
+
+    # a second pass over unchanged sources copies nothing
+    git2 = FakeGit(dirty=False)
+    assert run_backup(services, env=env, run=git2)["files"] == 0
+
+
+def test_sync_never_deletes_and_only_copies_changes(tmp_path):
+    src, dst = tmp_path / "src", tmp_path / "dst"
+    (src / "sub").mkdir(parents=True)
+    (src / "a.txt").write_text("a")
+    (src / "sub" / "b.txt").write_text("b")
+    dst.mkdir()
+    (dst / "old.txt").write_text("keep me")
+    assert backup.sync_dir(src, dst) == 2
+    assert (dst / "old.txt").read_text() == "keep me"
+    assert (dst / "sub" / "b.txt").read_text() == "b"
+    assert backup.sync_dir(src, dst) == 0
+    (src / "a.txt").write_text("changed!")
+    assert backup.sync_dir(src, dst) == 1 and (dst / "a.txt").read_text() == "changed!"
+    assert backup.sync_dir(tmp_path / "missing", dst) == 0
+
+
+def test_failure_archived_without_the_key(services, env):
+    key_path, _ = backup.backup_paths(services.cfg)
+    # a hostile stderr: echoes the key path and the key text back at us
+    stderr = f"Permission denied (publickey) using {key_path}\n{KEY}\n" + "x" * 500
+    git = FakeGit(fail=("push", stderr))
+    result = run_backup(services, env=env, run=git)
+    assert result["kind"] == "backup_failed" and result["error"] == "CalledProcessError"
+    assert result["stderr"].startswith("Permission denied (publickey) using <key-path>")
+    assert len(result["stderr"]) <= 300
     dumped = json.dumps(services.archive.entries)
-    assert "PRIVATE KEY" not in dumped and sa["private_key"][40:80] not in dumped
-    assert "403" not in result.get("error", "")  # only the type; the message is not stored
+    assert "PRIVATE KEY" not in dumped and "secretsecret" not in dumped and str(key_path) not in dumped
+    assert services.archive.entries == [("backup", result)]
 
 
-def test_token_exchange_failure(services, env):
-    rec = Recorder(token_status=401)
-    result = run_backup(services, http=rec.client(), env=env)
-    assert result["kind"] == "backup_failed" and result["error"] == "RuntimeError"
-    assert len(rec.requests) == 1  # never got to upload
+def test_non_git_exception_is_a_failure_not_a_crash(services, env):
+    def boom(repo_dir, *args, check=True):
+        raise OSError(f"cannot run git with {KEY}")
 
-
-def test_bad_key_json_is_a_failure_not_a_crash(services, env):
-    rec = Recorder()
-    result = run_backup(services, http=rec.client(), env={**env, "GCS_ARCHIVE_SA_JSON": "{not json"})
-    assert result["kind"] == "backup_failed" and result["error"] == "JSONDecodeError"
-    assert rec.requests == []
-    assert "not json" not in json.dumps(services.archive.entries)
+    result = run_backup(services, env=env, run=boom)
+    assert result["kind"] == "backup_failed" and result["error"] == "OSError"
+    assert "secretsecret" not in result["stderr"] and "<key>" in result["stderr"]
 
 
 def test_backup_dirs_env_override(services, monkeypatch, tmp_path):
@@ -170,3 +238,7 @@ def test_backup_dirs_env_override(services, monkeypatch, tmp_path):
     assert dirs == [Path(services.cfg.archive_dir), Path(services.cfg.state_dir), tmp_path / "elsewhere"]
     monkeypatch.delenv("COUNCIL_MINUTES_DIR")
     assert backup.backup_dirs(services.cfg)[2] == Path(services.cfg.state_dir).parent / "council_minutes"
+    key_path, repo = backup.backup_paths(services.cfg)
+    assert key_path == Path(services.cfg.state_dir).parent / "backup_key"
+    assert repo == Path(services.cfg.state_dir).parent / "backup-repo"
+    assert os.path.basename(key_path) == "backup_key"

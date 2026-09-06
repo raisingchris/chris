@@ -65,7 +65,7 @@ async def test_backup_job_runs_unguarded_and_notes_last_run(sched, services, mon
 
     def fake_run(_services):
         seen.append(1)
-        return {"kind": "backup_done", "objects": [], "bytes": 0}
+        return {"kind": "backup_done", "changed": False, "commit": None, "files": 0}
 
     monkeypatch.setattr(backup_mod, "run_backup", fake_run)
     pause.trigger(services, "Runaway loop, condition 4.", "parent-a")
@@ -79,8 +79,8 @@ async def test_backup_job_runs_unguarded_and_notes_last_run(sched, services, mon
 async def test_backup_job_skip_path_noted(sched, services, monkeypatch):
     from agent import wiring
 
-    monkeypatch.delenv("GCS_ARCHIVE_BUCKET", raising=False)
-    monkeypatch.delenv("GCS_ARCHIVE_SA_JSON", raising=False)
+    monkeypatch.delenv("BACKUP_GIT_URL", raising=False)
+    monkeypatch.delenv("BACKUP_DEPLOY_KEY", raising=False)
     await sched.get_job("backup").func()
     assert services.archive.entries[-1][1]["kind"] == "backup_skipped"
     runs = wiring.read_last_runs(services.cfg.state_dir)
