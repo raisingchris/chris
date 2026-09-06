@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}parent{% endblock %}
+{% block body %}
+<p class="muted">Signed in as {{ handle }}. <a href="/parent/logout">Sign out</a></p>
+
+{% if error %}<p class="err">{{ error }}</p>{% endif %}
+
+<h1>{% if paused %}Paused{% else %}Running{% endif %}</h1>
+{% if paused %}
+<p>Since {{ paused.at }} by {{ paused.by }}. Reason: {{ paused.reason }}</p>
+<form method="post" action="/parent/unpause"><button type="submit">Unpause</button></form>
+{% else %}
+<form method="post" action="/parent/pause">
+  <label>Reason (published in governance/pause_log.md)</label>
+  <textarea name="reason" rows="3" required minlength="10">{{ reason or "" }}</textarea>
+  <button type="submit">Pause</button>
+</form>
+{% endif %}
+
+<h2>Meters</h2>
+<table>
+  <tr><td>Inference today</td><td>${{ "%.2f"|format(inference) }} of ${{ "%.0f"|format(soft) }} soft / ${{ "%.0f"|format(hard) }} hard</td></tr>
+  <tr><td>Council this week</td><td>${{ "%.2f"|format(council) }} of ${{ "%.0f"|format(council_cap) }}</td></tr>
+  <tr><td>Odometer</td><td>{{ odometer }}</td></tr>
+  <tr><td>Unread inbox</td><td>{{ unread }}</td></tr>
+</table>
+
+<h2>Last diary</h2>
+{% if diary %}<p class="muted">{{ diary.name }}</p><pre>{{ diary.excerpt }}</pre>{% else %}<p class="muted">None yet.</p>{% endif %}
+
+<h2>Proposals</h2>
+{% if proposals %}
+{% for p in proposals %}
+<p><strong>{{ p.id }}</strong>{% if p.votes %} — {% for h, v in p.votes.items() %}{{ h }}: {{ v }}{{ ", " if not loop.last }}{% endfor %}{% endif %}</p>
+<form method="post" action="/parent/vote">
+  <input type="hidden" name="proposal_id" value="{{ p.id }}">
+  <button name="vote" value="ratify">Ratify</button>
+  <button name="vote" value="veto">Veto</button>
+</form>
+{% endfor %}
+{% else %}<p class="muted">None pending.</p>{% endif %}
+
+<h2>Unseal a lesson</h2>
+<form method="post" action="/parent/unseal">
+  <label>Lesson number</label>
+  <input type="number" name="n" min="1" max="99" required>
+  <button type="submit">Unseal</button>
+</form>
+{% if unsealed %}<p class="muted">Unsealed so far: {{ unsealed|join(", ") }}</p>{% endif %}
+
+<h2>Allowance</h2>
+<form method="post" action="/parent/allowance">
+  <label>Weekly USD</label><input type="number" name="weekly_usd" step="0.01" min="0" value="{{ allowance.weekly_usd }}" required>
+  <label>Per transaction USD</label><input type="number" name="per_txn_usd" step="0.01" min="0" value="{{ allowance.per_txn_usd }}" required>
+  <button type="submit">Set</button>
+</form>
+
+<h2>Next scheduled</h2>
+{% if next_runs %}
+<table>{% for name, t in next_runs %}<tr><td>{{ name }}</td><td>{{ t.strftime("%a %Y-%m-%d %H:%M %Z") }}</td></tr>{% endfor %}</table>
+{% else %}<p class="muted">No scheduler attached.</p>{% endif %}
+{% endblock %}

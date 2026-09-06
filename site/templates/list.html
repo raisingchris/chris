@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block main %}
+<article>
+  <h1>{{ title }}</h1>
+  {% if intro %}<p class="lede">{{ intro }}</p>{% endif %}
+  {% if intro_html %}{{ intro_html|safe }}{% endif %}
+  {% if items %}
+  <ul class="listing">
+  {% for href, label, desc in items %}
+    <li><a href="{{ href }}">{{ label }}</a>{% if desc %} <span class="desc">— {{ desc }}</span>{% endif %}</li>
+  {% endfor %}
+  </ul>
+  {% elif empty %}
+  <p class="meta">{{ empty }}</p>
+  {% endif %}
+  {% if raw %}<p class="meta"><a href="{{ raw }}">Raw markdown</a></p>{% endif %}
+</article>
+{% endblock %}

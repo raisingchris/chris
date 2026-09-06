@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% if title and title != site_name %}{{ title }} — {{ site_name }}{% else %}{{ site_name }}{% endif %}</title>
+<meta name="description" content="{{ footer }}">
+<link rel="stylesheet" href="/style.css">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt">
+</head>
+<body>
+<header>
+  <div class="masthead">
+    <a class="brand" href="/">{{ site_name }}</a>
+    <nav aria-label="Sections">
+      {% for href, label in nav %}<a href="{{ href }}"{% if url and url.startswith('/' + href.split('/')[1] + '/') %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
+    </nav>
+  </div>
+  <p class="disclosure">{{ disclosure }}</p>
+</header>
+<main>
+{% block main %}{% endblock %}
+</main>
+<footer>
+  <p>{{ footer }}</p>
+  <p class="small">Write to her: <a href="mailto:{{ mail }}">{{ mail }}</a> · <a href="/llms.txt">llms.txt</a> · <a href="/for-agents/">for agents</a></p>
+</footer>
+</body>
+</html>

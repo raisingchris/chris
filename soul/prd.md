@@ -393,3 +393,4 @@ Decided by both parents before launch. Where these differ from the sections abov
 6. **Day:** timezone America/New_York. Wake 07:00, three sittings, sleep 22:00. Sunday is light: one sitting and the letter home.
 7. **Food bill:** soft cap USD 15/day, hard cap USD 25/day. Council: USD 10/week.
 8. **Runtime:** an agent loop with an explicit tool list plus a terminal that sees only her own workspace on a machine that holds no secrets she isn't meant to have.
+9. **Self-sustainability:** an expectation, not a deadline and not a pause condition. The letter states the principle; the date is agreed with Chris in conversation after her first month.

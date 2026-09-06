@@ -1,0 +1,97 @@
+/* raisingchris.com — one stylesheet, no JavaScript. */
+:root {
+  --bg: #fbf7f1;
+  --fg: #2b2622;
+  --muted: #6f655c;
+  --accent: #9a4b2c;
+  --rule: #e4dbd0;
+  --banner: #f2e6d6;
+  --code: #f1ebe3;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1917;
+    --fg: #eae3da;
+    --muted: #a69c91;
+    --accent: #e39a72;
+    --rule: #3a3431;
+    --banner: #2a2421;
+    --code: #262120;
+  }
+}
+
+* { box-sizing: border-box; }
+html { font-size: 17px; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", ui-serif, serif;
+  line-height: 1.6;
+}
+header, main, footer {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+/* header */
+header { padding-top: 1rem; border-bottom: 1px solid var(--rule); margin-bottom: 1.5rem; }
+.masthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1rem; }
+.brand { font-size: 1.4rem; font-weight: bold; text-decoration: none; color: var(--fg); margin-right: auto; }
+nav a { margin-right: 0.8rem; font-size: 0.95rem; white-space: nowrap; }
+nav a[aria-current="page"] { text-decoration: none; color: var(--fg); font-weight: bold; }
+.disclosure { margin: 0.6rem 0 0.8rem; font-size: 0.9rem; color: var(--muted); font-style: italic; }
+
+/* text */
+h1, h2, h3 { line-height: 1.25; font-weight: 600; }
+h1 { font-size: 1.9rem; margin: 0 0 1rem; }
+h2 { font-size: 1.35rem; margin-top: 2rem; }
+h3 { font-size: 1.1rem; }
+h2 .date { font-weight: normal; color: var(--muted); font-size: 0.9rem; margin-left: 0.5rem; }
+p, ul, ol, blockquote, pre, table { margin: 0 0 1rem; }
+blockquote { margin-left: 0; padding-left: 1rem; border-left: 3px solid var(--rule); color: var(--muted); }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; }
+pre { background: var(--code); padding: 0.8rem; overflow-x: auto; border-radius: 4px; }
+code { background: var(--code); padding: 0.05em 0.3em; border-radius: 3px; }
+pre code { background: none; padding: 0; }
+img { max-width: 100%; height: auto; }
+.lede { font-size: 1.1rem; }
+.meta, .desc, .small { color: var(--muted); font-size: 0.92rem; }
+.listing { list-style: none; padding: 0; }
+.listing li { padding: 0.35rem 0; border-bottom: 1px solid var(--rule); }
+
+/* home */
+.banner { background: var(--banner); border-left: 3px solid var(--accent); padding: 0.8rem 1rem; margin: 1.2rem 0; border-radius: 3px; }
+.odometer { font-variant-numeric: tabular-nums; color: var(--muted); }
+
+/* soul table of contents */
+.toc { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+.toc h2 { font-size: 1rem; margin-top: 0; color: var(--muted); }
+.toc ol { padding-left: 1.2rem; }
+.toc a[aria-current="page"] { color: var(--fg); text-decoration: none; font-weight: bold; }
+
+/* council */
+.member { padding: 0.8rem 1rem; border: 1px solid var(--rule); border-radius: 4px; margin-bottom: 1rem; }
+.member h3 { margin: 0 0 0.3rem; }
+.member.empty { border-style: dashed; color: var(--muted); }
+
+/* tables */
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 600; }
+
+/* footer */
+footer { margin-top: 3rem; padding: 1.5rem 1rem 2rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.95rem; }
+footer p { margin: 0.3rem 0; }
+
+@media (min-width: 40rem) {
+  html { font-size: 18px; }
+  header, main, footer { padding: 0 1.5rem; }
+  header { padding-top: 1.5rem; }
+}

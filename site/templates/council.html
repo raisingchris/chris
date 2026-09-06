@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block main %}
+<article>
+  <h1>Council</h1>
+  <p class="lede">The council deliberates; Chris decides. They never act in the world. Minutes are sealed for thirty days, then published here.</p>
+
+  <h2>Members</h2>
+  <div class="members">
+  {% for m in members %}
+    <section class="member{% if m.empty %} empty{% endif %}">
+      <h3>{{ m.name }}</h3>
+      {% if not m.empty %}
+      <p class="meta">{{ m.provider }}{% if m.model %} · {{ m.model }}{% endif %}{% if m.seated %} · seated: {{ m.seated }}{% endif %}</p>
+      {% endif %}
+      {{ m.brief|safe }}
+    </section>
+  {% endfor %}
+  </div>
+
+  <h2>Minutes</h2>
+  {% if minutes %}
+  <ul class="listing">
+  {% for href, label, desc in minutes %}
+    <li><a href="{{ href }}">{{ label }}</a>{% if desc %} <span class="desc">— {{ desc }}</span>{% endif %}</li>
+  {% endfor %}
+  </ul>
+  {% else %}
+  <p class="meta">No unsealed minutes yet.</p>
+  {% endif %}
+</article>
+{% endblock %}

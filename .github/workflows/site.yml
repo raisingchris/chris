@@ -1,0 +1,35 @@
+# Build the public site from the repo's markdown and deploy it to Vercel.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   VERCEL_TOKEN       personal token from the Vercel owner account
+#   VERCEL_ORG_ID      the team id  (from .vercel/project.json after `vercel link`)
+#   VERCEL_PROJECT_ID  the project id for `raisingchris` (same file)
+name: site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: site
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      TZ: UTC
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install .
+      - run: python site/build.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npx vercel deploy --prod --yes --token ${{ secrets.VERCEL_TOKEN }}

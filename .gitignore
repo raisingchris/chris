@@ -7,3 +7,5 @@ __pycache__/
 .pytest_cache/
 .venv/
 /data/
+chris.egg-info/
+*.egg-info/

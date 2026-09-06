@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>{% block title %}parent{% endblock %}</title>
+<style>
+  body { font: 15px/1.5 -apple-system, system-ui, sans-serif; max-width: 48rem; margin: 2rem auto; padding: 0 1rem; color: #111; background: #fff; }
+  h1, h2 { font-weight: 600; }
+  h2 { margin-top: 2rem; font-size: 1.1rem; }
+  pre { background: #f4f4f4; padding: .75rem; overflow-x: auto; white-space: pre-wrap; }
+  form { margin: .5rem 0 1rem; }
+  input[type=text], input[type=number], textarea { width: 100%; box-sizing: border-box; padding: .4rem; font: inherit; }
+  .err { color: #a00; }
+  .muted { color: #666; }
+  table { border-collapse: collapse; }
+  td, th { text-align: left; padding: .15rem .8rem .15rem 0; vertical-align: top; }
+</style>
+</head>
+<body>
+{% block body %}{% endblock %}
+</body>
+</html>

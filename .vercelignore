@@ -1,0 +1,6 @@
+# Only the built site is uploaded to Vercel. Everything else stays in git.
+*
+!site
+site/*
+!site/out
+!vercel.json
