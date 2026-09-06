@@ -3,14 +3,17 @@
 import base64
 import json
 import time
+from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import pytest
 from fake_services import make_services
 from fastapi.testclient import TestClient
+from freezegun import freeze_time
 
-from agent import pause
-from agent.server import create_app, record_vote, sign_svix, verify_svix
+from agent import pause, wiring
+from agent.server import create_app, is_stale, record_vote, sign_svix, verify_svix
 
 SECRET = "whsec_" + base64.b64encode(b"0123456789abcdef0123456789abcdef").decode()
 PASSWORD = "correct horse battery staple"
@@ -51,6 +54,66 @@ def test_health(client, services):
     assert isinstance(body["disk_free_mb"], int) and body["unpushed"] == 0
     pause.trigger(services, "Chris asked to be paused.", "parent-a")
     assert client.get("/health").json()["paused"] is True
+
+
+# Her tz is America/New_York (EDT, UTC-4, in September). freezegun takes UTC.
+NY = ZoneInfo("America/New_York")
+
+
+def _note(services, key, when: datetime):
+    with freeze_time(when.astimezone(timezone.utc)):
+        wiring.note_last_run(services.cfg.state_dir, key, tz=NY)
+
+
+def test_is_stale_pure():
+    runs = {"last_sleep_done": "2026-09-07T22:10:00-04:00", "last_sitting_done": "2026-09-07T09:40:00-04:00"}
+    mon_night = datetime(2026, 9, 7, 23, 45, tzinfo=NY)
+    assert not is_stale(runs, mon_night)
+    assert is_stale({**runs, "last_sleep_done": "2026-09-06T22:10:00-04:00"}, mon_night)  # slept yesterday only
+    sat = {"last_sitting_done": "2026-09-07T09:40:00-04:00"}
+    assert not is_stale(sat, datetime(2026, 9, 7, 23, 29, tzinfo=NY))  # not yet 23:30
+    assert is_stale(sat, datetime(2026, 9, 7, 23, 30, tzinfo=NY))
+    # weekday 10:00 sitting rule
+    assert not is_stale({}, datetime(2026, 9, 7, 9, 59, tzinfo=NY))
+    assert is_stale({}, datetime(2026, 9, 7, 10, 0, tzinfo=NY))
+    assert not is_stale({"last_sitting_done": "2026-09-07T09:40:00-04:00"}, datetime(2026, 9, 7, 10, 0, tzinfo=NY))
+    assert is_stale({"last_sitting_done": "2026-09-06T13:40:00-04:00"}, datetime(2026, 9, 7, 10, 0, tzinfo=NY))
+    assert is_stale({}, datetime(2026, 9, 12, 10, 0, tzinfo=NY))  # Saturday has sittings too
+    assert not is_stale({}, datetime(2026, 9, 6, 12, 0, tzinfo=NY))  # Sunday: the letter is at 13:00, no rule
+    assert not is_stale({"last_sitting_done": "garbage"}, datetime(2026, 9, 7, 9, 0, tzinfo=NY))
+
+
+def test_health_stale_returns_503(client, services):
+    # Monday 2026-09-07, 10:30 her time, nothing done today → stale
+    with freeze_time("2026-09-07 14:30:00"):
+        r = client.get("/health")
+        assert r.status_code == 503
+        body = r.json()
+        assert body["stale"] is True and body["ok"] is False
+        assert body["last_backup_done"] is None
+    _note(services, "last_sitting_done", datetime(2026, 9, 7, 9, 40, tzinfo=NY))
+    with freeze_time("2026-09-07 14:30:00"):
+        r = client.get("/health")
+        assert r.status_code == 200 and r.json()["stale"] is False
+    # 23:45 her time, slept yesterday only → stale
+    _note(services, "last_sleep_done", datetime(2026, 9, 6, 22, 10, tzinfo=NY))
+    with freeze_time("2026-09-08 03:45:00"):
+        r = client.get("/health")
+        assert r.status_code == 503 and r.json()["stale"] is True
+    _note(services, "last_sleep_done", datetime(2026, 9, 7, 22, 10, tzinfo=NY))
+    _note(services, "last_backup_done", datetime(2026, 9, 7, 22, 46, tzinfo=NY))
+    with freeze_time("2026-09-08 03:45:00"):
+        r = client.get("/health")
+        assert r.status_code == 200 and r.json()["stale"] is False
+        assert r.json()["last_backup_done"].startswith("2026-09-07T22:46")
+
+
+def test_health_paused_is_never_stale(client, services):
+    pause.trigger(services, "Chris asked to be paused.", "parent-a")
+    with freeze_time("2026-09-08 03:45:00"):  # 23:45 Monday her time, never slept
+        r = client.get("/health")
+        assert r.status_code == 200
+        assert r.json()["paused"] is True and r.json()["stale"] is False
 
 
 # --- resend webhook ---------------------------------------------------------------

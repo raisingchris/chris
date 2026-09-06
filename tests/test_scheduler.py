@@ -1,7 +1,7 @@
 from pathlib import Path
 """Scheduler: weekday vs Sunday job sets, pause guard, next_runs."""
 
-from datetime import date
+from datetime import date, datetime
 
 import pytest
 from fake_services import make_services
@@ -43,13 +43,48 @@ def sched(services, calls):
 def test_weekday_jobs(sched):
     # 2026-09-07 is a Monday
     assert due_on(sched, date(2026, 9, 7)) == [
-        "git-pull", "wake", "unseal", "sitting-09:00", "sitting-13:00", "sitting-17:00", "sleep",
+        "git-pull", "wake", "unseal", "sitting-09:00", "sitting-13:00", "sitting-17:00", "sleep", "backup",
     ]
 
 
 def test_sunday_jobs(sched):
     # 2026-09-06 is a Sunday: no wake, no ordinary sittings — one letter home and sleep.
-    assert due_on(sched, date(2026, 9, 6)) == ["git-pull", "unseal", "sunday", "sleep"]
+    assert due_on(sched, date(2026, 9, 6)) == ["git-pull", "unseal", "sunday", "sleep", "backup"]
+
+
+async def test_backup_job_runs_unguarded_and_notes_last_run(sched, services, monkeypatch):
+    """Backup fires even while paused (or unborn) and records last_backup_done."""
+    from agent import backup as backup_mod, wiring
+
+    job = sched.get_job("backup")
+    assert job is not None
+    t = job.trigger.get_next_fire_time(None, datetime(2026, 9, 7, tzinfo=sched.timezone))
+    assert (t.hour, t.minute) == (22, 45)
+
+    seen = []
+
+    def fake_run(_services):
+        seen.append(1)
+        return {"kind": "backup_done", "objects": [], "bytes": 0}
+
+    monkeypatch.setattr(backup_mod, "run_backup", fake_run)
+    pause.trigger(services, "Runaway loop, condition 4.", "parent-a")
+    await job.func()
+    assert seen == [1]
+    runs = wiring.read_last_runs(services.cfg.state_dir)
+    assert runs["last_backup_done"] and runs["last_backup_done_ok"] is True
+    assert runs["last_backup_done_kind"] == "backup_done"
+
+
+async def test_backup_job_skip_path_noted(sched, services, monkeypatch):
+    from agent import wiring
+
+    monkeypatch.delenv("GCS_ARCHIVE_BUCKET", raising=False)
+    monkeypatch.delenv("GCS_ARCHIVE_SA_JSON", raising=False)
+    await sched.get_job("backup").func()
+    assert services.archive.entries[-1][1]["kind"] == "backup_skipped"
+    runs = wiring.read_last_runs(services.cfg.state_dir)
+    assert runs["last_backup_done_ok"] is False and runs["last_backup_done_kind"] == "backup_skipped"
 
 
 def test_job_defaults(sched):

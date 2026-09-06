@@ -11,6 +11,9 @@ trigger the deploy workflow), GIT_SHA (the commit this image runs; set at build)
 Passwords: PARENT_A_PASSWORD / PARENT_B_PASSWORD (one per handle, in
 ``cfg.parent_handles`` order); either falls back to the shared PARENT_PASSWORD.
 No password for a handle → its login is 503.
+
+``/health`` answers 503 with ``stale: true`` when her day is visibly behind
+(no sleep by 23:30, or no sitting by 10:00 Mon–Sat) — unless she is paused.
 """
 
 from __future__ import annotations
@@ -27,6 +30,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
+from zoneinfo import ZoneInfo
 
 from fastapi import Depends, FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
@@ -156,6 +160,35 @@ class LoginLimiter:
 def _slug(text: str, limit: int = 40) -> str:
     s = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
     return s[:limit].rstrip("-") or "lesson"
+
+
+STALE_SLEEP_AFTER = (23, 30)  # her time; sleep is at 22:00
+STALE_SITTING_AFTER = (10, 0)  # weekdays; the first sitting is at 09:00
+
+
+def _done_today(iso: str | None, today) -> bool:
+    """True if ``iso`` (a last_runs timestamp, her tz) falls on ``today``."""
+    if not iso:
+        return False
+    try:
+        return datetime.fromisoformat(iso).date() == today
+    except ValueError:
+        return False
+
+
+def is_stale(runs: dict, now: datetime) -> bool:
+    """A dumb uptime signal: her day is visibly behind schedule.
+
+    (a) past 23:30 and she has not slept today; (b) a weekday (Mon–Sat) past
+    10:00 and no sitting has finished today. ``now`` must be in her timezone.
+    """
+    today = now.date()
+    after = lambda hm: (now.hour, now.minute) >= hm  # noqa: E731
+    if after(STALE_SLEEP_AFTER) and not _done_today(runs.get("last_sleep_done"), today):
+        return True
+    if now.weekday() < 6 and after(STALE_SITTING_AFTER) and not _done_today(runs.get("last_sitting_done"), today):
+        return True
+    return False
 
 
 def _read_json(path: Path, default):
@@ -309,15 +342,21 @@ def create_app(services, scheduler=None) -> FastAPI:
             disk_free_mb = shutil.disk_usage(state if state.exists() else state.parent).free // (1024 * 1024)
         except OSError:
             disk_free_mb = None
-        return {
-            "ok": True,
-            "paused": pause.is_paused(cfg.state_dir),
+        paused = pause.is_paused(cfg.state_dir)
+        # Paused is deliberate, never stale; otherwise a missed sleep/sitting turns the pinger red.
+        stale = (not paused) and is_stale(runs, datetime.now(ZoneInfo(cfg.tz)))
+        body = {
+            "ok": not stale,
+            "paused": paused,
+            "stale": stale,
             "last_sitting_done": runs.get("last_sitting_done"),
             "last_sleep_done": runs.get("last_sleep_done"),
+            "last_backup_done": runs.get("last_backup_done"),
             "disk_free_mb": disk_free_mb,
             "unpushed": gitops.unpushed_count(repo),
             "git_sha": gitops.running_sha() or None,
         }
+        return JSONResponse(body, status_code=503 if stale else 200)
 
     @app.post("/webhooks/resend")
     async def resend_webhook(request: Request):

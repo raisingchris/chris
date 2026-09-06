@@ -3,7 +3,9 @@
 Mon–Sat: wake, each sitting, sleep. Sunday: one 13:00 "sunday" sitting (the
 letter home) and sleep. Every job checks the pause flag first and does nothing
 while paused. Two housekeeping jobs: ``git pull --rebase`` at 06:55 so parent
-commits land before she wakes, and ``council.unseal_due()`` at 07:05.
+commits land before she wakes, and ``council.unseal_due()`` at 07:05. A third,
+``backup`` at 22:45, ships her private state off-box; it is deliberately not
+``guarded`` — it runs paused or not, born or not.
 """
 
 from __future__ import annotations
@@ -29,6 +31,7 @@ WEEKDAYS = "mon-sat"
 SUNDAY_SITTING = "13:00"
 PULL_AT = "06:55"
 UNSEAL_AT = "07:05"
+BACKUP_AT = "22:45"
 
 
 def _hm(s: str) -> tuple[int, int]:
@@ -130,8 +133,16 @@ def make_scheduler(services, run_sitting, run_sleep) -> AsyncIOScheduler:
         if copied:
             log.info("unsealed %d council minute(s)", len(copied))
 
+    async def backup() -> None:
+        from agent import backup as backup_mod, wiring
+
+        result = await asyncio.to_thread(backup_mod.run_backup, services)
+        wiring.note_last_run(cfg.state_dir, "last_backup_done", tz=ZoneInfo(cfg.tz),
+                             ok=result.get("kind") == "backup_done", kind=result.get("kind"))
+
     add(pull, cron(PULL_AT), "git-pull", "git pull")
     add(unseal, cron(UNSEAL_AT), "unseal", "council unseal")
+    add(backup, cron(BACKUP_AT), "backup", "backup")
     return sched
 
 

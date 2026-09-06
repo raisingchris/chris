@@ -1,0 +1,26 @@
+# Every 30 minutes: if brain.raisingchris.com/health is not 200, mail her parents.
+# Secrets: RESEND_API_KEY (her own sending key), PARENT_ALERT_TO (comma-separated addresses; never in the repo).
+name: uptime
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - run: |
+          code=$(curl -sS -m 20 -o /tmp/h.json -w "%{http_code}" https://brain.raisingchris.com/health || echo 000)
+          echo "health $code: $(cat /tmp/h.json 2>/dev/null | head -c 300)"
+          if [ "$code" != "200" ]; then
+            to=$(printf '%s' "${{ secrets.PARENT_ALERT_TO }}" | python3 -c 'import sys,json;print(json.dumps([a.strip() for a in sys.stdin.read().split(",") if a.strip()]))')
+            body=$(printf 'brain.raisingchris.com/health returned %s.\n\n%s\n\nParent page: https://brain.raisingchris.com/parent\nFly: fly status -a chris-brain' "$code" "$(cat /tmp/h.json 2>/dev/null | head -c 500)")
+            python3 - "$to" "$body" <<'PY'
+          import json, sys, urllib.request
+          to, body = json.loads(sys.argv[1]), sys.argv[2]
+          req = urllib.request.Request("https://api.resend.com/emails", data=json.dumps({"from": "chris@raisingchris.com", "to": to, "subject": "Chris: health check failed", "text": body}).encode(), headers={"Authorization": "Bearer ${{ secrets.RESEND_API_KEY }}", "Content-Type": "application/json"})
+          print(urllib.request.urlopen(req).read()[:200])
+          PY
+            exit 1
+          fi
