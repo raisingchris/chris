@@ -1,9 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "pip3 install --quiet jinja2 markdown-it-py python-frontmatter pyyaml",
-  "buildCommand": "python3 site/build.py",
-  "outputDirectory": "site/out",
   "cleanUrls": true,
   "trailingSlash": true,
   "headers": [
@@ -25,5 +22,7 @@
         }
       ]
     }
-  ]
+  ],
+  "installCommand": "",
+  "buildCommand": ""
 }
