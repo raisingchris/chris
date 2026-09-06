@@ -7,9 +7,7 @@
 name: site
 
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+  workflow_dispatch:  # disabled on push: Vercel's Git integration builds the site (vercel.json)
 
 concurrency:
   group: site
