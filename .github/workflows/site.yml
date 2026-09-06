@@ -11,7 +11,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 6
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -26,4 +26,5 @@ jobs:
         with:
           node-version: 20
       - run: npm install -g vercel@latest
-      - run: cd site/out && vercel deploy --prod --yes --token "${{ secrets.VERCEL_TOKEN }}"
+      - run: cd site/out && vercel link --yes --project raisingchris --scope dariuscheung --token "${{ secrets.VERCEL_TOKEN }}"
+      - run: cd site/out && vercel deploy --prod --yes --scope dariuscheung --token "${{ secrets.VERCEL_TOKEN }}"
