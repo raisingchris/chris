@@ -137,7 +137,7 @@ def test_bash_writes_to_code_allowed_but_not_to_parents_files(repo):
 def test_max_turns_from_env():
     c = Config.from_env({"MAX_TURNS": "12", "SLEEP_MAX_TURNS": "7"})
     assert c.max_turns == 12 and c.sleep_max_turns == 7
-    assert Config.from_env({}).max_turns == 80 and Config.from_env({}).sleep_max_turns == 60
+    assert Config.from_env({}).max_turns == 150 and Config.from_env({}).sleep_max_turns == 60
 
 
 # --- failures are visible ------------------------------------------------------------

@@ -1,6 +1,7 @@
 """A sitting: gate on pause and budget, compose the prompt, run, redact, commit.
 
-Kinds: birth (first ever), wake, sitting, sunday. Sleep lives in sleep.py.
+Kinds: birth (first ever), wake, sitting, sunday, mail (an extra sitting because
+mail arrived). Sleep lives in sleep.py.
 """
 
 from __future__ import annotations
@@ -16,9 +17,12 @@ from agent.paths import UnsafePath, safe_path
 log = logging.getLogger("chris.loop")
 
 PROMPTS = Path(__file__).parent / "prompts"
-KINDS = ("birth", "wake", "sitting", "sunday")
-# wake uses the sitting prompt; it is the same shape of work, just first of the day.
-PROMPT_FILE = {"birth": "birth.md", "wake": "sitting.md", "sitting": "sitting.md", "sunday": "sunday.md"}
+KINDS = ("birth", "wake", "sitting", "sunday", "mail")
+# wake and mail use the sitting prompt; same shape of work, just first of the day / woken by mail.
+PROMPT_FILE = {"birth": "birth.md", "wake": "sitting.md", "sitting": "sitting.md", "sunday": "sunday.md",
+               "mail": "sitting.md"}
+# One line the loop puts above the prompt file for some kinds (the prompt files stay generic).
+KIND_HEADER = {"mail": "You were woken by new mail."}
 
 
 def _read(path: Path, repo: Path | None = None, archive=None) -> str:
@@ -62,6 +66,8 @@ def inbox_subjects(mail) -> list[str]:
 def compose_user_prompt(services, kind: str) -> str:
     repo = services.repo_dir
     parts = [_read(PROMPTS / PROMPT_FILE[kind]).rstrip(), "---"]
+    if kind in KIND_HEADER:
+        parts.insert(0, KIND_HEADER[kind])
     self_dir = repo / "memory" / "wiki" / "self"
     if (self_dir / "character.md").exists():
         parts.append("## memory/wiki/self/character.md\n" + _rread(services, self_dir / "character.md").rstrip())

@@ -25,11 +25,11 @@ class Config:
     archive_dir: str = "/data/archive"
     state_dir: str = "/data/state"
     tz: str = "America/New_York"
-    sittings: list[str] = field(default_factory=lambda: ["09:00", "13:00", "17:00"])
+    sittings: list[str] = field(default_factory=lambda: ["09:00", "12:00", "15:00", "18:00"])
     wake: str = "07:00"
     sleep: str = "22:00"
-    soft_usd: float = 15.0
-    hard_usd: float = 25.0
+    soft_usd: float = 25.0
+    hard_usd: float = 40.0
     council_weekly_usd: float = 10.0
     parent_a_email: str = ""
     parent_b_email: str = ""
@@ -40,7 +40,7 @@ class Config:
     model: str = "claude-fable-5-1"
     stripe_webhook_secret: str = ""
     birthday: str = ""  # ISO date of her first day, or empty to infer from the first diary
-    max_turns: int = 80  # per sitting
+    max_turns: int = 150  # per sitting
     sleep_max_turns: int = 60
 
     @classmethod
@@ -52,11 +52,11 @@ class Config:
             archive_dir=g("ARCHIVE_DIR", "/data/archive"),
             state_dir=g("STATE_DIR", "/data/state"),
             tz=g("TZ", "America/New_York"),
-            sittings=_csv(g("SITTINGS", "09:00,13:00,17:00")),
+            sittings=_csv(g("SITTINGS", "09:00,12:00,15:00,18:00")),
             wake=g("WAKE", "07:00"),
             sleep=g("SLEEP", "22:00"),
-            soft_usd=float(g("SOFT_USD", "15")),
-            hard_usd=float(g("HARD_USD", "25")),
+            soft_usd=float(g("SOFT_USD", "25")),
+            hard_usd=float(g("HARD_USD", "40")),
             council_weekly_usd=float(g("COUNCIL_WEEKLY_USD", "10")),
             parent_a_email=g("PARENT_A_EMAIL"),
             parent_b_email=g("PARENT_B_EMAIL"),
@@ -67,7 +67,7 @@ class Config:
             model=g("CHRIS_MODEL", "claude-fable-5-1"),
             stripe_webhook_secret=g("STRIPE_WEBHOOK_SECRET"),
             birthday=g("CHRIS_BIRTHDAY").strip(),
-            max_turns=int(g("MAX_TURNS", "80")),
+            max_turns=int(g("MAX_TURNS", "150")),
             sleep_max_turns=int(g("SLEEP_MAX_TURNS", "60")),
         )
 

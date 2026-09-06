@@ -62,11 +62,11 @@ async def test_paused_skips(services):
 
 
 async def test_hard_cap_skip_writes_handoff(services, repo):
-    services.inference.add_usd(30.0, "burned")
+    services.inference.add_usd(45.0, "burned")
     git = FakeGit()
     assert await loop.run_sitting(services, "sitting", query_fn=fake_messages(), git_run=git) is None
     handoff = (repo / "memory/handoff.md").read_text()
-    assert "Sitting skipped: daily food bill hit the hard cap ($30.00 of $25.00)." in handoff
+    assert "Sitting skipped: daily food bill hit the hard cap ($45.00 of $40.00)." in handoff
     assert git.calls == []
 
 
@@ -116,3 +116,24 @@ def test_is_birth(services, repo):
     assert loop.is_birth(services)  # an ordinary session_start does not count
     services.archive.append("session_start", {"kind": "birth"})
     assert not loop.is_birth(services)
+
+
+async def test_mail_kind_uses_sitting_prompt_with_header(services, repo):
+    (repo / "memory/diary/2026-09-04.md").write_text("diary\n")
+    prompt = loop.compose_user_prompt(services, "mail")
+    assert prompt.startswith("You were woken by new mail.\n\n")
+    assert "This is a sitting" in prompt
+    assert "You were woken by new mail." not in loop.compose_user_prompt(services, "sitting")
+
+    seen = {}
+
+    async def query_fn(prompt, options):
+        seen["prompt"] = prompt
+        async for m in fake_messages()(prompt, options):
+            yield m
+
+    git = FakeGit()
+    await loop.run_sitting(services, "mail", query_fn=query_fn, git_run=git)
+    assert seen["prompt"].startswith("You were woken by new mail.")
+    assert ("commit", "-m", loop.datetime.now(services.archive.tz).strftime("mail: %Y-%m-%d sitting 1")) in git.calls
+    assert '"kind": "mail"' in archive_text(services)

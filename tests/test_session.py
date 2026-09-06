@@ -76,9 +76,9 @@ def test_repo_ships_no_claude_settings_json():
 
 
 def test_build_options_sets_per_session_budget(services):
-    services.inference.add_usd(20.0, "earlier today")
+    services.inference.add_usd(35.0, "earlier today")
     opts = session.build_options(services, "SYS", session.BUILTIN_TOOLS, 80)
-    assert opts.max_budget_usd == 5.0  # hard cap 25 minus 20 spent
+    assert opts.max_budget_usd == 5.0  # hard cap 40 minus 35 spent
     services.inference.add_usd(10.0, "more")
     opts = session.build_options(services, "SYS", session.BUILTIN_TOOLS, 80)
     assert opts.max_budget_usd == session.MIN_BUDGET_USD

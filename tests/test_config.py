@@ -20,11 +20,11 @@ def test_defaults(monkeypatch):
     assert c.archive_dir == "/data/archive"
     assert c.state_dir == "/data/state"
     assert c.tz == "America/New_York"
-    assert c.sittings == ["09:00", "13:00", "17:00"]
+    assert c.sittings == ["09:00", "12:00", "15:00", "18:00"]
     assert c.wake == "07:00"
     assert c.sleep == "22:00"
-    assert c.soft_usd == 15.0
-    assert c.hard_usd == 25.0
+    assert c.soft_usd == 25.0
+    assert c.hard_usd == 40.0
     assert c.council_weekly_usd == 10.0
     assert c.chris_email == "chris@raisingchris.com"
     assert c.parent_handles == ["parent-a", "parent-b"]

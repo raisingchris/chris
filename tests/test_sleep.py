@@ -102,7 +102,7 @@ async def test_daily_summary_to_both_parents_from_parent_note(services, repo):
     body = res.mail["text"]
     assert "may I buy a domain?" in body
     assert f"Chris's day, {d}. 1 new message(s)" in body
-    assert "Food bill today $0.42 (soft $15 / hard $25). Council this week $0.00 of $10." in body
+    assert "Food bill today $0.42 (soft $25 / hard $40). Council this week $0.00 of $10." in body
     assert "loops closed" in body
     # the note is filed as a letter, the working file is gone
     letter = repo / "memory/wiki/letters" / f"{d}-to-parents.md"

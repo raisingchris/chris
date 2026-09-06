@@ -6,12 +6,16 @@ while paused. Two housekeeping jobs: ``git pull --rebase`` at 06:55 so parent
 commits land before she wakes, and ``council.unseal_due()`` at 07:05. A third,
 ``backup`` at 22:45, ships her private state off-box; it is deliberately not
 ``guarded`` — it runs paused or not, born or not.
+
+Mail wakes her too: when the Resend webhook ingests a message, ``request_mail_wake``
+adds a one-off ``mail`` sitting a minute out — at most one per 30 minutes and six a
+day, never in sleep hours or just before a scheduled sitting (see ``mail_wake_decision``).
 """
 
 from __future__ import annotations
 
 import asyncio
-from apscheduler.triggers.date import DateTrigger
+import json
 import os
 import logging
 from datetime import date, datetime, time, timedelta
@@ -21,6 +25,7 @@ from zoneinfo import ZoneInfo
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.date import DateTrigger
 
 from agent import gitops, pause
 
@@ -32,6 +37,15 @@ SUNDAY_SITTING = "13:00"
 PULL_AT = "06:55"
 UNSEAL_AT = "07:05"
 BACKUP_AT = "22:45"
+
+# Wake-on-mail limits (her timezone).
+MAIL_WAKE_FILE = "mail_wake.json"
+MAIL_WAKE_DELAY_S = 60
+MAIL_WAKE_MIN_GAP = timedelta(minutes=30)
+MAIL_WAKE_DAILY_CAP = 6
+MAIL_WAKE_NEAR = timedelta(minutes=20)  # skip if a scheduled sitting/sleep is this close
+MAIL_WAKE_SLEEP_FROM = time(22, 0)
+MAIL_WAKE_SLEEP_TO = time(7, 0)
 
 
 def _hm(s: str) -> tuple[int, int]:
@@ -144,6 +158,112 @@ def make_scheduler(services, run_sitting, run_sleep) -> AsyncIOScheduler:
     add(unseal, cron(UNSEAL_AT), "unseal", "council unseal")
     add(backup, cron(BACKUP_AT), "backup", "backup")
     return sched
+
+
+# --- wake on mail --------------------------------------------------------------
+
+
+def _mail_wake_path(state_dir: str | Path) -> Path:
+    return Path(state_dir) / MAIL_WAKE_FILE
+
+
+def read_mail_wake_state(state_dir: str | Path) -> dict:
+    """``{"last": iso | None, "day": "YYYY-MM-DD", "count": n}``; empty when never fired."""
+    try:
+        data = json.loads(_mail_wake_path(state_dir).read_text() or "null")
+    except (OSError, json.JSONDecodeError):
+        data = None
+    return data if isinstance(data, dict) else {}
+
+
+def mail_wakes_today(state_dir: str | Path, now: datetime) -> int:
+    """Extra sittings fired for mail so far today (her tz)."""
+    state = read_mail_wake_state(state_dir)
+    return int(state.get("count", 0)) if state.get("day") == now.date().isoformat() else 0
+
+
+def _scheduled_times(cfg) -> list[time]:
+    """Sittings and sleep (wake sits inside sleep hours already)."""
+    out = []
+    for hhmm in [*cfg.sittings, cfg.sleep]:
+        try:
+            h, m = _hm(hhmm)
+            out.append(time(h, m))
+        except ValueError:
+            continue
+    return out
+
+
+def mail_wake_decision(now: datetime, state: dict, cfg, born: bool, paused: bool) -> tuple[bool, str]:
+    """Pure: may a mail arriving at ``now`` (her tz) wake her? ``(ok, reason)``.
+
+    ``state`` is the ``mail_wake.json`` dict. Reasons: unborn, paused, sleep_hours,
+    near_scheduled, debounce, daily_cap, ok.
+    """
+    if not born:
+        return False, "unborn"
+    if paused:
+        return False, "paused"
+    t = now.time().replace(second=0, microsecond=0)
+    if t >= MAIL_WAKE_SLEEP_FROM or t < MAIL_WAKE_SLEEP_TO:
+        return False, "sleep_hours"
+    for st in _scheduled_times(cfg):
+        due = now.replace(hour=st.hour, minute=st.minute, second=0, microsecond=0)
+        if now <= due < now + MAIL_WAKE_NEAR:
+            return False, "near_scheduled"
+    last = state.get("last")
+    if last:
+        try:
+            last_dt = datetime.fromisoformat(last)
+            if last_dt.tzinfo is None:
+                last_dt = last_dt.replace(tzinfo=now.tzinfo)
+            if now - last_dt < MAIL_WAKE_MIN_GAP:
+                return False, "debounce"
+        except ValueError:
+            pass
+    today = now.date().isoformat()
+    count = int(state.get("count", 0)) if state.get("day") == today else 0
+    if count >= MAIL_WAKE_DAILY_CAP:
+        return False, "daily_cap"
+    return True, "ok"
+
+
+def request_mail_wake(services, sched, run_sitting=None, now: datetime | None = None) -> tuple[bool, str]:
+    """Called by the Resend webhook after a successful ingest.
+
+    If ``mail_wake_decision`` allows it, adds (or replaces) the one-off ``mail-wake``
+    job ``MAIL_WAKE_DELAY_S`` out and records the fire in ``mail_wake.json``;
+    otherwise archives ``mail_wake_skipped`` with the reason.
+    """
+    cfg = services.cfg
+    tz = ZoneInfo(cfg.tz)
+    now = now or datetime.now(tz)
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=tz)
+    if sched is None:
+        services.archive.append("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": "no_scheduler"})
+        return False, "no_scheduler"
+    if run_sitting is None:
+        from agent import loop
+
+        run_sitting = loop.run_sitting
+    state = read_mail_wake_state(cfg.state_dir)
+    ok, reason = mail_wake_decision(now, state, cfg, born(services), pause.is_paused(cfg.state_dir))
+    if not ok:
+        log.info("mail wake skipped: %s", reason)
+        services.archive.append("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": reason})
+        return False, reason
+    today = now.date().isoformat()
+    count = int(state.get("count", 0)) if state.get("day") == today else 0
+    path = _mail_wake_path(cfg.state_dir)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"last": now.isoformat(timespec="seconds"), "day": today, "count": count + 1}, indent=1))
+    when = now + timedelta(seconds=MAIL_WAKE_DELAY_S)
+    sched.add_job(guarded(services, run_sitting, services, "mail", name="mail wake"),
+                  DateTrigger(run_date=when), id="mail-wake", name="mail wake", replace_existing=True, **JOB_DEFAULTS)
+    services.archive.append("mail_wake", {"kind": "mail_wake", "at": when.isoformat(timespec="seconds"),
+                                          "n_today": count + 1})
+    return True, "ok"
 
 
 def next_runs(sched: AsyncIOScheduler, limit: int = 8) -> list[tuple[str, datetime]]:

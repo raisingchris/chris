@@ -336,6 +336,7 @@ def create_app(services, scheduler=None) -> FastAPI:
     @app.get("/health")
     async def health():
         from agent import gitops, wiring
+        from agent.scheduler import mail_wakes_today
 
         runs = wiring.read_last_runs(state)
         try:
@@ -344,7 +345,8 @@ def create_app(services, scheduler=None) -> FastAPI:
             disk_free_mb = None
         paused = pause.is_paused(cfg.state_dir)
         # Paused is deliberate, never stale; otherwise a missed sleep/sitting turns the pinger red.
-        stale = (not paused) and is_stale(runs, datetime.now(ZoneInfo(cfg.tz)))
+        now = datetime.now(ZoneInfo(cfg.tz))
+        stale = (not paused) and is_stale(runs, now)
         body = {
             "ok": not stale,
             "paused": paused,
@@ -352,6 +354,7 @@ def create_app(services, scheduler=None) -> FastAPI:
             "last_sitting_done": runs.get("last_sitting_done"),
             "last_sleep_done": runs.get("last_sleep_done"),
             "last_backup_done": runs.get("last_backup_done"),
+            "mail_wakes_today": mail_wakes_today(state, now),
             "disk_free_mb": disk_free_mb,
             "unpushed": gitops.unpushed_count(repo),
             "git_sha": gitops.running_sha() or None,
@@ -370,6 +373,12 @@ def create_app(services, scheduler=None) -> FastAPI:
             raise HTTPException(400, "bad json")
         if payload.get("type") == "email.received":
             services.mail.ingest(payload)
+            from agent import scheduler as scheduler_module
+
+            try:
+                scheduler_module.request_mail_wake(services, scheduler)
+            except Exception as exc:  # noqa: BLE001 — the mail is already filed; a wake is a bonus
+                log.warning("mail wake failed: %s", exc)
         return {"ok": True}
 
     @app.post("/webhooks/stripe")
@@ -421,6 +430,7 @@ def create_app(services, scheduler=None) -> FastAPI:
 
             runs = next_runs(scheduler)
         from agent import gitops
+        from agent.scheduler import mail_wakes_today
 
         running_sha, head_sha = gitops.running_sha(), gitops.head_sha(repo)
         return {
@@ -434,6 +444,7 @@ def create_app(services, scheduler=None) -> FastAPI:
             "council_cap": cfg.council_weekly_usd,
             "odometer": odometer,
             "unread": unread,
+            "mail_wakes_today": mail_wakes_today(state, datetime.now(ZoneInfo(cfg.tz))),
             "diary": diary,
             "proposals": proposals,
             "unsealed": unsealed,

@@ -241,7 +241,8 @@ def test_status_page_renders(client, services, tmp_path):
     sign_in(client, "parent-a")
     page = client.get("/parent").text
     assert "Running" in page
-    assert "$4.20 of $15 soft / $25 hard" in page
+    assert "$4.20 of $25 soft / $40 hard" in page
+    assert "Mail wakes today</td><td>0 of 6" in page
     assert "$1.50 of $10" in page
     assert "3 loops closed" in page
     assert "I read the letter." in page
@@ -494,3 +495,61 @@ def test_deploy_github_failure_is_visible(client, services, monkeypatch):
 def test_health_reports_git_sha(client, monkeypatch):
     monkeypatch.setenv("GIT_SHA", "abc1234")
     assert client.get("/health").json()["git_sha"] == "abc1234"
+
+
+def test_resend_webhook_schedules_mail_wake(services, env):
+    """A valid email.received adds the one-off ``mail-wake`` job when the decision allows it."""
+    from agent import scheduler as scheduler_module
+
+    Path(services.cfg.repo_dir, "memory", "diary", "2026-09-05.md").write_text("born")
+
+    class FakeSched:
+        running = True
+        timezone = NY
+
+        def __init__(self):
+            self.jobs = []
+
+        def add_job(self, fn, trigger, **kw):
+            self.jobs.append((fn, trigger, kw))
+
+        def get_jobs(self):
+            return []
+
+        def start(self):
+            pass
+
+        def shutdown(self, wait=False):
+            pass
+
+    fs = FakeSched()
+    client = TestClient(create_app(services, fs))
+    payload = {"type": "email.received", "data": {"email_id": "e9", "from": "x@y.z"}}
+    body = json.dumps(payload).encode()
+
+    def headers(mid):  # signed with the (frozen) clock so the svix timestamp check passes
+        ts = int(time.time())
+        return {"svix-id": mid, "svix-timestamp": str(ts), "svix-signature": sign_svix(mid, ts, body, SECRET)}
+
+    with freeze_time("2026-09-07 14:30:00"):  # Monday 10:30 her time
+        assert client.post("/webhooks/resend", content=body, headers=headers("m1")).status_code == 200
+    assert services.mail.ingested == [payload]
+    assert len(fs.jobs) == 1
+    fn, trigger, kw = fs.jobs[0]
+    assert kw["id"] == "mail-wake" and kw["replace_existing"] is True
+    assert trigger.run_date.astimezone(NY) == datetime(2026, 9, 7, 10, 31, tzinfo=NY)
+    with freeze_time("2026-09-07 14:32:00"):
+        assert client.get("/health").json()["mail_wakes_today"] == 1
+        sign_in(client, "parent-a")
+        assert "Mail wakes today</td><td>1 of 6" in client.get("/parent").text
+    # a second mail two minutes later is debounced, not scheduled
+    with freeze_time("2026-09-07 14:32:00"):
+        assert client.post("/webhooks/resend", content=body, headers=headers("m2")).status_code == 200
+    assert len(fs.jobs) == 1
+    assert ("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": "debounce"}) in services.archive.entries
+    # at night the mail waits for the 07:00 wake
+    with freeze_time("2026-09-08 03:00:00"):  # 23:00 her time
+        assert client.post("/webhooks/resend", content=body, headers=headers("m3")).status_code == 200
+    assert len(fs.jobs) == 1
+    assert services.archive.entries[-1][1] == {"kind": "mail_wake_skipped", "reason": "sleep_hours"}
+    assert scheduler_module.MAIL_WAKE_DAILY_CAP == 6
