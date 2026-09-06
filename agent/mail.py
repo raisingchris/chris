@@ -94,7 +94,15 @@ class Mail:
         reply_to: str | None = None,
     ) -> dict:
         given = [to] if isinstance(to, str) else list(to)
-        text = body.rstrip("\n") + SIGNATURE
+        # She often signs herself; don't stack two signatures.
+        clean = body.rstrip("\n")
+        for tail in (SIGNATURE.strip(), SIGNATURE.strip().split("\n", 1)[1]):
+            if clean.endswith(tail):
+                clean = clean[: -len(tail)].rstrip("\n")
+                if clean.endswith("— Chris") or clean.endswith("Chris"):
+                    clean = clean[: clean.rfind("Chris")].rstrip("—").rstrip("\n")
+                break
+        text = clean + SIGNATURE
         params: dict = {
             "from": self.chris_email,
             "to": [self.resolve(t) for t in given],

@@ -71,7 +71,7 @@ def _note_handoff(repo: Path, line: str) -> None:
 
 def redact_and_log(services, ts: str) -> list[dict]:
     """Redact the repo in place; log kinds/counts only (never matched text) beside the private state."""
-    report = redaction.clean_tree(services.repo_dir, services.cfg.canaries)
+    report = redaction.clean_tree(services.repo_dir, services.cfg.canaries, exclude=redaction.CONTENT_EXCLUDE)
     if report:
         out = services.state_dir.parent / "redaction" / f"{ts}.json"
         out.parent.mkdir(parents=True, exist_ok=True)
