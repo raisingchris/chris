@@ -6,7 +6,8 @@ session stores only the handle. Every admin action is archived as
 ``parent_action`` with the handle.
 
 Env: SESSION_SECRET, RESEND_WEBHOOK_SECRET, STRIPE_WEBHOOK_SECRET,
-LESSONS_DIR (default /data/lessons).
+LESSONS_DIR (default /data/lessons), GITHUB_DEPLOY_TOKEN (brain-only; lets a parent
+trigger the deploy workflow), GIT_SHA (the commit this image runs; set at build).
 Passwords: PARENT_A_PASSWORD / PARENT_B_PASSWORD (one per handle, in
 ``cfg.parent_handles`` order); either falls back to the shared PARENT_PASSWORD.
 No password for a handle → its login is 503.
@@ -42,6 +43,28 @@ SVIX_TOLERANCE_S = 5 * 60
 LESSON_SUBJECT = "A lesson from your parents"
 VETO_REASON_MIN = 10
 _ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$")
+
+DEPLOY_REPO = "raisingchris/chris"
+DEPLOY_WORKFLOW = "deploy.yml"
+DEPLOY_REF = "main"
+DEPLOY_DISPATCH_URL = f"https://api.github.com/repos/{DEPLOY_REPO}/actions/workflows/{DEPLOY_WORKFLOW}/dispatches"
+CHANGELOG = Path("governance") / "changelog.md"
+
+
+def dispatch_deploy(token: str, post: Callable | None = None) -> None:
+    """Ask GitHub Actions to run the deploy workflow on ``main``. Raises on any non-2xx."""
+    if post is None:
+        import httpx
+
+        post = lambda url, **kw: httpx.post(url, timeout=20, **kw)  # noqa: E731
+    r = post(
+        DEPLOY_DISPATCH_URL,
+        headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
+                 "X-GitHub-Api-Version": "2022-11-28"},
+        json={"ref": DEPLOY_REF},
+    )
+    if not (200 <= r.status_code < 300):
+        raise RuntimeError(f"GitHub returned {r.status_code}: {getattr(r, 'text', '')[:200]}")
 
 
 # --- Svix (Resend) signature -------------------------------------------------
@@ -293,6 +316,7 @@ def create_app(services, scheduler=None) -> FastAPI:
             "last_sleep_done": runs.get("last_sleep_done"),
             "disk_free_mb": disk_free_mb,
             "unpushed": gitops.unpushed_count(repo),
+            "git_sha": gitops.running_sha() or None,
         }
 
     @app.post("/webhooks/resend")
@@ -357,6 +381,9 @@ def create_app(services, scheduler=None) -> FastAPI:
             from agent.scheduler import next_runs
 
             runs = next_runs(scheduler)
+        from agent import gitops
+
+        running_sha, head_sha = gitops.running_sha(), gitops.head_sha(repo)
         return {
             "request": request,
             "handle": handle,
@@ -373,6 +400,10 @@ def create_app(services, scheduler=None) -> FastAPI:
             "unsealed": unsealed,
             "allowance": allowance,
             "next_runs": runs,
+            "running_sha": running_sha[:7] or "unknown",
+            "head_sha": head_sha[:7] or "unknown",
+            "code_behind": bool(running_sha and head_sha and running_sha != head_sha),
+            "deploy_configured": bool(os.environ.get("GITHUB_DEPLOY_TOKEN")),
             "error": None,
             "reason": None,
             **extra,
@@ -472,6 +503,34 @@ def create_app(services, scheduler=None) -> FastAPI:
             pause.commit_as_parent(repo, f"governance: {proposal_id} {result}",
                                    [proposal.relative_to(repo).as_posix()], dry_run=cfg.dry_run, canaries=cfg.canaries)
         archive_action("vote", handle, proposal=proposal_id, vote=vote, result=result)
+        return RedirectResponse("/parent", status_code=303)
+
+    @app.post("/parent/deploy")
+    async def parent_deploy(request: Request, handle: str = Depends(require_parent)):
+        from agent import gitops
+
+        token = os.environ.get("GITHUB_DEPLOY_TOKEN", "")
+        if not token:
+            raise HTTPException(503, "GITHUB_DEPLOY_TOKEN not configured")
+        try:
+            dispatch_deploy(token)
+        except Exception as e:  # noqa: BLE001 — network / GitHub errors surface on the page
+            log.warning("deploy dispatch failed: %s", e)
+            return templates.TemplateResponse(
+                request, "parent.html", status_context(request, handle, error=f"Deploy request failed: {e}"), status_code=502
+            )
+        sha = (gitops.head_sha(repo, "origin/main") or gitops.head_sha(repo))[:7] or "unknown"
+        today = datetime.now(timezone.utc).date().isoformat()
+        try:
+            changelog = safe_path(repo, CHANGELOG)
+            changelog.parent.mkdir(parents=True, exist_ok=True)
+            with open(changelog, "a", encoding="utf-8") as f:
+                f.write(f"- {today} — a parent deployed Chris's code at {sha}\n")
+            pause.commit_as_parent(repo, f"governance: deployed {sha}", [CHANGELOG.as_posix()],
+                                   dry_run=cfg.dry_run, canaries=cfg.canaries)
+        except UnsafePath as exc:
+            services.archive.append("unsafe_path", {"kind": "unsafe_path", "path": CHANGELOG.as_posix(), "error": str(exc)})
+        archive_action("deploy", handle, sha=sha)
         return RedirectResponse("/parent", status_code=303)
 
     @app.post("/parent/allowance")

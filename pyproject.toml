@@ -20,6 +20,7 @@ dependencies = [
   "markdown-it-py>=3",
   "python-frontmatter>=1.1",
   "pytz",
+  "playwright>=1.47",
 ]
 
 [project.optional-dependencies]

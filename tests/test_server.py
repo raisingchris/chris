@@ -369,3 +369,65 @@ def test_parent_page_commits_explicit_paths_only(client, services, tmp_path, mon
     assert adds == [("add", "--", "memory/wiki/lessons/from_parent/01-first.md"),
                     ("add", "--", "governance/proposals/p-9.md")]
     assert not any("-A" in a for a in calls)
+
+
+# --- deploy her code -------------------------------------------------------------------
+
+
+def test_deploy_button_dispatches_workflow_and_logs(client, services, monkeypatch):
+    from types import SimpleNamespace
+
+    from agent import gitops, server
+
+    calls = []
+    monkeypatch.setenv("GITHUB_DEPLOY_TOKEN", "ghp_test")
+    monkeypatch.setenv("GIT_SHA", "aaaaaaa1111")
+    monkeypatch.setattr(gitops, "head_sha", lambda repo_dir, ref="HEAD", run=None: "bbbbbbb2222")
+
+    def post(url, **kw):
+        calls.append((url, kw))
+        return SimpleNamespace(status_code=204, text="")
+
+    real = server.dispatch_deploy
+    monkeypatch.setattr(server, "dispatch_deploy", lambda token: real(token, post=post))
+
+    sign_in(client, "parent-a")
+    page = client.get("/parent").text
+    assert "aaaaaaa" in page and "bbbbbbb" in page and "not deployed yet" in page and "whatever is on main" in page
+
+    r = client.post("/parent/deploy", follow_redirects=False)
+    assert r.status_code == 303
+    url, kw = calls[0]
+    assert url == "https://api.github.com/repos/raisingchris/chris/actions/workflows/deploy.yml/dispatches"
+    assert kw["json"] == {"ref": "main"} and kw["headers"]["Authorization"] == "Bearer ghp_test"
+    changelog = (Path(services.cfg.repo_dir) / "governance" / "changelog.md").read_text()
+    assert "a parent deployed Chris's code at bbbbbbb" in changelog
+    assert any(k == "parent_action" and p["action"] == "deploy" and p["by"] == "parent-a"
+               for k, p in services.archive.entries)
+
+
+def test_deploy_without_token_is_503_and_needs_login(client, monkeypatch):
+    monkeypatch.delenv("GITHUB_DEPLOY_TOKEN", raising=False)
+    assert client.post("/parent/deploy", follow_redirects=False).status_code == 303  # to login
+    sign_in(client, "parent-b")
+    assert client.post("/parent/deploy").status_code == 503
+
+
+def test_deploy_github_failure_is_visible(client, services, monkeypatch):
+    from types import SimpleNamespace
+
+    from agent import server
+
+    monkeypatch.setenv("GITHUB_DEPLOY_TOKEN", "ghp_test")
+    real = server.dispatch_deploy
+    monkeypatch.setattr(server, "dispatch_deploy",
+                        lambda token: real(token, post=lambda url, **kw: SimpleNamespace(status_code=401, text="Bad credentials")))
+    sign_in(client, "parent-a")
+    r = client.post("/parent/deploy")
+    assert r.status_code == 502 and "401" in r.text
+    assert not (Path(services.cfg.repo_dir) / "governance" / "changelog.md").exists()
+
+
+def test_health_reports_git_sha(client, monkeypatch):
+    monkeypatch.setenv("GIT_SHA", "abc1234")
+    assert client.get("/health").json()["git_sha"] == "abc1234"

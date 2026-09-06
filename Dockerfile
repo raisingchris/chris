@@ -1,9 +1,22 @@
 FROM python:3.12-slim
 
+# GIT_SHA is the commit this image was built from (passed by .github/workflows/deploy.yml).
+# The parent page and /health compare it with the repo's HEAD so everyone can see when
+# Chris's code changes are not yet running.
+ARG GIT_SHA=unknown
+ENV GIT_SHA=${GIT_SHA}
+
 # git for her repo; node for the Claude Code CLI the Agent SDK drives; sudo for the user split.
 RUN apt-get update && apt-get install -y --no-install-recommends git curl ca-certificates openssh-client nodejs npm sudo \
     && rm -rf /var/lib/apt/lists/* \
     && npm install -g @anthropic-ai/claude-code
+
+# flyctl, so Chris can deploy her own products (`FLY_API_TOKEN=$APP_TOKEN_X fly deploy -a chris-x`).
+# Each product gets its own deploy-only token minted by a parent with scripts/parent-new-app.sh and
+# stored as a chris-brain secret APP_TOKEN_<NAME>; the wrapper passes those through to her shell.
+# The brain's own FLY token (if any) never crosses over.
+RUN curl -L https://fly.io/install.sh | FLYCTL_INSTALL=/usr/local sh \
+    && chmod 755 /usr/local/bin/flyctl && ln -sf /usr/local/bin/flyctl /usr/local/bin/fly
 
 # Two users. `brain` runs the Python service and holds the secrets. `chris` is who the Claude
 # CLI — and so her terminal — runs as. brain may become chris; chris may become nobody.
@@ -21,6 +34,13 @@ COPY agent ./agent
 COPY site ./site
 COPY scripts ./scripts
 RUN pip install --no-cache-dir . && chown -R root:root /app && chmod -R a+rX /app && chmod 755 /app/scripts/*.sh
+
+# A browser for her. Chromium and its system libraries are installed once, as root, into a
+# world-readable location so both `brain` (Python) and `chris` (her shell) find it.
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
+RUN python -m playwright install --with-deps chromium \
+    && rm -rf /var/lib/apt/lists/* \
+    && chmod -R a+rX /opt/pw-browsers
 
 EXPOSE 8080
 ENTRYPOINT ["/app/scripts/entrypoint.sh"]

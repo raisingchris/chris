@@ -1,5 +1,6 @@
 """run_session with a fake query_fn: cost metered, transcript archived, options shaped right."""
 
+from pathlib import Path
 from types import SimpleNamespace
 
 from agent import session
@@ -56,6 +57,22 @@ def test_build_options_shape(services):
     assert "mcp__chris__recall" in opts.allowed_tools and "mcp__chris__card_details" not in opts.allowed_tools
     assert opts.mcp_servers["chris"]["type"] == "sdk"
     assert set(opts.hooks) == {"PreToolUse", "PostToolUse"}
+    assert opts.setting_sources == ["project"] and opts.strict_mcp_config is True
+
+
+def test_project_is_a_valid_setting_source():
+    import typing
+
+    from claude_agent_sdk import types as sdk_types
+
+    assert "project" in typing.get_args(sdk_types.SettingSource)
+
+
+def test_repo_ships_no_claude_settings_json():
+    """Skills live in .claude/skills; a settings file there could widen permissions, so none is committed."""
+    root = Path(__file__).resolve().parents[1]
+    assert not list((root / ".claude").glob("settings*.json"))
+    assert (root / ".claude" / "skills" / "frontend-design" / "SKILL.md").exists()
 
 
 def test_build_options_sets_per_session_budget(services):

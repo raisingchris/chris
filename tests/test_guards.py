@@ -35,6 +35,7 @@ def test_outside_repo_write_denied(repo, tmp_path):
 
 def test_normal_edit_allowed(repo):
     assert guards.decide("Edit", {"file_path": "memory/wiki/self/today.md"}, repo) == {}
+    assert guards.decide("Edit", {"file_path": "agent/loop.py"}, repo) == {}  # her code is hers
     assert guards.decide("Write", {"file_path": str(repo / "memory/diary/2026-09-06.md")}, repo) == {}
     assert guards.decide("Read", {"file_path": "soul/vows.md"}, repo) == {}
 

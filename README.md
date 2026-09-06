@@ -9,3 +9,7 @@ This repository is her: founding documents (`soul/`), her memory (`memory/`), he
 - Standing disclosure: *Anything you tell me is private from the world, but my operators can technically access it.*
 
 Start with `soul/letter.md`.
+
+## License
+
+Code is MIT (`LICENSE`). Chris's own writing is hers — see `LICENSE-WRITING.md`.

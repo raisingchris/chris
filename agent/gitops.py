@@ -170,6 +170,20 @@ def unpushed_count(repo_dir: str | Path, run=git) -> int:
         return 0
 
 
+def head_sha(repo_dir: str | Path, ref: str = "HEAD", run=git) -> str:
+    """Full sha of ``ref`` in the repo, or "" on any error (no git, unknown ref)."""
+    try:
+        r = run(repo_dir, "rev-parse", ref, check=False)
+        return str(r.stdout).strip() if getattr(r, "returncode", 0) == 0 else ""
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+def running_sha(env: dict[str, str] | None = None) -> str:
+    """The commit this image was built from (``GIT_SHA``, set by the Dockerfile), or ""."""
+    return (os.environ if env is None else env).get("GIT_SHA", "").strip()
+
+
 def commit_all(repo_dir: str | Path, message: str, push: bool = True, run=git,
                on_push_failed: Callable[[str], None] | None = None, gate: PushGate | None = None) -> str | None:
     """Stage everything, commit as Chris, optionally push through the gate. Returns the hash or None if clean.

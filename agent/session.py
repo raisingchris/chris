@@ -70,7 +70,9 @@ def build_options(services, system_prompt: str, tools_allowed: list[str], max_tu
         permission_mode="dontAsk",
         mcp_servers={"chris": tools.make_server(services)},
         strict_mcp_config=True,
-        setting_sources=[],  # nothing from the machine's ~/.claude or repo .claude leaks in
+        # Only the repo's own .claude/ (her skills; hers to edit) — never the machine's ~/.claude.
+        # .claude/settings*.json are guard-protected so they cannot widen what the hooks deny.
+        setting_sources=["project"],
         hooks=guards.hook_matchers(services),
         env=env,
         cli_path=cli_path,

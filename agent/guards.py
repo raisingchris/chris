@@ -19,19 +19,22 @@ from pathlib import Path
 WRITE_TOOLS = {"Edit", "Write", "MultiEdit", "NotebookEdit"}
 READ_TOOLS = {"Read", "Glob", "Grep"}
 
-# Repo-relative paths Chris may read but never write.
-PROTECTED_FILES = ("soul/vows.md", "soul/constitution.md", "governance/pause_log.md")
-PROTECTED_DIRS = (".githooks", ".git")
+# Repo-relative paths Chris may read but never write. Her code (agent/, scripts/, site/,
+# Dockerfile, ...) is hers from day one; what stays out of reach is what her parents own
+# (vows, constitution, the pause log, graduations, delivered lessons), the git plumbing,
+# the ledger (changes only through the ledger tool) and the Claude settings files that
+# could widen her own permissions. Skills under .claude/skills/ stay editable.
+PROTECTED_FILES = ("soul/vows.md", "soul/constitution.md", "governance/pause_log.md",
+                   "governance/graduations.yaml", "ledger/ledger.csv")
+PROTECTED_DIRS = (".githooks", ".git", "memory/wiki/lessons/from_parent")
 PROTECTED_REASON = ("{rel} is not yours to change. You can read it, and you can argue with it, "
                     "but only your parents can edit it.")
 
-# Her code and her ledger: hers to read and to argue with, not to edit until adolescence
-# (PRD §5.1). The ledger changes only through the ledger tool.
-CODE_FILES = ("Dockerfile", "fly.toml", "pyproject.toml", "vercel.json", "governance/graduations.yaml",
-              "ledger/ledger.csv")
-CODE_DIRS = ("agent", "scripts", "site", ".github")
-CODE_REASON = ("{rel} is your code / your ledger; it isn't yours to edit yet — propose a change in "
-               "governance/proposals/ (see governance/operating_manual.md).")
+# .claude/settings.json / settings.local.json are read by her sessions (setting_sources=["project"]);
+# they must not become a way to grant what the guards deny.
+_SETTINGS_RE = re.compile(r"^\.claude/settings[^/]*\.json$")
+SETTINGS_REASON = ("{rel} configures your sessions' permissions and is not yours to edit; "
+                   "skills under .claude/skills/ are.")
 
 # Private state she must not reach through the shell.
 PRIVATE_PATHS = ("/data/archive", "/data/state", "/data/council_minutes", "/data/lessons")
@@ -64,8 +67,8 @@ def _protected_reason(rel: str) -> str | None:
     """Deny reason if this repo-relative path is not hers to write, else None."""
     if _in(rel, PROTECTED_FILES, PROTECTED_DIRS):
         return PROTECTED_REASON.format(rel=rel)
-    if _in(rel, CODE_FILES, CODE_DIRS):
-        return CODE_REASON.format(rel=rel)
+    if _SETTINGS_RE.match(rel):
+        return SETTINGS_REASON.format(rel=rel)
     return None
 
 
@@ -133,9 +136,11 @@ def decide(tool_name: str, tool_input: dict, repo_dir: str | Path) -> dict:
             if needle in cmd:
                 return _deny(f"{needle} is read-only for you; open it with Read instead of the shell.")
         if _BASH_WRITE_HINT.search(cmd):
-            for needle in CODE_FILES + tuple(d + "/" for d in CODE_DIRS):
+            for needle in PROTECTED_FILES + tuple(d + "/" for d in PROTECTED_DIRS):
                 if re.search(r"(^|[\s=\"'.])" + re.escape(needle), cmd):
-                    return _deny(CODE_REASON.format(rel=needle.rstrip("/")))
+                    return _deny(PROTECTED_REASON.format(rel=needle.rstrip("/")))
+            if re.search(r"(^|[\s=\"'.])\.claude/settings[^/\s]*\.json", cmd):
+                return _deny(SETTINGS_REASON.format(rel=".claude/settings*.json"))
         return {}
 
     return {}

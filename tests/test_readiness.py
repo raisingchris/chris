@@ -78,11 +78,28 @@ def test_mail_list_unread_skips_symlinks(services, repo, tmp_path):
 
 @pytest.mark.parametrize("rel", [
     "agent/loop.py", "scripts/entrypoint.sh", "site/build.py", ".github/workflows/ci.yml",
-    "Dockerfile", "fly.toml", "pyproject.toml", "vercel.json", "governance/graduations.yaml", "ledger/ledger.csv",
+    "Dockerfile", "fly.toml", "pyproject.toml", "vercel.json", ".claude/skills/seo/SKILL.md",
 ])
-def test_code_and_ledger_not_hers_yet(repo, rel):
+def test_her_code_is_hers_from_day_one(repo, rel):
+    assert guards.decide("Write", {"file_path": rel}, repo) == {}
+    assert guards.decide("Edit", {"file_path": str(repo / rel)}, repo) == {}
+
+
+@pytest.mark.parametrize("rel", [
+    "soul/vows.md", "soul/constitution.md", "governance/pause_log.md", "governance/graduations.yaml",
+    "ledger/ledger.csv", "memory/wiki/lessons/from_parent/01-x.md", ".githooks/pre-push", ".git/config",
+])
+def test_parents_files_and_ledger_still_denied(repo, rel):
     reason = denied(guards.decide("Write", {"file_path": rel}, repo))
-    assert reason and "governance/proposals/" in reason and "isn't yours to edit yet" in reason
+    assert reason and "only your parents can edit it" in reason
+
+
+@pytest.mark.parametrize("rel", [".claude/settings.json", ".claude/settings.local.json"])
+def test_claude_settings_denied_but_skills_editable(repo, rel):
+    assert "permissions" in denied(guards.decide("Write", {"file_path": rel}, repo))
+    assert denied(guards.decide("Bash", {"command": f"echo '{{}}' > {rel}"}, repo))
+    assert guards.decide("Write", {"file_path": ".claude/skills/new/SKILL.md"}, repo) == {}
+    assert guards.decide("Read", {"file_path": rel}, repo) == {}
 
 
 def test_dot_git_denied_for_edit_and_bash(repo):
@@ -104,11 +121,14 @@ def test_git_reads_allowed(repo, cmd):
     assert guards.decide("Bash", {"command": cmd}, repo) == {}
 
 
-def test_bash_writes_to_code_denied_reads_allowed(repo):
-    assert "isn't yours to edit yet" in denied(guards.decide("Bash", {"command": "echo hi >> agent/loop.py"}, repo))
-    assert denied(guards.decide("Bash", {"command": "sed -i 's/a/b/' pyproject.toml"}, repo))
+def test_bash_writes_to_code_allowed_but_not_to_parents_files(repo):
+    assert guards.decide("Bash", {"command": "echo hi >> agent/loop.py"}, repo) == {}
+    assert guards.decide("Bash", {"command": "sed -i 's/a/b/' pyproject.toml"}, repo) == {}
     assert guards.decide("Bash", {"command": "cat agent/loop.py"}, repo) == {}
-    assert guards.decide("Bash", {"command": "grep -n def agent/guards.py"}, repo) == {}
+    assert "only your parents" in denied(guards.decide("Bash", {"command": "echo x >> ledger/ledger.csv"}, repo))
+    assert denied(guards.decide("Bash", {"command": "sed -i 's/a/b/' governance/graduations.yaml"}, repo))
+    assert denied(guards.decide("Bash", {"command": "cp x memory/wiki/lessons/from_parent/02.md"}, repo))
+    assert guards.decide("Bash", {"command": "cat governance/graduations.yaml"}, repo) == {}
 
 
 # --- config --------------------------------------------------------------------------
@@ -329,3 +349,14 @@ def test_bash_code_guard_does_not_catch_lookalike_paths(repo):
     assert guards.decide("Bash", {"command": "echo hi >> memory/site/notes.md"}, repo) == {}
     assert guards.decide("Bash", {"command": "cat .github/workflows/ci.yml"}, repo) == {}
     assert guards.decide("Bash", {"command": "cat .gitignore"}, repo) == {}
+
+
+def test_meters_line_shows_undeployed_code(services, monkeypatch):
+    monkeypatch.setattr(gitops, "unpushed_count", lambda repo_dir, run=None: 0)
+    monkeypatch.setattr(gitops, "head_sha", lambda repo_dir, ref="HEAD", run=None: "bbbbbbb2222")
+    monkeypatch.setenv("GIT_SHA", "bbbbbbb2222")
+    assert "running code" not in services.meters_line()
+    monkeypatch.setenv("GIT_SHA", "aaaaaaa1111")
+    assert services.meters_line().endswith("· running code aaaaaaa; repo HEAD bbbbbbb (not deployed yet)")
+    monkeypatch.delenv("GIT_SHA")
+    assert "running code" not in services.meters_line()

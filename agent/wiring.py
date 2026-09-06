@@ -113,6 +113,10 @@ class Services:
         blocked = gitops.push_blocked_reason(self.state_dir)
         if blocked:
             line += f" · push blocked: {blocked}"
+        # Her code changes run only after a parent deploys; say so when the two differ.
+        running, head = gitops.running_sha(), gitops.head_sha(self.repo_dir)
+        if running and head and running != head:
+            line += f" · running code {running[:7]}; repo HEAD {head[:7]} (not deployed yet)"
         return line
 
 

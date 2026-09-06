@@ -57,6 +57,16 @@
   <button type="submit">Set</button>
 </form>
 
+<h2>Her code</h2>
+<table>
+  <tr><td>Running code</td><td><code>{{ running_sha }}</code></td></tr>
+  <tr><td>Repo HEAD</td><td><code>{{ head_sha }}</code>{% if code_behind %} — not deployed yet{% endif %}</td></tr>
+</table>
+<form method="post" action="/parent/deploy">
+  <button type="submit"{% if not deploy_configured %} disabled{% endif %}>Deploy</button>
+  <p class="muted">Deploys whatever is on main (runs the deploy workflow on GitHub; takes a few minutes).{% if not deploy_configured %} GITHUB_DEPLOY_TOKEN is not set.{% endif %}</p>
+</form>
+
 <h2>Next scheduled</h2>
 {% if next_runs %}
 <table>{% for name, t in next_runs %}<tr><td>{{ name }}</td><td>{{ t.strftime("%a %Y-%m-%d %H:%M %Z") }}</td></tr>{% endfor %}</table>
