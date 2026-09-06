@@ -10,9 +10,10 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
-from datetime import date, datetime, timezone
+from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
+from zoneinfo import ZoneInfo
 
 from agent.archive import Archive
 from agent.budget import Meter
@@ -81,7 +82,9 @@ class Services:
         return {"inference": self.inference, "council": self.council_meter}
 
     def birthday(self) -> date:
-        """Day of the first diary entry; today if she has not been born yet."""
+        """CHRIS_BIRTHDAY if set; else the first diary entry's day; else today."""
+        if self.cfg.birthday:
+            return date.fromisoformat(self.cfg.birthday)
         diaries = sorted((self.repo_dir / "memory" / "diary").glob("????-??-??.md"))
         if diaries:
             return date.fromisoformat(diaries[0].stem)
@@ -102,10 +105,6 @@ class Services:
         except Exception as exc:
             parts.append(f"Odometer: unavailable ({type(exc).__name__}).")
         return " ".join(parts)
-
-
-def _now_utc() -> datetime:
-    return datetime.now(timezone.utc)
 
 
 def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | None = None) -> Services:
@@ -161,7 +160,9 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
 
     from agent.odometer import Odometer
 
-    odometer = Odometer(cfg.repo_dir, cfg.state_dir, archive.append, _now_utc)
+    # Her clock, not UTC: odometer claims and archive refs must share a date.
+    tz = ZoneInfo(cfg.tz)
+    odometer = Odometer(cfg.repo_dir, cfg.state_dir, archive.append, lambda: datetime.now(tz))
 
     return Services(
         cfg=cfg,

@@ -131,8 +131,16 @@ def archive_tool_use(archive_append, tool_name: str, tool_input: dict, tool_resp
     })
 
 
+PAUSED_REASON = "You're paused. Write what you want on the record; nothing else runs until a parent unpauses."
+
+
 def pre_tool_use(services):
+    from agent import pause
+
     async def hook(input_data: dict, tool_use_id, context) -> dict:
+        # A pause mid-sitting stops her at the next tool call, whatever the tool.
+        if pause.is_paused(services.cfg.state_dir):
+            return _deny(PAUSED_REASON)
         return decide(input_data.get("tool_name", ""), input_data.get("tool_input") or {}, services.repo_dir)
     return hook
 

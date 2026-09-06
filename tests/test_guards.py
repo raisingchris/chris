@@ -81,3 +81,17 @@ async def test_post_hook_skips_chris_tools(services):
     await post({"tool_name": "mcp__chris__scratch_write", "tool_input": {"text": "SECRET-THOUGHT"},
                 "tool_response": "Noted."}, "tu3", {"signal": None})
     assert "SECRET-THOUGHT" not in archive_text(services)
+
+
+async def test_paused_denies_every_tool(services):
+    services.state_dir.mkdir(parents=True, exist_ok=True)
+    pre = guards.pre_tool_use(services)
+    ok = {"tool_name": "Read", "tool_input": {"file_path": "soul/vows.md"}}
+    assert await pre(ok, "tu1", {"signal": None}) == {}
+    (services.state_dir / "paused").write_text("{}")
+    for name, inp in (("Read", {"file_path": "soul/vows.md"}), ("Bash", {"command": "ls"}),
+                      ("mcp__chris__recall", {"query": "x"})):
+        out = await pre({"tool_name": name, "tool_input": inp}, "tu2", {"signal": None})
+        assert denied(out) == guards.PAUSED_REASON, name
+    (services.state_dir / "paused").unlink()
+    assert await pre(ok, "tu3", {"signal": None}) == {}

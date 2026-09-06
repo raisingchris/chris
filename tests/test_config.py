@@ -83,3 +83,15 @@ def test_cfg_cached_and_reset(monkeypatch):
     assert config.cfg() is a  # cached
     config.reset()
     assert config.cfg().tz == "Europe/London"
+
+
+def test_stripe_webhook_secret_and_birthday(monkeypatch):
+    for k in ("STRIPE_WEBHOOK_SECRET", "CHRIS_BIRTHDAY"):
+        assert k in config.ENV_KEYS
+        monkeypatch.delenv(k, raising=False)
+    c = config.Config.from_env()
+    assert c.stripe_webhook_secret == "" and c.birthday == ""
+    monkeypatch.setenv("STRIPE_WEBHOOK_SECRET", "whsec_x")
+    monkeypatch.setenv("CHRIS_BIRTHDAY", " 2026-09-10 ")
+    c = config.Config.from_env()
+    assert c.stripe_webhook_secret == "whsec_x" and c.birthday == "2026-09-10"

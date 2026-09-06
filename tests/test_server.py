@@ -226,8 +226,8 @@ def test_vote_endpoint_both_needed_and_either_vetoes(client, services):
     sign_in(client, "alice.real@example.com")
     client.post("/parent/vote", data={"proposal_id": "p-1", "vote": "ratify"})
     assert "## Result" not in (repo / "governance" / "proposals" / "p-1.md").read_text()
-    client.post("/parent/vote", data={"proposal_id": "p-2", "vote": "veto"})
-    assert "Vetoed by a parent." in (repo / "governance" / "proposals" / "p-2.md").read_text()
+    client.post("/parent/vote", data={"proposal_id": "p-2", "vote": "veto", "reason": "Not yet; too expensive."})
+    assert "Vetoed by a parent. Reason: Not yet; too expensive." in (repo / "governance" / "proposals" / "p-2.md").read_text()
 
     client.get("/parent/logout")
     sign_in(client, "bob.real@example.com")
@@ -270,3 +270,24 @@ def test_allowance(client, services):
     assert saved["weekly_usd"] == 80.0 and saved["per_txn_usd"] == 25.0
     assert any(k == "parent_action" and p["action"] == "allowance" for k, p in services.archive.entries)
     assert 'value="80.0"' in client.get("/parent").text
+
+
+def test_veto_requires_reason_ratify_does_not(client, services):
+    repo = Path(services.cfg.repo_dir)
+    for pid in ("v-1", "v-2"):
+        (repo / "governance" / "proposals" / f"{pid}.md").write_text(f"# {pid}\n")
+    sign_in(client, "alice.real@example.com")
+
+    r = client.post("/parent/vote", data={"proposal_id": "v-1", "vote": "veto"})
+    assert r.status_code == 400 and "reason" in r.text
+    r = client.post("/parent/vote", data={"proposal_id": "v-1", "vote": "veto", "reason": "short"})
+    assert r.status_code == 400
+    assert "## Result" not in (repo / "governance" / "proposals" / "v-1.md").read_text()
+
+    r = client.post("/parent/vote", data={"proposal_id": "v-1", "vote": "veto", "reason": "Too early; wait a month."},
+                    follow_redirects=False)
+    assert r.status_code == 303
+    assert "Vetoed by a parent. Reason: Too early; wait a month." in (repo / "governance" / "proposals" / "v-1.md").read_text()
+
+    assert client.post("/parent/vote", data={"proposal_id": "v-2", "vote": "ratify"}, follow_redirects=False).status_code == 303
+    assert 'name="reason"' in client.get("/parent").text

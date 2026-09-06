@@ -35,6 +35,7 @@ log = logging.getLogger("chris.server")
 TEMPLATES_DIR = Path(__file__).parent / "templates"
 SVIX_TOLERANCE_S = 5 * 60
 LESSON_SUBJECT = "A lesson from your parents"
+VETO_REASON_MIN = 10
 _ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$")
 
 
@@ -360,7 +361,8 @@ def create_app(services, scheduler=None) -> FastAPI:
 
     @app.post("/parent/vote")
     async def parent_vote(
-        request: Request, proposal_id: str = Form(...), vote: str = Form(...), handle: str = Depends(require_parent)
+        request: Request, proposal_id: str = Form(...), vote: str = Form(...), reason: str = Form(""),
+        handle: str = Depends(require_parent),
     ):
         if vote not in ("ratify", "veto"):
             raise HTTPException(400, "vote must be ratify or veto")
@@ -369,11 +371,19 @@ def create_app(services, scheduler=None) -> FastAPI:
         proposal = repo / "governance" / "proposals" / f"{proposal_id}.md"
         if not proposal.exists():
             raise HTTPException(404, "no such proposal")
+        reason = reason.strip()
+        if vote == "veto" and len(reason) < VETO_REASON_MIN:
+            return templates.TemplateResponse(
+                request, "parent.html",
+                status_context(request, handle, error="A veto needs a reason of at least ten characters."),
+                status_code=400,
+            )
         result = record_vote(state / "votes.json", proposal_id, handle, vote, cfg.parent_handles)
         if result:
             today = datetime.now(timezone.utc).date().isoformat()
+            line = "Ratified by both parents." if result == "ratified" else f"Vetoed by a parent. Reason: {reason}"
             with open(proposal, "a", encoding="utf-8") as f:
-                f.write(f"\n\n## Result\n\n{today} — {'Ratified by both parents.' if result == 'ratified' else 'Vetoed by a parent.'}\n")
+                f.write(f"\n\n## Result\n\n{today} — {line}\n")
             pause.commit_as_parent(repo, f"governance: {proposal_id} {result}", dry_run=cfg.dry_run)
         archive_action("vote", handle, proposal=proposal_id, vote=vote, result=result)
         return RedirectResponse("/parent", status_code=303)

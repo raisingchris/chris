@@ -9,3 +9,4 @@ __pycache__/
 /data/
 chris.egg-info/
 *.egg-info/
+.vercel

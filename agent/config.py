@@ -9,6 +9,7 @@ ENV_KEYS = (
     "REPO_DIR", "ARCHIVE_DIR", "STATE_DIR", "TZ", "SITTINGS", "WAKE", "SLEEP",
     "SOFT_USD", "HARD_USD", "COUNCIL_WEEKLY_USD", "PARENT_A_EMAIL", "PARENT_B_EMAIL",
     "CHRIS_EMAIL", "PARENT_HANDLES", "CHRIS_DRY_RUN", "REDACT_CANARIES", "CHRIS_MODEL",
+    "STRIPE_WEBHOOK_SECRET", "CHRIS_BIRTHDAY",
 )
 
 _TRUE = {"1", "true", "yes", "on"}
@@ -37,6 +38,8 @@ class Config:
     dry_run: bool = False
     canaries: list[str] = field(default_factory=list)
     model: str = "claude-fable-5-1"
+    stripe_webhook_secret: str = ""
+    birthday: str = ""  # ISO date of her first day, or empty to infer from the first diary
 
     @classmethod
     def from_env(cls, env: dict[str, str] | None = None) -> "Config":
@@ -60,6 +63,8 @@ class Config:
             dry_run=g("CHRIS_DRY_RUN").strip().lower() in _TRUE,
             canaries=_csv(g("REDACT_CANARIES")),
             model=g("CHRIS_MODEL", "claude-fable-5-1"),
+            stripe_webhook_secret=g("STRIPE_WEBHOOK_SECRET"),
+            birthday=g("CHRIS_BIRTHDAY").strip(),
         )
 
 

@@ -62,6 +62,9 @@ class FakeCouncil:
         self.exceeded = exceeded
         self.asked = []
 
+    def unseal_due(self):
+        return []
+
     async def deliberate(self, question, context=""):
         self.asked.append(question)
         if self.exceeded:

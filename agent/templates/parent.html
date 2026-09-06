@@ -35,6 +35,8 @@
 <form method="post" action="/parent/vote">
   <input type="hidden" name="proposal_id" value="{{ p.id }}">
   <button name="vote" value="ratify">Ratify</button>
+  <label>Reason (required to veto; appended to the proposal)</label>
+  <textarea name="reason" rows="2" minlength="10"></textarea>
   <button name="vote" value="veto">Veto</button>
 </form>
 {% endfor %}
