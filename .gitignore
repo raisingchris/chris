@@ -1,0 +1,9 @@
+memory/scratchpad/
+.env
+.env.*
+site/out/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+/data/

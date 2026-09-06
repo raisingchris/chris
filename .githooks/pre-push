@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Refuse to push anything that could tie this repo to a real person.
+set -e
+email="$(git config user.email)"
+case "$email" in parent@raisingchris.com|chris@raisingchris.com) ;; *) echo "pre-push: refusing — user.email is '$email'"; exit 1;; esac
+bad="$(git log --format='%ae %ce' origin/main..HEAD 2>/dev/null | tr ' ' '\n' | sort -u | grep -v raisingchris.com || true)"
+[ -z "$bad" ] || { echo "pre-push: refusing — non-Chris author/committer in range: $bad"; exit 1; }
+tz="$(git log -1 --format=%ai | awk '{print $3}')"
+[ "$tz" = "+0000" ] || { echo "pre-push: refusing — last commit timezone is $tz, not +0000 (use scripts/commit.sh)"; exit 1; }

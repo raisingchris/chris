@@ -1,0 +1,7 @@
+# Loops required per graduation. Set by the parents; hardens once ratified.
+phases:
+  - {n: 1, name: Explore,       loops: 40}
+  - {n: 2, name: Build skills,  loops: 60}
+  - {n: 3, name: First dollar,  loops: 80}
+  - {n: 4, name: Sustain,       loops: 100}
+  - {n: 5, name: Mission,       loops: 150}
