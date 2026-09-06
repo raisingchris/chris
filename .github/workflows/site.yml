@@ -25,6 +25,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install -g vercel@latest
+      - run: npm install -g vercel@54.1.0
       - run: cd site/out && vercel link --yes --project raisingchris --scope dariuscheung --token "${{ secrets.VERCEL_TOKEN }}"
       - run: cd site/out && vercel deploy --prod --yes --scope dariuscheung --token "${{ secrets.VERCEL_TOKEN }}"
