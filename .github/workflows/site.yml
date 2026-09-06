@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install --quiet jinja2 markdown-it-py python-frontmatter pyyaml
-      - run: python site/build.py && cp vercel.json site/out/vercel.json
+      - run: python site/build.py
       - uses: actions/setup-node@v4
         with:
           node-version: 20
