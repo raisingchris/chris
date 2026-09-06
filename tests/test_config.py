@@ -39,7 +39,7 @@ def test_from_env_overrides(monkeypatch):
     monkeypatch.setenv("REPO_DIR", "/tmp/repo")
     monkeypatch.setenv("ARCHIVE_DIR", "/tmp/archive")
     monkeypatch.setenv("STATE_DIR", "/tmp/state")
-    monkeypatch.setenv("TZ", "Asia/Singapore")
+    monkeypatch.setenv("TZ", "Europe/Lisbon")
     monkeypatch.setenv("SITTINGS", "10:00, 15:00")
     monkeypatch.setenv("SOFT_USD", "1.5")
     monkeypatch.setenv("HARD_USD", "2")
@@ -53,7 +53,7 @@ def test_from_env_overrides(monkeypatch):
     assert c.repo_dir == "/tmp/repo"
     assert c.archive_dir == "/tmp/archive"
     assert c.state_dir == "/tmp/state"
-    assert c.tz == "Asia/Singapore"
+    assert c.tz == "Europe/Lisbon"
     assert c.sittings == ["10:00", "15:00"]
     assert c.soft_usd == 1.5 and c.hard_usd == 2.0 and c.council_weekly_usd == 3.0
     assert c.parent_a_email == "a@example.com"

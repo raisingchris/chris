@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import subprocess
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
 from typing import Awaitable, Callable
@@ -19,7 +18,7 @@ from zoneinfo import ZoneInfo
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-from agent import pause
+from agent import gitops, pause
 
 log = logging.getLogger("chris.scheduler")
 
@@ -66,13 +65,17 @@ def guarded(services, fn: Callable[..., Awaitable], *args, name: str = "") -> Ca
     return run
 
 
-def git_pull(repo_dir: str | Path) -> bool:
+def git_pull(repo_dir: str | Path, run=gitops.git) -> bool:
     repo = Path(repo_dir)
     if not (repo / ".git").exists():
         return False
-    r = subprocess.run(["git", "pull", "--rebase", "--quiet"], cwd=repo, capture_output=True)
-    if r.returncode != 0:
-        log.warning("git pull failed: %s", r.stderr.decode(errors="replace").strip())
+    try:
+        r = run(repo, "pull", "--rebase", "--quiet", check=False)
+    except Exception as exc:  # noqa: BLE001 — git missing, timeout
+        log.warning("git pull failed: %s", exc)
+        return False
+    if getattr(r, "returncode", 0) != 0:
+        log.warning("git pull failed: %s", str(getattr(r, "stderr", "") or "").strip())
         return False
     return True
 

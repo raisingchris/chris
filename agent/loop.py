@@ -78,6 +78,17 @@ def compose_user_prompt(services, kind: str) -> str:
     return "\n\n".join(parts) + "\n"
 
 
+def is_birth(services) -> bool:
+    """Her first sitting ever: no diary yet *and* no birth session in the archive.
+
+    The archive decides, not the diary: a birth that failed or ended before a diary was written
+    must not be repeated — the next sitting is an ordinary one (the handoff says what happened).
+    """
+    if diary_entries(services.repo_dir):
+        return False
+    return not services.archive.any("session_start", "birth")
+
+
 def sitting_number(services, today: str) -> int:
     day = services.archive.read_day(today)
     return 1 + sum(1 for r in day if r.get("kind") == "session_start" and r.get("payload", {}).get("kind") != "sleep")
@@ -141,7 +152,7 @@ async def run_sitting(services, kind: str = "sitting", query_fn=None, git_run=No
         _note_handoff(repo, line)
         return None
 
-    if not diary_entries(repo):
+    if is_birth(services):
         kind = "birth"
 
     n = sitting_number(services, today)
@@ -171,7 +182,7 @@ async def run_sitting(services, kind: str = "sitting", query_fn=None, git_run=No
     redact_and_log(services, now.strftime("%Y%m%dT%H%M%S"))
     run = git_run or gitops.git
     sha = gitops.commit_all(repo, f"{kind}: {today} sitting {n}", push=not cfg.dry_run, run=run,
-                            on_push_failed=push_failed_hook(services))
+                            on_push_failed=push_failed_hook(services), gate=gitops.PushGate.from_services(services))
     if failure is None:
         archive.append("sitting_done", {"kind": kind, "n": n, "cost_usd": result.cost_usd, "turns": result.turns,
                                         "commit": sha, "transcript": result.transcript_ref})

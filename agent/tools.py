@@ -42,8 +42,8 @@ def make_handlers(services) -> dict[str, Callable[[dict], Any]]:
         hits = archive.search(query, limit=limit)
         lines = []
         for h in hits:
-            # Raw archive may hold real parent addresses; map them before she sees them.
-            body = mail.map_addresses(str(h.get("payload", "")))
+            # Raw archive may hold real parent addresses or names; map + redact before she sees them.
+            body = mail.clean(str(h.get("payload", "")))
             lines.append(f"{h.get('ref')} [{h.get('kind')}] {h.get('ts', '')}\n{body}")
         archive.append("tool", {"name": "recall", "query": query, "limit": limit, "hits": [h.get("ref") for h in hits]})
         return text("\n\n".join(lines) if lines else "Nothing in the archive matches that.")

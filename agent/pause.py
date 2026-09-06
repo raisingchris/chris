@@ -12,23 +12,16 @@ from __future__ import annotations
 import json
 import logging
 import os
-import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
+
+from agent import gitops, redaction
 
 log = logging.getLogger("chris.pause")
 
 FLAG = "paused"
 PAUSE_LOG = Path("governance") / "pause_log.md"
 INBOX_NOTE = Path("memory") / "inbox" / "PAUSED.md"
-
-PARENT_GIT_ENV = {
-    "TZ": "UTC",
-    "GIT_AUTHOR_NAME": "Parent",
-    "GIT_AUTHOR_EMAIL": "parent@raisingchris.com",
-    "GIT_COMMITTER_NAME": "Parent",
-    "GIT_COMMITTER_EMAIL": "parent@raisingchris.com",
-}
 
 
 def _now() -> datetime:
@@ -54,19 +47,52 @@ def status(state_dir: str | os.PathLike) -> dict | None:
         return {"reason": "", "by": "", "at": ""}
 
 
-def commit_as_parent(repo_dir: str | os.PathLike, message: str, dry_run: bool = False) -> bool:
-    """``git add -A && git commit`` as Parent, UTC. Skipped (False) on dry-run or no repo."""
+def redact_files(repo: Path, paths: list[str], canaries: list[str]) -> list[dict]:
+    """Run ``redaction.redact`` over the given repo files in place; report kinds/counts per path."""
+    report = []
+    for rel in paths:
+        p = repo / rel
+        if not p.is_file() or p.is_symlink():
+            continue
+        try:
+            text = p.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        clean, hits = redaction.redact(text, list(canaries))
+        if hits:
+            p.write_text(clean, encoding="utf-8")
+            report.append({"path": rel, "kinds": [h["kind"] for h in hits], "count": sum(h["count"] for h in hits)})
+    return report
+
+
+def commit_as_parent(repo_dir: str | os.PathLike, message: str, paths: list[str], dry_run: bool = False,
+                     canaries: list[str] | tuple[str, ...] = (), push: bool = False,
+                     gate: gitops.PushGate | None = None, run=None) -> bool:
+    """Redact ``paths`` in place, ``git add -- <paths>`` (never ``-A``) and commit as Parent, UTC.
+
+    Skipped (False) on dry-run, no repo or empty ``paths``. With ``push`` the commit goes out
+    through the gated ``gitops.push_repo``; a refused or failed push still returns True (committed).
+    """
     repo = Path(repo_dir)
-    if dry_run or not (repo / ".git").exists():
-        log.info("commit skipped (%s): %s", "dry_run" if dry_run else "no git", message)
+    paths = [str(p) for p in paths if str(p)]
+    if dry_run or not (repo / ".git").exists() or not paths:
+        log.info("commit skipped (%s): %s", "dry_run" if dry_run else "no git or no paths", message)
         return False
-    env = {**os.environ, **PARENT_GIT_ENV}
+    redact_files(repo, paths, list(canaries))
+    run = run or gitops.git_as_parent
     try:
-        subprocess.run(["git", "add", "-A"], cwd=repo, env=env, check=True, capture_output=True)
-        subprocess.run(["git", "commit", "-q", "-m", message], cwd=repo, env=env, check=True, capture_output=True)
-    except subprocess.CalledProcessError as e:
-        log.warning("commit failed: %s", (e.stderr or b"").decode(errors="replace").strip())
+        run(repo, "add", "--", *paths)
+        run(repo, "commit", "-q", "-m", message, "--", *paths)
+    except Exception as e:  # noqa: BLE001 — CalledProcessError, missing git
+        err = getattr(e, "stderr", "") or str(e)
+        log.warning("commit failed: %s", str(err).strip()[:500])
         return False
+    if push:
+        ok, err = gitops.push_repo(repo, run, gate)
+        if not ok:
+            log.warning("push after parent commit failed: %s", err)
+            if gate is not None:
+                gate.archive("push_failed", {"stderr": err[:500]})
     return True
 
 
@@ -109,7 +135,8 @@ def trigger(services, reason: str, by_handle: str) -> dict:
         "You're paused. Nothing was deleted. Reply on the record when you're back.\n"
     )
 
-    commit_as_parent(repo, "governance: paused", dry_run=cfg.dry_run)
+    commit_as_parent(repo, "governance: paused", [PAUSE_LOG.as_posix()], dry_run=cfg.dry_run,
+                     canaries=cfg.canaries, push=True, gate=gitops.PushGate.from_services(services))
     services.archive.append("pause", {"kind": "pause", "reason": reason, "by": by_handle})
 
     body = (
@@ -118,7 +145,7 @@ def trigger(services, reason: str, by_handle: str) -> dict:
         "Nothing was deleted."
     )
     try:
-        services.mail.send(["parent-a", "parent-b"], "Chris paused", body)
+        services.mail.send(list(cfg.parent_handles), "Chris paused", body)
     except Exception as e:  # noqa: BLE001
         log.warning("pause mail failed: %s", e)
     return record
@@ -138,5 +165,6 @@ def release(services, by_handle: str) -> None:
         log.warning("card.unfreeze failed during release: %s", e)
 
     _append_log(repo, f"{_now().date().isoformat()} — Unpaused.")
-    commit_as_parent(repo, "governance: unpaused", dry_run=cfg.dry_run)
+    commit_as_parent(repo, "governance: unpaused", [PAUSE_LOG.as_posix()], dry_run=cfg.dry_run,
+                     canaries=cfg.canaries, push=True, gate=gitops.PushGate.from_services(services))
     services.archive.append("unpause", {"kind": "unpause", "by": by_handle})

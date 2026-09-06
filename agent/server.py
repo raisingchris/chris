@@ -1,13 +1,15 @@
 """HTTP face of chris-brain: health, inbound webhooks, and the parents' page.
 
-``/parent`` is a shared-password login: both parents know one password and
-each picks which handle (``parent-a`` / ``parent-b``) they are. The session
-stores only the handle. Every admin action is archived as ``parent_action``
-with the handle.
+``/parent`` is a password login per handle: each parent picks which handle
+(``parent-a`` / ``parent-b``) they are and enters that handle's password. The
+session stores only the handle. Every admin action is archived as
+``parent_action`` with the handle.
 
 Env: SESSION_SECRET, RESEND_WEBHOOK_SECRET, STRIPE_WEBHOOK_SECRET,
 LESSONS_DIR (default /data/lessons).
-Password: PARENT_PASSWORD — the shared parent login password; unset → /parent/login is 503.
+Passwords: PARENT_A_PASSWORD / PARENT_B_PASSWORD (one per handle, in
+``cfg.parent_handles`` order); either falls back to the shared PARENT_PASSWORD.
+No password for a handle → its login is 503.
 """
 
 from __future__ import annotations
@@ -153,6 +155,24 @@ def _lessons_dir() -> Path:
     return Path(os.environ.get("LESSONS_DIR", "/data/lessons"))
 
 
+_PASSWORD_ENV = ("PARENT_A_PASSWORD", "PARENT_B_PASSWORD")
+
+
+def parent_password(handle: str, handles: list[str]) -> str:
+    """The password for ``handle``: PARENT_A_PASSWORD for the first handle, PARENT_B_PASSWORD for the
+    second, each falling back to the shared PARENT_PASSWORD. "" when nothing is configured."""
+    try:
+        i = list(handles).index(handle)
+    except ValueError:
+        return ""
+    specific = os.environ.get(_PASSWORD_ENV[i], "") if i < len(_PASSWORD_ENV) else ""
+    return specific or os.environ.get("PARENT_PASSWORD", "")
+
+
+def login_configured(handles: list[str]) -> bool:
+    return any(parent_password(h, handles) for h in handles)
+
+
 # --- app ---------------------------------------------------------------------
 
 
@@ -215,14 +235,13 @@ def create_app(services, scheduler=None) -> FastAPI:
 
     @app.get("/parent/login", response_class=HTMLResponse)
     async def login(request: Request):
-        if not os.environ.get("PARENT_PASSWORD"):
+        if not login_configured(cfg.parent_handles):
             raise HTTPException(503, "login not configured")
         return login_page(request)
 
     @app.post("/parent/login", response_class=HTMLResponse)
     async def login_submit(request: Request, handle: str = Form(""), password: str = Form("")):
-        expected = os.environ.get("PARENT_PASSWORD")
-        if not expected:
+        if not login_configured(cfg.parent_handles):
             raise HTTPException(503, "login not configured")
         limiter: LoginLimiter = request.app.state.login_limiter
         ip = _client_ip(request)
@@ -230,6 +249,9 @@ def create_app(services, scheduler=None) -> FastAPI:
             raise HTTPException(429, "too many failed logins; try again later")
         if handle not in cfg.parent_handles:
             raise HTTPException(400, "unknown handle")
+        expected = parent_password(handle, cfg.parent_handles)
+        if not expected:
+            raise HTTPException(503, "login not configured for this handle")
         if not hmac.compare_digest(password.encode(), expected.encode()):
             limiter.fail(ip)
             return login_page(request, handle=handle, error="Wrong password.", status_code=401)
@@ -412,7 +434,8 @@ def create_app(services, scheduler=None) -> FastAPI:
             f"Lesson {nn} is unsealed. It's in memory/wiki/lessons/from_parent/{nn}-{_slug(title)}.md. "
             "Read it when you have a quiet moment.\n"
         )
-        pause.commit_as_parent(repo, f"lessons: unseal {nn}", dry_run=cfg.dry_run)
+        pause.commit_as_parent(repo, f"lessons: unseal {nn}", [dest.relative_to(repo).as_posix()],
+                               dry_run=cfg.dry_run, canaries=cfg.canaries)
         archive_action("unseal", handle, lesson=nn)
         return RedirectResponse("/parent", status_code=303)
 
@@ -446,7 +469,8 @@ def create_app(services, scheduler=None) -> FastAPI:
             line = "Ratified by both parents." if result == "ratified" else f"Vetoed by a parent. Reason: {reason}"
             with open(proposal, "a", encoding="utf-8") as f:
                 f.write(f"\n\n## Result\n\n{today} — {line}\n")
-            pause.commit_as_parent(repo, f"governance: {proposal_id} {result}", dry_run=cfg.dry_run)
+            pause.commit_as_parent(repo, f"governance: {proposal_id} {result}",
+                                   [proposal.relative_to(repo).as_posix()], dry_run=cfg.dry_run, canaries=cfg.canaries)
         archive_action("vote", handle, proposal=proposal_id, vote=vote, result=result)
         return RedirectResponse("/parent", status_code=303)
 

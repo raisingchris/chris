@@ -84,3 +84,35 @@ async def test_redaction_runs_before_commit(services, repo, tmp_path):
     assert "Alice Realname" not in (repo / "memory/diary/2026-09-01.md").read_text()
     logs = list((tmp_path / "redaction").glob("*.json"))
     assert logs and "Alice" not in logs[0].read_text()
+
+
+async def test_birth_decided_by_archive_not_diary(services, repo):
+    """A failed birth (no diary written) is not repeated: the next sitting is a normal one."""
+    async def dying(prompt, options):
+        raise RuntimeError("cli crashed")
+        yield  # pragma: no cover
+
+    await loop.run_sitting(services, "sitting", query_fn=dying, git_run=FakeGit())
+    assert not loop.diary_entries(repo)
+    assert services.archive.any("session_start", "birth")
+    assert "birth" in (repo / "memory/handoff.md").read_text() and "failed" in (repo / "memory/handoff.md").read_text()
+
+    seen = {}
+
+    async def query_fn(prompt, options):
+        seen["prompt"] = prompt
+        async for m in fake_messages()(prompt, options):
+            yield m
+
+    git = FakeGit()
+    await loop.run_sitting(services, "sitting", query_fn=query_fn, git_run=git)
+    assert "This is a sitting" in seen["prompt"] and "first day" not in seen["prompt"]
+    assert any(c[:2] == ("commit", "-m") and c[2].startswith("sitting:") for c in git.calls)
+
+
+def test_is_birth(services, repo):
+    assert loop.is_birth(services)
+    services.archive.append("session_start", {"kind": "sitting"})
+    assert loop.is_birth(services)  # an ordinary session_start does not count
+    services.archive.append("session_start", {"kind": "birth"})
+    assert not loop.is_birth(services)

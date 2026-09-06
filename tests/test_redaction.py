@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import pytest
@@ -10,7 +11,7 @@ from agent.redaction import (
     scan_tree,
 )
 
-CANARIES = ["Jane Q. Example", "jane.example@gmail.com", "Example Holdings Pte Ltd"]
+CANARIES = ["Jane Q. Example", "jane.example@gmail.com", "Example Holdings Pte Ltd", "Ruritania", "Zenda", "+999"]
 
 
 def _kinds(report):
@@ -37,7 +38,7 @@ def test_email_on_raisingchris_kept():
 
 
 def test_phone_caught():
-    clean, report = redact("call +65 9123 4567 or (212) 555-0199 or +1-415-555-0100", CANARIES)
+    clean, report = redact("call +44 9123 4567 or (212) 555-0199 or +1-415-555-0100", CANARIES)
     assert "9123" not in clean and "555" not in clean
     assert _kinds(report)["phone"] == 3
 
@@ -48,31 +49,43 @@ def test_dates_refs_and_ids_not_treated_as_phones():
     assert clean == text and report == []
 
 
-def test_singapore_local_phone_caught():
+def test_local_eight_digit_phone_caught():
     clean, report = redact("call 9123 4567 tomorrow", CANARIES)
     assert clean == "call [redacted] tomorrow"
     assert _kinds(report)["phone"] == 1
 
 
-def test_builtin_patterns():
-    text = "She lives in Singapore (UTC+8, SGT), a Singaporean at Moat Venture; see moatventure.com and 99.co"
+def test_builtin_pattern_is_only_the_generic_utc_offset():
+    text = "She lives at UTC+3 (UTC-05:30 in winter, utc +11); the city is Zenda in Ruritania, phone +999 1234 5678"
     clean, report = redact(text, CANARIES)
-    for bad in ["Singapore", "UTC+8", "SGT", "Moat Venture", "moatventure.com", "99.co"]:
+    for bad in ["UTC+3", "UTC-05:30", "utc +11", "Zenda", "Ruritania", "+999", "1234 5678"]:
         assert bad not in clean
-    assert _kinds(report)["pattern"] >= 6
+    kinds = _kinds(report)
+    assert kinds["pattern"] == 3
+    assert kinds["canary"] >= 3  # named places and the country code come from the canary list, not the source
+
+
+def test_source_has_no_named_patterns():
+    """The only built-in pattern is the generic UTC offset; nothing named lives in agent/redaction.py."""
+    from agent import redaction
+
+    assert redaction._PATTERNS.pattern.startswith(r"\bUTC")
+    assert "|" not in redaction._PATTERNS.pattern  # a single alternative
+    src = Path(redaction.__file__).read_text()
+    assert re.search(r"re\.compile\(\s*r?[\"'][^)]*\\b[A-Z][a-z]{3,}", src) is None  # no capitalised word patterns
 
 
 def test_ordinary_words_not_over_redacted():
-    clean, report = redact("sgtest is a word; the sign said 1999.com sale", CANARIES)
-    assert clean == "sgtest is a word; the sign said 1999.com sale"
+    clean, report = redact("utctest is a word; the sign said 1984.com sale", CANARIES)
+    assert clean == "utctest is a word; the sign said 1984.com sale"
     assert report == []
 
 
 def test_report_never_contains_matched_text():
-    text = "Jane Q. Example <jane.example@gmail.com> +65 9123 4567 Singapore"
+    text = "Jane Q. Example <jane.example@gmail.com> +44 9123 4567 Ruritania"
     _, report = redact(text, CANARIES)
     dumped = repr(report).lower()
-    for c in CANARIES + ["9123", "singapore"]:
+    for c in CANARIES + ["9123", "ruritania"]:
         assert c.lower() not in dumped
     assert set(report[0].keys()) == {"kind", "count"}
 
@@ -89,7 +102,7 @@ def tree(tmp_path: Path) -> Path:
     (tmp_path / "memory" / "scratchpad").mkdir(parents=True)
     (tmp_path / ".git").mkdir()
     (tmp_path / "memory" / "diary" / "2026-09-06.md").write_text(
-        "Talked to Jane Q. Example about Singapore.\n"
+        "Talked to Jane Q. Example about Ruritania at UTC+3.\n"
     )
     (tmp_path / "memory" / "scratchpad" / "notes.md").write_text("jane.example@gmail.com\n")
     (tmp_path / ".git" / "config").write_text("Example Holdings Pte Ltd\n")
@@ -102,7 +115,7 @@ def test_scan_tree_skips_scratchpad_git_and_binaries(tree: Path):
     hits = scan_tree(tree, CANARIES)
     assert [h["path"] for h in hits] == ["memory/diary/2026-09-06.md"]
     assert set(hits[0]["kinds"]) == {"canary", "pattern"}
-    assert hits[0]["count"] == 2
+    assert hits[0]["count"] == 3
 
 
 def test_assert_clean_raises_with_paths_not_secrets(tree: Path):
@@ -111,14 +124,14 @@ def test_assert_clean_raises_with_paths_not_secrets(tree: Path):
     msg = str(exc.value)
     assert "memory/diary/2026-09-06.md" in msg
     assert "canary" in msg
-    assert "Jane" not in msg and "Singapore" not in msg
+    assert "Jane" not in msg and "Ruritania" not in msg
 
 
 def test_clean_tree_rewrites_and_then_clean(tree: Path):
     report = clean_tree(tree, CANARIES)
     assert [h["path"] for h in report] == ["memory/diary/2026-09-06.md"]
     assert (tree / "memory" / "diary" / "2026-09-06.md").read_text() == (
-        "Talked to [redacted] about [redacted].\n"
+        "Talked to [redacted] about [redacted] at [redacted].\n"
     )
     # untouched: excluded + binary + already-clean
     assert (tree / "memory" / "scratchpad" / "notes.md").read_text() == "jane.example@gmail.com\n"

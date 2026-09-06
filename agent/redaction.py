@@ -1,9 +1,12 @@
 """Redaction of identifying strings before anything reaches the public repo.
 
-Canaries (parent names, emails, holdco, city) come from the caller (see
-`Config.canaries`); built-in patterns cover the known markers. Reports and
-errors only ever carry *kinds and counts* — never the matched text — so the
-canaries cannot leak through logs.
+Every specific identifier (parent names, emails, holdco, city, country code,
+timezone name…) comes from the caller as a *canary* (see ``Config.canaries``,
+env ``REDACT_CANARIES``). This module itself only knows generic shapes:
+foreign e-mail addresses, phone numbers and ``UTC±N`` offsets — nothing in
+this source names anyone or anywhere. Reports and errors only ever carry
+*kinds and counts* — never the matched text — so the canaries cannot leak
+through logs.
 """
 
 from __future__ import annotations
@@ -28,18 +31,10 @@ _PHONE = re.compile(
     r"(?<![\w+])(?:\+\d{1,3}[ .-]?|\(\d{2,4}\)[ .-]?)?\d(?:[ .-]?\d){6,14}(?!\w)"
 )
 _ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-_SG_LOCAL = re.compile(r"^[3689]\d{3}[ -]\d{4}$")
-_PATTERNS = re.compile(
-    r"UTC\+8"
-    r"|\bSGT\b"
-    r"|\bSingaporeans?\b"
-    r"|\bSingapore\b"
-    r"|\+65\b"
-    r"|\bMoat\s*Ventures?\b"
-    r"|\bmoatventure\.com\b"
-    r"|\b99\.co\b",
-    re.IGNORECASE,
-)
+# eight digits as two groups of four ("9123 4567"): a local mobile number in several countries
+_LOCAL_8 = re.compile(r"^\d{4}[ -]\d{4}$")
+# Generic only: a UTC offset gives away a timezone band. Anything named is a canary.
+_PATTERNS = re.compile(r"\bUTC\s?[+\-−]\s?\d{1,2}(?::?\d{2})?\b", re.IGNORECASE)
 
 
 class RedactionError(Exception):
@@ -64,7 +59,7 @@ def _is_phone(m: re.Match) -> bool:
         return False
     if s[0] in "+(":
         return True
-    if _SG_LOCAL.match(s):  # 9123 4567 — Singapore local style
+    if _LOCAL_8.match(s):
         return True
     return digits >= 9 and not _ISO_DATE.match(s) and not s.isdigit()
 

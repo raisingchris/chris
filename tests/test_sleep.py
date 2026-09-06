@@ -206,3 +206,24 @@ def test_render_archive_drops_middle():
     assert "archive:2026-09-06#1 " in out and "archive:2026-09-06#200 " in out
     assert "records dropped from the middle" in out and "archive:2026-09-06#100 " not in out
     assert sleep.render_archive([]) == "(nothing archived today)"
+
+
+async def test_archive_in_sleep_prompt_is_mapped_and_redacted(services, repo):
+    from conftest import PARENT_A
+
+    # the raw event carries a display name (canary) and, historically, a real address
+    services.archive.append("mail_in", {"data": {"from": f"Alice Realname <{PARENT_A}>", "subject": "hi",
+                                                  "note": "Alice Realname " + "x" * 700}})
+    seen = {}
+    await sleep.run_sleep(services, query_fn=model(capture=seen), git_run=fresh_git())
+    p = seen["prompt"]
+    assert "[mail_in]" in p
+    assert "Alice" not in p and PARENT_A not in p and "alice.realname" not in p
+    assert "parent-a" in p
+
+
+def test_render_archive_applies_clean_before_truncation():
+    recs = [{"ref": "archive:2026-09-06#1", "ts": "t", "kind": "k", "payload": {"pad": "y" * 590, "name": "Alice Realname"}}]
+    out = sleep.render_archive(recs, clean=lambda s: s.replace("Alice Realname", "[redacted]"))
+    assert "Alice" not in out  # without pre-clean the cut would leave "Alice Real…" in the prompt
+    assert out.endswith("…")

@@ -83,12 +83,13 @@ def test_webhook_adds_revenue_row(make, archived):
     p, fake, ledger = make(event)
     out = p.handle_webhook(b"{}", "sig", "whsec")
     assert out["amount"] == 25.0 and out["ccy"] == "USD"
-    assert out["counterparty"] == "example.org"
+    assert out["counterparty"] == "stranger"  # not even the payer's domain reaches the public ledger
     rows = ledger.rows()
     assert len(rows) == 1 and rows[0]["type"] == "revenue" and rows[0]["ref"] == "cs_1"
     assert ledger.balance() == 25.0
     assert archived[-1][0] == "payment_received"
     assert "someone@" not in str(archived) and "someone@" not in str(rows)
+    assert "example.org" not in str(archived) and "example.org" not in str(rows)
     # replay is idempotent
     p.handle_webhook(b"{}", "sig", "whsec")
     assert len(ledger.rows()) == 1

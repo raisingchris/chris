@@ -306,3 +306,66 @@ def test_veto_requires_reason_ratify_does_not(client, services):
 
     assert client.post("/parent/vote", data={"proposal_id": "v-2", "vote": "ratify"}, follow_redirects=False).status_code == 303
     assert 'name="reason"' in client.get("/parent").text
+
+
+# --- two passwords ----------------------------------------------------------------------
+
+
+def test_per_handle_passwords(client, monkeypatch):
+    monkeypatch.setenv("PARENT_A_PASSWORD", "alpha pass phrase")
+    monkeypatch.setenv("PARENT_B_PASSWORD", "bravo pass phrase")
+    assert sign_in(client, "parent-a", "alpha pass phrase").status_code == 303
+    client.get("/parent/logout")
+    assert sign_in(client, "parent-a", "bravo pass phrase").status_code == 401  # the other parent's password
+    assert sign_in(client, "parent-b", "alpha pass phrase").status_code == 401
+    assert sign_in(client, "parent-b", "bravo pass phrase").status_code == 303
+    client.get("/parent/logout")
+    assert sign_in(client, "parent-a", PASSWORD).status_code == 401  # shared fallback ignored once a specific one is set
+
+
+def test_shared_password_fallback_per_handle(client, monkeypatch):
+    monkeypatch.setenv("PARENT_A_PASSWORD", "alpha pass phrase")
+    monkeypatch.delenv("PARENT_B_PASSWORD", raising=False)
+    assert sign_in(client, "parent-b", PASSWORD).status_code == 303  # B falls back to PARENT_PASSWORD
+    client.get("/parent/logout")
+    assert sign_in(client, "parent-a", PASSWORD).status_code == 401
+
+
+def test_login_503_when_only_other_handle_configured(client, monkeypatch):
+    monkeypatch.delenv("PARENT_PASSWORD")
+    monkeypatch.setenv("PARENT_A_PASSWORD", "alpha pass phrase")
+    assert client.get("/parent/login").status_code == 200
+    assert sign_in(client, "parent-a", "alpha pass phrase").status_code == 303
+    client.get("/parent/logout")
+    assert sign_in(client, "parent-b", "anything at all").status_code == 503
+
+
+def test_parent_page_commits_explicit_paths_only(client, services, tmp_path, monkeypatch):
+    """unseal and vote commit just the file they wrote, never `git add -A`."""
+    import dataclasses
+
+    from agent import gitops
+
+    calls = []
+
+    def git(repo_dir, *args, check=True, **kw):
+        calls.append(args)
+        from types import SimpleNamespace
+        return SimpleNamespace(stdout="", stderr="", returncode=0)
+
+    monkeypatch.setattr(gitops, "git_as_parent", git)
+    services.cfg = dataclasses.replace(services.cfg, dry_run=False)
+    repo = Path(services.cfg.repo_dir)
+    (repo / ".git").mkdir()
+    lessons = tmp_path / "lessons"
+    lessons.mkdir()
+    (lessons / "01.md").write_text("# First\n\nHi.\n")
+    (repo / "governance" / "proposals" / "p-9.md").write_text("# p-9\n")
+    c = TestClient(create_app(services), base_url="https://testserver")  # session cookie is https-only outside dry-run
+    assert sign_in(c, "parent-a").status_code == 303
+    assert c.post("/parent/unseal", data={"n": "1"}, follow_redirects=False).status_code == 303
+    c.post("/parent/vote", data={"proposal_id": "p-9", "vote": "veto", "reason": "Not now, thank you."})
+    adds = [a for a in calls if a[:1] == ("add",)]
+    assert adds == [("add", "--", "memory/wiki/lessons/from_parent/01-first.md"),
+                    ("add", "--", "governance/proposals/p-9.md")]
+    assert not any("-A" in a for a in calls)

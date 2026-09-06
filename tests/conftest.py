@@ -90,7 +90,8 @@ def services(tmp_path, repo) -> Services:
         parent_a_email=PARENT_A, parent_b_email=PARENT_B, dry_run=True, canaries=["Alice Realname"],
     )
     archive = Archive(cfg.archive_dir, tz=cfg.tz)
-    mail = Mail(repo, archive.append, {"parent-a": PARENT_A, "parent-b": PARENT_B}, cfg.chris_email, dry_run=True)
+    mail = Mail(repo, archive.append, {"parent-a": PARENT_A, "parent-b": PARENT_B}, cfg.chris_email, dry_run=True,
+                canaries=cfg.canaries)
     return Services(
         cfg=cfg, secrets=Secrets(), archive=archive,
         inference=Meter("inference", "day", cfg.state_dir, tz=cfg.tz),

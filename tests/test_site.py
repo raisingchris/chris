@@ -1,6 +1,7 @@
 """The public site: builds from the real repo, discloses on every page, leaks nothing."""
 
 import importlib.util
+import os
 from pathlib import Path
 
 import pytest
@@ -42,11 +43,19 @@ def test_disclosure_on_every_page(out: Path):
 
 
 def test_no_canaries_anywhere(out: Path):
+    """The built site carries none of the forbidden fragments.
+
+    The real list never lives in the repo: the parents run this locally with
+    ``IDENTITY_FORBIDDEN="Name,City,..."`` (see tests/test_no_identity_strings.py).
+    """
+    forbidden = [s.strip() for s in os.environ.get("IDENTITY_FORBIDDEN", "").split(",") if s.strip()]
+    if not forbidden:
+        pytest.skip("IDENTITY_FORBIDDEN not set")
     for p in out.rglob("*"):
         if p.is_file():
-            text = p.read_text(errors="ignore")
-            for canary in ("Moat", "Singapore"):
-                assert canary not in text, f"{canary} in {p}"
+            text = p.read_text(errors="ignore").lower()
+            for i, canary in enumerate(forbidden):
+                assert canary.lower() not in text, f"forbidden fragment #{i} in {p}"
 
 
 def test_council_shows_empty_chair(out: Path):

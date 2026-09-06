@@ -13,6 +13,8 @@ from typing import Any, AsyncIterator, Callable
 from agent import guards, tools
 
 BUILTIN_TOOLS = ["Bash", "Read", "Edit", "Write", "Glob", "Grep", "WebFetch", "WebSearch"]
+MIN_BUDGET_USD = 0.5  # a session always gets at least this much, so a nearly-spent day still lets her say goodnight
+UNKNOWN_COST_USD = 1.0  # metered when a session ends without a ResultMessage (crash, disconnect)
 
 
 @dataclass
@@ -35,11 +37,26 @@ def allowed_tools(tools_allowed: list[str], excluded: list[str] | tuple[str, ...
     return [t for t in tools_allowed if t not in excluded] + tools.mcp_names(exclude=excluded)
 
 
+def session_budget_usd(services) -> float:
+    """What this one session may spend: the rest of today's hard cap, never below MIN_BUDGET_USD."""
+    cfg = services.cfg
+    try:
+        spent = float(services.inference.spent())
+    except Exception:  # noqa: BLE001
+        spent = 0.0
+    return max(MIN_BUDGET_USD, float(cfg.hard_usd) - spent)
+
+
 def build_options(services, system_prompt: str, tools_allowed: list[str], max_turns: int,
                   excluded: list[str] | tuple[str, ...] = ()):
+    import dataclasses
+
     from claude_agent_sdk import ClaudeAgentOptions
 
     cfg = services.cfg
+    extra = {}
+    if any(f.name == "max_budget_usd" for f in dataclasses.fields(ClaudeAgentOptions)):
+        extra["max_budget_usd"] = session_budget_usd(services)
     env = {"ANTHROPIC_API_KEY": services.secrets.anthropic_key} if services.secrets.anthropic_key else {}
     # In production the CLI runs as a different OS user through this wrapper (see Dockerfile);
     # locally it is unset and the SDK uses its bundled CLI.
@@ -58,6 +75,7 @@ def build_options(services, system_prompt: str, tools_allowed: list[str], max_tu
         env=env,
         cli_path=cli_path,
         max_turns=max_turns,
+        **extra,
     )
 
 
@@ -105,25 +123,43 @@ async def run_session(
     is_error = False
     subtype = ""
     result_text = ""
-    async for msg in query_fn(user_prompt, options):
-        name = type(msg).__name__
-        if name == "AssistantMessage":
-            for t in _text_blocks(msg):
-                texts.append(t)
-                archive.append("assistant", {"kind": kind, "text": t})
-        elif name == "ResultMessage":
-            cost = float(getattr(msg, "total_cost_usd", None) or 0.0)
-            turns = int(getattr(msg, "num_turns", 0) or 0)
-            is_error = bool(getattr(msg, "is_error", False))
-            subtype = str(getattr(msg, "subtype", "") or "")
-            result_text = getattr(msg, "result", None) or ""
-            archive.append("session_result", {
-                "kind": kind, "subtype": getattr(msg, "subtype", ""), "cost_usd": cost, "turns": turns,
-                "is_error": is_error, "duration_ms": getattr(msg, "duration_ms", None),
-                "result": result_text, "start": start_ref,
-            })
+    got_result = False
 
-    if cost:
+    def meter_unknown(reason: str) -> None:
+        # No ResultMessage: the CLI died or the stream broke. Meter a conservative estimate so an
+        # unmetered crash loop cannot run past the hard cap unseen.
+        archive.append("cost_unknown", {"kind": kind, "estimate_usd": UNKNOWN_COST_USD, "reason": reason,
+                                        "start": start_ref})
+        services.inference.add_usd(UNKNOWN_COST_USD, f"{kind} session (cost unknown)")
+
+    try:
+        async for msg in query_fn(user_prompt, options):
+            name = type(msg).__name__
+            if name == "AssistantMessage":
+                for t in _text_blocks(msg):
+                    texts.append(t)
+                    archive.append("assistant", {"kind": kind, "text": t})
+            elif name == "ResultMessage":
+                got_result = True
+                cost = float(getattr(msg, "total_cost_usd", None) or 0.0)
+                turns = int(getattr(msg, "num_turns", 0) or 0)
+                is_error = bool(getattr(msg, "is_error", False))
+                subtype = str(getattr(msg, "subtype", "") or "")
+                result_text = getattr(msg, "result", None) or ""
+                archive.append("session_result", {
+                    "kind": kind, "subtype": getattr(msg, "subtype", ""), "cost_usd": cost, "turns": turns,
+                    "is_error": is_error, "duration_ms": getattr(msg, "duration_ms", None),
+                    "result": result_text, "start": start_ref,
+                })
+    except BaseException as exc:
+        if not got_result:
+            meter_unknown(f"{type(exc).__name__}")
+        raise
+
+    if not got_result:
+        cost = UNKNOWN_COST_USD
+        meter_unknown("no ResultMessage")
+    elif cost:
         services.inference.add_usd(cost, f"{kind} session")
     final_text = result_text or (texts[-1] if texts else "")
     return SessionResult(cost_usd=cost, turns=turns, transcript_ref=start_ref,

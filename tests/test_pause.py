@@ -1,7 +1,9 @@
 """Invariant 9: pause sets the flag, freezes the card, logs without identity, tells both parents."""
 
+import dataclasses
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from fake_services import FakeCard, make_services
@@ -80,5 +82,69 @@ def test_release_clears_flag_unfreezes_and_logs(services):
 
 
 def test_commit_skipped_on_dry_run_and_without_git(services, tmp_path):
-    assert pause.commit_as_parent(services.cfg.repo_dir, "x", dry_run=True) is False
-    assert pause.commit_as_parent(tmp_path / "nogit", "x", dry_run=False) is False
+    assert pause.commit_as_parent(services.cfg.repo_dir, "x", ["governance/pause_log.md"], dry_run=True) is False
+    assert pause.commit_as_parent(tmp_path / "nogit", "x", ["governance/pause_log.md"], dry_run=False) is False
+    Path(services.cfg.repo_dir, ".git").mkdir()
+    assert pause.commit_as_parent(services.cfg.repo_dir, "x", [], dry_run=False) is False  # no paths, no -A
+
+
+class RecordingGit:
+    def __init__(self):
+        self.calls = []
+
+    def __call__(self, repo_dir, *args, check=True, **kw):
+        self.calls.append(args)
+        return SimpleNamespace(stdout="", stderr="", returncode=0)
+
+
+def test_commit_as_parent_adds_only_given_paths_and_redacts_them(services):
+    repo = Path(services.cfg.repo_dir)
+    (repo / ".git").mkdir()
+    (repo / "governance" / "pause_log.md").write_text("- 2026-09-06 — Paused. Reason: Alice Realname rang.\n")
+    (repo / "governance" / "other.md").write_text("Alice Realname\n")
+    git = RecordingGit()
+    ok = pause.commit_as_parent(repo, "governance: paused", ["governance/pause_log.md"], dry_run=False,
+                                canaries=["Alice Realname"], run=git)
+    assert ok is True
+    assert git.calls[0] == ("add", "--", "governance/pause_log.md")
+    assert git.calls[1][:3] == ("commit", "-q", "-m") and git.calls[1][-1] == "governance/pause_log.md"
+    assert not any("-A" in c for c in git.calls)
+    assert "Alice" not in (repo / "governance" / "pause_log.md").read_text()
+    assert "[redacted] rang" in (repo / "governance" / "pause_log.md").read_text()
+    assert (repo / "governance" / "other.md").read_text() == "Alice Realname\n"  # untouched: not in paths
+    assert not any(c[:1] == ("push",) for c in git.calls)
+
+
+def test_commit_as_parent_pushes_through_gate(services):
+    from agent import gitops
+
+    repo = Path(services.cfg.repo_dir)
+    (repo / ".git").mkdir()
+    (repo / "governance" / "pause_log.md").write_text("- paused\n")
+    git = RecordingGit()
+    gate = gitops.PushGate(canaries=["Alice Realname"], archive_append=services.archive.append,
+                           state_dir=Path(services.cfg.state_dir))
+    assert pause.commit_as_parent(repo, "m", ["governance/pause_log.md"], run=git, push=True, gate=gate)
+    assert ("push",) in git.calls
+    assert ("diff", "origin/main..HEAD") in git.calls  # canary gate ran before the push
+
+
+def test_trigger_and_release_commit_and_push_when_not_dry_run(services, monkeypatch):
+    from agent import gitops
+
+    services.cfg = dataclasses.replace(services.cfg, dry_run=False)
+    Path(services.cfg.repo_dir, ".git").mkdir()
+    git = RecordingGit()
+    monkeypatch.setattr(gitops, "git_as_parent", git)
+    pause.trigger(services, REASON, "parent-a")
+    assert ("add", "--", "governance/pause_log.md") in git.calls
+    assert ("push",) in git.calls
+    n = len(git.calls)
+    pause.release(services, "parent-b")
+    assert git.calls.count(("push",)) == 2 and len(git.calls) > n
+
+
+def test_trigger_mails_configured_handles(tmp_path):
+    services = make_services(tmp_path, parent_handles=["mum", "dad"])
+    pause.trigger(services, REASON, "mum")
+    assert sorted(services.mail.sent[0]["to"]) == ["dad", "mum"]

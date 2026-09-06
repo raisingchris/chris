@@ -69,20 +69,26 @@ def _safe(services, rel: str) -> Path | None:
 # --- prompt --------------------------------------------------------------------
 
 
-def _render_record(rec: dict) -> str:
+def _render_record(rec: dict, clean=None) -> str:
     payload = rec.get("payload", {})
     try:
         body = json.dumps(payload, ensure_ascii=False, default=str)
     except Exception:  # noqa: BLE001
         body = str(payload)
+    if clean is not None:
+        body = clean(body)  # before truncation, so a name is never cut into an unrecognisable half
     if len(body) > PAYLOAD_CHARS:
         body = body[:PAYLOAD_CHARS] + "…"
     return f"{rec.get('ref', '')} {str(rec.get('ts', ''))[11:19]} [{rec.get('kind', '')}] {body}"
 
 
-def render_archive(records: list[dict], limit: int = ARCHIVE_CHARS) -> str:
-    """Today's archive, one compact line per record; the middle is dropped if it runs past `limit`."""
-    lines = [_render_record(r) for r in records]
+def render_archive(records: list[dict], limit: int = ARCHIVE_CHARS, clean=None) -> str:
+    """Today's archive, one compact line per record; the middle is dropped if it runs past `limit`.
+
+    ``clean`` (``Mail.clean``: handles for parent addresses, then redaction) runs over every line —
+    the raw archive may hold a parent's display name or a stranger's address.
+    """
+    lines = [_render_record(r, clean) for r in records]
     text = "\n".join(lines)
     if len(text) <= limit:
         return text or "(nothing archived today)"
@@ -109,7 +115,7 @@ def render_archive(records: list[dict], limit: int = ARCHIVE_CHARS) -> str:
 def compose_user_prompt(services, today: str) -> str:
     repo = services.repo_dir
     parts = [loop._read(PROMPT_FILE).rstrip(), "---",
-             "## Today's archive\n" + render_archive(services.archive.read_day(today))]
+             "## Today's archive\n" + render_archive(services.archive.read_day(today), clean=services.mail.clean)]
     character = repo / "memory" / "wiki" / "self" / "character.md"
     if character.exists():
         parts.append("## memory/wiki/self/character.md\n" + loop._rread(services, character).rstrip())
@@ -266,7 +272,8 @@ async def run_sleep(services, query_fn=None, git_run=None) -> SleepResult:
 
     run = git_run or gitops.git
     result.commit = gitops.commit_all(repo, f"sleep: {today}", push=not cfg.dry_run, run=run,
-                                      on_push_failed=loop.push_failed_hook(services))
+                                      on_push_failed=loop.push_failed_hook(services),
+                                      gate=gitops.PushGate.from_services(services))
 
     spend = spend_line(services)
     inbox_count = len(services.mail.list_unread())

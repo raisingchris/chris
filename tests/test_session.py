@@ -56,3 +56,39 @@ def test_build_options_shape(services):
     assert "mcp__chris__recall" in opts.allowed_tools and "mcp__chris__card_details" not in opts.allowed_tools
     assert opts.mcp_servers["chris"]["type"] == "sdk"
     assert set(opts.hooks) == {"PreToolUse", "PostToolUse"}
+
+
+def test_build_options_sets_per_session_budget(services):
+    services.inference.add_usd(20.0, "earlier today")
+    opts = session.build_options(services, "SYS", session.BUILTIN_TOOLS, 80)
+    assert opts.max_budget_usd == 5.0  # hard cap 25 minus 20 spent
+    services.inference.add_usd(10.0, "more")
+    opts = session.build_options(services, "SYS", session.BUILTIN_TOOLS, 80)
+    assert opts.max_budget_usd == session.MIN_BUDGET_USD
+
+
+async def test_no_result_message_meters_conservative_estimate(services):
+    AssistantMessage = type("AssistantMessage", (), {})
+
+    async def query_fn(prompt, options):
+        a = AssistantMessage()
+        a.content = [SimpleNamespace(text="hi")]
+        yield a  # then the stream just ends
+
+    res = await session.run_session(services, "sitting", "S", "U", query_fn=query_fn)
+    assert res.cost_usd == session.UNKNOWN_COST_USD
+    assert services.inference.spent() == session.UNKNOWN_COST_USD
+    assert '"kind": "cost_unknown"' in archive_text(services) or "cost_unknown" in archive_text(services)
+
+
+async def test_stream_exception_still_meters(services):
+    async def query_fn(prompt, options):
+        raise ConnectionError("cli died")
+        yield  # pragma: no cover
+
+    import pytest
+
+    with pytest.raises(ConnectionError):
+        await session.run_session(services, "sitting", "S", "U", query_fn=query_fn)
+    assert services.inference.spent() == session.UNKNOWN_COST_USD
+    assert "cost_unknown" in archive_text(services) and "ConnectionError" in archive_text(services)

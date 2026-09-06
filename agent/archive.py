@@ -71,6 +71,23 @@ class Archive:
             raise KeyError(ref)
         return day[n - 1]
 
+    def any(self, kind: str, payload_kind: str | None = None) -> bool:
+        """True if any record of ``kind`` exists (optionally with ``payload["kind"] == payload_kind``), any day."""
+        for path in sorted(self.dir.glob("????-??-??.jsonl"), reverse=True):
+            with open(path, "r", encoding="utf-8") as f:
+                for ln in f:
+                    if not ln.strip():
+                        continue
+                    try:
+                        rec = json.loads(ln)
+                    except json.JSONDecodeError:
+                        continue
+                    if rec.get("kind") != kind:
+                        continue
+                    if payload_kind is None or (rec.get("payload") or {}).get("kind") == payload_kind:
+                        return True
+        return False
+
     def search(self, query: str, limit: int = 20) -> list[dict]:
         """Case-insensitive substring match over serialized lines, newest first."""
         q = query.lower()

@@ -87,8 +87,9 @@ class Card:
         return {"card_id": self.card_id, "card_status": out.get("card_status")}
 
     def details(self) -> dict:
-        """Sensitive card data for Chris to pay with. Name stripped; numbers never archived."""
-        self._archive("card_details_requested", {"kind": "card_details_requested"})
+        """Sensitive card data for Chris to pay with. Name stripped; numbers never archived.
+
+        The request itself is archived (with its memo) by the ``card_details`` tool, not here."""
         d = self._call("GET", self._card_path("/details"))
         return {"number": d["card_number"], "expiry_month": d["expiry_month"],
                 "expiry_year": d["expiry_year"], "cvc": d["cvv"]}

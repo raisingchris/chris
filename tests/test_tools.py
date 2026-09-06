@@ -83,3 +83,19 @@ def test_make_server_builds_with_sdk(services):
     server = tools.make_server(services)
     assert server["type"] == "sdk" and server["name"] == "chris"
     assert tools.mcp_names(exclude=["mail_send"]) == [f"mcp__chris__{n}" for n in tools.TOOL_NAMES if n != "mail_send"]
+
+
+async def test_recall_redacts_canaries_in_raw_payloads(services):
+    services.archive.append("mail_in", {"data": {"from": f"Alice Realname <{PARENT_A}>", "subject": "hello there"}})
+    h = tools.make_handlers(services)
+    got = out_text(await h["recall"]({"query": "hello there", "limit": 5}))
+    assert "Alice" not in got and PARENT_A not in got
+    assert "parent-a" in got and "hello there" in got
+
+
+async def test_mail_read_keeps_stranger_address_so_she_can_reply(services, repo):
+    (repo / "memory/inbox/2026-09-06-q.md").write_text(
+        '---\nfrom: someone@else.org\nsubject: "q"\nemail_id: "e9"\n---\n\nHello.\n')
+    h = tools.make_handlers(services)
+    got = out_text(await h["mail_read"]({}))
+    assert "from: someone@else.org" in got and "Hello." in got

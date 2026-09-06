@@ -2,21 +2,26 @@
 
 Outbound: handle (``parent-a``) → real address, signed, sent via Resend, archived
 with the handle (never the real address). Inbound: Resend ``email.received``
-webhook → raw event archived → sender mapped to handle → quoted history and
-signatures stripped → ``memory/inbox/<date>-<slug>.md``. Real parent addresses
-never appear in anything written under ``repo_dir``.
+webhook → parent addresses in the event rewritten to handles → event archived →
+quoted history and signatures stripped → body redacted (canaries, foreign
+addresses, phones) → ``memory/inbox/<date>-<slug>.md``. Real parent addresses
+never appear in anything written under ``repo_dir`` or in the archive.
+Strangers' addresses survive in the ``from:`` line of the inbox file (git-ignored)
+so she can reply; only the body is redacted.
 
 Dependencies (archive, config) are injected; this module imports neither.
 """
 
 from __future__ import annotations
 
+import copy
 import html as _html
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Iterable
 
+from agent import redaction
 from agent.paths import UnsafePath, safe_path
 
 SIGNATURE = (
@@ -53,6 +58,7 @@ class Mail:
         resend_api_key: str | None = None,
         dry_run: bool = False,
         fetch_body: Callable[[str], dict] | None = None,
+        canaries: Iterable[str] = (),
     ):
         self.repo_dir = Path(repo_dir)
         self.archive_append = archive_append
@@ -61,6 +67,7 @@ class Mail:
         self.resend_api_key = resend_api_key
         self.dry_run = dry_run
         self.fetch_body = fetch_body or _default_fetch_body
+        self.canaries = [c for c in canaries if c]
         self.inbox_dir = self.repo_dir / "memory" / "inbox"
 
     def _safe(self, path: Path) -> Path | None:
@@ -92,6 +99,34 @@ class Mail:
             for needle in (real, local):
                 text = re.sub(re.escape(needle), handle, text, flags=re.IGNORECASE)
         return text
+
+    def clean(self, text: str) -> str:
+        """Handles for parent addresses, then ``redaction.redact`` with the canaries: for anything she reads."""
+        return redaction.redact(self.map_addresses(text), self.canaries)[0]
+
+    def _anonymise_event(self, payload: dict) -> dict:
+        """A copy of the webhook event with parent addresses (from/to/cc/bcc/reply_to) replaced by handles."""
+        event = copy.deepcopy(payload)
+        data = event.get("data")
+        if not isinstance(data, dict):
+            return event
+        for key in ("from", "to", "cc", "bcc", "reply_to"):
+            if key not in data or data[key] is None:
+                continue
+            value = data[key]
+            if isinstance(value, list):
+                data[key] = [self._anonymise_address(v) for v in value]
+            else:
+                data[key] = self._anonymise_address(value)
+        if isinstance(data.get("subject"), str):
+            data["subject"] = self.map_addresses(data["subject"])
+        return event
+
+    def _anonymise_address(self, value):
+        if not isinstance(value, str):
+            return value
+        handle = self.handle_for(value)
+        return handle if handle else self.map_addresses(value)
 
     # --- outbound ------------------------------------------------------------
 
@@ -171,20 +206,33 @@ class Mail:
     # --- inbound -------------------------------------------------------------
 
     def ingest(self, payload: dict) -> Path:
-        """Ingest a Resend ``email.received`` webhook event; return the inbox path."""
-        ref = self.archive_append("mail_in", payload)
+        """Ingest a Resend ``email.received`` webhook event; return the inbox path.
 
+        Idempotent on ``data.email_id``: a redelivered event returns the existing inbox file
+        without archiving or fetching again.
+        """
         data = payload.get("data", payload)
+        email_id = str(data.get("email_id") or "")
+        if email_id:
+            existing = self._find_by_email_id(email_id)
+            if existing is not None:
+                self.archive_append("mail_in_duplicate", {"kind": "mail_in_duplicate", "email_id": email_id})
+                return existing
+
+        # Parent addresses become handles *before* the raw event is archived.
+        ref = self.archive_append("mail_in", self._anonymise_event(payload))
+
         sender = data.get("from", "")
         subject = data.get("subject") or "(no subject)"
         received = data.get("created_at") or payload.get("created_at") or _now_iso()
 
-        body = self.fetch_body(data["email_id"]) if data.get("email_id") else {}
+        body = self.fetch_body(email_id) if email_id else {}
         text = body.get("text") or _html_to_text(body.get("html") or "")
 
-        sender_out = self.handle_for(sender) or sender
-        subject_out = self.map_addresses(subject)
-        body_out = self.map_addresses(_clean_body(text))
+        # A parent becomes the handle; a stranger keeps the address so she can reply.
+        sender_out = self.handle_for(sender) or self.map_addresses(sender)
+        subject_out = self.clean(subject)
+        body_out = self.clean(_clean_body(text))
 
         date = received[:10]
         path = self._unique_path(date, subject_out)
@@ -199,10 +247,26 @@ class Mail:
             f"subject: {_yaml_str(subject_out)}\n"
             f"received: {received}\n"
             f"archive: {ref}\n"
-            "---\n\n"
+            + (f"email_id: {_yaml_str(email_id)}\n" if email_id else "")
+            + "---\n\n"
             f"{body_out}\n"
         )
         return path
+
+    def _find_by_email_id(self, email_id: str) -> Path | None:
+        if not self.inbox_dir.exists():
+            return None
+        needle = f"\nemail_id: {_yaml_str(email_id)}\n"
+        for p in sorted(self.inbox_dir.glob("*.md")):
+            safe = self._safe(p)
+            if safe is None:
+                continue
+            try:
+                if needle in _frontmatter(safe.read_text(encoding="utf-8")):
+                    return safe
+            except OSError:
+                continue
+        return None
 
     def _unique_path(self, date: str, subject: str) -> Path:
         base = f"{date}-{_slug(subject)}"

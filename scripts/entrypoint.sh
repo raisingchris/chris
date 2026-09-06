@@ -40,4 +40,10 @@ fi
 
 # brain keeps the secrets; the wrapper hands chris only her API key.
 export CHRIS_CLI_PATH=/app/scripts/claude-as-chris.sh
-exec su --preserve-environment brain -c "cd /app && exec python -m agent.main"
+# brain's git runs with a from-scratch env (agent/gitops.py): HOME must be brain's own so nothing
+# under root's or chris's home is read, and the deploy key is named explicitly rather than found.
+export HOME=/home/brain
+export GIT_HOME=/home/brain
+export GIT_SSH_COMMAND="ssh -i /home/brain/.ssh/id_ed25519 -o IdentitiesOnly=yes -o UserKnownHostsFile=/home/brain/.ssh/known_hosts"
+# `su -p` keeps the environment; HOME is re-exported inside so it ends up /home/brain regardless of su's defaults.
+exec su -p brain -c "export HOME=/home/brain; cd /app && exec python -m agent.main"

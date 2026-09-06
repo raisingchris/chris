@@ -24,6 +24,9 @@ def archive():
     return FakeArchive()
 
 
+CANARIES = ["Alice Realname", "Example Holdings"]
+
+
 @pytest.fixture
 def mail(tmp_path, archive):
     return Mail(
@@ -32,6 +35,7 @@ def mail(tmp_path, archive):
         parents=PARENTS,
         chris_email=CHRIS,
         dry_run=True,
+        canaries=CANARIES,
     )
 
 
@@ -162,16 +166,59 @@ def test_ingest_writes_inbox_file_without_real_address(mail, archive, tmp_path):
     assert "earlier stuff" not in text
     assert "wrote:" not in text
     assert "Sent from my phone" not in text
-    # raw event archived first, with the raw sender (archive is not Chris-readable)
+    # the event is archived with the sender already mapped to the handle — the raw address is nowhere
     kind, payload = archive.entries[0]
     assert kind == "mail_in"
-    assert payload["data"]["from"] == f"Alice <{PARENT_A}>"
+    assert payload["data"]["from"] == "parent-a"
+    assert_no_real_address(str(archive.entries))
+    assert meta["email_id"] == "em_in_1"
+    # the signature line carried a canary (the parent's display name); it is gone from the file
+    assert "Alice" not in text
 
 
-def test_ingest_stranger_keeps_address(mail):
-    mail.fetch_body = lambda _id: {"text": "hello\n", "html": None}
+def test_ingest_stranger_keeps_address(mail, archive):
+    mail.fetch_body = lambda _id: {"text": "hello, write me at other@else.org or ring +1 415 555 0100\n", "html": None}
     path = mail.ingest(webhook("someone@else.org", subject="Q"))
-    assert "from: someone@else.org" in path.read_text()
+    text = path.read_text()
+    assert "from: someone@else.org" in text  # the from: line is never redacted — she needs it to reply
+    assert "other@else.org" not in text and "555" not in text  # the body is
+    assert archive.entries[0][1]["data"]["from"] == "someone@else.org"
+
+
+def test_ingest_redacts_canaries_and_parent_names_in_body_and_subject(mail, archive):
+    mail.fetch_body = lambda _id: {"text": f"Alice Realname says hi; cc {PARENT_B}; Example Holdings pays.\n", "html": None}
+    path = mail.ingest(webhook("s@e.org", subject=f"From Alice Realname <{PARENT_A}>"))
+    text = path.read_text()
+    assert_no_real_address(text)
+    assert "Alice" not in text and "Example Holdings" not in text
+    assert "cc parent-b" in text
+    # archived subject: parent address mapped; the canary name is a redaction concern for what she reads
+    assert PARENT_A not in str(archive.entries)
+
+
+def test_ingest_anonymises_every_address_field_in_the_archived_event(mail, archive):
+    mail.fetch_body = lambda _id: {"text": "x", "html": None}
+    event = webhook(f"Bob <{PARENT_B}>")
+    event["data"]["to"] = [CHRIS, PARENT_A]
+    event["data"]["cc"] = [f"A <{PARENT_A}>", "friend@else.org"]
+    event["data"]["reply_to"] = PARENT_B
+    mail.ingest(event)
+    data = archive.entries[0][1]["data"]
+    assert data["from"] == "parent-b" and data["to"] == [CHRIS, "parent-a"]
+    assert data["cc"] == ["parent-a", "friend@else.org"] and data["reply_to"] == "parent-b"
+    assert event["data"]["from"] == f"Bob <{PARENT_B}>"  # caller's payload untouched
+    assert_no_real_address(str(archive.entries))
+
+
+def test_ingest_dedupes_on_email_id(mail, archive):
+    fetched = []
+    mail.fetch_body = lambda _id: fetched.append(_id) or {"text": "once", "html": None}
+    p1 = mail.ingest(webhook("s@e.org", email_id="dup_1"))
+    p2 = mail.ingest(webhook("s@e.org", email_id="dup_1"))
+    assert p1 == p2 and fetched == ["dup_1"]
+    assert len(list((mail.inbox_dir).glob("*.md"))) == 1
+    assert [k for k, _ in archive.entries] == ["mail_in", "mail_in_duplicate"]
+    assert mail.ingest(webhook("s@e.org", email_id="dup_2")) != p1
 
 
 def test_ingest_strips_original_message_marker_and_quotes(mail):

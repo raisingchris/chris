@@ -54,8 +54,8 @@ class Payments:
         s = event["data"]["object"]
         amount = (s.get("amount_total") or 0) / 100
         ccy = (s.get("currency") or "usd").upper()
-        email = (s.get("customer_details") or {}).get("email") or ""
-        counterparty = email.split("@", 1)[1].lower() if "@" in email else "stranger"
+        # Never the payer's address or even their domain: the ledger is public.
+        counterparty = "stranger"
         row = self._ledger.add("revenue", amount, ccy, counterparty,
                                "stripe payment link", ref=s["id"])
         self._archive("payment_received", {"session_id": s["id"], "amount": amount,

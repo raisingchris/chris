@@ -75,7 +75,7 @@ def test_details_strips_name_and_never_archives_number(card, archived):
     d = card.details()
     assert d == {"number": PAN, "expiry_month": 1, "expiry_year": 2030, "cvc": "123"}
     assert not any("name" in k for k in d)
-    assert archived == [("card_details_requested", {"kind": "card_details_requested"})]
+    assert archived == []  # the tool archives the request (with its memo); the client never does
     assert PAN not in json.dumps(archived) and "123" not in json.dumps(archived)
 
 

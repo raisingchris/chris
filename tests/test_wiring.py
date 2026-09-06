@@ -8,13 +8,13 @@ from agent.config import Config
 
 def _cfg(tmp_path, **kw):
     return Config(repo_dir=str(tmp_path / "repo"), archive_dir=str(tmp_path / "archive"),
-                  state_dir=str(tmp_path / "state"), tz="Asia/Singapore", dry_run=True, **kw)
+                  state_dir=str(tmp_path / "state"), tz="Europe/Lisbon", dry_run=True, **kw)
 
 
 def test_odometer_clock_in_her_timezone(tmp_path):
     s = wiring.build(_cfg(tmp_path), secrets=wiring.Secrets())
     now = s.odometer._now()
-    assert str(now.tzinfo) == "Asia/Singapore"
+    assert str(now.tzinfo) == "Europe/Lisbon"
     # an odometer claim dated today lands on the same archive day as its evidence ref
     assert s.archive.append("x", {}).startswith(f"archive:{now.strftime('%Y-%m-%d')}#")
 

@@ -110,6 +110,9 @@ class Services:
         n = gitops.unpushed_count(self.repo_dir)
         if n > 0:
             line += f" · {n} commits unpushed"
+        blocked = gitops.push_blocked_reason(self.state_dir)
+        if blocked:
+            line += f" · push blocked: {blocked}"
         return line
 
 
@@ -161,6 +164,7 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
         chris_email=cfg.chris_email,
         resend_api_key=secrets.resend_key,
         dry_run=cfg.dry_run,
+        canaries=cfg.canaries,
     )
     # Private minutes sit next to the other private state, never in the repo.
     minutes_dir = Path(os.environ.get("COUNCIL_MINUTES_DIR") or Path(cfg.state_dir).parent / "council_minutes")
