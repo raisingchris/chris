@@ -16,6 +16,7 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
+      - run: echo "::add-mask::${{ secrets.VERCEL_TEAM_SLUG }}"
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
@@ -26,5 +27,5 @@ jobs:
         with:
           node-version: 20
       - run: npm install -g vercel@54.1.0
-      - run: cd site/out && vercel link --yes --project raisingchris --scope dariuscheung --token "${{ secrets.VERCEL_TOKEN }}"
-      - run: cd site/out && vercel deploy --prod --yes --scope dariuscheung --token "${{ secrets.VERCEL_TOKEN }}"
+      - run: cd site/out && vercel link --yes --project raisingchris --token "${{ secrets.VERCEL_TOKEN }}"
+      - run: cd site/out && vercel deploy --prod --yes --token "${{ secrets.VERCEL_TOKEN }}"
