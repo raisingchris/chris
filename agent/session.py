@@ -7,6 +7,7 @@ instead of launching the CLI. Only ``build_options`` touches SDK types.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
 from typing import Any, AsyncIterator, Callable
 
 from agent import guards, tools
@@ -34,6 +35,9 @@ def build_options(services, system_prompt: str, tools_allowed: list[str], max_tu
 
     cfg = services.cfg
     env = {"ANTHROPIC_API_KEY": services.secrets.anthropic_key} if services.secrets.anthropic_key else {}
+    # In production the CLI runs as a different OS user through this wrapper (see Dockerfile);
+    # locally it is unset and the SDK uses its bundled CLI.
+    cli_path = os.environ.get("CHRIS_CLI_PATH") or None
     return ClaudeAgentOptions(
         system_prompt=system_prompt,
         model=cfg.model,
@@ -46,6 +50,7 @@ def build_options(services, system_prompt: str, tools_allowed: list[str], max_tu
         setting_sources=[],  # nothing from the machine's ~/.claude or repo .claude leaks in
         hooks=guards.hook_matchers(services),
         env=env,
+        cli_path=cli_path,
         max_turns=max_turns,
     )
 

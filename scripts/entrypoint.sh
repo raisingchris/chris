@@ -1,23 +1,35 @@
 #!/usr/bin/env bash
-# Runs as root only long enough to set up /data, then drops to `chris`.
+# Root only long enough to lay out /data, then drops to `brain`.
 set -euo pipefail
-mkdir -p /data/repo /data/archive /data/state /data/council_minutes /data/lessons /data/redaction /data/scratch
-chown -R chris:chris /data
+mkdir -p /data/repo /data/archive /data/state /data/council_minutes /data/lessons /data/redaction
+# The repo is shared: chris edits it in sittings, brain commits it. Group-writable, setgid.
+chown -R brain:chris /data
+chmod 2775 /data/repo
+chmod 700 /data/archive /data/state /data/council_minutes /data/redaction; chown brain:brain /data/archive /data/state /data/council_minutes /data/redaction
 
-if [ ! -d /data/repo/.git ]; then
-  if [ -n "${CHRIS_DEPLOY_KEY:-}" ]; then
-    mkdir -p /home/chris/.ssh && printf '%s\n' "$CHRIS_DEPLOY_KEY" > /home/chris/.ssh/id_ed25519
-    chmod 700 /home/chris/.ssh && chmod 600 /home/chris/.ssh/id_ed25519 && chown -R chris:chris /home/chris/.ssh
-    ssh-keyscan github.com >> /home/chris/.ssh/known_hosts 2>/dev/null
-    su chris -c "git clone git@github.com:raisingchris/chris.git /data/repo"
-  fi
+# brain pushes with her deploy key; chris never sees it.
+if [ -n "${CHRIS_DEPLOY_KEY:-}" ]; then
+  mkdir -p /home/brain/.ssh && printf '%s\n' "$CHRIS_DEPLOY_KEY" > /home/brain/.ssh/id_ed25519
+  chmod 700 /home/brain/.ssh && chmod 600 /home/brain/.ssh/id_ed25519
+  ssh-keyscan github.com >> /home/brain/.ssh/known_hosts 2>/dev/null; chown -R brain:brain /home/brain/.ssh
 fi
+if [ ! -d /data/repo/.git ]; then
+  su brain -c "git clone git@github.com:raisingchris/chris.git /data/repo && cd /data/repo && git config core.sharedRepository group"
+  chmod -R g+w /data/repo; find /data/repo -type d -exec chmod g+s {} +
+fi
+su brain -c "cd /data/repo && git config user.name Chris && git config user.email chris@raisingchris.com && git config --global --add safe.directory /data/repo"
+su chris -c "git config --global --add safe.directory /data/repo"
 
 # Invariant: vows and constitution are not hers to change. Root-owned, read-only, every boot.
 for f in soul/vows.md soul/constitution.md; do
-  if [ -f "/data/repo/$f" ]; then chown root:root "/data/repo/$f"; chmod 0444 "/data/repo/$f"; fi
+  [ -f "/data/repo/$f" ] && chown root:root "/data/repo/$f" && chmod 0444 "/data/repo/$f"
 done
-# Sealed lessons arrive from a private source (LESSONS_TAR_B64), never from the public repo.
-if [ -n "${LESSONS_TAR_B64:-}" ]; then printf '%s' "$LESSONS_TAR_B64" | base64 -d | tar -xz -C /data/lessons; chown -R root:root /data/lessons; chmod -R a+rX /data/lessons; fi
+# Sealed lessons come from a private source, never the public repo. Readable by brain only.
+if [ -n "${LESSONS_TAR_B64:-}" ]; then
+  printf '%s' "$LESSONS_TAR_B64" | base64 -d | tar -xz -C /data/lessons
+  chown -R brain:brain /data/lessons; chmod -R go-rwx /data/lessons
+fi
 
-exec su chris -c "cd /app && exec python -m agent.main"
+# brain keeps the secrets; the wrapper hands chris only her API key.
+export CHRIS_CLI_PATH=/app/scripts/claude-as-chris.sh
+exec su --preserve-environment brain -c "cd /app && exec python -m agent.main"
