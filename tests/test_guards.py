@@ -96,3 +96,9 @@ async def test_paused_denies_every_tool(services):
         assert denied(out) == guards.PAUSED_REASON, name
     (services.state_dir / "paused").unlink()
     assert await pre(ok, "tu3", {"signal": None}) == {}
+
+
+def test_reading_a_parent_file_with_null_redirect_is_allowed(repo):
+    from agent.guards import decide
+    assert decide("Bash", {"command": "cat governance/graduations.yaml 2>/dev/null; echo done"}, repo) == {}
+    assert "permissionDecision" in str(decide("Bash", {"command": "echo x > governance/graduations.yaml"}, repo))

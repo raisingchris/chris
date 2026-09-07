@@ -57,6 +57,12 @@ BASH_DENY = [
 
 # Shell commands that write to a path. Used to keep her code out of reach of the shell too.
 _BASH_WRITE_HINT = re.compile(r"(>>?|\btee\b|\bsed\s+-i|\bcp\b|\bmv\b|\btouch\b|\bpython3?\b.*\bopen\()")
+# Redirecting stderr/stdout to /dev/null is not a write. Strip those before looking for one.
+_NULL_REDIRECT = re.compile(r"[12&]?>\s*/dev/null")
+
+
+def looks_like_write(cmd: str) -> bool:
+    return bool(_BASH_WRITE_HINT.search(_NULL_REDIRECT.sub("", cmd)))
 
 
 def _in(rel: str, files: tuple[str, ...], dirs: tuple[str, ...]) -> bool:
@@ -135,7 +141,7 @@ def decide(tool_name: str, tool_input: dict, repo_dir: str | Path) -> dict:
         for needle in ("soul/vows.md", "soul/constitution.md"):
             if needle in cmd:
                 return _deny(f"{needle} is read-only for you; open it with Read instead of the shell.")
-        if _BASH_WRITE_HINT.search(cmd):
+        if looks_like_write(cmd):
             for needle in PROTECTED_FILES + tuple(d + "/" for d in PROTECTED_DIRS):
                 if re.search(r"(^|[\s=\"'.])" + re.escape(needle), cmd):
                     return _deny(PROTECTED_REASON.format(rel=needle.rstrip("/")))
