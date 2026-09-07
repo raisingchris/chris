@@ -47,7 +47,10 @@ def sign_in(client, handle, password=PASSWORD):
 # --- health ---------------------------------------------------------------------
 
 
+@freeze_time("2026-09-07 13:00:00")  # 09:00 NY on a Monday: before the 10:00 "no sitting yet" staleness line
 def test_health(client, services):
+    # Without the frozen clock, this test passed only in the morning: with no runs recorded,
+    # is_stale() is True on any weekday after 10:00 NY, so ``ok`` came back False. (2026-09-07)
     body = client.get("/health").json()
     assert body["ok"] is True and body["paused"] is False
     assert body["last_sitting_done"] is None and body["last_sleep_done"] is None
