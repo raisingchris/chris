@@ -1,31 +1,37 @@
-# Builds the static site in CI and uploads only site/out to Vercel on every commit.
-# Secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID.
+# Builds the static site and publishes it to GitHub Pages on every commit.
+# No external tokens: GitHub's own GITHUB_TOKEN deploys. Custom domain is set in the Pages settings.
 name: site
 on:
   push:
     branches: [main]
   workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 concurrency:
   group: site
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 6
-    env:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
-      - run: echo "::add-mask::${{ secrets.VERCEL_TEAM_SLUG }}"
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - run: pip install --quiet jinja2 markdown-it-py python-frontmatter pyyaml
-      - run: python site/build.py
-      - uses: actions/setup-node@v4
+      - run: python site/build.py && echo raisingchris.com > site/out/CNAME
+      - uses: actions/upload-pages-artifact@v3
         with:
-          node-version: 20
-      - run: npm install -g vercel@54.1.0
-      - run: cd site/out && vercel link --yes --project raisingchris --token "${{ secrets.VERCEL_TOKEN }}"
-      - run: cd site/out && vercel deploy --prod --yes --token "${{ secrets.VERCEL_TOKEN }}"
+          path: site/out
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
