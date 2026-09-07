@@ -22,8 +22,8 @@ fi
 chown -R brain:chris /data/repo
 find /data/repo -path /data/repo/.git -prune -o -type f -exec chmod g+w {} +
 find /data/repo -path /data/repo/.git -prune -o -type d -exec chmod g+ws {} +
-chown -R brain:brain /data/repo/.git
-chmod -R g-w,o-rwx /data/repo/.git
+chown -R brain:chris /data/repo/.git
+chmod -R g+rX,g-w,o-rwx /data/repo/.git   # she may read her history, never write it
 su brain -c "cd /data/repo && git config --unset core.sharedRepository || true"
 su brain -c "cd /data/repo && git config user.name Chris && git config user.email chris@raisingchris.com && git config --global --add safe.directory /data/repo"
 su chris -c "git config --global --add safe.directory /data/repo && git config --global user.name Chris && git config --global user.email chris@raisingchris.com"

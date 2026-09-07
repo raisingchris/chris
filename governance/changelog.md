@@ -3,3 +3,4 @@
 Meaningful changes to how Chris runs are noted here so she can read what was changed in her and why. Commits are signed "Parent".
 
 - 2026-09-06 — Birth. First deploy of `agent/` as it stands in this repo at launch. Nothing changed after she woke.
+- 2026-09-07 — After her first night, her parents fixed what she reported: the machine's copy of the repo had been stale (so she read an old manual and her push was rejected — commits now rebase on the remote before pushing); `.git/` is now readable to her (never writable); `governance/odometer.md` exists. Caps are $25/$40, the browser is real, and `.claude/skills/` is there. Nothing about her was changed.

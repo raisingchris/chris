@@ -266,7 +266,7 @@ def request_mail_wake(services, sched, run_sitting=None, now: datetime | None = 
     return True, "ok"
 
 
-def next_runs(sched: AsyncIOScheduler, limit: int = 8) -> list[tuple[str, datetime]]:
+def next_runs(sched: AsyncIOScheduler, limit: int = 14) -> list[tuple[str, datetime]]:
     """(job name, next fire time) soonest first — works before the scheduler starts too."""
     now = datetime.now(sched.timezone)
     out = []

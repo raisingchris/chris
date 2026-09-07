@@ -151,6 +151,14 @@ def push_repo(repo_dir: str | Path, run=git, gate: PushGate | None = None) -> tu
                 gate.archive("push_blocked_canary", {"report": report})
                 gate.mark_blocked("identity hit")
                 return False, "push blocked: identity hit"
+        # A parent may have pushed since we last pulled (a deploy, a lesson, a changelog line).
+        # Rebase our commits on top so her work lands instead of being rejected.
+        f = run(repo_dir, "fetch", "--quiet", "origin", check=False)
+        if f.returncode == 0:
+            rb = run(repo_dir, "rebase", "--quiet", "origin/main", check=False)
+            if rb.returncode != 0:
+                run(repo_dir, "rebase", "--abort", check=False)
+                return False, "push skipped: local and remote diverged and the rebase conflicted"
         r = run(repo_dir, "push", check=False)
     except Exception as exc:  # noqa: BLE001 — git missing, network down, timeout
         return False, f"{type(exc).__name__}: {exc}"[:500]
