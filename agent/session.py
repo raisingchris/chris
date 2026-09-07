@@ -15,6 +15,7 @@ from agent import guards, tools
 BUILTIN_TOOLS = ["Bash", "Read", "Edit", "Write", "Glob", "Grep", "WebFetch", "WebSearch"]
 MIN_BUDGET_USD = 0.5  # a session always gets at least this much, so a nearly-spent day still lets her say goodnight
 UNKNOWN_COST_USD = 1.0  # metered when a session ends without a ResultMessage (crash, disconnect)
+MAX_BUFFER_BYTES = 8 * 1024 * 1024  # SDK stdout JSON buffer; default 1 MiB is smaller than one screenshot
 
 
 @dataclass
@@ -55,8 +56,13 @@ def build_options(services, system_prompt: str, tools_allowed: list[str], max_tu
 
     cfg = services.cfg
     extra = {}
-    if any(f.name == "max_budget_usd" for f in dataclasses.fields(ClaudeAgentOptions)):
+    field_names = {f.name for f in dataclasses.fields(ClaudeAgentOptions)}
+    if "max_budget_usd" in field_names:
         extra["max_budget_usd"] = session_budget_usd(services)
+    if "max_buffer_size" in field_names:
+        # The SDK's default is 1 MiB per JSON message. One screenshot read back as base64 can pass that,
+        # and when it does the whole sitting dies mid-turn (twice on 2026-09-07). 8 MiB leaves room.
+        extra["max_buffer_size"] = MAX_BUFFER_BYTES
     env = {"ANTHROPIC_API_KEY": services.secrets.anthropic_key} if services.secrets.anthropic_key else {}
     # In production the CLI runs as a different OS user through this wrapper (see Dockerfile);
     # locally it is unset and the SDK uses its bundled CLI.
