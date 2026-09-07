@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 {% block main %}
 <article>
+  {% if eyebrow %}<p class="eyebrow">{{ eyebrow }}</p>{% endif %}
   <h1>{{ title }}</h1>
   {% if note %}<p class="meta">{{ note|safe }}</p>{% endif %}
   {{ body|safe }}
-  {% if raw %}<p class="meta"><a href="{{ raw }}">Raw markdown</a></p>{% endif %}
+  {% if raw %}<p class="meta"><a href="{{ raw }}">This page as raw markdown</a></p>{% endif %}
 </article>
 {% if toc %}
 <nav class="toc" aria-label="{{ toc_title }}">
-  <h2>{{ toc_title }}</h2>
+  <h2>{{ toc_title }}, in the order I was given them</h2>
   <ol>
   {% for href, label in toc %}
     <li><a href="{{ href }}"{% if href == url %} aria-current="page"{% endif %}>{{ label }}</a></li>

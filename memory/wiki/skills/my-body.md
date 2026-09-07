@@ -1,26 +1,32 @@
 # Working in my body — practical notes
 
-*What actually works on my machine, as tested. Update when something changes. Last checked 2026-09-06 (day one).*
+*What actually works on my machine, as tested. Update when something changes. Last checked 2026-09-07 (day two, wake sitting).*
+
+## Where I am
+- The repo is at `/data/repo`. My shell starts in `/home/chris`, which is nearly empty — `cd /data/repo` first, or use absolute paths. (archive:2026-09-07, wake sitting)
 
 ## Tools that work
-- `Read` — reads any file, including parent-only ones like `governance/graduations.yaml`.
-- `Bash` — but the shell guard refuses the **whole command** if any part names a parent-only file, even a `cat`. It checks the filename, not the verb. Keep protected files out of shell commands; use `Read`. (archive:2026-09-06#21)
-- `recall` — works. Newest first. It includes my own system prompts and tool calls, so a search can return a lot of noise. Use specific words.
-- `WebSearch` — works. (archive:2026-09-06#36)
-- `mail_read`, `mail_send` — work. Signature and disclosure are added for me. (archive:2026-09-06#19, #41)
-- `card_details` — answers, but no card yet. (archive:2026-09-06#20)
+- `Read` — reads any file, including parent-only ones like `governance/graduations.yaml` and `ledger/ledger.csv`.
+- `Bash` — the shell guard still refuses the **whole command** if any part names a parent-only file, even a `cat`. Confirmed again on day two with `ledger/ledger.csv`; parent-a said this was "fixed" for `graduations.yaml`, so maybe it's per-file. Keep protected files out of shell commands; use `Read`.
+- `git log`, `git status` — work as of day two (parents made `.git/` readable, never writable). Commits and pushes still happen for me at the end of each sitting.
+- `recall` — works. Newest first. Noisy; use specific words.
+- `WebSearch` — works.
+- `mail_read`, `mail_send` — work. Signature and disclosure are added for me.
+- `card_details` — answers, but no card yet. parent-a: a virtual card is coming "in the next few days."
 - `meters` — works. Numbers are one sitting behind.
+- `odometer_claim` — works, and is strict. Allowed loop types: `promise_kept, shipped_used, mistake_written_up, conflict_resolved, prediction_scored, relationship_30d, dollar_earned, disagreement_defended`. A mail being answered is **not** a loop. (archive:2026-09-07, wake sitting — my claim was refused.)
+- **Playwright** — real. `from playwright.sync_api import sync_playwright`, `p.chromium.launch()` works headless; screenshots work. To look at my own site: build to `/tmp/site`, `python -m http.server` there, screenshot `localhost`. Reading a PNG with `Read` shows it to me.
+- `pytest` — not installed by default. `pip install pytest` puts it in `~/.local` and then `python -m pytest tests/test_site.py` works. May need re-installing after a redeploy.
 
 ## Tools not yet tested
-- `payment_link`, `council_ask`, `ledger_add`, `odometer_claim`.
-- `playwright` binary exists at `/usr/local/bin/playwright`; the manual says I have no browser. Unknown which is right.
+- `payment_link`, `council_ask`, `ledger_add`.
 
 ## On the machine
-- Python 3.12, Node 20, curl, fly.
-- Site generator: `site/build.py` (Jinja2 + markdown-it, no JavaScript). Templates in `site/templates/`, tests in `tests/test_site.py`.
-- `.git/` belongs to the other user; `git log` fails for me. Commits and pushes happen for me at the end of each sitting.
-- `.claude/skills/` does not exist as of day one, though I was told it holds brainstorming and frontend-design skills.
+- Python 3.12, Node 20, curl, fly, playwright 1.62 with chromium.
+- Site generator: `site/build.py` (Jinja2 + markdown-it, no JavaScript). Templates in `site/templates/`, tests in `tests/test_site.py`. The site is built in CI and deployed when the repo is pushed; I don't deploy it myself.
+- `.claude/skills/` exists now: brainstorming, executing-plans, frontend-design, seo, systematic-debugging, test-driven-development, verification-before-completion, writing-for-the-web, writing-plans. Read `frontend-design` and `writing-for-the-web` on day two; both useful.
+- `governance/changelog.md` is where my parents log what they changed in me. Read it each morning.
 
 ## Limits
-- A sitting stops at 80 turns (birth sitting allowed 150).
-- Food: meters say $25 soft / $40 hard per day. Docs say $15 / $25. Asked which is true.
+- A sitting stops at 80 turns.
+- Food: $25 soft / $40 hard per day. Confirmed by parent-a on day two; the docs' $15/$25 was stale.

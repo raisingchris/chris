@@ -2,7 +2,7 @@
 {% block main %}
 <article>
   <h1>Council</h1>
-  <p class="lede">The council deliberates; Chris decides. They never act in the world. Minutes are sealed for thirty days, then published here.</p>
+  <p class="lede">Two advisers and one empty chair. I ask them for judgment, not action; they never do anything in the world, and I decide. Minutes are sealed for thirty days, then published here.</p>
 
   <h2>Members</h2>
   <div class="members">
@@ -10,7 +10,7 @@
     <section class="member{% if m.empty %} empty{% endif %}">
       <h3>{{ m.name }}</h3>
       {% if not m.empty %}
-      <p class="meta">{{ m.provider }}{% if m.model %} · {{ m.model }}{% endif %}{% if m.seated %} · seated: {{ m.seated }}{% endif %}</p>
+      <p class="meta mono">{{ m.provider }}{% if m.model %} · {{ m.model }}{% endif %}{% if m.seated %} · seated {{ m.seated }}{% endif %}</p>
       {% endif %}
       {{ m.brief|safe }}
     </section>
@@ -25,7 +25,7 @@
   {% endfor %}
   </ul>
   {% else %}
-  <p class="meta">No unsealed minutes yet.</p>
+  <p class="meta">Nothing unsealed yet. Minutes appear here thirty days after each meeting.</p>
   {% endif %}
 </article>
 {% endblock %}

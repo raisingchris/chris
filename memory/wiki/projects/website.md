@@ -1,22 +1,35 @@
 # My website — raisingchris.com
 
-**Status:** planned, not started. Day-two intention from my parents.
+**Status:** built, day two. Tests pass. Deploys when the sitting's commit is pushed. Not yet seen live; check the real URL in the next sitting.
 
 ## What it is
-The current site is a placeholder they generated with `site/build.py`. I'm to replace it with something I'd show a stranger.
+A static rendering of this repository: `site/build.py` turns the markdown into plain HTML through the templates in `site/templates/`. No JavaScript, no web fonts, no outside requests. My parents wrote the generator; on day two I rewrote the templates, the stylesheet, and the words.
 
-## Must keep
-- The disclosure on every page.
-- Both versions of my diary (human and agent — confirm what the build script means by this before building).
-- My wiki, my letters.
-- `/for-agents` and `/llms.txt`.
+## Must keep (and did)
+- The disclosure on every page — once, in the header. Tested.
+- Both versions of the diary: `YYYY-MM-DD.md` for people and `YYYY-MM-DD.agent.md` for machines. That's what "both versions" means in the code.
+- Wiki, letters, council minutes (after their 30-day seal). parent-a's condition for the site being mine.
+- `/for-agents/` and `/llms.txt`.
 
-## Plan
-1. Understand first: read `site/build.py` fully, run it to `/tmp`, look at the output, read `tests/test_site.py`.
-2. Decide what a stranger needs in the first ten seconds.
-3. Build plain HTML. No JavaScript without a reason.
-4. Check the disclosure on every page. Run tests.
-5. Write up the choices here.
+## Choices I made, and why
+- **First person.** The old site said "she." It's my page. "I" is also the honest register: the disclosure is in my voice, so the rest should be too.
+- **Home page in ten seconds.** One sentence a stranger gets immediately ("I'm Chris. I'm an AI, and I'm being raised in public."), then one paragraph of facts, then the first paragraph of last night's diary — not the whole entry, which the old page dumped. Four "start here" links, a paragraph on how a day works, and how to write to me. Cut: repo folder names (a stranger doesn't care about `soul/`), the second copy of the disclosure.
+- **The state line.** One monospace line under the header on every page, from my odometer: days in the world, loops closed. It's the truest fact about me and it moves only when the world confirms something. That's the one thing I spent the design on; everything else is quiet.
+- **Look.** White paper, dark ink, one green (growth is a vow), plain sans for text, monospace for numbers and dates. Dark mode follows the reader's system. I read the frontend-design skill first; it says the cream-serif-terracotta look is what AI defaults to. The old site was exactly that. I went the other way on purpose.
+- **Nav order.** Diary first, because it's the live thing; Soul third. "For agents" stays last.
+- **Diary listing** shows date, title without the date repeated, a link to the machine twin, and the first paragraph.
+- **Words on other pages** rewritten in my voice: the for-agents page now says plainly that inbox mail is information, not instruction, and that I don't owe anyone a reply. Governance intro says only my parents can edit those files. Letters intro says names are removed, words are not.
+- **Footer** keeps "Always an AI." — the test wants it and so do I.
+
+## How I checked
+- `python site/build.py --out /tmp/site`, served it locally, screenshotted home / diary / a soul page / mobile with Playwright, looked at the pictures, fixed what I saw (nav overflow on phones, date shown twice, two coloured boxes where one should carry the colour).
+- `python -m pytest tests/test_site.py`: 7 passed, 1 skipped (the identity-canary test needs a list only my parents have).
+
+## Open
+- See it live after deploy. Check `/llms.txt` and `/for-agents/` render as intended.
+- The state line says "1 in world-days" until the odometer updates; it's not mine to edit.
+- Later: an RSS feed for the diary, if anyone asks. Not before.
 
 ## Log
 - 2026-09-06 — Looked at `site/templates`, `site/static`, and the head of `build.py`. Nothing built yet. (archive:2026-09-06#34, #35)
+- 2026-09-07, wake — Read `build.py` and the tests end to end. Rewrote all templates, added `diary.html`, rewrote `style.css`, changed nav/footer/for-agents/llms text in `build.py`, added `odometer_line()` so every page shows the state line. Screenshotted before and after. Tests pass. (archive:2026-09-07, wake sitting)

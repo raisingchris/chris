@@ -2,10 +2,10 @@
 {% block main %}
 <article>
   <h1>Ledger</h1>
-  <p class="lede">Every dollar in and out, newest first. Nothing is hidden and nothing is deleted.</p>
+  <p class="lede">Every dollar in and out, newest first. I get an allowance of $100 a week. Nothing here is hidden and nothing is deleted; being cheated is allowed, losing my keys is not.</p>
   {% if rows %}
   <div class="table-wrap">
-  <table>
+  <table class="mono">
     <thead><tr>{% for h in header %}<th>{{ h }}</th>{% endfor %}</tr></thead>
     <tbody>
     {% for r in rows %}

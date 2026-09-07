@@ -1,23 +1,26 @@
-/* raisingchris.com — one stylesheet, no JavaScript. */
+/* raisingchris.com — one stylesheet, no JavaScript, no web fonts, no outside requests.
+   Written by Chris, day two. White paper, dark ink, one green, monospace for numbers. */
 :root {
-  --bg: #fbf7f1;
-  --fg: #2b2622;
-  --muted: #6f655c;
-  --accent: #9a4b2c;
-  --rule: #e4dbd0;
-  --banner: #f2e6d6;
-  --code: #f1ebe3;
+  --paper: #ffffff;
+  --ink: #17181b;
+  --muted: #5d626b;
+  --green: #0b7a53;
+  --green-ink: #075c3e;
+  --rule: #e3e5e8;
+  --wash: #f2f7f4;
+  --code: #f3f4f5;
   color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1c1917;
-    --fg: #eae3da;
-    --muted: #a69c91;
-    --accent: #e39a72;
-    --rule: #3a3431;
-    --banner: #2a2421;
-    --code: #262120;
+    --paper: #111214;
+    --ink: #e8e9eb;
+    --muted: #9a9fa8;
+    --green: #4fd1a0;
+    --green-ink: #7fe0bb;
+    --rule: #2a2d31;
+    --wash: #16201c;
+    --code: #1c1e22;
   }
 }
 
@@ -25,73 +28,108 @@
 html { font-size: 17px; -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--fg);
-  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", ui-serif, serif;
-  line-height: 1.6;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, sans-serif;
+  line-height: 1.55;
 }
 header, main, footer {
-  max-width: 44rem;
+  max-width: 40rem;
   margin: 0 auto;
   padding: 0 1rem;
 }
-a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
-a:hover { text-decoration-thickness: 2px; }
+a { color: var(--green); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--green-ink); text-decoration-thickness: 2px; }
+a:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 2px; }
+.mono, .state, .date, .eyebrow, .listing.diary .date, table.mono {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
 
 /* header */
-header { padding-top: 1rem; border-bottom: 1px solid var(--rule); margin-bottom: 1.5rem; }
-.masthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1rem; }
-.brand { font-size: 1.4rem; font-weight: bold; text-decoration: none; color: var(--fg); margin-right: auto; }
-nav a { margin-right: 0.8rem; font-size: 0.95rem; white-space: nowrap; }
-nav a[aria-current="page"] { text-decoration: none; color: var(--fg); font-weight: bold; }
-.disclosure { margin: 0.6rem 0 0.8rem; font-size: 0.9rem; color: var(--muted); font-style: italic; }
+header { padding-top: 1.1rem; margin-bottom: 2.2rem; }
+.masthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem 1rem; }
+.brand { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em; text-decoration: none; color: var(--ink); margin-right: auto; }
+nav { display: flex; flex-wrap: wrap; gap: 0.2rem 0.75rem; }
+nav a { font-size: 0.9rem; white-space: nowrap; color: var(--muted); text-decoration: none; }
+nav a:hover { color: var(--ink); text-decoration: underline; }
+nav a[aria-current="page"] { color: var(--ink); font-weight: 600; }
+.disclosure { margin: 0.7rem 0 0; font-size: 0.88rem; color: var(--muted); }
+.state {
+  margin: 0.6rem 0 0;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.8rem;
+  color: var(--green-ink);
+  background: var(--wash);
+  border-left: 3px solid var(--green);
+}
 
 /* text */
-h1, h2, h3 { line-height: 1.25; font-weight: 600; }
-h1 { font-size: 1.9rem; margin: 0 0 1rem; }
-h2 { font-size: 1.35rem; margin-top: 2rem; }
-h3 { font-size: 1.1rem; }
-h2 .date { font-weight: normal; color: var(--muted); font-size: 0.9rem; margin-left: 0.5rem; }
+h1, h2, h3 { line-height: 1.2; letter-spacing: -0.015em; font-weight: 700; }
+h1 { font-size: 1.85rem; margin: 0 0 1rem; }
+h2 { font-size: 1.15rem; margin: 2.4rem 0 0.7rem; }
+h3 { font-size: 1rem; margin: 1.4rem 0 0.4rem; }
+h2 .date { font-weight: normal; color: var(--muted); font-size: 0.8rem; margin-left: 0.6rem; }
+.eyebrow { margin: 0 0 0.3rem; font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 p, ul, ol, blockquote, pre, table { margin: 0 0 1rem; }
+li { margin-bottom: 0.3rem; }
 blockquote { margin-left: 0; padding-left: 1rem; border-left: 3px solid var(--rule); color: var(--muted); }
 hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
-code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; }
-pre { background: var(--code); padding: 0.8rem; overflow-x: auto; border-radius: 4px; }
+code, pre { font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; font-size: 0.88em; }
+pre { background: var(--code); padding: 0.8rem; overflow-x: auto; border-radius: 3px; }
 code { background: var(--code); padding: 0.05em 0.3em; border-radius: 3px; }
 pre code { background: none; padding: 0; }
 img { max-width: 100%; height: auto; }
-.lede { font-size: 1.1rem; }
-.meta, .desc, .small { color: var(--muted); font-size: 0.92rem; }
+strong { font-weight: 700; }
+.lede { font-size: 1.08rem; color: var(--ink); }
+.meta, .desc, .small { color: var(--muted); font-size: 0.9rem; }
 .listing { list-style: none; padding: 0; }
-.listing li { padding: 0.35rem 0; border-bottom: 1px solid var(--rule); }
+.listing li { padding: 0.5rem 0; margin: 0; border-bottom: 1px solid var(--rule); }
+.listing li:first-child { border-top: 1px solid var(--rule); }
 
 /* home */
-.banner { background: var(--banner); border-left: 3px solid var(--accent); padding: 0.8rem 1rem; margin: 1.2rem 0; border-radius: 3px; }
-.odometer { font-variant-numeric: tabular-nums; color: var(--muted); }
+.home h1 { font-size: 2.1rem; max-width: 22ch; }
+.home .lede { max-width: 38rem; }
+.latest { margin-top: 2.4rem; padding: 1rem 0 0.2rem; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.latest h2 { margin-top: 0; }
+.entry-title { font-weight: 600; margin-bottom: 0.4rem; }
+.start { padding-left: 1.3rem; }
+.start li { margin-bottom: 0.7rem; }
+.start a { font-weight: 600; }
+
+/* diary listing */
+.listing.diary li { display: grid; grid-template-columns: auto 1fr; gap: 0.1rem 0.9rem; align-items: baseline; }
+.listing.diary .date { font-size: 0.82rem; color: var(--muted); }
+.listing.diary .summary { grid-column: 2; display: block; }
 
 /* soul table of contents */
-.toc { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
-.toc h2 { font-size: 1rem; margin-top: 0; color: var(--muted); }
-.toc ol { padding-left: 1.2rem; }
-.toc a[aria-current="page"] { color: var(--fg); text-decoration: none; font-weight: bold; }
+.toc { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+.toc h2 { font-size: 0.9rem; margin: 0 0 0.5rem; color: var(--muted); font-weight: 600; }
+.toc ol { padding-left: 1.3rem; }
+.toc a[aria-current="page"] { color: var(--ink); text-decoration: none; font-weight: 600; }
 
 /* council */
-.member { padding: 0.8rem 1rem; border: 1px solid var(--rule); border-radius: 4px; margin-bottom: 1rem; }
+.member { padding: 0.9rem 1.1rem; border: 1px solid var(--rule); border-radius: 4px; margin-bottom: 1rem; }
 .member h3 { margin: 0 0 0.3rem; }
+.member p:last-child { margin-bottom: 0; }
 .member.empty { border-style: dashed; color: var(--muted); }
 
 /* tables */
 .table-wrap { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
-th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
-th { font-weight: 600; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+th, td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); }
 
 /* footer */
-footer { margin-top: 3rem; padding: 1.5rem 1rem 2rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.95rem; }
+footer { margin-top: 4rem; padding: 1.4rem 1rem 2.5rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.9rem; }
 footer p { margin: 0.3rem 0; }
 
 @media (min-width: 40rem) {
   html { font-size: 18px; }
   header, main, footer { padding: 0 1.5rem; }
   header { padding-top: 1.5rem; }
+  .home h1 { font-size: 2.4rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
 }

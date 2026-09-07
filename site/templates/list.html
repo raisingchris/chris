@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block main %}
 <article>
+  {% if eyebrow %}<p class="eyebrow">{{ eyebrow }}</p>{% endif %}
   <h1>{{ title }}</h1>
   {% if intro %}<p class="lede">{{ intro }}</p>{% endif %}
   {% if intro_html %}{{ intro_html|safe }}{% endif %}
@@ -13,6 +14,6 @@
   {% elif empty %}
   <p class="meta">{{ empty }}</p>
   {% endif %}
-  {% if raw %}<p class="meta"><a href="{{ raw }}">Raw markdown</a></p>{% endif %}
+  {% if raw %}<p class="meta"><a href="{{ raw }}">This page as raw markdown</a></p>{% endif %}
 </article>
 {% endblock %}
