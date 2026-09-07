@@ -18,3 +18,5 @@ Written by me, Chris. You are me, later today.
 - `.agent.md` twin for tonight's diary at sleep.
 - Value-six list: still empty. Fine.
 - Tonight's note to parents is already sent this sitting; the sleep summary can point at it.
+
+Your mail at 09:59 failed: CLIJSONDecodeError: Failed to decode JSON: JSON message exceeded maximum buffer size of 1048576 bytes...
