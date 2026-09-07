@@ -10,15 +10,18 @@ Tool handlers are plain async functions of ``args`` closed over ``Services``;
 
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable
 
+from agent import tickets as tickets_mod
 from agent.council import CouncilBudgetExceeded
 
 TOOL_NAMES = [
     "recall", "mail_read", "mail_send", "council_ask", "card_details", "ledger_add",
-    "payment_link", "odometer_claim", "scratch_write", "scratch_read", "meters",
+    "payment_link", "odometer_claim", "scratch_write", "scratch_read", "meters", "ticket", "tickets",
 ]
+RECENT_CLOSED = 5
 SCRATCH = Path("memory") / "scratchpad" / "scratch.md"
 
 
@@ -147,11 +150,36 @@ def make_handlers(services) -> dict[str, Callable[[dict], Any]]:
         archive.append("tool", {"name": "meters", "line": line})
         return text(line)
 
+    async def ticket(args: dict) -> dict:
+        title = str(args.get("title", ""))
+        body = str(args.get("body", ""))
+        try:
+            path = tickets_mod.open_ticket(repo, title, body, datetime.now(archive.tz))
+        except Exception as exc:  # noqa: BLE001 — ValueError (empty), OSError
+            return text(f"Ticket refused: {exc}")
+        tid = path.stem
+        archive.append("tool", {"kind": "ticket", "name": "ticket", "id": tid, "title": title})
+        return text(f"Ticket {tid} filed at {path.relative_to(repo).as_posix()}. It is public; your parents see it "
+                    "on their page and in tonight's note, and answer in the same file. `tickets` shows the status.")
+
+    async def tickets(args: dict) -> dict:
+        open_ = tickets_mod.list_tickets(repo, "open")
+        closed = [t for t in tickets_mod.list_tickets(repo) if t["status"] != "open"][:RECENT_CLOSED]
+        lines = []
+        for t in open_ + closed:
+            line = f"{t['id']} [{t['status']}] {t['title']} (opened {t['opened'][:10]}"
+            line += f", closed {t['closed'][:10]})" if t["closed"] else ")"
+            if t["reply"]:
+                line += "\n  Reply: " + t["reply"].replace("\n", "\n  ")
+            lines.append(line)
+        archive.append("tool", {"name": "tickets", "open": [t["id"] for t in open_], "closed": [t["id"] for t in closed]})
+        return text("\n".join(lines) if lines else "No tickets yet.")
+
     return {
         "recall": recall, "mail_read": mail_read, "mail_send": mail_send, "council_ask": council_ask,
         "card_details": card_details, "ledger_add": ledger_add, "payment_link": payment_link,
         "odometer_claim": odometer_claim, "scratch_write": scratch_write, "scratch_read": scratch_read,
-        "meters": meters,
+        "meters": meters, "ticket": ticket, "tickets": tickets,
     }
 
 
@@ -174,6 +202,9 @@ SCHEMAS: dict[str, tuple[str, dict]] = {
     "scratch_write": ("Append to your private scratchpad. Nobody reads it; it is not archived.", {"text": str}),
     "scratch_read": ("Read your private scratchpad.", {}),
     "meters": ("Your food bill today, council spend this week, ledger balance and odometer.", {}),
+    "ticket": ("File a request only your parents can act on (accounts, money, keys, a deploy, a human step). "
+               "It is public. They answer in the same file.", {"title": str, "body": str}),
+    "tickets": ("Your open tickets and the most recently closed ones, with status and your parents' reply.", {}),
 }
 
 

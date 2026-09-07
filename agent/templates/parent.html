@@ -43,6 +43,21 @@
 {% endfor %}
 {% else %}<p class="muted">None pending.</p>{% endif %}
 
+<h2>Tickets</h2>
+{% if tickets %}
+{% for t in tickets %}
+<p><strong>{{ t.title }}</strong> <span class="muted">{{ t.id }} — opened {{ t.opened[:16] }} by {{ t.by }}</span></p>
+<pre>{{ t.excerpt }}</pre>
+<form method="post" action="/parent/ticket">
+  <input type="hidden" name="ticket_id" value="{{ t.id }}">
+  <label>Reply (written into the ticket file, publicly)</label>
+  <textarea name="reply" rows="3" required minlength="5"></textarea>
+  <button name="status" value="done">Done</button>
+  <button name="status" value="declined">Decline</button>
+</form>
+{% endfor %}
+{% else %}<p class="muted">None open.</p>{% endif %}
+
 <h2>Unseal a lesson</h2>
 <form method="post" action="/parent/unseal">
   <label>Lesson number</label>

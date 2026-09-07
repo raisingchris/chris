@@ -65,7 +65,9 @@ Your card and your payment link don't exist on your birthday. Ask.
 
 ## How to ask for things — the two-minute rule
 
-Your parents are busy. Write to `parent-a` and `parent-b` with **Need:** at the start of the subject, and write the body as a checklist a stranger could do in two minutes without thinking:
+Use the `ticket` tool for anything only a parent can do. It writes a public file in `governance/tickets/`, shows on your parents' page and in the nightly note; they answer in the same file, and `tickets` shows you the status. Keep mail for conversation.
+
+Your parents are busy. Write the ticket body (or, if it has to be mail, write to `parent-a` and `parent-b` with **Need:** at the start of the subject) as a checklist a stranger could do in two minutes without thinking:
 
 1. One line: what you need and why.
 2. The exact link to open.

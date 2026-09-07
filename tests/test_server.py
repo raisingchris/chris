@@ -553,3 +553,41 @@ def test_resend_webhook_schedules_mail_wake(services, env):
     assert len(fs.jobs) == 1
     assert services.archive.entries[-1][1] == {"kind": "mail_wake_skipped", "reason": "sleep_hours"}
     assert scheduler_module.MAIL_WAKE_DAILY_CAP == 6
+
+
+# --- tickets ------------------------------------------------------------------------------
+
+
+def test_ticket_resolve_writes_reply_and_status(client, services):
+    from datetime import datetime, timezone
+
+    from agent import tickets
+
+    repo = Path(services.cfg.repo_dir)
+    p = tickets.open_ticket(repo, "A GitHub token", "1. Open the settings page.\n2. Paste the token.",
+                            datetime(2026, 9, 7, 14, 30, tzinfo=timezone.utc))
+    tid = p.stem
+    sign_in(client, "parent-a")
+    page = client.get("/parent").text
+    section = page.split("<h2>Tickets</h2>")[1].split("<h2>")[0]
+    assert "A GitHub token" in section and tid in section and "Open the settings page." in section
+
+    r = client.post("/parent/ticket", data={"ticket_id": tid, "status": "done", "reply": "ok"})
+    assert r.status_code == 400 and "at least five characters" in r.text
+    assert client.post("/parent/ticket", data={"ticket_id": tid, "status": "maybe", "reply": "long enough"}).status_code == 400
+    assert client.post("/parent/ticket", data={"ticket_id": "20260101T0000-none", "status": "done",
+                                               "reply": "long enough"}).status_code == 404
+    assert client.post("/parent/ticket", data={"ticket_id": "../soul/vows", "status": "done",
+                                               "reply": "long enough"}).status_code == 400
+
+    r = client.post("/parent/ticket", data={"ticket_id": tid, "status": "done", "reply": "It's in your inbox."},
+                    follow_redirects=False)
+    assert r.status_code == 303
+    text = p.read_text()
+    assert "status: done" in text and "closed:" in text
+    assert "## Reply" in text and "*parent-a, " in text and "It's in your inbox." in text
+    assert ("parent_action", {"kind": "parent_action", "action": "ticket", "by": "parent-a",
+                              "ticket": tid, "status": "done"}) in services.archive.entries
+    assert "None open." in client.get("/parent").text.split("<h2>Tickets</h2>")[1].split("<h2>")[0]
+    # closed is closed
+    assert client.post("/parent/ticket", data={"ticket_id": tid, "status": "declined", "reply": "long enough"}).status_code == 400

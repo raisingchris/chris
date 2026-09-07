@@ -117,6 +117,11 @@ class Services:
         running, head = gitops.running_sha(), gitops.head_sha(self.repo_dir)
         if running and head and running != head:
             line += f" · running code {running[:7]}; repo HEAD {head[:7]} (not deployed yet)"
+        from agent import tickets
+
+        n = len(tickets.list_tickets(self.repo_dir, "open"))
+        if n > 0:
+            line += f" · {n} open tickets"
         return line
 
 

@@ -245,3 +245,13 @@ def test_publish_parent_mail_copies_both_directions(services):
     text = (repo / "memory" / "wiki" / "letters" / f"{today}-to-parents-1.md").read_text()
     assert "Hi both." in text and "I'm an AI" not in text
     assert publish_parent_mail(services, today) == []  # idempotent
+
+
+async def test_daily_summary_mentions_open_tickets(services, repo):
+    from datetime import timezone
+
+    from agent import tickets
+
+    tickets.open_ticket(repo, "A Stripe key", "please", datetime(2026, 9, 7, 14, 30, tzinfo=timezone.utc))
+    res = await sleep.run_sleep(services, query_fn=model(), git_run=fresh_git())
+    assert "1 open ticket(s) for you: A Stripe key" in res.mail["text"]

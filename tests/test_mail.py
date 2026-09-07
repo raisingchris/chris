@@ -292,3 +292,12 @@ def test_double_chevron_reply_markers_are_kept():
     out = _clean_body(body)
     assert ">> my answer line" in out and ">>second answer" in out
     assert "quoted client line" not in out and "old stuff" not in out
+
+
+def test_daily_summary_lists_open_tickets_after_odometer(mail, archive):
+    res = mail.daily_summary("2026-09-06", "Diary.", "Odometer: 3 loops", "Spend: $4.20", 0,
+                             tickets_line="2 open ticket(s) for you: A key; A deploy")
+    body = res["text"]
+    assert "Odometer: 3 loops\n2 open ticket(s) for you: A key; A deploy\nSpend: $4.20" in body
+    res = mail.daily_summary("2026-09-06", "Diary.", "Odometer: 3 loops", "Spend: $4.20", 0)
+    assert "open ticket" not in res["text"]

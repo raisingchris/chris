@@ -33,7 +33,19 @@ COPY pyproject.toml ./
 COPY agent ./agent
 COPY site ./site
 COPY scripts ./scripts
-RUN pip install --no-cache-dir . && chown -R root:root /app && chmod -R a+rX /app && chmod 755 /app/scripts/*.sh
+# `.[dev]` pulls in pytest, so she can run her own test suite from her shell before asking for a deploy.
+RUN pip install --no-cache-dir ".[dev]" && chown -R root:root /app && chmod -R a+rX /app && chmod 755 /app/scripts/*.sh
+
+# The GitHub CLI, from GitHub's own apt repo (https://cli.github.com/packages). Chris has no GitHub
+# token: `gh` runs unauthenticated, which is enough for public data (`gh api repos/<owner>/<repo>`,
+# `gh api /repos/.../issues`, `gh release view -R ...`) at the anonymous rate limit. Anything that
+# needs to write to GitHub — or read a private repo — is a ticket for her parents.
+RUN mkdir -p -m 755 /etc/apt/keyrings \
+    && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg -o /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list \
+    && apt-get update && apt-get install -y --no-install-recommends gh \
+    && rm -rf /var/lib/apt/lists/*
 
 # A browser for her. Chromium and its system libraries are installed once, as root, into a
 # world-readable location so both `brain` (Python) and `chris` (her shell) find it.

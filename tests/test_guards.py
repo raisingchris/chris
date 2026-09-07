@@ -102,3 +102,60 @@ def test_reading_a_parent_file_with_null_redirect_is_allowed(repo):
     from agent.guards import decide
     assert decide("Bash", {"command": "cat governance/graduations.yaml 2>/dev/null; echo done"}, repo) == {}
     assert "permissionDecision" in str(decide("Bash", {"command": "echo x > governance/graduations.yaml"}, repo))
+
+
+# --- shell writes to parent-owned files: denied only as a write TARGET -------------------
+
+
+@pytest.mark.parametrize("cmd", [
+    "cat ledger/ledger.csv",
+    "grep spend ledger/ledger.csv | head",
+    "head -5 governance/graduations.yaml",
+    "wc -l ledger/ledger.csv governance/graduations.yaml",
+    "diff ledger/ledger.csv /tmp/x",
+    "git show HEAD:ledger/ledger.csv",
+    "git log -- .githooks/pre-push",
+    "python3 -c \"print(open('ledger/ledger.csv').read())\"",
+    "python3 -c \"open('governance/graduations.yaml', 'r').read()\"",
+    "cp ledger/ledger.csv /tmp/x",                       # protected file is the SOURCE
+    "cp governance/graduations.yaml /tmp/y && cat /tmp/y",
+    "cat ledger/ledger.csv > /tmp/out.txt",              # redirect goes elsewhere
+    "cat governance/graduations.yaml 2>/dev/null; echo done",
+    "sed -n 1,5p ledger/ledger.csv",
+    "cat .claude/settings.json",
+    "echo hi > memory/wiki/self/notes.md",
+])
+def test_reading_parent_files_from_shell_allowed(repo, cmd):
+    assert guards.decide("Bash", {"command": cmd}, repo) == {}, cmd
+
+
+@pytest.mark.parametrize("cmd", [
+    "echo x > ledger/ledger.csv",
+    "echo x >> governance/graduations.yaml",
+    "echo x >'ledger/ledger.csv'",
+    "echo x > ./ledger/ledger.csv",
+    "echo x > /app/repo/ledger/ledger.csv",
+    "echo x | tee ledger/ledger.csv",
+    "echo x | tee -a governance/graduations.yaml",
+    "sed -i 's/a/b/' ledger/ledger.csv",
+    "sed -i.bak -e s/a/b/ governance/graduations.yaml",
+    "cp x ledger/ledger.csv",                            # protected file is the DESTINATION
+    "cp x governance/graduations.yaml; ls",
+    "mv x ledger/ledger.csv",
+    "install -m 644 x ledger/ledger.csv",
+    "touch ledger/ledger.csv",
+    "touch -a governance/graduations.yaml",
+    "truncate -s 0 ledger/ledger.csv",
+    "python3 -c \"open('ledger/ledger.csv','w').write('x')\"",
+    "python -c \"open('governance/graduations.yaml', 'a')\"",
+    "rm ledger/ledger.csv",
+    "unlink governance/graduations.yaml",
+    "shred governance/graduations.yaml",
+    "echo x > governance/pause_log.md",
+    "echo x > .claude/settings.json",
+    "echo x > .githooks/pre-push",
+    "rm memory/wiki/lessons/from_parent/01-x.md",
+])
+def test_writing_parent_files_from_shell_denied(repo, cmd):
+    reason = denied(guards.decide("Bash", {"command": cmd}, repo))
+    assert reason and ("not yours" in reason or "configures your sessions" in reason or "not allowed" in reason), cmd

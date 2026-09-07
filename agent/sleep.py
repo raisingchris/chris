@@ -10,8 +10,9 @@ note to her parents. Afterwards, in this order and without the model:
 4. card transactions since yesterday become ledger spend rows;
 5. the odometer line is re-rendered;
 6. the repo is redacted, committed as Chris ("sleep: <date>") and pushed;
-7. the parent note (or the diary, if she wrote none) is mailed to both parents
-   and filed under ``memory/wiki/letters/<date>-to-parents.md``.
+7. the parent note (or the diary, if she wrote none) is mailed to both parents,
+   with a line for any open tickets, and filed under
+   ``memory/wiki/letters/<date>-to-parents.md``.
 """
 
 from __future__ import annotations
@@ -22,7 +23,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from agent import character_diff, gitops, loop, pause, session, tools, wiring
+from agent import character_diff, gitops, loop, pause, session, tickets, tools, wiring
 from agent.paths import UnsafePath, safe_path
 
 log = logging.getLogger("chris.sleep")
@@ -335,8 +336,13 @@ async def run_sleep(services, query_fn=None, git_run=None) -> SleepResult:
     inbox_count = len(services.mail.list_unread())
     alert = f"Sleep failed tonight: {result.failed}" if result.failed else ""
     try:
+        tickets_line = tickets.summary_line(repo)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("tickets.summary_line failed: %s", exc)
+        tickets_line = ""
+    try:
         result.mail = services.mail.daily_summary(today, note_md, result.odometer_line, spend, inbox_count,
-                                                  alert=alert)
+                                                  alert=alert, tickets_line=tickets_line)
     except Exception as exc:  # noqa: BLE001 — the day is saved; mail is best effort
         log.warning("daily_summary failed: %s", exc)
         archive.append("mail_failed", {"kind": "daily_summary", "error": type(exc).__name__})

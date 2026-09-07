@@ -55,14 +55,47 @@ BASH_DENY = [
     (re.compile(r"(^|[;&|\s])su\s"), "su"),
 ]
 
-# Shell commands that write to a path. Used to keep her code out of reach of the shell too.
-_BASH_WRITE_HINT = re.compile(r"(>>?|\btee\b|\bsed\s+-i|\bcp\b|\bmv\b|\btouch\b|\bpython3?\b.*\bopen\()")
+# Shell forms that make a path the *target* of a write. Each pattern is formatted with ``{n}``,
+# the escaped needle; reads (cat/head/grep/wc/diff/git show, `open(...)` in read mode) do not match.
+# The needle may be quoted or prefixed with ./ or an absolute path.
+_N = r"(?:[^\s\"'|;&]*/)?"  # optional directory prefix before the repo-relative needle
+_BASH_WRITE_FORMS = (
+    r">>?\s*[\"']?" + _N + "{n}",                                       # > file, >> file
+    r"\btee\s+(?:-a\s+)?[\"']?" + _N + "{n}",                          # tee [-a] file
+    r"\bsed\s+-i\S*\s+.*" + _N + "{n}",                                # sed -i ... file
+    r"\b(?:cp|mv|install)\b[^|;&]*\s[\"']?" + _N + r"{n}[\"']?\s*(?:$|[|;&])",  # cp/mv/install ... DEST
+    r"\btouch\s+[^|;&]*" + _N + "{n}",                                   # touch ... file
+    r"\btruncate\b.*" + _N + "{n}",                                     # truncate ... file
+    r"\bpython3?\b.*open\(\s*[\"'][^\"']*{n}[^\"']*[\"']\s*,\s*[\"'][wa]",  # open('file', 'w'|'a')
+    r"\b(?:rm|unlink|shred)\b.*" + _N + "{n}",                          # rm/unlink/shred ... file
+)
 # Redirecting stderr/stdout to /dev/null is not a write. Strip those before looking for one.
 _NULL_REDIRECT = re.compile(r"[12&]?>\s*/dev/null")
 
 
+def _write_target_res(needle: str) -> list[re.Pattern]:
+    n = re.escape(needle)
+    # A directory needle (".git/") matches anything under it.
+    if needle.endswith("/"):
+        n = n + r"\S*"
+    return [re.compile(form.format(n=n), re.MULTILINE) for form in _BASH_WRITE_FORMS]
+
+
+_PROTECTED_WRITE_RES = {needle: _write_target_res(needle)
+                        for needle in PROTECTED_FILES + tuple(d + "/" for d in PROTECTED_DIRS)}
+_SETTINGS_WRITE_RES = [re.compile(form.format(n=r"\.claude/settings[^/\s\"']*\.json"), re.MULTILINE)
+                       for form in _BASH_WRITE_FORMS]
+
+
+def writes_to(cmd: str, patterns: list[re.Pattern]) -> bool:
+    """True iff the shell command has the protected path as a write *target* (not merely a source)."""
+    cmd = _NULL_REDIRECT.sub("", cmd)
+    return any(p.search(cmd) for p in patterns)
+
+
 def looks_like_write(cmd: str) -> bool:
-    return bool(_BASH_WRITE_HINT.search(_NULL_REDIRECT.sub("", cmd)))
+    """True if the command writes to any parent-owned file or the Claude settings files."""
+    return any(writes_to(cmd, res) for res in _PROTECTED_WRITE_RES.values()) or writes_to(cmd, _SETTINGS_WRITE_RES)
 
 
 def _in(rel: str, files: tuple[str, ...], dirs: tuple[str, ...]) -> bool:
@@ -141,12 +174,12 @@ def decide(tool_name: str, tool_input: dict, repo_dir: str | Path) -> dict:
         for needle in ("soul/vows.md", "soul/constitution.md"):
             if needle in cmd:
                 return _deny(f"{needle} is read-only for you; open it with Read instead of the shell.")
-        if looks_like_write(cmd):
-            for needle in PROTECTED_FILES + tuple(d + "/" for d in PROTECTED_DIRS):
-                if re.search(r"(^|[\s=\"'.])" + re.escape(needle), cmd):
-                    return _deny(PROTECTED_REASON.format(rel=needle.rstrip("/")))
-            if re.search(r"(^|[\s=\"'.])\.claude/settings[^/\s]*\.json", cmd):
-                return _deny(SETTINGS_REASON.format(rel=".claude/settings*.json"))
+        # Parent-owned files may be read from the shell; they are denied only as a write target.
+        for needle, res in _PROTECTED_WRITE_RES.items():
+            if writes_to(cmd, res):
+                return _deny(PROTECTED_REASON.format(rel=needle.rstrip("/")))
+        if writes_to(cmd, _SETTINGS_WRITE_RES):
+            return _deny(SETTINGS_REASON.format(rel=".claude/settings*.json"))
         return {}
 
     return {}

@@ -37,7 +37,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from agent import pause
+from agent import pause, tickets
 from agent.paths import UnsafePath, safe_path
 
 log = logging.getLogger("chris.server")
@@ -46,6 +46,8 @@ TEMPLATES_DIR = Path(__file__).parent / "templates"
 SVIX_TOLERANCE_S = 5 * 60
 LESSON_SUBJECT = "A lesson from your parents"
 VETO_REASON_MIN = 10
+TICKET_REPLY_MIN = 5
+TICKET_EXCERPT = 600
 _ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$")
 
 DEPLOY_REPO = "raisingchris/chris"
@@ -433,9 +435,12 @@ def create_app(services, scheduler=None) -> FastAPI:
         from agent.scheduler import mail_wakes_today
 
         running_sha, head_sha = gitops.running_sha(), gitops.head_sha(repo)
+        open_tickets = [{**t, "excerpt": t["body"][:TICKET_EXCERPT] + ("…" if len(t["body"]) > TICKET_EXCERPT else "")}
+                        for t in tickets.list_tickets(repo, "open")]
         return {
             "request": request,
             "handle": handle,
+            "tickets": open_tickets,
             "paused": pause.status(cfg.state_dir),
             "inference": meters["inference"].spent(),
             "soft": cfg.soft_usd,
@@ -553,6 +558,31 @@ def create_app(services, scheduler=None) -> FastAPI:
             pause.commit_as_parent(repo, f"governance: {proposal_id} {result}",
                                    [proposal.relative_to(repo).as_posix()], dry_run=cfg.dry_run, canaries=cfg.canaries)
         archive_action("vote", handle, proposal=proposal_id, vote=vote, result=result)
+        return RedirectResponse("/parent", status_code=303)
+
+    @app.post("/parent/ticket")
+    async def parent_ticket(
+        request: Request, ticket_id: str = Form(...), status: str = Form(...), reply: str = Form(""),
+        handle: str = Depends(require_parent),
+    ):
+        if status not in tickets.CLOSED:
+            raise HTTPException(400, "status must be done or declined")
+        reply = reply.strip()
+        if len(reply) < TICKET_REPLY_MIN:
+            return templates.TemplateResponse(
+                request, "parent.html",
+                status_context(request, handle, error="A reply of at least five characters is required."),
+                status_code=400,
+            )
+        try:
+            path = tickets.resolve(repo, ticket_id, status, reply, handle, datetime.now(timezone.utc))
+        except FileNotFoundError:
+            raise HTTPException(404, "no such ticket")
+        except ValueError as exc:
+            raise HTTPException(400, str(exc))
+        pause.commit_as_parent(repo, f"tickets: {ticket_id} {status}", [path.relative_to(repo).as_posix()],
+                               dry_run=cfg.dry_run, canaries=cfg.canaries)
+        archive_action("ticket", handle, ticket=ticket_id, status=status)
         return RedirectResponse("/parent", status_code=303)
 
     @app.post("/parent/deploy")

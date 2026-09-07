@@ -182,8 +182,10 @@ class Mail:
         spend_line: str,
         inbox_count: int,
         alert: str = "",
+        tickets_line: str = "",
     ) -> dict:
-        """The nightly mail to both parents. ``alert`` (e.g. a failed sleep) goes on the very first line."""
+        """The nightly mail to both parents. ``alert`` (e.g. a failed sleep) goes on the very first line;
+        ``tickets_line`` (her open tickets, if any) follows the odometer."""
         body = "\n".join(
             ([alert.rstrip(), ""] if alert else []) + [
                 f"Chris's day, {date}. {inbox_count} new message(s) in her inbox.",
@@ -191,6 +193,7 @@ class Mail:
                 diary_md.rstrip(),
                 "",
                 odometer_line,
+            ] + ([tickets_line.rstrip()] if tickets_line.strip() else []) + [
                 spend_line,
                 "",
                 SUMMARY_FOOTER,
