@@ -52,6 +52,7 @@ class SleepResult:
     commit: str | None = None
     note_source: str = ""
     letter: Path | None = None
+    published: list = field(default_factory=list)
     mail: dict | None = None
     failed: str = ""  # "ErrorType: message" if the model session raised
 
@@ -210,6 +211,56 @@ def file_parent_note(services, today: str) -> Path | None:
     return dest
 
 
+def publish_parent_mail(services, today: str) -> list[Path]:
+    """Letters between Chris and her parents are public (PRD §11), anonymised.
+
+    Every mail she sent to a parent today (from the archive) and every mail a parent sent her
+    (from the inbox) is copied into memory/wiki/letters/ as <date>-to-parents-<n>.md /
+    <date>-from-<handle>-<n>.md. Identity redaction runs on the whole repo before commit.
+    """
+    out: list[Path] = []
+    letters = _safe(services, "memory/wiki/letters")
+    if letters is None:
+        return out
+    letters.mkdir(parents=True, exist_ok=True)
+    handles = set(services.cfg.parent_handles)
+    n = 0
+    for rec in services.archive.read_day(today):
+        if rec.get("kind") != "mail_out":
+            continue
+        p = rec.get("payload", {})
+        to = p.get("to") or []
+        if isinstance(to, str):
+            to = [to]
+        if not any(t in handles for t in to):
+            continue
+        n += 1
+        dest = letters / f"{today}-to-parents-{n}.md"
+        if not dest.exists():
+            body = p.get("body", "").split("\n\n— Chris\n")[0]
+            dest.write_text(f"---\nfrom: chris\nto: {', '.join(to)}\nsubject: {json.dumps(p.get('subject', ''))}\n"
+                            f"archive: {rec.get('ref', '')}\n---\n\n{body}\n", encoding="utf-8")
+            out.append(dest)
+    inbox = _safe(services, "memory/inbox")
+    if inbox is not None and inbox.exists():
+        m = 0
+        for f in sorted(inbox.glob(f"{today}-*.md")):
+            text = f.read_text(encoding="utf-8")
+            head = text.split("---", 2)[1] if text.startswith("---") else ""
+            sender = ""
+            for line in head.splitlines():
+                if line.startswith("from:"):
+                    sender = line.split(":", 1)[1].strip()
+            if sender not in handles:
+                continue
+            m += 1
+            dest = letters / f"{today}-from-{sender}-{m}.md"
+            if not dest.exists():
+                dest.write_text(text, encoding="utf-8")
+                out.append(dest)
+    return out
+
+
 # --- entry point -------------------------------------------------------------
 
 
@@ -269,6 +320,11 @@ async def run_sleep(services, query_fn=None, git_run=None) -> SleepResult:
 
     note_md, result.note_source = parent_note(services, today)
     result.letter = file_parent_note(services, today)
+    try:
+        result.published = publish_parent_mail(services, today)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("publish_parent_mail failed: %s", exc)
+        result.published = []
 
     run = git_run or gitops.git
     result.commit = gitops.commit_all(repo, f"sleep: {today}", push=not cfg.dry_run, run=run,

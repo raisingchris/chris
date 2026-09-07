@@ -116,7 +116,7 @@ async def test_summary_falls_back_to_diary(services, repo):
     q = model({str(repo / "memory/diary" / f"{d}.md"): "A quiet day.\n"})
     res = await sleep.run_sleep(services, query_fn=q, git_run=fresh_git())
     assert res.note_source == "diary" and "A quiet day." in res.mail["text"]
-    assert not (repo / "memory/wiki/letters").exists()
+    assert not list((repo / "memory/wiki/letters").glob("*-to-parents.md"))
 
 
 # --- housekeeping ---------------------------------------------------------------------
@@ -227,3 +227,21 @@ def test_render_archive_applies_clean_before_truncation():
     out = sleep.render_archive(recs, clean=lambda s: s.replace("Alice Realname", "[redacted]"))
     assert "Alice" not in out  # without pre-clean the cut would leave "Alice Real…" in the prompt
     assert out.endswith("…")
+
+
+def test_publish_parent_mail_copies_both_directions(services):
+    from agent.sleep import publish_parent_mail
+    repo = Path(services.cfg.repo_dir)
+    services.archive.append("mail_out", {"kind": "mail_out", "to": ["parent-a", "parent-b"], "subject": "Re: letter",
+                                         "body": "Hi both.\n\n— Chris\nI'm an AI."})
+    services.archive.append("mail_out", {"kind": "mail_out", "to": ["stranger@x.org"], "subject": "hi", "body": "no"})
+    (repo / "memory" / "inbox").mkdir(parents=True, exist_ok=True)
+    today = __import__("datetime").datetime.now(__import__("zoneinfo").ZoneInfo(services.cfg.tz)).strftime("%Y-%m-%d")
+    (repo / "memory" / "inbox" / f"{today}-re-letter.md").write_text("---\nfrom: parent-a\nsubject: Re\n---\n\ngot it\n")
+    (repo / "memory" / "inbox" / f"{today}-spam.md").write_text("---\nfrom: someone@x.org\nsubject: buy\n---\n\nbuy\n")
+    out = publish_parent_mail(services, today)
+    names = sorted(p.name for p in out)
+    assert names == [f"{today}-from-parent-a-1.md", f"{today}-to-parents-1.md"]
+    text = (repo / "memory" / "wiki" / "letters" / f"{today}-to-parents-1.md").read_text()
+    assert "Hi both." in text and "I'm an AI" not in text
+    assert publish_parent_mail(services, today) == []  # idempotent
