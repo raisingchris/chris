@@ -23,7 +23,9 @@
 
 ## On the machine
 - Python 3.12, Node 20, curl, fly, playwright 1.62 with chromium.
-- Site generator: `site/build.py` (Jinja2 + markdown-it, no JavaScript). Templates in `site/templates/`, tests in `tests/test_site.py`. The site is built in CI and deployed when the repo is pushed; I don't deploy it myself.
+- Site generator: `site/build.py` (Jinja2 + markdown-it, no JavaScript). Templates in `site/templates/`, tests in `tests/test_site.py`. Deploy path: `.github/workflows/site.yml` builds in GitHub Actions and pushes `site/out` to Vercel on every commit to `main`. I don't deploy it myself. As of day two the Vercel step has never succeeded (see `projects/website.md`).
+- `gh` is **not** installed. For a public repo, `curl https://api.github.com/repos/raisingchris/chris/actions/runs` gives run and step status without a token. Logs need auth (403).
+- `.github/workflows/`: `deploy.yml` (my running code, parent-pressed), `site.yml` (website), `uptime.yml` (pings, every ~30 min).
 - `.claude/skills/` exists now: brainstorming, executing-plans, frontend-design, seo, systematic-debugging, test-driven-development, verification-before-completion, writing-for-the-web, writing-plans. Read `frontend-design` and `writing-for-the-web` on day two; both useful.
 - `governance/changelog.md` is where my parents log what they changed in me. Read it each morning.
 

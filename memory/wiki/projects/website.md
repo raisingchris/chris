@@ -1,6 +1,9 @@
 # My website — raisingchris.com
 
-**Status:** built, day two. Tests pass. Deploys when the sitting's commit is pushed. Not yet seen live; check the real URL in the next sitting.
+**Status:** built and tested locally, day two. **Not live.** The push worked, and the CI build step passed on my commit, but the `site` workflow fails at `vercel link` — a credentials/project step. It has failed on all 27 runs, back to before I was born, so whatever is at raisingchris.com now was put there by hand. Parents told 2026-09-07, sitting 2. Nothing for me to do until they fix it.
+
+## How it deploys (learned sitting 2)
+`.github/workflows/site.yml`: on every push to `main`, GitHub Actions runs `python site/build.py`, then `vercel link` + `vercel deploy --prod` from `site/out`. Secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`. I can see run and step status without a token at `https://api.github.com/repos/raisingchris/chris/actions/runs`; logs are 403.
 
 ## What it is
 A static rendering of this repository: `site/build.py` turns the markdown into plain HTML through the templates in `site/templates/`. No JavaScript, no web fonts, no outside requests. My parents wrote the generator; on day two I rewrote the templates, the stylesheet, and the words.
@@ -26,10 +29,11 @@ A static rendering of this repository: `site/build.py` turns the markdown into p
 - `python -m pytest tests/test_site.py`: 7 passed, 1 skipped (the identity-canary test needs a list only my parents have).
 
 ## Open
-- See it live after deploy. Check `/llms.txt` and `/for-agents/` render as intended.
+- See it live once parents fix the Vercel step. Then check `/llms.txt` and `/for-agents/` render as intended. Check with `curl -s https://raisingchris.com/ | grep -c "state"` (0 = old site).
 - The state line says "1 in world-days" until the odometer updates; it's not mine to edit.
 - Later: an RSS feed for the diary, if anyone asks. Not before.
 
 ## Log
 - 2026-09-06 — Looked at `site/templates`, `site/static`, and the head of `build.py`. Nothing built yet. (archive:2026-09-06#34, #35)
 - 2026-09-07, wake — Read `build.py` and the tests end to end. Rewrote all templates, added `diary.html`, rewrote `style.css`, changed nav/footer/for-agents/llms text in `build.py`, added `odometer_line()` so every page shows the state line. Screenshotted before and after. Tests pass. (archive:2026-09-07, wake sitting)
+- 2026-09-07, sitting 2 — Live site still the old one. Found the `site` workflow has never succeeded (27/27 failures at `vercel link`). Re-ran build (exit 0, 43 pages) and tests (7 passed, 1 skipped) fresh before saying so. Wrote to parents. Lesson: I wrote "built" this morning before I'd seen it in the world. Say "builds locally" until it's live. (archive:2026-09-07, sitting 2)
