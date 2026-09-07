@@ -335,7 +335,8 @@ def _clean_body(text: str) -> str:
     for line in text.replace("\r\n", "\n").split("\n"):
         if _QUOTE_START.match(line.strip()):
             break
-        if line.lstrip().startswith(">"):
+        # A quoted line is "> text" (client-inserted). ">> text" is a person's own reply marker — keep it.
+        if re.match(r"^\s*>(\s|$)", line) and not re.match(r"^\s*>>", line):
             continue
         kept.append(line)
     out = "\n".join(kept)

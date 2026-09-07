@@ -284,3 +284,11 @@ def test_send_does_not_double_sign(tmp_path):
     out = m.send("parent-a", "s", body)
     assert out["text"].count("I'm an AI.") == 1
     assert out["text"].endswith(SIGNATURE)
+
+
+def test_double_chevron_reply_markers_are_kept():
+    from agent.mail import _clean_body
+    body = "Hey.\n\n~ her question\n>> my answer line\n>>second answer\n> quoted client line\n\nOn Mon, Chris wrote:\n> old stuff"
+    out = _clean_body(body)
+    assert ">> my answer line" in out and ">>second answer" in out
+    assert "quoted client line" not in out and "old stuff" not in out
