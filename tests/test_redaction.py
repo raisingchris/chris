@@ -138,3 +138,9 @@ def test_clean_tree_rewrites_and_then_clean(tree: Path):
     assert (tree / "blob.bin").read_bytes().startswith(b"Jane Q. Example\x00")
     assert scan_tree(tree, CANARIES) == []
     assert_clean(tree, CANARIES)
+
+
+def test_timestamps_are_not_phone_numbers():
+    for t in ("2026-09-07 14:30 UTC", "at 2026-09-07 09:59 the sitting died", "2026-09-07 9am"):
+        assert redact(t, CANARIES)[0] == t
+    assert "[redacted]" in redact("call +1 415 555 0199", CANARIES)[0]

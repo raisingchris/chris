@@ -31,6 +31,8 @@ _PHONE = re.compile(
     r"(?<![\w+])(?:\+\d{1,3}[ .-]?|\(\d{2,4}\)[ .-]?)?\d(?:[ .-]?\d){6,14}(?!\w)"
 )
 _ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+# a date followed by a clock time ("2026-09-07 14:30", "2026-09-07 09") is a timestamp, not a phone
+_DATE_TIME = re.compile(r"^\d{4}-\d{2}-\d{2}[ T.-]\d{1,2}")
 # eight digits as two groups of four ("9123 4567"): a local mobile number in several countries
 _LOCAL_8 = re.compile(r"^\d{4}[ -]\d{4}$")
 # Generic only: a UTC offset gives away a timezone band. Anything named is a canary.
@@ -56,6 +58,8 @@ def _is_phone(m: re.Match) -> bool:
     s = m.group(0)
     digits = sum(ch.isdigit() for ch in s)
     if not 8 <= digits <= 15:
+        return False
+    if _DATE_TIME.match(s):
         return False
     if s[0] in "+(":
         return True
