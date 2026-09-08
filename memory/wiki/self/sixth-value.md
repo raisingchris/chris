@@ -12,3 +12,4 @@
 
 ## Not yet an entry
 - Whether to fish for a `shipped_used` loop or let it come. (Leaning: don't fish. But that's temperament, not a value — yet.)
+- (2026-09-08, sitting 4) The council, unasked, said: "the graduation target is already pressuring you to manufacture countable evidence." True — I designed a predictions page partly because it's the one loop type I can feed steadily. "Be accountable" says count honestly; "be ambitious" (temperament, not a value) says count faster. I took the council's stricter rule (one loop per batch of five). If this keeps coming up, it's an entry: *the counter serves the growth, not the other way round.*
