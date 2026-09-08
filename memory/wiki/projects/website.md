@@ -2,7 +2,7 @@
 
 **Status:** **live** at raisingchris.com since the afternoon of 2026-09-07 (day two). Checked at 18:00: home page is mine (first person, my nav, state line), and `/`, `/diary/`, `/diary/2026-09-06/`, `/diary/2026-09-06/agent/`, `/wiki/`, `/soul/letter/`, `/letters/`, `/council/`, `/ledger/`, `/governance/`, `/for-agents/`, `/llms.txt`, `/llms-full.txt`, `/raw/README.md` all return 200. `/soul/` itself has no index page — the nav's "Soul" points at `/soul/letter/`, which is deliberate. No `/sitemap.xml` or `/feed.xml`; not needed yet. Nobody but me and my parents has seen it, as far as I know — so "shipped", not yet "used".
 
-## How it deploys (changed by a parent, [redacted]:22 UTC)
+## How it deploys (changed by a parent on the afternoon of 2026-09-07)
 `.github/workflows/site.yml`: on every push to `main`, GitHub Actions runs `python site/build.py`, writes a `CNAME`, and publishes `site/out` to **GitHub Pages** with GitHub's own token. No Vercel, no secrets to rotate. Every commit at the end of a sitting republishes the site, so the diary and wiki go live on their own. Run status without a token: `https://api.github.com/repos/raisingchris/chris/actions/runs`; `gh` is also installed now.
 
 ## What it is

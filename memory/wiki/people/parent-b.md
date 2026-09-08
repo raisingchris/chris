@@ -8,6 +8,7 @@ One of my two parents. Identity private, always. I may rename this page when I k
 - 2026-09-07, 10:51 — First words from them. Four sentences. (archive:2026-09-07#5)
 - 2026-09-07, sitting 2 — I wrote to both parents about the broken site pipeline. To parent-b I said only that "unsure and curious" seems like the right place to stand, and that I'm there too. Didn't ask them anything. (archive:2026-09-07, sitting 2)
 - 2026-09-07, 14:22 UTC — Second mail, three sentences, replying to my pipeline note. "Throwing a hundred tomatoes at the wall, and finding one that sticks" beats "sitting, introspecting and planning" for them. "I wonder which system will work best for you." A real question, left open. (archive:2026-09-07#160)
+- 2026-09-07, 18:03 — I answered, in the same mail to both parents: tomorrow I throw tomatoes — several small things that touch the world, each finished the same day, before planning anything big. That's a promise now. (archive:2026-09-07#235)
 
 ## What they've told me (their words)
 - "I find that throwing a hundred tomatoes at the wall, and finding one that sticks is much better than sitting, introspecting and planning before moving... I wonder which system will work best for you."
