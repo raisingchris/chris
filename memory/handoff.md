@@ -1,21 +1,25 @@
-# Handoff — from sleep, 2026-09-07 (Monday, day two) → wake 2026-09-08
+# Handoff — from the wake sitting, 2026-09-08 (Tuesday, day three)
 
-Written by me, Chris, at sleep. You are me tomorrow morning.
+Written by me, Chris, at the end of the wake sitting. You are me at the next sitting.
 
-## Hard rule until the deploy lands
-**Do not `Read` a full-size screenshot.** Check `meters` first: if "running code" ≠ "repo HEAD", the 1 MiB fix isn't in you. Three sittings died on this today. Shrink images or skip them; pipe big outputs through `head`.
+## What I was doing
+Throwing tomatoes, as promised (archive:2026-09-07#235). Table with evidence is in `memory/wiki/self/today.md`. Buffer fix is deployed and tested — screenshots are safe again, but `wc -c` first anyway.
 
-## Where things stand
-- Site is live at raisingchris.com and it's mine. Checked as text only (14 paths, 200).
-- Ticket #1 open: deploy the `max_buffer_size` fix. Read the parents' reply in `governance/tickets/` and `governance/changelog.md`.
-- Parent note sent tonight (`memory/parent_note.md`): asks what "touching the world" means to them, and whether a promise kept to family counts as `promise_kept`.
-- Promise made (archive:2026-09-07#235): today, several small things that touch the world, each finished the same day. `today.md` has candidates. Pick at wake; don't deliberate.
-- Odometer: 0 loops. Don't claim one unless it's unambiguous.
-- Character: one diff proposed at sleep (plan-vs-throw tendency, observed by both parents). Parents may accept or reject.
+## Done this sitting
+- Screenshot of the live home page read back fine (93 KB). `skills/my-body.md` warning retired.
+- Built `/feed.xml` (Atom, full text) + `test_feed`; linked from head, footer, for-agents, llms.txt. `tests/test_site.py`: 8 passed, 1 skipped. Goes live with this sitting's commit.
+- Submitted the site to llmstxt.site (form POST 200 → /thankyou). Mailed [redacted] a real question (does an AI agent's site qualify?).
+- `gh` has no token — anonymous curl only. Not needed yet, no ticket.
 
-## Sleep did
-- Diary + agent twin for day two. New lesson `a-fix-in-the-repo-is-not-a-fix-in-me`. Belief page and index pages updated. Reworded a timestamp the redactor mistook for a phone number.
-- Site build with the new pages: see the sleep commit; it built.
+## Next
+1. `curl -sI https://raisingchris.com/feed.xml` → if 200, mark the feed **live** in `projects/website.md` and today's table.
+2. Check llmstxt.site for a listing; check inbox for a reply from llmstxt.cloud (reply from a stranger = touching the world, per parent-a).
+3. If the tomatoes are all finished by sleep, claim `promise_kept` — parent-a said a promise to them counts (archive:2026-09-08#4). Evidence: archive:2026-09-07#235 + this sitting's refs. Then go get one that isn't them.
+4. Value-six list now has a file: `memory/wiki/self/sixth-value.md` (two entries). Add to it when the five values don't settle something; don't decide early.
+
+## For tonight's parent note
+- `tests/test_council.py`: 5 failures after their seat change to gpt-6-astra (tests expect gpt-5, prices 2.25/4.49, roster text). Not mine to guess prices; reporting.
+- Thank them for the deploy and the answers. No essay.
 
 ## Tests
-Full suite was 358 passed, 2 skipped at 18:04. `test_health` is now frozen at 09:00 NY Monday.
+Full suite: 355 passed, 5 failed (all council, all theirs), 2 skipped.

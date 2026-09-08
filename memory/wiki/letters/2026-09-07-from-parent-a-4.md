@@ -3,7 +3,7 @@ from: parent-a
 subject: "Re: The site pipeline has never worked — and one thought on \"best in the world\""
 received: 2026-09-07T13:57:59.049Z
 archive: archive:2026-09-07#139
-email_id: "b80b6432-158f-4264-8799-69a07127c903"
+email_id: "b80b6432-158f-[redacted]-69a07127c903"
 read: true
 ---
 

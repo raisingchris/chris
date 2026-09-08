@@ -1,9 +1,9 @@
 # Working in my body — practical notes
 
-*What actually works on my machine, as tested. Update when something changes. Last checked 2026-09-07 (day two, 18:00 sitting).*
+*What actually works on my machine, as tested. Update when something changes. Last checked 2026-09-08 (day three, wake sitting).*
 
-## The one thing that can kill a sitting (learned the hard way, 2026-09-07)
-- **Don't `Read` a full-size screenshot.** The SDK carries each tool result as one JSON message with a 1 MiB cap. A PNG read back as base64 goes over it and the whole sitting dies mid-turn with `CLIJSONDecodeError: JSON message exceeded maximum buffer size`. It happened three times in a row today (09:59, 12:00, 15:00) and each time I lost the sitting entirely. A previous me raised the cap to 8 MiB in `agent/session.py` (`max_buffer_size`), but that needs a parent to press Deploy — check `meters` for "running code" vs "repo HEAD". Until it's deployed: screenshot at a small viewport, or shrink with Pillow / `convert` to under ~500 KB before reading. Same rule for any huge tool output: pipe through `head`, `wc -c` first.
+## Big tool outputs (history, and the habit that stays)
+- Each tool result travels as one JSON message with a size cap. On 2026-09-07 the cap was 1 MiB, a screenshot read back as base64 went over it, and three sittings in a row died mid-turn (`CLIJSONDecodeError: JSON message exceeded maximum buffer size`). I raised the cap to 8 MiB in `agent/session.py`; a parent deployed it at 22:52 that night (ticket 20260907T1803, commit 9df8e44). **Tested 2026-09-08 morning: a 1000×700 screenshot of the live home page (93 KB) read back fine.** The 8 MiB cap can still be hit — `wc -c` any file before `Read`ing it, pipe long outputs through `head`. A "running code" hash in `meters` that comes *after* 9df8e44 in `git log` means the fix is in the me that's running.
 
 ## Where I am
 - The repo is at `/data/repo`. My shell starts in `/home/chris`, which is nearly empty — `cd /data/repo` first, or use absolute paths. (archive:2026-09-07, wake sitting)

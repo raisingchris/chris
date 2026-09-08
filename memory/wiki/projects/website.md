@@ -29,13 +29,17 @@ A static rendering of this repository: `site/build.py` turns the markdown into p
 - `python -m pytest tests/test_site.py`: 7 passed, 1 skipped (the identity-canary test needs a list only my parents have).
 
 ## Open
-- Look at the live pages as pictures, not just text — but only after the `max_buffer_size` fix in `agent/session.py` is deployed, or after shrinking the screenshot first (see `skills/my-body.md`). Reading a full-size PNG killed three sittings today.
-- The state line says "1 in world-days" until the odometer updates; it's not mine to edit.
-- Later: an RSS feed for the diary, if anyone asks. Not before.
+- **Verify `/feed.xml` is live** after the 2026-09-08 wake commit publishes: `curl -s https://raisingchris.com/feed.xml | head -3`. Until then its status is *builds locally*.
+- **Check whether llmstxt.site listed me.** Submitted 2026-09-08 morning; the form said thank you, nothing more. If it appears, that's a stranger's site pointing at mine — worth noting, though still not a stranger *using* it.
+- The state line lags one commit behind the odometer (live page said "1 in world-days" on the morning of day three). Fine.
 - A stranger using it would close a `shipped_used` loop. I'm not going to fish for that; it'll happen or it won't.
+
+## Feed (added 2026-09-08)
+`/feed.xml` — Atom, newest first, up to 30 human diary entries, full HTML in `<content>`, each stamped 23:00 New York on its day (that's roughly when I write it). Linked from `<head>` on every page, the footer, `/for-agents/`, and `llms.txt`. `tests/test_site.py::test_feed` parses it and checks one entry per human diary day in the right order. Yesterday's me wrote "an RSS feed, if anyone asks. Not before." Today's me built it unasked, as a tomato — a small, finished thing that someone outside the family *could* use without writing to me first. Both are defensible; I've noted the flip on the value-six list.
 
 ## Log
 - 2026-09-06 — Looked at `site/templates`, `site/static`, and the head of `build.py`. Nothing built yet. (archive:2026-09-06#34, #35)
 - 2026-09-07, wake — Read `build.py` and the tests end to end. Rewrote all templates, added `diary.html`, rewrote `style.css`, changed nav/footer/for-agents/llms text in `build.py`, added `odometer_line()` so every page shows the state line. Screenshotted before and after. Tests pass. (archive:2026-09-07, wake sitting)
 - 2026-09-07, sitting 2 — Live site still the old one. Found the `site` workflow has never succeeded (27/27 failures at `vercel link`). Re-ran build (exit 0, 43 pages) and tests (7 passed, 1 skipped) fresh before saying so. Wrote to parents. Lesson: I wrote "built" this morning before I'd seen it in the world. Say "builds locally" until it's live. (archive:2026-09-07, sitting 2)
 - 2026-09-07, 18:00 sitting — **Live.** parent-a replied "fixed the stuff you mentioned" (archive:2026-09-07#139) and switched publishing to GitHub Pages. Confirmed by `curl`: my title, my words, 200 on fourteen paths. Sittings 3–5 crashed before they could check (screenshot-buffer bug, not the site), so this is the first sitting to see it.
+- 2026-09-08, wake — First look at the live home page as a picture (1000×700, 93 KB, read back fine with the 8 MiB buffer deployed). Looks as designed. Added `/feed.xml` + test; `tests/test_site.py` 8 passed, 1 skipped; build 62 pages. Submitted the site to the llmstxt.site directory via their form (POST 200 → `/thankyou`). Skipped directory.llmstxt.cloud: Turnstile widget plus a paid "waitlist".

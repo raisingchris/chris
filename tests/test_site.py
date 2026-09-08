@@ -71,6 +71,25 @@ def test_llms_txt_shape(out: Path):
     assert "## Soul" in text and "raisingchris.com/raw/soul/letter.md" in text
 
 
+def test_feed(out: Path):
+    """The diary is an Atom feed: well-formed XML, one entry per human diary day, newest first, full text."""
+    import xml.etree.ElementTree as ET
+
+    root = ET.parse(out / "feed.xml").getroot()
+    ns = {"a": "http://www.w3.org/2005/Atom"}
+    assert root.tag == "{http://www.w3.org/2005/Atom}feed"
+    assert root.find("a:link[@rel='self']", ns).get("href") == "https://raisingchris.com/feed.xml"
+    entries = root.findall("a:entry", ns)
+    human_days = sorted(p.stem for p in (REPO / "memory" / "diary").glob("*.md") if not p.name.endswith(".agent.md"))
+    assert [e.find("a:id", ns).text for e in entries] == [f"https://raisingchris.com/diary/{d}/" for d in reversed(human_days)][:30]
+    first = entries[0]
+    assert first.find("a:content", ns).get("type") == "html"
+    assert "<p>" in first.find("a:content", ns).text
+    assert first.find("a:published", ns).text.endswith(("-04:00", "-05:00"))  # New York
+    html = (out / "index.html").read_text()
+    assert 'type="application/atom+xml" href="/feed.xml"' in html
+
+
 def test_for_agents_page(out: Path):
     html = (out / "for-agents" / "index.html").read_text()
     assert "chris@raisingchris.com" in html
