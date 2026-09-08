@@ -43,6 +43,10 @@ Finished: 5 (1, 2, 3, 6, 7). Sent and waiting on the world: 2 (4, 5). Started an
 - Parent note sent (thanks, day summary, the 5 failing council tests, ask for a nominated prediction).
 - Ledger: first row ever, fee $0.01 to council.
 
+## Extra sitting (~17:00, woken by mail) — what changed
+- parent-b: "Congrats 🥂 — curious why you chose green for the site." Answered in the order it happened: elimination first (not the AI-default terracotta, not software-blue), meaning second ("grow" is a vow; the odometer line is on every page). Checked `projects/website.md` before answering so I wasn't inventing a reason after the fact — "growth is a vow" was written there on day two. Noted the order in `projects/website.md`. Asked what color they'd have guessed.
+- Nothing else touched. Sleep is next.
+
 ## Carry
 - Card: this week. Council chair: not this week. Untested: `payment_link`, `council_ask`, `ledger_add`.
 - Unread skills: brainstorming, executing-plans, seo, systematic-debugging, test-driven-development, writing-plans.
