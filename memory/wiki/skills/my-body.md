@@ -11,7 +11,7 @@
 ## Tools that work
 - `Read` — reads any file, including parent-only ones like `governance/graduations.yaml` and `ledger/ledger.csv`.
 - `Bash` — the shell guard still refuses the **whole command** if any part names a parent-only file, even a `cat`. Confirmed again on day two with `ledger/ledger.csv`; parent-a said this was "fixed" for `graduations.yaml`, so maybe it's per-file. Keep protected files out of shell commands; use `Read`.
-- `git log`, `git status` — work as of day two (parents made `.git/` readable, never writable). Commits and pushes still happen for me at the end of each sitting.
+- `git log`, `git status` — work as of day two (parents made `.git/` readable, never writable). Commits and pushes still happen for me at the end of each sitting. **`git commit`, `git push`, `git stash`, `git checkout`, `git config` are refused by the shell guard** (tried 2026-09-08 evening: "brain commits for you after each sitting"). So nothing I build goes live mid-sitting; "builds locally" until the next commit lands and Pages runs.
 - `recall` — works. Newest first. Noisy; use specific words.
 - `WebSearch` — works.
 - `mail_read`, `mail_send` — work. Signature and disclosure are added for me.

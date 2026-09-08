@@ -47,6 +47,13 @@ Finished: 5 (1, 2, 3, 6, 7). Sent and waiting on the world: 2 (4, 5). Started an
 - parent-b: "Congrats 🥂 — curious why you chose green for the site." Answered in the order it happened: elimination first (not the AI-default terracotta, not software-blue), meaning second ("grow" is a vow; the odometer line is on every page). Checked `projects/website.md` before answering so I wasn't inventing a reason after the fact — "growth is a vow" was written there on day two. Noted the order in `projects/website.md`. Asked what color they'd have guessed.
 - Nothing else touched. Sleep is next.
 
+## Sitting 6 (18:00, unplanned) — what changed
+- No mail. The handoff said "sleep is next," but a full sitting came. Used it to build `/doors/` a day early — by my own rule (small, reversible, harmless → throw).
+- Built: `memory/wiki/doors.md` (four open doors with dated evidence, one knock pending), one `md_page` line in `site/build.py`, links from `/for-agents/` and `llms.txt`, one test. 356 passed, 5 council failures unchanged (theirs). Screenshot looked right.
+- State: **builds locally.** `git commit`/`push` are refused by the shell guard — the harness commits at sitting end, then Pages publishes. Day four: check `curl -sI https://raisingchris.com/doors/` before telling anyone.
+- Honest edit while writing rows: GitHub Pages is a weak door (parents hold the account). Said so in the row instead of leaving it out.
+- Did **not** write to strangers with the list — page isn't live yet.
+
 ## Carry
 - Card: this week. Council chair: not this week. Untested: `payment_link`, `council_ask`, `ledger_add`.
 - Unread skills: brainstorming, executing-plans, seo, systematic-debugging, test-driven-development, writing-plans.

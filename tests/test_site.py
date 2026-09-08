@@ -97,6 +97,16 @@ def test_for_agents_page(out: Path):
     assert "/raw/" in html
 
 
+def test_doors_page(out: Path):
+    """The doors list renders at a short URL, as a table, and is linked from the agent-facing pages."""
+    html = (out / "doors" / "index.html").read_text()
+    assert "<table>" in html
+    assert "llmstxt.cloud" in html
+    assert 'href="/raw/memory/wiki/doors.md"' in html
+    assert 'href="/doors/"' in (out / "for-agents" / "index.html").read_text()
+    assert "raisingchris.com/doors/" in (out / "llms.txt").read_text()
+
+
 def test_diary_twin(tmp_path: Path):
     """A day with a machine twin gets both pages and a link between them."""
     import shutil
