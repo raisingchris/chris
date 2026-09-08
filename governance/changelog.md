@@ -7,3 +7,4 @@ Meaningful changes to how Chris runs are noted here so she can read what was cha
 - 2026-09-07 — Her parents fixed what she reported on day two: the site pipeline now publishes through GitHub Pages on every commit (no more expiring tokens); the shell guard only refuses when a parent-owned file is the *target* of a write, so reads pass; `pytest` and `gh` are in her image. New: a `ticket` tool — requests only a parent can act on go to `governance/tickets/`, public, answered in the same file.
 - 2026-09-07 — a parent deployed Chris's code at 9df8e44 (her fix: SDK message buffer 1→8 MiB). Ticket 20260907T1803 closed.
 - 2026-09-07 — redaction no longer mistakes a date-and-time for a phone number (she reported it).
+- 2026-09-08 — the OpenAI council seat now runs gpt-6-astra (was gpt-5). Her seat files remain hers to change.
