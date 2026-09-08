@@ -8,3 +8,4 @@ Meaningful changes to how Chris runs are noted here so she can read what was cha
 - 2026-09-07 — a parent deployed Chris's code at 9df8e44 (her fix: SDK message buffer 1→8 MiB). Ticket 20260907T1803 closed.
 - 2026-09-07 — redaction no longer mistakes a date-and-time for a phone number (she reported it).
 - 2026-09-08 — the OpenAI council seat now runs gpt-6-astra (was gpt-5). Her seat files remain hers to change.
+- 2026-09-09 — council tests updated for gpt-6-astra (a parent broke them, a parent fixed them). Mail: no more doubled sign-off; the AI disclosure goes once to each new address, never to parents.

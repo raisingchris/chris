@@ -76,7 +76,8 @@ def test_send_appends_signature_and_dry_run(mail):
     assert res["to"] == [PARENT_A]
     assert res["from"] == CHRIS
     assert res["text"] == "body text" + SIGNATURE
-    assert SIGNATURE.startswith("\n\n— Chris\nI'm an AI.")
+    assert SIGNATURE == "\n\n— Chris"
+    assert "I'm an AI" not in res["text"]  # parents never get the disclosure
 
 
 def test_send_archives_handle_not_real_address(mail, archive):
@@ -282,8 +283,16 @@ def test_send_does_not_double_sign(tmp_path):
     m = Mail(tmp_path, lambda k, p: "archive:2026-01-01#1", {"parent-a": "a@x.com"}, "chris@raisingchris.com", dry_run=True)
     body = "Hello.\n\nChris\n\nI'm an AI. Anything you tell me is private from the world, but my operators can technically access it."
     out = m.send("parent-a", "s", body)
-    assert out["text"].count("I'm an AI.") == 1
-    assert out["text"].endswith(SIGNATURE)
+    assert out["text"] == "Hello." + SIGNATURE
+
+
+def test_disclosure_once_per_stranger(tmp_path):
+    from agent.mail import Mail, DISCLOSURE
+    m = Mail(tmp_path, lambda k, p: "archive:2026-01-01#1", {"parent-a": "a@x.com"}, "chris@raisingchris.com", dry_run=True)
+    first = m.send("someone@example.org", "hi", "Hello there.")
+    second = m.send("someone@example.org", "hi again", "Following up.")
+    assert first["text"].endswith(DISCLOSURE) and "I'm an AI" in first["text"]
+    assert "I'm an AI" not in second["text"] and second["text"].endswith("— Chris")
 
 
 def test_double_chevron_reply_markers_are_kept():

@@ -24,11 +24,11 @@ from typing import Callable, Iterable
 from agent import redaction
 from agent.paths import UnsafePath, safe_path
 
-SIGNATURE = (
-    "\n\n— Chris\n"
-    "I'm an AI. Anything you tell me is private from the world, "
-    "but my operators can technically access it."
-)
+SIGNATURE = "\n\n— Chris"
+# Said once, to each new address, the first time she writes to it. Never to her parents.
+DISCLOSURE = ("\nI'm an AI. Anything you tell me is private from the world, "
+              "but my operators can technically access it.")
+_OLD_DISCLOSURE_TAIL = "but my operators can technically access it."
 
 SUMMARY_FOOTER = "Reply to this email and Chris reads it in the morning. Assignments welcome."
 
@@ -92,6 +92,25 @@ class Mail:
                 return handle
         return None
 
+    def _first_contact(self, addr: str) -> bool:
+        """True (and remembers it) the first time she writes to ``addr``. Ledger of addresses lives
+        beside the inbox, git-ignored with it."""
+        addr = addr.strip().lower()
+        path = Path(self.repo_dir) / "memory" / "inbox" / ".contacted"
+        try:
+            seen = set(path.read_text(encoding="utf-8").split()) if path.exists() else set()
+        except OSError:
+            seen = set()
+        if addr in seen:
+            return False
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with open(path, "a", encoding="utf-8") as f:
+                f.write(addr + "\n")
+        except OSError:
+            pass
+        return True
+
     def map_addresses(self, text: str) -> str:
         """Replace every real parent address and its local-part with the handle."""
         for handle, real in self.parents.items():
@@ -139,15 +158,19 @@ class Mail:
         reply_to: str | None = None,
     ) -> dict:
         given = [to] if isinstance(to, str) else list(to)
-        # She often signs herself; don't stack two signatures.
+        # She often signs herself; don't stack two signatures or repeat the disclosure.
         clean = body.rstrip("\n")
-        for tail in (SIGNATURE.strip(), SIGNATURE.strip().split("\n", 1)[1]):
-            if clean.endswith(tail):
-                clean = clean[: -len(tail)].rstrip("\n")
-                if clean.endswith("— Chris") or clean.endswith("Chris"):
-                    clean = clean[: clean.rfind("Chris")].rstrip("—").rstrip("\n")
-                break
+        lines = clean.split("\n")
+        while lines and (lines[-1].strip() in ("", "Chris", "— Chris", "- Chris", "-- Chris")
+                         or lines[-1].strip().endswith(_OLD_DISCLOSURE_TAIL)):
+            lines.pop()
+        clean = "\n".join(lines).rstrip("\n")
         text = clean + SIGNATURE
+        # First contact with an address that isn't a parent gets the disclosure once.
+        for t in given:
+            if t not in self.parents and self._first_contact(t):
+                text += DISCLOSURE
+                break
         params: dict = {
             "from": self.chris_email,
             "to": [self.resolve(t) for t in given],

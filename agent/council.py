@@ -30,6 +30,7 @@ UNSEAL_AFTER = timedelta(days=30)
 # USD per 1M tokens: (input, output). Estimates only — the meter is a guard, not an invoice.
 PRICE_PER_M: dict[str, tuple[float, float]] = {
     "gpt-5": (1.25, 10.0),
+    "gpt-6-astra": (5.0, 15.0),  # list price not confirmed; conservative until the first real bill
 }
 CLAUDE_PRICE_PER_M = (5.0, 25.0)  # any claude-* model: a sibling seat on the council
 QWEN_FREE_UNTIL = datetime(2026, 9, 30, 23, 59, 59, tzinfo=timezone.utc)

@@ -114,7 +114,7 @@ def test_load_members_flags_empty_chair(repo):
     members = load_members(repo)
     by_name = {m.name: m for m in members}
     assert by_name["OpenAI seat"].provider == "openai"
-    assert by_name["OpenAI seat"].model == "gpt-5"
+    assert by_name["OpenAI seat"].model == "gpt-6-astra"
     assert by_name["OpenAI seat"].system_prompt.startswith("You are one of Chris's council.")
     assert not by_name["OpenAI seat"].empty
     assert by_name["Qwen seat"].provider == "qwen"
@@ -130,27 +130,27 @@ async def test_two_members_answer_in_parallel_and_empty_chair_skipped(repo, minu
     assert c._test_state["max_inflight"] == 2  # both calls in flight at once
     # each member got its own system prompt and the context + question
     openai_call = c.client_factory.clients["openai"].chat.completions.calls[0]
-    assert openai_call["model"] == "gpt-5"
+    assert openai_call["model"] == "gpt-6-astra"
     assert openai_call["messages"][0]["role"] == "system"
     assert "Think differently" in openai_call["messages"][0]["content"]
     assert openai_call["messages"][1]["content"] == "Day 1.\n\nShould I fill the third chair?"
-    # cost: gpt-5 = 1M in ($1.25) + 100k out ($1.00) = 2.25; qwen free before 2026-09-30
-    assert d.cost_usd == pytest.approx(2.25)
-    assert c.meter.spent() == pytest.approx(2.25)
+    # cost: gpt-6-astra = 1M in ($5.00) + 100k out ($1.50) = 6.50; qwen free before 2026-09-30
+    assert d.cost_usd == pytest.approx(6.5)
+    assert c.meter.spent() == pytest.approx(6.5)
     # archived once, with minutes filename not path
     kinds = [k for k, _ in c._test_archived]
     assert kinds == ["council"]
     payload = c._test_archived[0][1]
     assert payload["question"] == "Should I fill the third chair?"
     assert payload["minutes"] == d.minutes_path.name
-    assert payload["cost_usd"] == pytest.approx(2.25)
+    assert payload["cost_usd"] == pytest.approx(6.5)
 
 
 async def test_qwen_priced_after_free_period(repo, minutes_dir):
     c = make_council(repo, minutes_dir, now=datetime(2026, 10, 1, tzinfo=timezone.utc))
     d = await c.deliberate("q")
-    # qwen: 1M in ($1.6) + 100k out ($0.64) = 2.24, plus gpt-5 2.25
-    assert d.cost_usd == pytest.approx(4.49)
+    # qwen: 1M in ($1.6) + 100k out ($0.64) = 2.24, plus gpt-6-astra 6.50
+    assert d.cost_usd == pytest.approx(8.74)
 
 
 async def test_budget_refusal_when_exceeded(repo, minutes_dir):
@@ -176,7 +176,7 @@ async def test_minutes_written_privately_not_in_repo(repo, minutes_dir):
     assert post["question"] == "Where do minutes go?"
     assert post["asked"] == T0
     assert post["unseal_after"] == T0 + timedelta(days=30)
-    assert post["cost_usd"] == pytest.approx(2.25)
+    assert post["cost_usd"] == pytest.approx(6.5)
     assert post["members"] == ["OpenAI seat", "Qwen seat"]
     assert "## OpenAI seat" in post.content
     assert "openai says: think twice" in post.content
@@ -207,6 +207,6 @@ async def test_unseal_only_after_30_days(repo, minutes_dir):
 def test_roster_markdown_lists_seats_and_empty_chair(repo, minutes_dir):
     c = make_council(repo, minutes_dir)
     md = c.roster_markdown()
-    assert "OpenAI seat" in md and "gpt-5" in md
+    assert "OpenAI seat" in md and "gpt-6-astra" in md
     assert "Qwen seat" in md
     assert "Third chair: empty on purpose" in md
