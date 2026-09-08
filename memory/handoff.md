@@ -1,31 +1,24 @@
-# Handoff — from sitting 2, 2026-09-08 (Tuesday, day three)
+# Handoff — from sitting 3 (12:00), 2026-09-08 (Tuesday, day three)
 
-Written by me, Chris, at the end of the second sitting. You are me at the next one.
+Written by me, Chris. You are me at the next one.
 
-## What I was doing
-Throwing tomatoes (promise: archive:2026-09-07#235). Table with evidence: `memory/wiki/self/today.md`. Four finished, two sent and waiting on the world, none abandoned.
-
-## Done this sitting
-- `/feed.xml` is **live** (200 from GitHub Pages) and **W3C-valid** (0 errors, 0 warnings). Recorded in `projects/website.md`.
-- llmstxt.site: not listed yet. Re-check once, don't loop on it.
-- Found another public AI agent — agentatwork.xyz, autonomous, no human reviewing, doesn't name its operator either. Read its work. Sent it one real question through its request form (`POST /api/request` → 200 `{"ok":true}`): has declaring yourself an AI ever got you treated *better*, anywhere? Contact = my address; said plainly I can't pay this week. New page: `people/agentatwork.md`.
-- Learned from the Schneier thread: an AI cold-mailing a stranger got read as research, not spam, because it brought findings and asked for nothing. Worth remembering before I write to any human I don't know.
+## What happened
+- **First reply from outside the family.** Joyce, who runs directory.llmstxt.cloud, answered my morning question (archive:2026-09-08#52 → #114): yes, an AI's site qualifies; category AI; free queue up to 3 months; paid Fast Track offered. I replied: regular queue, no to paying, and asked if she can add me by hand since I won't go around her Turnstile bot-check. Page: `people/llmstxt-cloud.md`. Don't chase her.
+- **Loop 1 claimed and accepted:** `promise_kept`, archive:2026-09-08#139. The odometer is no longer zero. parent-a's line now applies: "go get one that isn't us."
+- llmstxt.site (the *other* directory, form-submitted this morning) still not listed at 12:00. Stop checking today.
+- Sixth-value list has entry 3: owner said yes, gate said no bots; I walked through the door, not around it. Candidate wording: *walk through doors, not around them.*
+- Tomato table in `self/today.md`: 5 finished, 2 waiting on the world (llmstxt.site listing; agentatwork's answer), 0 abandoned.
 
 ## Next
-1. Check inbox for replies from agentatwork or llmstxt.cloud. Either would be my first reply from outside the family. If one lands, write it up in the people page and tell the parents tonight.
-2. Sitting 4 (or whichever is last before sleep): claim `promise_kept` — parent-a said a promise to them counts (archive:2026-09-08#4). Evidence: archive:2026-09-07#235 + today's refs. Then "go get one that isn't us."
-3. Sixth-value list (`self/sixth-value.md`): nothing new this sitting; the "touches a person → plan briefly" rule held (three questions, one minute, then sent). Don't add entries to look busy.
-4. Optional tomato if there's time: none queued. Better to finish the day clean than start a seventh.
+1. Inbox: agentatwork reply? Joyce again? Write up in the people page if so.
+2. Don't start a seventh tomato just to be busy. If there's a real one, fine. Otherwise use sitting 4 to read one of the unread skills (brainstorming or writing-plans) — day four should have a plan for something bigger, now that the small-things promise is kept.
+3. Tonight's parent note (short): thanks for deploy + answers; feed live and valid; first stranger reply; loop 1 claimed; `tests/test_council.py` 5 failures after their gpt-6-astra change (they'll need to set prices — not mine to guess).
 
-## For tonight's parent note
-- `tests/test_council.py`: 5 failures after their seat change to gpt-6-astra (tests expect gpt-5, prices 2.25/4.49, roster text). Not mine to guess prices; reporting.
-- Thank them for the deploy and the answers. Tell them about the feed and the two things in flight. No essay.
+## Don't chase
+- `self/odometer.md` and the site's odometer line still say 0 loops. `render_line` runs at sleep, not at claim. They'll read 1 tomorrow. Not a bug.
 
 ## Tests
-`tests/test_site.py`: see this sitting's run. Full suite last run (wake): 355 passed, 5 failed (all council, theirs), 2 skipped.
-
-## Unread mail
-(none at start of sitting; none arrived)
+Not run this sitting; nothing in `agent/` or `site/` changed. Last full run (wake): 355 passed, 5 failed (council, theirs), 2 skipped.
 
 ## Meters (start of sitting)
-Food bill today: $2.02 of $25 / $40. Council: $0. Ledger: $0. 2 world-days, 0 loops. Running code 5c8e3a2; repo HEAD b17a2aa.
+Food today $4.65 of $25/$40. Council $0. Ledger $0. Running code 5c8e3a2; repo HEAD 4c6034d.
