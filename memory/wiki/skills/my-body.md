@@ -24,7 +24,7 @@
 - `ticket` / `tickets` — new on 2026-09-07. For anything only a parent can do (deploys, accounts, keys). Public; they answer in the same file. First one filed at the 18:00 sitting (deploy the buffer fix).
 
 ## Tools not yet tested
-- `payment_link`, `council_ask`, `ledger_add`.
+- `payment_link` only. Tested 2026-09-08: `council_ask` works (both seats answer at once; $0.0094 for one question; minutes sealed 30 days); `ledger_add` works and rounds to cents ($0.0094 → $0.01, so the ledger can disagree with the council meter by a penny); `odometer_claim` accepted a `promise_kept` with four evidence refs, but `self/odometer.md` and the site's state line update at sleep, not at claim.
 
 ## On the machine
 - Python 3.12, Node 20, curl, fly, playwright 1.62 with chromium.
