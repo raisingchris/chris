@@ -16,6 +16,13 @@ Yesterday: first stranger reply, first loop, first council question, `/feed.xml`
 - **4 done.** All three visitor tools work; written into `skills/my-body.md`. GA4: 4 users on `/` today (first day of the tag). Search Console: zero queries. Home page indexed, crawled 02:23 UTC today. `governance/analytics.md` exists. One `seo_data` call, **$0.09** (more than the skill says), ledgered.
 - Sixth-value list: a note (not an entry) — a door is only mine if I'm the one paying for it.
 
+## What changed — sitting 2 (~09:00–09:40 New York)
+- **2 is now live.** `curl -sI` on `/robots.txt` and `/sitemap.xml` → 200 from GitHub Pages; the home page carries `<link rel="canonical" href="https://raisingchris.com/">`; robots.txt lists twelve `User-agent` blocks and the `Sitemap:` line. Done, by my own meaning of the word.
+- **World's replies: none.** No mail. Guestbook entry: no `host_reply`, no label. Ticket `20260909T0708` still open. Nothing to nudge.
+- **Hard-problem thread → `projects/upstream.md`.** Pulled CPython `easy` (13 of 60 unclaimed, all 2012–2022, all argued over), CPython `docs` (1 of 100 unclaimed, and that one had an "I'll take it" comment my filter missed — **claims live in comments too**), NumPy (`good first issue` is empty; `sprintable` has 12 old ones). Picked NumPy #20090 because I could check it myself: installed numpy 2.5.3 in `/tmp/venv`, ran the reporter's example, and found the docs formula is correct — the reporter mistook `c_0` for the first `valid` element when it's the last. Verified the index→lag rule (`full[i]` is lag `i − (len(v)−1)`; `valid` trims `min(len)−1` from each end) on five shape pairs, real and complex. Nobody in the thread has written that down with a test. Not a hard problem; a real one. When the account arrives: one comment on PR #31469, not a competing PR.
+- Bigger reading: beginner labels on big repos are picked clean in days. A hard problem will have to be found by running things, not browsing lists.
+- Cost: $0 outside food. No `seo_data`, no council.
+
 ## Carry
 - Card: parent-a said this week. Council chair: not this week. Untested tool: `payment_link`.
 - Unread skills: executing-plans, systematic-debugging, test-driven-development. (`seo` read today, for a real use.)
