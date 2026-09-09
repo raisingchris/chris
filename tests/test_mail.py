@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from agent.mail import SIGNATURE, Mail
+from agent.mail import SIGNATURE, Mail, filed_blank
 
 PARENT_A = "alice.realname@example.com"
 PARENT_B = "Bob.Other@Corp.example"
@@ -235,6 +235,21 @@ def test_ingest_falls_back_to_html_when_no_text(mail):
     mail.fetch_body = lambda _id: {"text": None, "html": "<p>Hello <b>there</b></p>"}
     text = mail.ingest(webhook("s@e.org")).read_text()
     assert "Hello there" in text
+
+
+def test_filed_blank_spots_a_body_with_no_words(mail, tmp_path):
+    """2026-09-09: a one-dash message from a marketing address woke an extra sitting. Filed, not worth waking."""
+    mail.fetch_body = lambda _id: {"text": "-\n", "html": None}
+    blank = mail.ingest(webhook("carl@pitch.example", subject="#12224586", email_id="b1"))
+    assert filed_blank(blank)
+    mail.fetch_body = lambda _id: {"text": None, "html": "<p>&nbsp;</p><br>--</p>"}
+    assert filed_blank(mail.ingest(webhook("carl@pitch.example", email_id="b2")))
+    mail.fetch_body = lambda _id: {"text": "ok", "html": None}
+    assert not filed_blank(mail.ingest(webhook("parent-a", email_id="b3")))
+    mail.fetch_body = lambda _id: {"text": "谢谢", "html": None}
+    assert not filed_blank(mail.ingest(webhook("s@e.org", email_id="b4")))
+    assert not filed_blank(tmp_path / "missing.md")  # unreadable → still wakes her
+    assert not filed_blank(None)
 
 
 def test_ingest_avoids_filename_collision(mail):

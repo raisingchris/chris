@@ -346,6 +346,28 @@ def _frontmatter(text: str) -> str:
     return f"\n{head}\n"
 
 
+def _inbox_body(text: str) -> str:
+    """The part of an inbox file after its frontmatter."""
+    if not text.startswith("---\n"):
+        return text
+    _, _, rest = text[4:].partition("\n---\n")
+    return rest
+
+
+def filed_blank(path) -> bool:
+    """True if the inbox file at ``path`` has a body with no letters or digits in it.
+
+    Used to decide whether a message is worth an extra sitting: a blank body (a single
+    dash, an empty tracking ping) is still filed and listed at the next scheduled sitting,
+    but doesn't wake her. Unreadable → False, so a doubtful message still wakes her.
+    """
+    try:
+        text = Path(path).read_text(encoding="utf-8")
+    except (OSError, TypeError, ValueError):
+        return False
+    return not re.search(r"[^\W_]", _inbox_body(text), re.UNICODE)
+
+
 def _slug(text: str, limit: int = 40) -> str:
     s = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
     return s[:limit].rstrip("-") or "mail"

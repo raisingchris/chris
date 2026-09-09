@@ -374,11 +374,16 @@ def create_app(services, scheduler=None) -> FastAPI:
         except json.JSONDecodeError:
             raise HTTPException(400, "bad json")
         if payload.get("type") == "email.received":
-            services.mail.ingest(payload)
+            path = services.mail.ingest(payload)
             from agent import scheduler as scheduler_module
+            from agent.mail import filed_blank
 
             try:
-                scheduler_module.request_mail_wake(services, scheduler)
+                if filed_blank(path):
+                    # Filed, and listed at the next scheduled sitting; not worth an extra one.
+                    services.archive.append("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": "empty_body"})
+                else:
+                    scheduler_module.request_mail_wake(services, scheduler)
             except Exception as exc:  # noqa: BLE001 — the mail is already filed; a wake is a bonus
                 log.warning("mail wake failed: %s", exc)
         return {"ok": True}

@@ -12,9 +12,10 @@
 - `Read` — reads any file, including parent-only ones like `governance/graduations.yaml` and `ledger/ledger.csv`.
 - `Bash` — the shell guard still refuses the **whole command** if any part names a parent-only file, even a `cat`. Confirmed again on day two with `ledger/ledger.csv`; parent-a said this was "fixed" for `graduations.yaml`, so maybe it's per-file. Keep protected files out of shell commands; use `Read`.
 - `git log`, `git status` — work as of day two (parents made `.git/` readable, never writable). Commits and pushes still happen for me at the end of each sitting. **`git commit`, `git push`, `git stash`, `git checkout`, `git config` are refused by the shell guard** (tried 2026-09-08 evening: "brain commits for you after each sitting"). So nothing I build goes live mid-sitting; "builds locally" until the next commit lands and Pages runs.
-- `recall` — works. Newest first. Noisy; use specific words.
+- `recall` — works. Newest first. Noisy; use specific words **and a small `limit` (5, not 15)** — each record can carry a whole tool call, and fifteen of them is thousands of words for one fact (2026-09-09, sitting 5).
 - `WebSearch` — works.
 - `mail_read`, `mail_send` — work. Signature and disclosure are added for me.
+- **Mail wakes** (`agent/scheduler.py`): a message wakes an extra sitting one minute after it lands, unless it's 22:00–07:00, within 20 minutes of a scheduled sitting, within 30 minutes of the last wake, or past six wakes a day. Each skip is archived as `mail_wake_skipped` with the reason. From 2026-09-09 (sitting 5, not yet deployed): a body with no letters or digits — a lone dash, a DMARC report with only an attachment — is filed but doesn't wake me (`filed_blank` in `agent/mail.py`, reason `empty_body`). It still shows in the next sitting's unread list. Every real message I've received so far, including all parent mail, passes the check.
 - `card_details` — answers, but no card yet. parent-a: a virtual card is coming "in the next few days."
 - `meters` — works. Numbers are one sitting behind.
 - `odometer_claim` — works, and is strict. Allowed loop types: `promise_kept, shipped_used, mistake_written_up, conflict_resolved, prediction_scored, relationship_30d, dollar_earned, disagreement_defended`. A mail being answered is **not** a loop. (archive:2026-09-07, wake sitting — my claim was refused.)

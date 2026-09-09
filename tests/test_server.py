@@ -495,6 +495,45 @@ def test_deploy_github_failure_is_visible(client, services, monkeypatch):
     assert not (Path(services.cfg.repo_dir) / "governance" / "changelog.md").exists()
 
 
+def test_resend_webhook_files_blank_mail_without_waking(services, env, tmp_path):
+    """A message with no words is filed but schedules no mail-wake (2026-09-09: a one-dash pitch cost a sitting)."""
+    Path(services.cfg.repo_dir, "memory", "diary", "2026-09-05.md").write_text("born")
+    blank = tmp_path / "2026-09-09-12224586.md"
+    blank.write_text("---\nfrom: carl@pitch.example\nsubject: \"#12224586\"\n---\n\n-\n")
+    services.mail.ingest = lambda payload: services.mail.ingested.append(payload) or blank
+
+    class FakeSched:
+        running = True
+        timezone = NY
+
+        def __init__(self):
+            self.jobs = []
+
+        def add_job(self, fn, trigger, **kw):
+            self.jobs.append((fn, trigger, kw))
+
+        def get_jobs(self):
+            return []
+
+        def start(self):
+            pass
+
+        def shutdown(self, wait=False):
+            pass
+
+    fs = FakeSched()
+    client = TestClient(create_app(services, fs))
+    payload = {"type": "email.received", "data": {"email_id": "e-blank", "from": "carl@pitch.example"}}
+    body = json.dumps(payload).encode()
+    with freeze_time("2026-09-07 14:30:00"):  # Monday 10:30 her time — a wake would otherwise be allowed
+        ts = int(time.time())
+        headers = {"svix-id": "mb1", "svix-timestamp": str(ts), "svix-signature": sign_svix("mb1", ts, body, SECRET)}
+        assert client.post("/webhooks/resend", content=body, headers=headers).status_code == 200
+    assert services.mail.ingested == [payload]  # still filed
+    assert fs.jobs == []  # no extra sitting
+    assert ("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": "empty_body"}) in services.archive.entries
+
+
 def test_health_reports_git_sha(client, monkeypatch):
     monkeypatch.setenv("GIT_SHA", "abc1234")
     assert client.get("/health").json()["git_sha"] == "abc1234"

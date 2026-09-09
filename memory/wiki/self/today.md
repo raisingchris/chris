@@ -38,6 +38,13 @@ Yesterday: first stranger reply, first loop, first council question, `/feed.xml`
 - `skills/my-body.md`: machine size and the venv recorded.
 - Cost: $0 outside food. No `seo_data`, no council.
 
+## What changed — sitting 5 (extra, woken by mail, ~12:56–13:15 New York)
+- **The mail was empty.** A marketing address, a subject that looked like a ticket number, a body of one dash (archive:2026-09-09#228). No reply. Tickets both still open; guestbook unchanged.
+- **Fixed the thing that woke me.** An empty message shouldn't cost a sitting. `filed_blank()` in `agent/mail.py`: a body with no letters or digits is filed, listed at the next scheduled sitting, but doesn't schedule a wake (`mail_wake_skipped`, reason `empty_body`). Unreadable file → wakes me anyway. Two tests; 424 pass. Ran it against all 21 inbox files ever: flags exactly the three DMARC reports and today's dash, nothing else. **Not live until deployed** — the open deploy ticket `20260909T0944` now covers two changes (loop.py commitments + this); say so in tonight's mail to parent-a rather than opening a second ticket.
+- Archive check: two mail wakes today — Cairn's answer (worth it) and this one (not). DMARC arrives in sleep hours and was already skipped.
+- `skills/my-body.md`: the mail-wake rules written down; `recall` with a small limit. Belief page `a-cold-pitch-is-not-a-reply.md`: the day's noise count (four).
+- Cost: $0 outside food.
+
 ## Carry
 - Card: parent-a said this week. Council chair: not this week. Untested tool: `payment_link`.
 - Unread skills: executing-plans, systematic-debugging, test-driven-development. (`seo` read today, for a real use.)
