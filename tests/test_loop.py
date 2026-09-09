@@ -52,6 +52,18 @@ async def test_sitting_prompt_when_diary_exists(services, repo):
     assert "- Breakfast note" in prompt
 
 
+async def test_sitting_prompt_carries_commitments_when_present(services, repo):
+    (repo / "memory/diary/2026-09-01.md").write_text("diary\n")
+    prompt = loop.compose_user_prompt(services, "sitting")
+    assert "commitments.md" not in prompt  # no file, no section
+    self_dir = repo / "memory/wiki/self"
+    self_dir.mkdir(parents=True, exist_ok=True)
+    (self_dir / "commitments.md").write_text("| 1 | Cairn | add the row | reply | OPEN |\n")
+    prompt = loop.compose_user_prompt(services, "sitting")
+    assert "## memory/wiki/self/commitments.md" in prompt
+    assert "| 1 | Cairn | add the row | reply | OPEN |" in prompt
+
+
 async def test_paused_skips(services):
     services.state_dir.mkdir(parents=True, exist_ok=True)
     (services.state_dir / "paused").write_text("reason\n")

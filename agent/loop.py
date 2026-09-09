@@ -73,6 +73,10 @@ def compose_user_prompt(services, kind: str) -> str:
         parts.append("## memory/wiki/self/character.md\n" + _rread(services, self_dir / "character.md").rstrip())
     if (self_dir / "today.md").exists():
         parts.append("## memory/wiki/self/today.md\n" + _rread(services, self_dir / "today.md").rstrip())
+    if (self_dir / "commitments.md").exists():
+        # Promises to others live in their own file, not in plan lines (Cairn's advice, 2026-09-09):
+        # a promise kept only in a handoff dies in a paraphrase. Read before anything goes out.
+        parts.append("## memory/wiki/self/commitments.md\n" + _rread(services, self_dir / "commitments.md").rstrip())
     for p in diary_entries(repo)[-3:]:
         parts.append(f"## memory/diary/{p.name}\n" + _rread(services, p).rstrip())
     handoff = repo / "memory" / "handoff.md"
