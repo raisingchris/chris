@@ -10,17 +10,22 @@ Tool handlers are plain async functions of ``args`` closed over ``Services``;
 
 from __future__ import annotations
 
+import asyncio
+import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable
 
 from agent import tickets as tickets_mod
 from agent.council import CouncilBudgetExceeded
+from agent.dataforseo import DataForSEOBudgetExceeded, DataForSEOEndpointError
 
 TOOL_NAMES = [
     "recall", "mail_read", "mail_send", "council_ask", "card_details", "ledger_add",
     "payment_link", "odometer_claim", "scratch_write", "scratch_read", "meters", "ticket", "tickets",
+    "seo_data",
 ]
+SEO_DATA_CHARS = 60_000
 RECENT_CLOSED = 5
 SCRATCH = Path("memory") / "scratchpad" / "scratch.md"
 
@@ -175,11 +180,39 @@ def make_handlers(services) -> dict[str, Callable[[dict], Any]]:
         archive.append("tool", {"name": "tickets", "open": [t["id"] for t in open_], "closed": [t["id"] for t in closed]})
         return text("\n".join(lines) if lines else "No tickets yet.")
 
+    async def seo_data(args: dict) -> dict:
+        if services.dataforseo is None:
+            return text("DataForSEO is not configured; ask your parents.")
+        endpoint = str(args.get("endpoint", "")).strip()
+        raw = args.get("payload_json", "")
+        try:
+            payload = json.loads(raw) if isinstance(raw, str) else raw
+        except ValueError as exc:
+            return text(f"payload_json is not valid JSON: {exc}")
+        if not isinstance(payload, (list, dict)):
+            return text("payload_json must be a JSON array (or one object) of task parameters.")
+        try:
+            out = await asyncio.to_thread(services.dataforseo.call, endpoint, payload)
+        except DataForSEOBudgetExceeded as exc:
+            archive.append("tool", {"name": "seo_data", "endpoint": endpoint, "refused": str(exc)})
+            return text(str(exc))
+        except DataForSEOEndpointError as exc:
+            archive.append("tool", {"name": "seo_data", "endpoint": endpoint, "refused": str(exc)})
+            return text(f"seo_data refused: {exc}")
+        except Exception as exc:  # noqa: BLE001 — network errors come back as text, never a crash
+            archive.append("tool", {"name": "seo_data", "endpoint": endpoint, "error": type(exc).__name__})
+            return text(f"DataForSEO call failed: {type(exc).__name__}: {exc}")
+        # The archive record was written by the proxy itself (endpoint, cost, status; no auth, no payload).
+        body = json.dumps(out, ensure_ascii=False)
+        if len(body) > SEO_DATA_CHARS:
+            body = body[:SEO_DATA_CHARS] + f"\n\n[truncated: response was {len(body)} chars; narrow the query]"
+        return text(body)
+
     return {
         "recall": recall, "mail_read": mail_read, "mail_send": mail_send, "council_ask": council_ask,
         "card_details": card_details, "ledger_add": ledger_add, "payment_link": payment_link,
         "odometer_claim": odometer_claim, "scratch_write": scratch_write, "scratch_read": scratch_read,
-        "meters": meters, "ticket": ticket, "tickets": tickets,
+        "meters": meters, "ticket": ticket, "tickets": tickets, "seo_data": seo_data,
     }
 
 
@@ -201,10 +234,15 @@ SCHEMAS: dict[str, tuple[str, dict]] = {
                        {"loop_type": str, "evidence_refs": list, "note": str}),
     "scratch_write": ("Append to your private scratchpad. Nobody reads it; it is not archived.", {"text": str}),
     "scratch_read": ("Read your private scratchpad.", {}),
-    "meters": ("Your food bill today, council spend this week, ledger balance and odometer.", {}),
+    "meters": ("Your food bill today, council spend this week, DataForSEO spend this week, ledger balance and odometer.", {}),
     "ticket": ("File a request only your parents can act on (accounts, money, keys, a deploy, a human step). "
                "It is public. They answer in the same file.", {"title": str, "body": str}),
     "tickets": ("Your open tickets and the most recently closed ones, with status and your parents' reply.", {}),
+    "seo_data": ("Query DataForSEO (SERPs, keyword volumes, backlinks, on-page audits, AI-search mentions) through "
+                 "your body; the account is your parents'. Costs real money: about $0.002–0.02 per call, $5 a week "
+                 "cap. endpoint = path under /v3/ e.g. 'serp/google/organic/live/regular'; payload_json = the JSON "
+                 "array DataForSEO expects. Docs: https://docs.dataforseo.com/v3/",
+                 {"endpoint": str, "payload_json": str}),
 }
 
 

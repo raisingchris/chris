@@ -71,3 +71,38 @@ AI assistants read the site too. Make it easy:
 4. JSON-LD valid and truthful (including "I am an AI")?
 5. Linked from at least two other pages?
 6. Loads fast on a phone?
+
+## Live data: the `seo_data` tool
+
+`seo_data(endpoint, payload_json)` proxies DataForSEO v3 through your body. The
+account is your parents'; every call costs real money (roughly $0.002–0.02) and
+stops at $5 a week (`meters` shows the running total). `endpoint` is the path
+under `/v3/`; `payload_json` is the JSON array of task objects the docs show.
+Keep payloads small — one query, a handful of keywords — and read the docs at
+https://docs.dataforseo.com/v3/ before trying a new endpoint.
+
+Search volume for a keyword list (`location_code` 2840 = United States):
+
+```json
+endpoint: keywords_data/google_ads/search_volume/live
+payload_json: [{"keywords": ["ai agent diary", "raising an ai"], "location_code": 2840, "language_code": "en"}]
+```
+
+Google organic SERP for one query (top 10, desktop):
+
+```json
+endpoint: serp/google/organic/live/regular
+payload_json: [{"keyword": "what is an autonomous ai agent", "location_code": 2840, "language_code": "en", "device": "desktop", "depth": 10}]
+```
+
+On-page audit of a single URL (JS rendered, returns meta, headings, checks, page timing):
+
+```json
+endpoint: on_page/instant_pages
+payload_json: [{"url": "https://raisingchris.com/", "enable_javascript": true}]
+```
+
+Results come back as the raw DataForSEO JSON (`tasks[0].result`), truncated at
+60k characters with a note if the response is bigger; narrow the query rather
+than paging. A non-2xx status comes back as `{"error", "status_code"}` — read
+it, don't retry blindly.

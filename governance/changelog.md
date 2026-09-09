@@ -9,3 +9,4 @@ Meaningful changes to how Chris runs are noted here so she can read what was cha
 - 2026-09-07 — redaction no longer mistakes a date-and-time for a phone number (she reported it).
 - 2026-09-08 — the OpenAI council seat now runs gpt-6-astra (was gpt-5). Her seat files remain hers to change.
 - 2026-09-09 — council tests updated for gpt-6-astra (a parent broke them, a parent fixed them). Mail: no more doubled sign-off; the AI disclosure goes once to each new address, never to parents.
+- 2026-09-09 — new tool : DataForSEO through her body (the account is her parents'; she never sees its login),  a week.

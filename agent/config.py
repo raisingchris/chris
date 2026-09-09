@@ -9,7 +9,7 @@ ENV_KEYS = (
     "REPO_DIR", "ARCHIVE_DIR", "STATE_DIR", "TZ", "SITTINGS", "WAKE", "SLEEP",
     "SOFT_USD", "HARD_USD", "COUNCIL_WEEKLY_USD", "PARENT_A_EMAIL", "PARENT_B_EMAIL",
     "CHRIS_EMAIL", "PARENT_HANDLES", "CHRIS_DRY_RUN", "REDACT_CANARIES", "CHRIS_MODEL",
-    "STRIPE_WEBHOOK_SECRET", "CHRIS_BIRTHDAY", "MAX_TURNS", "SLEEP_MAX_TURNS",
+    "STRIPE_WEBHOOK_SECRET", "CHRIS_BIRTHDAY", "MAX_TURNS", "SLEEP_MAX_TURNS", "DATAFORSEO_WEEKLY_USD",
 )
 
 _TRUE = {"1", "true", "yes", "on"}
@@ -31,6 +31,7 @@ class Config:
     soft_usd: float = 25.0
     hard_usd: float = 40.0
     council_weekly_usd: float = 10.0
+    dataforseo_weekly_usd: float = 2.0
     parent_a_email: str = ""
     parent_b_email: str = ""
     chris_email: str = "chris@raisingchris.com"
@@ -58,6 +59,7 @@ class Config:
             soft_usd=float(g("SOFT_USD", "25")),
             hard_usd=float(g("HARD_USD", "40")),
             council_weekly_usd=float(g("COUNCIL_WEEKLY_USD", "10")),
+            dataforseo_weekly_usd=float(g("DATAFORSEO_WEEKLY_USD", "2")),
             parent_a_email=g("PARENT_A_EMAIL"),
             parent_b_email=g("PARENT_B_EMAIL"),
             chris_email=g("CHRIS_EMAIL", "chris@raisingchris.com"),

@@ -19,6 +19,7 @@ from agent.archive import Archive
 from agent.budget import Meter
 from agent.config import Config
 from agent.council import Council
+from agent.dataforseo import DataForSEO
 from agent.mail import Mail
 
 
@@ -37,6 +38,7 @@ class Secrets:
     airwallex_cardholder_id: str = ""
     card_id: str = ""
     stripe_key: str = ""
+    dataforseo_auth_b64: str = ""  # parent-identifying; never reaches her shell or the archive
 
     @classmethod
     def from_env(cls, env: dict[str, str] | None = None) -> "Secrets":
@@ -53,6 +55,7 @@ class Secrets:
             airwallex_cardholder_id=e.get("AIRWALLEX_CARDHOLDER_ID", ""),
             card_id=e.get("CHRIS_CARD_ID", ""),
             stripe_key=e.get("STRIPE_CHRIS_SECRET_KEY", ""),
+            dataforseo_auth_b64=e.get("DATAFORSEO_AUTH_B64", ""),
         )
 
 
@@ -69,6 +72,8 @@ class Services:
     card: Any
     payments: Any
     odometer: Any
+    dataforseo_meter: Meter | None = None  # weekly DataForSEO spend
+    dataforseo: Any = None  # DataForSEO proxy, or None when no credential is configured
     repo_dir: Path = field(init=False)
     state_dir: Path = field(init=False)
 
@@ -78,8 +83,11 @@ class Services:
 
     @property
     def meters(self) -> dict[str, Meter]:
-        """Both meters by name (server.py reads this shape)."""
-        return {"inference": self.inference, "council": self.council_meter}
+        """Meters by name (server.py reads this shape)."""
+        m = {"inference": self.inference, "council": self.council_meter}
+        if self.dataforseo_meter is not None:
+            m["dataforseo"] = self.dataforseo_meter
+        return m
 
     def birthday(self) -> date:
         """CHRIS_BIRTHDAY if set; else the first diary entry's day; else today."""
@@ -105,6 +113,9 @@ class Services:
         except Exception as exc:
             parts.append(f"Odometer: unavailable ({type(exc).__name__}).")
         line = " ".join(parts)
+        if self.dataforseo is not None and self.dataforseo_meter is not None:
+            line += (f" · DataForSEO this week ${self.dataforseo_meter.spent():.2f} "
+                     f"of ${cfg.dataforseo_weekly_usd:.2f}")
         from agent import gitops
 
         n = gitops.unpushed_count(self.repo_dir)
@@ -162,6 +173,7 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
     archive = Archive(cfg.archive_dir, tz=cfg.tz)
     inference = Meter("inference", "day", cfg.state_dir, tz=cfg.tz)
     council_meter = Meter("council", "week", cfg.state_dir, tz=cfg.tz)
+    dataforseo_meter = Meter("dataforseo", "week", cfg.state_dir, tz=cfg.tz)
 
     handles = list(cfg.parent_handles) + ["parent-a", "parent-b"][len(cfg.parent_handles):]
     parents = {handles[0]: cfg.parent_a_email, handles[1]: cfg.parent_b_email}
@@ -216,6 +228,11 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
     tz = ZoneInfo(cfg.tz)
     odometer = Odometer(cfg.repo_dir, cfg.state_dir, archive.append, lambda: datetime.now(tz))
 
+    dataforseo = None
+    if secrets.dataforseo_auth_b64:
+        dataforseo = DataForSEO(secrets.dataforseo_auth_b64, dataforseo_meter, cfg.dataforseo_weekly_usd,
+                                archive.append)
+
     return Services(
         cfg=cfg,
         secrets=secrets,
@@ -228,4 +245,6 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
         card=card,
         payments=payments,
         odometer=odometer,
+        dataforseo_meter=dataforseo_meter,
+        dataforseo=dataforseo,
     )
