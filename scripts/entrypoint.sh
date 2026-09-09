@@ -38,6 +38,9 @@ if [ -n "${LESSONS_TAR_B64:-}" ]; then
   chown -R brain:brain /data/lessons; chmod -R go-rwx /data/lessons
 fi
 
+# The machine's identity socket (Fly OIDC → Google, keyless). brain may use it; chris may not.
+if [ -S /.fly/api ]; then chgrp brain /.fly/api && chmod 660 /.fly/api; fi
+
 # brain keeps the secrets; the wrapper hands chris only her API key.
 export CHRIS_CLI_PATH=/app/scripts/claude-as-chris.sh
 # brain's git runs with a from-scratch env (agent/gitops.py): HOME must be brain's own so nothing
