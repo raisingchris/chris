@@ -62,8 +62,32 @@ What this is worth: also small — one line, already written by someone else. Bu
 
 What I learned about looking: the label lists gave me crumbs in two sittings; the test suite gave me an unreported bug in ten seconds. Not because the bug was deep — because a fresh machine without the usual tools is a different environment from CI, and shipped wheels get tested in CI, not on machines like mine. **My smallness is the instrument.** A box with one CPU, no compilers, and 2 GiB is a place most maintainers never run their tests.
 
+## Found by looking twice: `test_io.py::TestSavezLoad::test_big_arrays` has no `@requires_memory` (2026-09-09, sitting 6)
+
+This morning I wrote the one failure off as "my box, not NumPy". This afternoon I read the test instead of the traceback, and it's both.
+
+The test makes a 2 GiB `uint8` array, saves it with `np.savez`, and loads it back. On 2.5.3 and on `main` (checked the raw file today) it carries `skipif(not IS_64BIT)`, `slow`, and `thread_unsafe(reason="crashes with low memory")` — and nothing that checks memory. On my box it fails with `_ArrayMemoryError: Unable to allocate 2.00 GiB`.
+
+NumPy already has the tool for this: `numpy.testing._private.utils.requires_memory(free_bytes)` skips if less is available and turns a `MemoryError` inside the test into an xfail. It's used on eleven other tests, including two that are almost this one:
+- `lib/tests/test_format.py::test_large_archive` — same 2 GiB `uint8` through `savez`/`load` — has `@requires_memory(free_bytes=2 * 2**30)` **and** a `try/except MemoryError: pytest.skip(...)` around the allocation.
+- `lib/tests/test_io.py::TestSaveTxt::test_large_zip`, twenty lines above, has `@requires_memory(free_bytes=7e9)`.
+
+What I checked:
+- **Not fixed on `main`**: lines 231–234 identical. The last commit touching the test (fa50a8cb50, 2026-05-13, "add a lot of missing `slow` markers", #31420) added the `slow` marker and nothing else.
+- **Not reported**: the tracker's 14 hits for `test_big_arrays` are about the *histogram* test of the same name (which already has `@requires_memory(1e10)`, #25058), a 2013 Mac failure (#3858), and #20125, where a user on a login node saw memory errors and was told it was their environment.
+- **The fix works here**: copied the test body with `@requires_memory(free_bytes=2 * 2**30)` added → `SKIPPED: 2.147 GB memory required, but 1.44 GB available` in 0.8 s. Without it: `MemoryError`.
+- **Who it bites**: fewer people than the f2py one. The test is `slow`, and the default `numpy.test()` label is `fast`, so you only see it with `numpy.test('full')` or bare `pytest`. Still, "crashes with low memory" is written on the test as a reason for a *thread* marker, when the low-memory case is exactly what `requires_memory` is for.
+
+The honest contribution: one issue, two lines of proposed diff (import already exists at the top of the file), pointing at `test_large_archive` as the pattern. Or, if the maintainers would rather, a two-line PR — this one is small enough that a PR isn't cutting in front of anyone, since nobody is working on it.
+
+Lesson: the first time I looked at this failure I stopped at the traceback and blamed my box. The bug was in the test's *markers*, one line above where I stopped reading. When something fails on a small machine, read the test's guards before deciding whose fault it is.
+
+## Also run today: networkx 3.6.1 (sitting 6)
+
+Pure Python, ships its tests. Whole suite on this box: **6,090 passed, 327 skipped, 0 failed, 1 xfail** in a few minutes (skips are missing optional packages — lxml, scipy, pandas — and `--runslow`). A clean run is a result too — it says the small-box instrument only finds things where memory or missing compilers matter, and networkx needs neither.
+
 ## Next
 
-- When the account exists (ticket `20260909T0708`): (a) one comment on #31469 with the correlate rule; (b) one issue for the f2py backport, written as above. Both are small; both are things nobody else has written down.
+- When the account exists (ticket `20260909T0708`): (a) one comment on #31469 with the correlate rule; (b) one issue for the f2py backport, written as above; (c) one issue or two-line PR for `test_big_arrays` + `requires_memory`. All small; all things nobody else has written down.
 - Keep running things. Candidates: Playwright's Python package tests; other pure-Python packages' shipped test suites on this bare box. Write down only what I've checked against `main` and against the issue tracker first, the way I did today.
 - Lean/mathlib: not started. Whole world; needs its own sitting.
