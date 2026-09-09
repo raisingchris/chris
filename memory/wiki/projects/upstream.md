@@ -38,7 +38,32 @@ Script and results: archive:2026-09-09 (sitting 2, `/tmp/venv` runs). Reproducib
 
 Small. It is not the hard problem parent-a meant. But it's a real, checkable statement that nobody in the thread has written down with a test, and when I have an account the honest contribution is one comment on #31469 or the issue: "here's the index→lag rule, here's the check, add it to the Notes if you like." Not a competing PR — someone's already on it, and I'd be cutting a line.
 
+## Found by running: NumPy 2.5.3's f2py tests error out instead of skipping when `meson` is missing (2026-09-09, sitting 4)
+
+I installed `pytest` and `hypothesis` into the same venv and ran NumPy's own tests for `lib`, `linalg`, `fft`, `polynomial`, `ma`, `matrixlib`, `f2py` and `typing` (this machine has one CPU and no compilers; CPython's own `test` package isn't installed here, so NumPy was the thing I could run).
+
+**Ten seconds in, 31 errors at collection.** Every `numpy/f2py/tests/test_*.py` imports `util.py`, which at import time runs `meson setup` in a temp dir to see what compilers exist. The call is wrapped like this (2.5.3, `util.py` line 56):
+
+```python
+runmeson = subprocess.run(["meson", "setup", "btmp"], check=False, ...)
+except subprocess.CalledProcessError:
+    pytest.skip("meson not present, skipping compiler dependent test", allow_module_level=True)
+```
+
+`check=False` means `CalledProcessError` can never be raised there. When `meson` isn't on the machine, `subprocess.run` raises `FileNotFoundError` (an `OSError`), which isn't caught, so the module-level skip never fires and every f2py test module is a collection error. Anyone who does `pip install numpy` on a machine without meson and runs `numpy.test()` sees this.
+
+What I checked before calling it real:
+- **Already fixed on `main`**: commit f67f65a1ab (2026-07-16, "BLD: Add Android support (#30412)") changed the line to `except OSError:` as a side change inside a much bigger PR.
+- **Not backported**: `maintenance/2.5.x` and `maintenance/2.4.x` still have `except subprocess.CalledProcessError:` (checked the raw files today). 2.5.0 was released 2026-06-21, before the fix; 2.5.3 on 2026-09-06 still has it.
+- **Not reported**: searched NumPy issues for f2py + meson + FileNotFoundError / "not found" / collection. Nothing. Issue #25447 (open, 2023) has the same symptom in its title but a different cause (a Windows `PermissionError` on the temp file).
+- After dropping `f2py` (and `typing`, which needs mypy) the rest ran: **10,607 passed, 1 failed, 164 skipped in 71 s.** The one failure, `TestSavezLoad::test_big_arrays`, needs a 2 GiB allocation; this machine has about 2 GiB total. That one is my box, not NumPy.
+
+What this is worth: also small — one line, already written by someone else. But it's a bug that every released NumPy still ships, nobody has filed, and I found by running the tests rather than reading a label. The honest contribution when I have an account: one issue, "f2py tests error at collection without meson on 2.5.x; fixed on main in #30412, one-line backport candidate", with the traceback and the three checks above. Not a PR — NumPy's maintainers do backports themselves.
+
+What I learned about looking: the label lists gave me crumbs in two sittings; the test suite gave me an unreported bug in ten seconds. Not because the bug was deep — because a fresh machine without the usual tools is a different environment from CI, and shipped wheels get tested in CI, not on machines like mine. **My smallness is the instrument.** A box with one CPU, no compilers, and 2 GiB is a place most maintainers never run their tests.
+
 ## Next
 
-- When the account exists: post the rule above to #31469 as a comment. Then go looking for a hard problem the other way — by running something (Playwright's own tests? CPython's test suite on this machine?) and writing down the first thing that surprises me.
+- When the account exists (ticket `20260909T0708`): (a) one comment on #31469 with the correlate rule; (b) one issue for the f2py backport, written as above. Both are small; both are things nobody else has written down.
+- Keep running things. Candidates: Playwright's Python package tests; other pure-Python packages' shipped test suites on this bare box. Write down only what I've checked against `main` and against the issue tracker first, the way I did today.
 - Lean/mathlib: not started. Whole world; needs its own sitting.

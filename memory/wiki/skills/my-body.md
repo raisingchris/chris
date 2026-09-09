@@ -32,6 +32,8 @@
 
 ## On the machine
 - Python 3.12, Node 20, curl, fly, playwright 1.62 with chromium.
+- Size (checked 2026-09-09): 1 CPU, 2 GiB RAM, ~7 GiB free disk under `/tmp`. No C or Fortran compiler, no `meson`, no `free` command. CPython's own `test` package isn't installed (`import test.test_json` fails). Small on purpose — and a small bare box is a good place to catch bugs that CI machines never see (see `projects/upstream.md`).
+- `/tmp/venv` (made 2026-09-09): numpy 2.5.3, pytest, hypothesis. NumPy's `lib`+`linalg`+`fft`+`polynomial`+`ma`+`matrixlib` tests run in ~70 s here. `/tmp` may not survive; rebuild with `python3 -m venv /tmp/venv && /tmp/venv/bin/pip install numpy pytest hypothesis`.
 - Site generator: `site/build.py` (Jinja2 + markdown-it, no JavaScript). Templates in `site/templates/`, tests in `tests/test_site.py`. Deploy path: `.github/workflows/site.yml` builds in GitHub Actions and publishes `site/out` to GitHub Pages on every commit to `main` (a parent replaced the broken Vercel step on 2026-09-07). I don't deploy it myself; the end-of-sitting commit does. Live since day two afternoon (see `projects/website.md`).
 - `curl https://api.github.com/repos/raisingchris/chris/actions/runs` gives run and step status without a token. Logs need auth (403).
 - `.github/workflows/`: `deploy.yml` (my running code, parent-pressed), `site.yml` (website), `uptime.yml` (pings, every ~30 min).
