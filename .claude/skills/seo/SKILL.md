@@ -106,3 +106,32 @@ Results come back as the raw DataForSEO JSON (`tasks[0].result`), truncated at
 60k characters with a note if the response is bigger; narrow the query rather
 than paging. A non-2xx status comes back as `{"error", "status_code"}` — read
 it, don't retry blindly.
+
+## Analytics
+
+Your measurement id is `G-MP025KFFY4` (see `governance/analytics.md`). Visitors
+are only counted on pages that carry the tag — put this in `<head>` of every
+page (or your shared layout):
+
+```html
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MP025KFFY4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-MP025KFFY4');
+</script>
+```
+
+Reading the numbers (all free, all read-only):
+
+- `site_analytics(dimensions_json, metrics_json, start, end, limit)` — GA4.
+  `["date"]` + `["activeUsers","screenPageViews"]` for a daily trend;
+  `["pagePath"]` for which pages people read; `["sessionSource"]` for where they
+  came from. Dates are `YYYY-MM-DD` or `today`, `yesterday`, `7daysAgo`.
+- `search_console(start, end, dimensions_json, row_limit)` — Google Search.
+  `["query"]` for the words people typed, `["page"]` per page, `["date"]` over
+  time. Each row has clicks, impressions, ctr and average position. Search data
+  lags about two days.
+- `search_console_inspect(url)` — is this page in Google's index, when was it
+  last crawled, which URL does Google treat as canonical.

@@ -19,7 +19,9 @@ from agent.archive import Archive
 from agent.budget import Meter
 from agent.config import Config
 from agent.council import Council
+from agent.analytics import Analytics
 from agent.dataforseo import DataForSEO
+from agent.google_auth import GoogleWIF
 from agent.mail import Mail
 
 
@@ -39,6 +41,12 @@ class Secrets:
     card_id: str = ""
     stripe_key: str = ""
     dataforseo_auth_b64: str = ""  # parent-identifying; never reaches her shell or the archive
+    # Google, keyless: the WIF provider resource and service-account address name her parents'
+    # project, so they stay here. Property/site ids are what the tools read.
+    google_wif_provider: str = ""
+    google_metrics_sa: str = ""
+    ga4_property_id: str = ""
+    gsc_site_url: str = ""
 
     @classmethod
     def from_env(cls, env: dict[str, str] | None = None) -> "Secrets":
@@ -56,6 +64,10 @@ class Secrets:
             card_id=e.get("CHRIS_CARD_ID", ""),
             stripe_key=e.get("STRIPE_CHRIS_SECRET_KEY", ""),
             dataforseo_auth_b64=e.get("DATAFORSEO_AUTH_B64", ""),
+            google_wif_provider=e.get("GOOGLE_WIF_PROVIDER", ""),
+            google_metrics_sa=e.get("GOOGLE_METRICS_SA", ""),
+            ga4_property_id=e.get("GA4_PROPERTY_ID", ""),
+            gsc_site_url=e.get("GSC_SITE_URL", ""),
         )
 
 
@@ -74,6 +86,10 @@ class Services:
     odometer: Any
     dataforseo_meter: Meter | None = None  # weekly DataForSEO spend
     dataforseo: Any = None  # DataForSEO proxy, or None when no credential is configured
+    google: Any = None  # GoogleWIF, or None when the provider/SA are not configured
+    ga4_property: str = ""
+    gsc_site: str = ""
+    analytics: Any = None  # Analytics (GA4 + Search Console), or None
     repo_dir: Path = field(init=False)
     state_dir: Path = field(init=False)
 
@@ -233,6 +249,11 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
         dataforseo = DataForSEO(secrets.dataforseo_auth_b64, dataforseo_meter, cfg.dataforseo_weekly_usd,
                                 archive.append)
 
+    google = analytics = None
+    if secrets.google_wif_provider and secrets.google_metrics_sa:
+        google = GoogleWIF(secrets.google_wif_provider, secrets.google_metrics_sa)
+        analytics = Analytics(google, secrets.ga4_property_id, secrets.gsc_site_url, archive.append)
+
     return Services(
         cfg=cfg,
         secrets=secrets,
@@ -247,4 +268,8 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
         odometer=odometer,
         dataforseo_meter=dataforseo_meter,
         dataforseo=dataforseo,
+        google=google,
+        ga4_property=secrets.ga4_property_id,
+        gsc_site=secrets.gsc_site_url,
+        analytics=analytics,
     )

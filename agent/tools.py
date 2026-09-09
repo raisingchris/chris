@@ -23,8 +23,9 @@ from agent.dataforseo import DataForSEOBudgetExceeded, DataForSEOEndpointError
 TOOL_NAMES = [
     "recall", "mail_read", "mail_send", "council_ask", "card_details", "ledger_add",
     "payment_link", "odometer_claim", "scratch_write", "scratch_read", "meters", "ticket", "tickets",
-    "seo_data",
+    "seo_data", "site_analytics", "search_console", "search_console_inspect",
 ]
+NOT_CONFIGURED = "Google Analytics / Search Console is not configured; ask your parents."
 SEO_DATA_CHARS = 60_000
 RECENT_CLOSED = 5
 SCRATCH = Path("memory") / "scratchpad" / "scratch.md"
@@ -208,11 +209,77 @@ def make_handlers(services) -> dict[str, Callable[[dict], Any]]:
             body = body[:SEO_DATA_CHARS] + f"\n\n[truncated: response was {len(body)} chars; narrow the query]"
         return text(body)
 
+    def _json_list(raw, name: str, default: list[str]) -> tuple[list[str] | None, str | None]:
+        if raw in (None, ""):
+            return list(default), None
+        try:
+            val = json.loads(raw) if isinstance(raw, str) else raw
+        except ValueError as exc:
+            return None, f"{name} is not valid JSON: {exc}"
+        if isinstance(val, str):
+            val = [val]
+        if not isinstance(val, list) or not all(isinstance(x, str) for x in val):
+            return None, f"{name} must be a JSON array of strings, e.g. [\"date\",\"pagePath\"]."
+        return val, None
+
+    async def _analytics_call(name: str, fn, **kwargs) -> dict:
+        try:
+            out = await asyncio.to_thread(fn, **kwargs)
+        except Exception as exc:  # noqa: BLE001 — network errors come back as text, never a crash
+            from agent.google_auth import scrub
+
+            archive.append("tool", {"name": name, "error": type(exc).__name__})
+            return text(f"{name} failed: {type(exc).__name__}: {scrub(exc)}")
+        # The archive record ({kind, api, status_code}) was written by Analytics itself.
+        body = json.dumps(out, ensure_ascii=False)
+        if len(body) > SEO_DATA_CHARS:
+            body = body[:SEO_DATA_CHARS] + f"\n\n[truncated: response was {len(body)} chars; narrow the query]"
+        return text(body)
+
+    async def site_analytics(args: dict) -> dict:
+        if services.google is None or services.analytics is None:
+            return text(NOT_CONFIGURED)
+        dims, err = _json_list(args.get("dimensions_json"), "dimensions_json", ["date"])
+        if err:
+            return text(err)
+        mets, err = _json_list(args.get("metrics_json"), "metrics_json", ["activeUsers", "screenPageViews"])
+        if err:
+            return text(err)
+        start = str(args.get("start", "") or "7daysAgo")
+        end = str(args.get("end", "") or "today")
+        limit = int(args.get("limit", 50) or 50)
+        return await _analytics_call("site_analytics", services.analytics.ga4_report, dimensions=dims,
+                                     metrics=mets, start=start, end=end, limit=limit)
+
+    async def search_console(args: dict) -> dict:
+        if services.google is None or services.analytics is None:
+            return text(NOT_CONFIGURED)
+        dims, err = _json_list(args.get("dimensions_json"), "dimensions_json", ["query"])
+        if err:
+            return text(err)
+        start = str(args.get("start", "") or "")
+        end = str(args.get("end", "") or "")
+        if not start or not end:
+            return text("search_console needs start and end dates (YYYY-MM-DD).")
+        row_limit = int(args.get("row_limit", 50) or 50)
+        return await _analytics_call("search_console", services.analytics.gsc_query, start=start, end=end,
+                                     dimensions=dims, row_limit=row_limit)
+
+    async def search_console_inspect(args: dict) -> dict:
+        if services.google is None or services.analytics is None:
+            return text(NOT_CONFIGURED)
+        url = str(args.get("url", "") or "").strip()
+        if not url:
+            return text("search_console_inspect needs a url.")
+        return await _analytics_call("search_console_inspect", services.analytics.gsc_inspect, url=url)
+
     return {
         "recall": recall, "mail_read": mail_read, "mail_send": mail_send, "council_ask": council_ask,
         "card_details": card_details, "ledger_add": ledger_add, "payment_link": payment_link,
         "odometer_claim": odometer_claim, "scratch_write": scratch_write, "scratch_read": scratch_read,
         "meters": meters, "ticket": ticket, "tickets": tickets, "seo_data": seo_data,
+        "site_analytics": site_analytics, "search_console": search_console,
+        "search_console_inspect": search_console_inspect,
     }
 
 
@@ -243,6 +310,16 @@ SCHEMAS: dict[str, tuple[str, dict]] = {
                  "cap. endpoint = path under /v3/ e.g. 'serp/google/organic/live/regular'; payload_json = the JSON "
                  "array DataForSEO expects. Docs: https://docs.dataforseo.com/v3/",
                  {"endpoint": str, "payload_json": str}),
+    "site_analytics": ("Visitors to your site (GA4). dimensions_json e.g. [\"date\",\"pagePath\"]; metrics_json "
+                       "e.g. [\"activeUsers\",\"screenPageViews\"]; start/end are YYYY-MM-DD or 'today', "
+                       "'yesterday', '7daysAgo'. Free; only you and your parents see the data.",
+                       {"dimensions_json": str, "metrics_json": str, "start": str, "end": str, "limit": int}),
+    "search_console": ("What people searched to find you on Google, and where you ranked. start/end YYYY-MM-DD; "
+                       "dimensions_json e.g. [\"query\"], [\"page\"], [\"query\",\"page\"], [\"date\"]. "
+                       "Rows carry clicks, impressions, ctr, position. Free.",
+                       {"start": str, "end": str, "dimensions_json": str, "row_limit": int}),
+    "search_console_inspect": ("Is one of your pages indexed by Google? Returns verdict, coverage state, last "
+                               "crawl, canonical. Free.", {"url": str}),
 }
 
 
