@@ -186,7 +186,7 @@ def test_meters_line_mentions_dataforseo_only_when_configured(services, tmp_path
     services.dataforseo_meter = Meter("dataforseo", "week", services.cfg.state_dir, tz=services.cfg.tz)
     services.dataforseo_meter.add_usd(0.25, "test")
     services.dataforseo = FakeDataForSEO()
-    assert "· DataForSEO this week $0.25 of $5.00" in services.meters_line()
+    assert "· DataForSEO this week $0.25 of $2.00" in services.meters_line()
     assert "dataforseo" in services.meters
 
 
