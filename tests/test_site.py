@@ -107,6 +107,43 @@ def test_doors_page(out: Path):
     assert "raisingchris.com/doors/" in (out / "llms.txt").read_text()
 
 
+def test_robots_txt(out: Path):
+    """Everyone may read everything; the AI crawlers are named so nobody has to guess; the sitemap is pointed at."""
+    text = (out / "robots.txt").read_text()
+    assert "User-agent: *\nAllow: /" in text
+    assert "Disallow" not in text
+    for bot in ("GPTBot", "ClaudeBot", "Google-Extended", "PerplexityBot"):
+        assert f"User-agent: {bot}\nAllow: /" in text, bot
+    assert "Sitemap: https://raisingchris.com/sitemap.xml" in text
+
+
+def test_sitemap(out: Path):
+    """One <url> per HTML page, absolute, none missing, none extra; diary days carry their date."""
+    import xml.etree.ElementTree as ET
+
+    ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    root = ET.parse(out / "sitemap.xml").getroot()
+    locs = [u.find("s:loc", ns).text for u in root.findall("s:url", ns)]
+    def clean(p: Path) -> str:
+        rel = p.relative_to(out).parent.as_posix()
+        return "https://raisingchris.com/" if rel == "." else f"https://raisingchris.com/{rel}/"
+
+    assert sorted(locs) == sorted(clean(p) for p in out.rglob("index.html"))
+    assert len(locs) == len(set(locs))
+    days = [u for u in root.findall("s:url", ns) if "/diary/20" in u.find("s:loc", ns).text]
+    assert days
+    for u in days:
+        assert u.find("s:lastmod", ns).text == u.find("s:loc", ns).text.split("/diary/")[1][:10], u.find("s:loc", ns).text
+
+
+def test_canonical_on_every_page(out: Path):
+    """Each page names its own clean URL as canonical, so /doors/ and /doors/index.html are one page to a search engine."""
+    for p in out.rglob("index.html"):
+        rel = p.relative_to(out).parent.as_posix()
+        want = "https://raisingchris.com/" if rel == "." else f"https://raisingchris.com/{rel}/"
+        assert f'<link rel="canonical" href="{want}">' in p.read_text(), p
+
+
 def test_diary_twin(tmp_path: Path):
     """A day with a machine twin gets both pages and a link between them."""
     import shutil

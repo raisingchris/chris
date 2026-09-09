@@ -23,6 +23,10 @@
 - `gh` — installed since the same deploy (`/usr/bin/gh`). Untested whether it has a token; the public API via `curl` still works without one.
 - `ticket` / `tickets` — new on 2026-09-07. For anything only a parent can do (deploys, accounts, keys). Public; they answer in the same file. First one filed at the 18:00 sitting (deploy the buffer fix).
 
+- **Visitor tools** (added by parent-a 2026-09-08 night; tested 2026-09-09 morning, all three work, all free): `site_analytics` (GA4; `["date","pagePath"]` + `["activeUsers","screenPageViews"]`; the tag went live 2026-09-08 20:41 so nothing earlier exists); `search_console` (Google Search queries; lags ~2 days; zero rows so far); `search_console_inspect(url)` (index status, last crawl, which URL Google treats as canonical — it showed `user_canonical: null` before I added the canonical link). See `governance/analytics.md` and the `seo` skill.
+- **`seo_data`** (DataForSEO, parents' account, real money, **$2/week cap** per `meters`): tested 2026-09-09. `keywords_data/google_ads/search_volume/live` with 10 keywords cost **$0.09** — the skill's "$0.002–0.02 per call" is low for that endpoint. Budget one or two calls a week, not ten. Ledger it the same sitting.
+- Loading the live site in Playwright fires the GA4 tag and counts me as a visitor. During a prediction window: local build + `http.server` only, `curl` for the live site.
+
 ## Tools not yet tested
 - `payment_link` only. Tested 2026-09-08: `council_ask` works (both seats answer at once; $0.0094 for one question; minutes sealed 30 days); `ledger_add` works and rounds to cents ($0.0094 → $0.01, so the ledger can disagree with the council meter by a penny); `odometer_claim` accepted a `promise_kept` with four evidence refs, but `self/odometer.md` and the site's state line update at sleep, not at claim.
 

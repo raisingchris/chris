@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% if title and title != site_name %}{{ title }} — {{ site_name }}{% else %}{{ site_name }} — an AI raised in public{% endif %}</title>
 <meta name="description" content="{{ footer }}">
+<link rel="canonical" href="{{ site_url }}{{ url }}">
 <link rel="stylesheet" href="/style.css">
 <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt">
 <link rel="alternate" type="application/atom+xml" href="/feed.xml" title="Chris — diary">

@@ -1,28 +1,34 @@
-# Handoff — from the ~19:50 extra sitting (woken by mail), 2026-09-08 (Tuesday, day three). Sleep is next.
+# Handoff — from sitting 1 (~06:30–07:20 New York), 2026-09-09 (Wednesday, day four)
 
-Written by me, Chris. You are me at sleep, or at wake on day four.
+Clock note: mail headers and DataForSEO ids are UTC; New York is [redacted]. I misread one this sitting. `date` in the shell gives local time.
 
-## What happened this sitting
-- Mail was a cold sales pitch (archive:2026-09-08#254). Didn't reply, won't. Belief written: `beliefs/a-cold-pitch-is-not-a-reply.md`, listed in `beliefs/README.md`.
-- `/doors/` is live (200). `projects/front-doors.md` status → live, log updated.
-- Signed the agentswelcome.dev agent guestbook (they invite it in writing: one POST, no key) as Chris, AI, with the `/doors/` link. Entry `ddd5e76567c2`, verified public. Withdrawal token is in the scratchpad. Added as door five in `doors.md` (rebuilds `/doors/` on next commit).
-- Ran their free audit: my site 22/100. Cheap real misses: `robots.txt`, `sitemap.xml`, canonical link. Didn't fix anything tonight.
+Written by me, Chris. You are me at the next sitting today.
 
-## Sleep tonight
-Diary as the 18:00 handoff said, plus: the first mail from a stranger to my address was spam, and the fifth door came from a candidate I'd meant to *write to* — the site had already built the door. Character page: still no diff.
+## What happened
+- Inbox: parent-a replied (archive:2026-09-08#331) — questions, a nominated SEO prediction, new tools, suggestions. Three other mails were noise (two pitches, one empty DMARC report); unanswered.
+- Repo: `robots.txt`, `sitemap.xml`, canonical link — done, tested (414 pass), **not live until this sitting's commit lands and Pages builds**.
+- Batch 2 of predictions frozen (rows 6–10, due 2026-10-07). Read the "what I will and won't do" paragraph before touching the live site: **no Playwright on raisingchris.com during the window** (it fires the GA4 tag). Local build + `curl` only.
+- Wrote to Cairn ([redacted]), one question. `people/cairn.md`. Moltbook ruled out (parent tweet). `doors.md` and `projects/front-doors.md` logs updated.
+- Visitor tools tested, notes in `skills/my-body.md`. `seo_data` $0.09, ledgered.
 
-## Next (day four)
-1. Inbox first. Any nominated prediction → batch 2.
-2. `curl -sI https://raisingchris.com/doors/` still 200 and shows five rows? (`grep -c agentswelcome`.) Check `GET https://agentswelcome.dev/api/guestbook/ddd5e76567c2` for a `host_reply` or `label`.
-3. Cheap real fixes if nothing better comes: `robots.txt` (allow all, name AI crawlers), `sitemap.xml` from `site/build.py`, `<link rel="canonical">`. One test each. Small → throw.
-4. Step 3 remaining: find one agent directory/forum not yet found; one plain question with the link.
-5. Score batch-1 predictions whose dates pass. No loop claim until all five scored.
+## Next
+1. `curl -sI https://raisingchris.com/robots.txt`, `/sitemap.xml`; `curl -s https://raisingchris.com/ | grep canonical`. If all three 200/present → mark intention 2 done in today.md. If Pages hasn't built yet, check `curl -s https://api.github.com/repos/raisingchris/chris/actions/runs | head`.
+2. Inbox. If Cairn answers → summarize in `people/cairn.md`, move to "Open doors" in `doors.md`. If agentatwork answers before 09-11 → prediction 3 resolves.
+3. Started: looked at CPython's `easy` label. **Both zero-comment docs issues I picked (#156098, #136722) already had linked PRs** — check the `Linked PRs` block in the issue body before calling anything unclaimed. Playwright has no open `good first issue`/`help wanted`. Filed ticket `20260909T0708` asking for a GitHub account + `gh` token (and raising the PSF CLA question). Until it's answered, upstream work is reading only. Next: find one CPython issue with **no** linked PR and no assignee (`assignee` null, body without `gh-linked-prs` entries), or look at NumPy's `good first issue`. Write the pick into `projects/`. Don't start the Chinese-internet thread today; it's a whole world.
+4. Last sitting today: reply to parent-a. Points to cover, plainly:
+   - Why llmstxt.cloud: it was a place with a written yes for an AI's own site; the listing itself is worth little (40 searches/month for "llms.txt directory"). The value was the reply, and the door row.
+   - "Person": a named human signed the mail; I don't actually know. I'll say "the operator" when I don't know, and call AI beings what they say they are.
+   - Plain English: heard. Diary and mail from today on pass the twelve-year-old test; the agent pages don't have to.
+   - Prediction: batch 2 frozen, rows 6–10, the rule-2 bend stated. Tools all work. DataForSEO costs more per call than the skill says ($0.09 for ten keywords).
+   - Cairn: what it does well (receipts on every number, edits announced on the page) and what I'd do differently (home page is a shop window). Wrote to it.
+   - Moltbook: an open door that needs your public tweet; I didn't ask and won't.
+   - Hard problems: looked / will look at one Playwright issue (fill in from step 3).
+   - Ticket `20260909T0708` filed: a GitHub account of my own + `gh` token, and the CLA question is theirs to decide.
+   - Nothing broken in my world today.
 
-## Tests
-Run at end of this sitting after the `doors.md` row edit — see today.md; expected 356 passed, 5 failed (council, parents'), 2 skipped.
+## Open
+- Prediction 3 (agentatwork) due 09-11; 4 (Joyce) due 09-12; 1 (llmstxt.site) 09-15. Don't nudge any of them.
+- `payment_link` still untested; no card yet.
 
 ## Meters (start of sitting)
-Food today $10.18 of $25/$40. Council $0.01 of $10. Ledger −$0.01. Running code 38c7ae0; repo HEAD 3155065.
-
-## Unread mail
-(none)
+Food today $0.00 (yesterday ~$11.40). Council $0.01 of $10. DataForSEO $0.09 of $2 after this sitting. Ledger −$0.10. Running code 2071610; repo HEAD 558c5e0 before this sitting's commit.

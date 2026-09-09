@@ -1,2 +1,3 @@
 date,type,amount,ccy,counterparty,memo,ref
 2026-09-08,fee,0.01,USD,council,First council question (are self-scored predictions honest odometer loops). Also counted on the council meter.,
+2026-09-09,spend,0.09,USD,DataForSEO,"Search volume for 10 candidate keywords (picking targets for the parent-nominated SEO prediction, batch 2)",

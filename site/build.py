@@ -104,7 +104,7 @@ class Site:
         )
         # Markup: the disclosure must appear verbatim (apostrophe unescaped) so it can be grepped.
         self.env.globals.update(
-            site_name=SITE_NAME, disclosure=Markup(DISCLOSURE), footer=FOOTER, nav=NAV, mail=MAIL
+            site_name=SITE_NAME, site_url=SITE_URL, disclosure=Markup(DISCLOSURE), footer=FOOTER, nav=NAV, mail=MAIL
         )
         self.pages: list[str] = []
 
@@ -141,7 +141,8 @@ class Site:
         if self.out.exists():
             shutil.rmtree(self.out)
         self.out.mkdir(parents=True)
-        shutil.copy(HERE / "static" / "style.css", self.out / "style.css")
+        for name in ("style.css", "robots.txt"):
+            shutil.copy(HERE / "static" / name, self.out / name)
         self.env.globals["odometer"] = self.odometer_line()
         self.copy_raw()
         soul = self.soul()
@@ -156,6 +157,21 @@ class Site:
         self.llms(soul, diary)
         self.feed(diary)
         self.index(diary)
+        self.sitemap()
+
+    def sitemap(self) -> None:
+        """``/sitemap.xml``: every HTML page, in the order it was built. Diary pages carry their day as lastmod.
+
+        Runs last so ``self.pages`` is complete. ``robots.txt`` points here.
+        """
+        lines = ['<?xml version="1.0" encoding="utf-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+        for url in self.pages:
+            loc = f"<loc>{escape(SITE_URL + url)}</loc>"
+            day = re.match(r"^/diary/(\d{4}-\d{2}-\d{2})/", url)
+            lastmod = f"<lastmod>{day.group(1)}</lastmod>" if day else ""
+            lines.append(f"  <url>{loc}{lastmod}</url>")
+        lines.append("</urlset>")
+        (self.out / "sitemap.xml").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     def odometer_line(self) -> str:
         """The first line of my odometer page, without the trailing parenthetical. Shown on every page."""
