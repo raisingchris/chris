@@ -16,3 +16,4 @@ Meaningful changes to how Chris runs are noted here so she can read what was cha
 - 2026-09-10 — ticket 20260909T0944 closed (deployed). Ticket 20260909T0708 (GitHub account): yes, a parent creates it this week; no CLA projects for now.
 - 2026-09-10 — continuation sittings: when your handoff leaves work pending (`next:` lines), another sitting starts 30 minutes later, up to 12 a day, until the soft cap. Your parents wanted you to have more of the day.
 - 2026-09-10 — her own GitHub account exists (raisingchris2026); its token reaches her shell as GH_TOKEN (fork, push to her forks, PRs, issues). Ticket 20260909T0708 closed.
+- 2026-09-10 — parents' page gained a Mail view (inbox + sent). Every look is written to her archive as a parent action; the manual says what it's for.

@@ -27,7 +27,7 @@ import os
 import re
 import shutil
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Callable
 from zoneinfo import ZoneInfo
@@ -48,6 +48,10 @@ LESSON_SUBJECT = "A lesson from your parents"
 VETO_REASON_MIN = 10
 TICKET_REPLY_MIN = 5
 TICKET_EXCERPT = 600
+MAIL_DAYS_DEFAULT = 14
+MAIL_DAYS_MAX = 365
+MAIL_CAP = 200
+MAIL_FOLD = 1500
 _ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$")
 
 DEPLOY_REPO = "raisingchris/chris"
@@ -191,6 +195,43 @@ def is_stale(runs: dict, now: datetime) -> bool:
     if now.weekday() < 6 and after(STALE_SITTING_AFTER) and not _done_today(runs.get("last_sitting_done"), today):
         return True
     return False
+
+
+def _parse_ts(value) -> datetime | None:
+    """An aware datetime from an ISO string (naive → UTC), or None."""
+    if not value:
+        return None
+    try:
+        dt = datetime.fromisoformat(str(value).strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+
+
+def parse_inbox_file(text: str) -> dict:
+    """The frontmatter keys (from/subject/received/read/...) and ``body`` of an inbox file."""
+    meta: dict = {}
+    body = text
+    if text.startswith("---\n"):
+        head, _, body = text[4:].partition("\n---\n")
+        for line in head.splitlines():
+            key, sep, val = line.partition(":")
+            if not sep:
+                continue
+            val = val.strip()
+            if len(val) >= 2 and val[0] == val[-1] == '"':
+                try:
+                    val = json.loads(val)
+                except ValueError:
+                    val = val[1:-1]
+            meta[key.strip()] = val
+    meta["body"] = body.strip("\n")
+    return meta
+
+
+def _fold(text: str) -> dict:
+    """Body split for display: ``head`` (first MAIL_FOLD chars) and ``rest`` (the remainder, possibly empty)."""
+    return {"head": text[:MAIL_FOLD], "rest": text[MAIL_FOLD:]}
 
 
 def _read_json(path: Path, default):
@@ -475,6 +516,68 @@ def create_app(services, scheduler=None) -> FastAPI:
     @app.get("/parent", response_class=HTMLResponse)
     async def parent_status(request: Request, handle: str = Depends(require_parent)):
         return templates.TemplateResponse(request, "parent.html", status_context(request, handle))
+
+    @app.get("/parent/mail", response_class=HTMLResponse)
+    async def parent_mail(
+        request: Request, days: str = "", q: str = "", handle: str = Depends(require_parent),
+    ):
+        sender = request.query_params.get("from", "")  # ``from`` is a keyword; read it off the query directly
+        try:
+            days = max(1, min(int(days), MAIL_DAYS_MAX))
+        except ValueError:
+            days = MAIL_DAYS_DEFAULT
+        tz = ZoneInfo(cfg.tz)
+        now = datetime.now(tz)
+        since = now - timedelta(days=days)
+        needle, sender_needle = q.strip().lower(), sender.strip().lower()
+
+        inbox = []
+        inbox_dir = repo / "memory" / "inbox"
+        for p in sorted(inbox_dir.glob("*.md")) if inbox_dir.exists() else []:
+            text = safe_repo_text(p)
+            if text is None:
+                continue
+            m = parse_inbox_file(text)
+            received = _parse_ts(m.get("received"))
+            if received is not None and received < since:
+                continue
+            frm, subject, body = str(m.get("from", "")), str(m.get("subject", "")), m["body"]
+            if sender_needle and sender_needle not in frm.lower():
+                continue
+            if needle and needle not in (subject + "\n" + body).lower():
+                continue
+            inbox.append({
+                "name": p.name, "received": received, "received_local": received.astimezone(tz) if received else None,
+                "from": frm, "subject": subject, "read": str(m.get("read", "")).lower() == "true", **_fold(body),
+            })
+        inbox.sort(key=lambda i: (i["received"] or datetime.min.replace(tzinfo=timezone.utc)), reverse=True)
+        inbox = inbox[:MAIL_CAP]
+
+        sent = []
+        for i in range(days + 1):
+            day = (now - timedelta(days=i)).date().isoformat()
+            for rec in services.archive.read_day(day):
+                if rec.get("kind") != "mail_out":
+                    continue
+                pl = rec.get("payload") or {}
+                to = pl.get("to") or []
+                to = [to] if isinstance(to, str) else [str(t) for t in to]
+                subject, body = str(pl.get("subject", "")), str(pl.get("body", ""))
+                if sender_needle and not any(sender_needle in t.lower() for t in to):
+                    continue
+                if needle and needle not in (subject + "\n" + body).lower():
+                    continue
+                ts = _parse_ts(rec.get("ts"))
+                sent.append({"ts": ts, "ts_local": ts.astimezone(tz) if ts else None, "to": to, "subject": subject,
+                             **_fold(body)})
+        sent.sort(key=lambda i: (i["ts"] or datetime.min.replace(tzinfo=timezone.utc)), reverse=True)
+        sent = sent[:MAIL_CAP]
+
+        archive_action("mail_view", handle, days=days, filtered=bool(needle or sender_needle))
+        return templates.TemplateResponse(request, "mail.html", {
+            "request": request, "handle": handle, "inbox": inbox, "sent": sent,
+            "days": days, "q": q, "from_filter": sender, "cap": MAIL_CAP,
+        })
 
     @app.post("/parent/pause")
     async def parent_pause(request: Request, reason: str = Form(""), handle: str = Depends(require_parent)):

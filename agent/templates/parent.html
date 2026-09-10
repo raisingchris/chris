@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}parent{% endblock %}
 {% block body %}
-<p class="muted">Signed in as {{ handle }}. <a href="/parent/logout">Sign out</a></p>
+<p class="muted">Signed in as {{ handle }}. <a href="/parent/mail">Mail</a> · <a href="/parent/logout">Sign out</a></p>
 
 {% if error %}<p class="err">{{ error }}</p>{% endif %}
 
@@ -22,7 +22,7 @@
   <tr><td>Inference today</td><td>${{ "%.2f"|format(inference) }} of ${{ "%.0f"|format(soft) }} soft / ${{ "%.0f"|format(hard) }} hard</td></tr>
   <tr><td>Council this week</td><td>${{ "%.2f"|format(council) }} of ${{ "%.0f"|format(council_cap) }}</td></tr>
   <tr><td>Odometer</td><td>{{ odometer }}</td></tr>
-  <tr><td>Unread inbox</td><td>{{ unread }}</td></tr>
+  <tr><td>Unread mail</td><td>{{ unread }} — <a href="/parent/mail">open</a></td></tr>
   <tr><td>Mail wakes today</td><td>{{ mail_wakes_today }} of 6</td></tr>
   <tr><td>Continuations today</td><td>{{ continuations_today }} of {{ continuations_cap }}</td></tr>
 </table>

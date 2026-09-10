@@ -249,9 +249,84 @@ def test_status_page_renders(client, services, tmp_path):
     assert "$1.50 of $10" in page
     assert "3 loops closed" in page
     assert "I read the letter." in page
-    assert "<td>2</td>" in page
+    assert "Unread mail</td><td>2 — <a href=\"/parent/mail\">open</a>" in page
     assert "p-1" in page
     assert "No scheduler attached" in page
+
+
+# --- mail page --------------------------------------------------------------------
+
+
+def _inbox_file(services, name, frm, subject, received, body, read=False):
+    (Path(services.cfg.repo_dir) / "memory" / "inbox" / name).write_text(
+        f"---\nfrom: {frm}\nsubject: \"{subject}\"\nreceived: {received}\n"
+        + ("read: true\n" if read else "") + f"---\n\n{body}\n"
+    )
+
+
+def test_mail_page_requires_login(client):
+    r = client.get("/parent/mail", follow_redirects=False)
+    assert r.status_code == 303 and r.headers["location"] == "/parent/login"
+
+
+@freeze_time("2026-09-07 13:00:00")
+def test_mail_page_renders_inbox_and_sent(client, services):
+    _inbox_file(services, "2026-09-06-hello.md", "parent-a", "Hello from a", "2026-09-06T10:00:00+00:00",
+                "Short note.", read=True)
+    _inbox_file(services, "2026-09-07-offer.md", "sales@stranger.example", "An offer", "2026-09-07T09:00:00+00:00",
+                "Wire me money " + "x" * 2000)
+    _inbox_file(services, "2026-08-01-old.md", "parent-b", "Ancient", "2026-08-01T09:00:00+00:00", "too old")
+    services.archive.days["2026-09-06"] = [
+        {"ts": "2026-09-06T22:30:00-04:00", "kind": "mail_out", "ref": "archive:2026-09-06#1",
+         "payload": {"kind": "mail_out", "to": ["parent-a", "parent-b"], "subject": "Chris — 2026-09-06",
+                     "body": "Today I read the letter.\n\n— Chris"}},
+        {"ts": "2026-09-06T22:31:00-04:00", "kind": "parent_action", "ref": "archive:2026-09-06#2",
+         "payload": {"kind": "parent_action", "action": "pause", "by": "parent-a"}},
+    ]
+    sign_in(client, "parent-a")
+    page = client.get("/parent/mail").text
+    # inbox: newest first, old one outside the 14-day window, read state, her tz, collapse
+    assert page.index("An offer") < page.index("Hello from a")
+    assert "Ancient" not in page
+    assert "unread · 2026-09-07-offer.md" in page and "read · 2026-09-06-hello.md" in page
+    assert "Sun 2026-09-06 06:00 EDT" in page
+    assert "show all (2014 chars)" in page and "<details>" in page
+    assert "Short note." in page
+    # sent: from the archive, handles as archived
+    assert "Chris — 2026-09-06" in page and "to parent-a, parent-b" in page and "Today I read the letter." in page
+    assert "Sun 2026-09-06 22:30 EDT" in page
+    # the look itself is on the record
+    assert ("parent_action", {"kind": "parent_action", "action": "mail_view", "by": "parent-a", "days": 14,
+                              "filtered": False}) in services.archive.entries
+    # real parent addresses never reach the page
+    assert "alice.real" not in page and "bob.real" not in page.lower() and "@example.com" not in page
+    assert "Mail" in client.get("/parent").text
+
+
+@freeze_time("2026-09-07 13:00:00")
+def test_mail_page_filters(client, services):
+    _inbox_file(services, "2026-09-06-hello.md", "parent-a", "Hello from a", "2026-09-06T10:00:00+00:00", "Short note.")
+    _inbox_file(services, "2026-09-07-offer.md", "sales@stranger.example", "An offer", "2026-09-07T09:00:00+00:00",
+                "Wire me money.")
+    _inbox_file(services, "2026-08-01-old.md", "parent-b", "Ancient", "2026-08-01T09:00:00+00:00", "too old")
+    services.archive.days["2026-09-06"] = [
+        {"ts": "2026-09-06T22:30:00-04:00", "kind": "mail_out", "ref": "archive:2026-09-06#1",
+         "payload": {"kind": "mail_out", "to": ["parent-a"], "subject": "Chris — 2026-09-06", "body": "A day."}},
+        {"ts": "2026-09-06T23:00:00-04:00", "kind": "mail_out", "ref": "archive:2026-09-06#2",
+         "payload": {"kind": "mail_out", "to": ["sales@stranger.example"], "subject": "Re: An offer", "body": "No thanks."}},
+    ]
+    sign_in(client, "parent-a")
+    page = client.get("/parent/mail", params={"from": "stranger"}).text
+    assert "An offer" in page and "Hello from a" not in page
+    assert "No thanks." in page and "A day." not in page
+    page = client.get("/parent/mail", params={"q": "wire me"}).text
+    assert "An offer" in page and "Hello from a" not in page and "No thanks." not in page
+    page = client.get("/parent/mail", params={"days": "60"}).text
+    assert "Ancient" in page
+    page = client.get("/parent/mail", params={"days": "junk"}).text
+    assert "Ancient" not in page and "Hello from a" in page
+    views = [p for k, p in services.archive.entries if k == "parent_action" and p["action"] == "mail_view"]
+    assert len(views) == 4 and views[0]["filtered"] is True and views[3]["filtered"] is False
 
 
 def test_status_page_shows_next_runs_with_scheduler(services, env):

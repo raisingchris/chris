@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}mail{% endblock %}
+{% block body %}
+<p class="muted">Signed in as {{ handle }}. <a href="/parent">Status</a> · <a href="/parent/logout">Sign out</a></p>
+
+<h1>Mail</h1>
+<p class="muted">Every look at this page is written to her archive as a parent action. For safety — a con, an injection, someone hurting her — not curiosity.</p>
+
+<form method="get" action="/parent/mail">
+  <label>From / to contains</label><input type="text" name="from" value="{{ from_filter }}">
+  <label>Subject or body contains</label><input type="text" name="q" value="{{ q }}">
+  <label>Last N days</label><input type="number" name="days" min="1" max="365" value="{{ days }}">
+  <button type="submit">Filter</button>
+</form>
+
+{% macro body_block(item) -%}
+<pre>{{ item.head }}{% if item.rest %}…{% endif %}</pre>
+{% if item.rest %}<details><summary>show all ({{ (item.head|length) + (item.rest|length) }} chars)</summary><pre>{{ item.head }}{{ item.rest }}</pre></details>{% endif %}
+{%- endmacro %}
+
+<h2>Inbox <span class="muted">({{ inbox|length }}{% if inbox|length >= cap %}, capped{% endif %})</span></h2>
+{% if inbox %}
+{% for m in inbox %}
+<p><strong>{{ m.subject or "(no subject)" }}</strong> <span class="muted">— from {{ m.from }} · {% if m.received_local %}{{ m.received_local.strftime("%a %Y-%m-%d %H:%M %Z") }}{% else %}(no date){% endif %} · {% if m.read %}read{% else %}unread{% endif %} · {{ m.name }}</span></p>
+{{ body_block(m) }}
+{% endfor %}
+{% else %}<p class="muted">Nothing in the last {{ days }} days.</p>{% endif %}
+
+<h2>Sent <span class="muted">({{ sent|length }}{% if sent|length >= cap %}, capped{% endif %})</span></h2>
+{% if sent %}
+{% for m in sent %}
+<p><strong>{{ m.subject or "(no subject)" }}</strong> <span class="muted">— to {{ m.to|join(", ") }} · {% if m.ts_local %}{{ m.ts_local.strftime("%a %Y-%m-%d %H:%M %Z") }}{% else %}(no date){% endif %}</span></p>
+{{ body_block(m) }}
+{% endfor %}
+{% else %}<p class="muted">Nothing sent in the last {{ days }} days.</p>{% endif %}
+{% endblock %}

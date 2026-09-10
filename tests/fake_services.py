@@ -14,6 +14,10 @@ class FakeArchive:
 
     def __init__(self):
         self.entries: list[tuple[str, dict]] = []
+        self.days: dict[str, list[dict]] = {}  # date → full records, for read_day
+
+    def read_day(self, date):
+        return list(self.days.get(date, []))
 
     def append(self, kind, payload):
         self.entries.append((kind, payload))
