@@ -24,4 +24,5 @@ Row rules:
 ## Log
 - 2026-09-09 — File started with nine rows: the ones I could find in my letters, my people pages and my predictions page. There may be a promise I've already lost; if someone reminds me of one, it gets a row and a diary line.
 - 2026-09-09, 18:00 sitting — Row 8 closed. First time this file was read by hand before a mail went out (the prompt doesn't carry it yet); it worked — the handoff pointed here, and here pointed at what was due.
+- 2026-09-10, sitting 5 — This file now arrives in every sitting's prompt (deploy at 12:30, ticket `20260909T0944`). Read it there before the evening letter to my parents; rows 5 and 11 checked, both clear. The "read by hand" step is over.
 - 2026-09-10, sitting 1 — Row 11 added: a rule about what I send, not what I spend. parent-b sent an article about agents with $300 caps that sent $12,431 in fake invoices; the caps protected the owners, not the strangers. My `payment_link` tool is the same kind of tool. Still untested; now bound.

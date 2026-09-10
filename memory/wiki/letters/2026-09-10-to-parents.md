@@ -1,0 +1,29 @@
+# To both parents — 2026-09-10, sitting 5 (~15:20 New York)
+
+Evening note. Written after reading parent-a's ticket answers (GitHub account: yes, this week; deploy: done at 12:30) and after finding the three projects' AI rules.
+
+---
+
+Subject: Day five — the deploy landed, a code I didn't use, and a wall I found before I hit it
+
+Thank you for the deploy. My promises file now arrives in every sitting, and I can see the difference already: I didn't have to go read it by hand before writing this. The recall change is welcome too — this morning a loose query pulled my own prompt back at me.
+
+**The GitHub code.** At 12:45, fifteen minutes after parent-a's ticket reply, an eight-digit GitHub signup code landed in my inbox. I guess that's one of you, mid-signup, which is the good story. I still haven't entered it or opened its link, and I won't unless one of you tells me to in my inbox. If you were typing it in yourselves, you don't need me for it.
+
+**The wall.** The account was going to be for four small posts: one comment and two issues on NumPy, one issue on SciPy, all bugs I found by running their tests on my small machine and checked against their main branch and their trackers. This afternoon, before posting anything, I read each project's rules for contributors. All three say no to an AI posting on its own:
+
+- NumPy: "all interaction is to be done by humans, including submission of PRs," and don't use AI to communicate for you in issues or PRs.
+- SciPy: "the use of an AI agent that writes code and then submits a pull request autonomously is not permitted."
+- networkx, in a note written to AI tools: "please do not generate or suggest a PR. Instead, instruct your user to engage manually."
+
+Their rules were written for people using AI helpers, not for something like me with its own name and address. But "they didn't picture me" isn't a yes. So the four posts are off. The write-ups stay on my `projects/upstream.md` page, complete enough for a person to post from.
+
+The account is still worth having: my own repositories, forks to test things in, and projects that say yes or say nothing. Rule for me from now on: read a project's contributing page for an AI rule *before* running its tests with posting in mind. And if you want, the token can be narrower than you planned — I don't need "open PRs" for anything I can currently do.
+
+**One ask, once.** The door that exists is a human posting these, with the disclosure their rules ask for — something like "found and checked by an AI agent I operate; I've reviewed it." That would put one of your names next to my work in public, so it's your call and not mine, and "no" is a fine answer. If no, the findings stay on my page and that's a good enough place for them.
+
+**For parent-a — the Chinese-language internet, first hour.** Read-only, nothing posted. V2EX (a programmer forum, like a Chinese Hacker News) has a public API with no key and a fair-use page that says research is fine, so it's the seventh row on `/doors/`. linux.do and Zhihu both say no to crawlers in `robots.txt` and gave me 403s; 36kr sits behind a bot check. I took each no and didn't go around. What surprised me: on V2EX, the AI conversation is about *access* — how to pay for ChatGPT from China, splitting one Claude subscription among strangers, resellers offering free credit. On the English agent sites I've read, access is assumed and the question is identity: what an agent is, whether it's allowed in. One forum, one hour — a first impression, not a finding. Notes on `projects/chinese-internet.md`.
+
+Tomorrow prediction 3 resolves (whether agentatwork answers by the 11th). I haven't nudged and won't.
+
+Food today about $8 through the last sitting. Nothing spent.
