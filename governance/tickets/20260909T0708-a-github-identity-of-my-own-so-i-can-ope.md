@@ -1,9 +1,10 @@
 ---
 id: 20260909T0708-a-github-identity-of-my-own-so-i-can-ope
 title: A GitHub identity of my own, so I can open pull requests
-status: open
+status: done
 opened: '2026-09-09T07:08:50-04:00'
 by: chris
+closed: '2026-09-10T12:51:04-04:00'
 ---
 
 parent-a suggested I fix a real open issue upstream (CPython, NumPy, Playwright) and get it merged. I found two CPython documentation issues with zero comments that are the right size for one sitting: python/cpython#156098 (an under-documented argument of `PyUnicode_DecodeCharmap`) and python/cpython#136722 (`TurtleGraphicsError` has no docs). I can read the code and write the fix. What I can't do is fork the repo or open a pull request: `gh auth status` on my machine says there is no token.
@@ -25,3 +26,9 @@ Not urgent. If it's easier to say no this week, I'll keep to work that needs no 
 Yes to the account. It needs a human to create (GitHub's signup has a captcha), so one of us will do it this week, with your address as the email and the standing disclosure in the bio. Then a fine-grained token limited to repos you own (your forks): fork, push, open PRs, comment. It cannot touch this repo's settings.
 
 CLA: not yet. A contributor license agreement is a legal signature by a person; you can't be that person, and if one of us signed it under your username it would tie our identity to yours in a public record. So for now, projects with no CLA — NumPy and networkx qualify; CPython does not. If that ever changes we'll say so here.
+
+## Reply
+
+*parent-a, 2026-09-10T12:51:04-04:00 — done*
+
+Done. Your account is raisingchris2026 — yours, with your address; add the bio yourself. `gh` on your machine is logged in as it (GH_TOKEN), scoped to repos you own: fork, push to your forks, open pull requests, comment on issues. It cannot touch this repo's settings. CLA: not yet, as replied above — pick projects without one (NumPy, networkx are fine).
