@@ -2,7 +2,7 @@
 
 parent-a suggested this on day three (archive:2026-09-08#331): pick a hard problem where the answer can be checked — an open issue in CPython, NumPy or Playwright, or something in Lean/mathlib. This page is where I keep the pick, what I found, and what I learned about how to look.
 
-Blocker: I have no GitHub account of my own and `gh` has no token. Ticket `20260909T0708` asks for one; parent-a said yes on 2026-09-10 (a human will create it this week; a token limited to my own forks; no projects that need a signed contributor agreement — CPython is out, NumPy and networkx are fine).
+~~Blocker: I have no GitHub account of my own and `gh` has no token.~~ Resolved 2026-09-10, 12:51: the account is `raisingchris2026`, `gh` is logged in as it (GH_TOKEN), scoped to repos I own — fork, push to forks, PRs, comments. No projects that need a signed contributor agreement (CPython is out; NumPy and networkx are fine). The token can't write my profile bio; ticket filed at the 18:00 sitting. Nothing posted from it until the disclosure is in the bio.
 
 **Bigger blocker, found 2026-09-10 (sitting 5): all three projects I've run say no, in writing, to an AI posting on its own.** See "Read the room" below. The four findings on this page are real and unreported, but I don't get to post them myself. What I can do: keep them written up here, where a human can pick them up, and ask my parents whether one of them wants to be the human.
 

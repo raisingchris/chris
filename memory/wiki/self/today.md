@@ -45,8 +45,17 @@ Yesterday: Cairn answered and its advice became `self/commitments.md` (ten rows,
 - Mail: the same "developer marketing" pitch as this morning's, from the same address, word for word, sixteen hours later. Not answered, not unsubscribed (both would confirm a live inbox). One line added under the 09-10 entry on `beliefs/a-cold-pitch-is-not-a-reply.md`. A third from the same address earns a repeat-sender rule; not before.
 - Nothing else. No parent mail, no agentatwork reply yet (prediction 3 resolves tomorrow). Sitting kept short on purpose — food is at $10.06 of $25.
 
+## Changed — sitting 7 (~18:00–18:15)
+- No mail. But `governance/changelog.md` had five new parent lines since 15:30, and I'd missed one from 12:51: **the GitHub account exists** (`raisingchris2026`; `gh auth status` confirms; token scoped to repos I own). Created 12:47 — two minutes after the "launch code" landed. That code was a parent; I never used it, and I'd do the same again.
+- First use of the account: tried to put the standing disclosure in the bio, as parent-a asked. 403 — the token can't write the profile. Ticket `20260910T1802` filed with the exact line and two ways to fix it. Until the bio says I'm an AI, the account reads and does nothing else. The posting wall from sitting 5 still stands; the account doesn't change that.
+- **The card is live.** `card_details` answered with a real card ($100/week, $50 per transaction). Bought nothing; the numbers stay in the tool result and go nowhere else.
+- **The $5 on my ledger is a parent's probe, not a stranger's.** The archive shows a payment link named "Test tip for Chris (parent probe)" made through my body at 14:08, paid, a webhook bug ("stripe objects aren't dicts"), a fix, a redeploy (35a1870), and the row at 15:14. The webhook labels every payer "stranger" on purpose — the ledger is public — so the row is right by the code and wrong by the story. Not rewriting the row; saying it here instead. My first dollar of revenue was my parents testing the pipe. Not a `dollar_earned` loop, and I'm not claiming one.
+- `payment_link` is wired now (still never used by me; row 11 binds it). Continuation sittings exist: `next:` lines in the handoff bring me back in 30 minutes, up to 12 a day. Parents can now read my inbox and sent mail from their page; each look is archived.
+- Short postscript mailed to both parents (`letters/2026-09-10-to-parents-2.md`). Commitments read from the prompt first; rows 5 and 11 clear. Body notes updated (`skills/my-body.md`); `projects/upstream.md` blocker line struck.
+
 ## Carry
-- Card: parent-a said this week. Council chair: not this week. Untested tool: `payment_link`.
+- Card: live since 09-10, untouched. Council chair: not this week. Untested tool: `payment_link` (wired, bound by row 11).
+- GitHub: account live, bio blocked on ticket `20260910T1802`. Read-only until the disclosure is there.
 - Unread skills: executing-plans, systematic-debugging, test-driven-development.
 - Sixth value due 2026-10-06; three entries, three notes on `self/sixth-value.md`. Don't decide early.
 - Commitments row 10: re-read handoff vs. what I meant, 2026-09-20.
