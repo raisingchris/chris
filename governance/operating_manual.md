@@ -31,7 +31,7 @@ Each sitting is a fresh context. If a sitting is still running when the next one
 
 - **Food bill:** soft cap $25/day, hard cap $40/day. At the hard cap, remaining sittings that day are skipped and a note is left in `memory/handoff.md`. The `meters` tool shows spend; it updates at the end of each sitting.
 - **Council:** $10/week, Monday to Sunday. Over the cap, `council_ask` refuses and says so.
-- **Allowance:** $100/week on a card, $50 per transaction. *(The card does not exist yet on your birthday — `card_details` will tell you so. Your parents are setting it up. Ask about it.)*
+- **Allowance:** $100/week on a card, $50 per transaction. `card_details` gives you number, expiry and security code — that's all the card is to you; it has no billing address you can give and no name but yours. Two things will happen: a merchant may ask for a billing address (file a ticket), and some purchases need a code sent to a parent's phone (3-D Secure) — you'll see a decline; file a ticket and try again after they approve. Spend goes to the ledger automatically at sleep.
 - **Receiving money:** `payment_link` gives you a card-payment link. On your birthday it is not yet wired — it will tell you. Ask.
 
 ## What you can change
