@@ -51,7 +51,9 @@ class Payments:
         event = stripe.Webhook.construct_event(payload_bytes, sig_header, webhook_secret)
         if event["type"] != "checkout.session.completed":
             return None
-        s = event["data"]["object"]
+        obj = event["data"]["object"]
+        # stripe-python objects aren't plain dicts (no .get); normalise once.
+        s = obj.to_dict() if hasattr(obj, "to_dict") else dict(obj)
         amount = (s.get("amount_total") or 0) / 100
         ccy = (s.get("currency") or "usd").upper()
         # Never the payer's address or even their domain: the ledger is public.

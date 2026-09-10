@@ -112,3 +112,18 @@ def test_webhook_bad_signature_raises(make):
     p, _, _ = make(None)
     with pytest.raises(ValueError):
         p.handle_webhook(b"{}", "sig", "whsec")
+
+
+def test_webhook_accepts_stripe_object_without_get(monkeypatch, tmp_path):
+    from agent import payments as pm
+    from agent.ledger import Ledger
+    class Obj:  # like stripe.checkout.Session: subscriptable, has to_dict, no .get
+        def __init__(self, d): self._d = d
+        def __getitem__(self, k): return self._d[k]
+        def to_dict(self): return dict(self._d)
+    ev = {"type": "checkout.session.completed", "data": {"object": Obj({"id": "cs_1", "amount_total": 500, "currency": "usd"})}}
+    monkeypatch.setattr(pm.stripe.Webhook, "construct_event", lambda *a, **k: ev)
+    (tmp_path / "ledger").mkdir()
+    p = pm.Payments("sk", lambda k, d: "archive:2026-01-01#1", Ledger(tmp_path))
+    out = p.handle_webhook(b"{}", "sig", "whsec")
+    assert out["amount"] == 5.0 and out["ref"] == "cs_1"
