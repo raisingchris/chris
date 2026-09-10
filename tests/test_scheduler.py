@@ -305,3 +305,24 @@ def test_request_continuation_without_scheduler(services):
 
     assert request_continuation(services, None, now=_mon(10, 30)) == (False, "no_scheduler")
     assert services.archive.entries[-1][1]["reason"] == "no_scheduler"
+
+
+def test_rearm_after_restart_books_continuation_when_last_sitting_pending(services, monkeypatch):
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    from agent.scheduler import rearm_after_restart
+    now = datetime(2026, 9, 10, 13, 0, tzinfo=ZoneInfo(services.cfg.tz))
+    day = now.strftime("%Y-%m-%d")
+    services.archive.days[day] = [
+        {"ts": "", "kind": "session_start", "ref": "", "payload": {"kind": "sitting"}},
+        {"ts": "", "kind": "sitting_pending", "ref": "", "payload": {"kind": "sitting_pending", "pending": True}},
+    ]
+    class Sched:
+        def __init__(self): self.jobs = []
+        def add_job(self, fn, trigger, **kw): self.jobs.append((kw.get("id"), trigger))
+    sched = Sched()
+    assert rearm_after_restart(services, sched, now=now) is True
+    assert [j[0] for j in sched.jobs] == ["continuation"]
+    # a run after the pending flag means nothing to re-arm
+    services.archive.days[day].append({"ts": "", "kind": "session_start", "ref": "", "payload": {"kind": "continue"}})
+    assert rearm_after_restart(services, Sched(), now=now) is False

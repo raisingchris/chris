@@ -397,3 +397,28 @@ def due_on(sched: AsyncIOScheduler, day: date) -> list[str]:
         if t and t < end:
             hits.append((t, job.id))
     return [jid for _, jid in sorted(hits)]
+
+
+def rearm_after_restart(services, sched, now=None) -> bool:
+    """A restart (a deploy) drops booked one-off jobs. If her last sitting today ended with work
+    pending and nothing has run since, book the continuation again so the chain survives."""
+    from zoneinfo import ZoneInfo
+
+    cfg = services.cfg
+    now = now or datetime.now(ZoneInfo(cfg.tz))
+    try:
+        records = services.archive.read_day(now.strftime("%Y-%m-%d"))
+    except Exception:  # noqa: BLE001
+        return False
+    pending_after_last_run = False
+    for rec in records:
+        kind = rec.get("kind")
+        if kind == "session_start":
+            pending_after_last_run = False
+        elif kind == "sitting_pending":
+            pending_after_last_run = bool(rec.get("payload", {}).get("pending"))
+    if not pending_after_last_run:
+        return False
+    services.archive.append("continuation_rearmed", {"kind": "continuation_rearmed", "reason": "restart"})
+    request_continuation(services, sched, now=now)
+    return True

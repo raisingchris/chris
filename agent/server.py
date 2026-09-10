@@ -287,6 +287,12 @@ def create_app(services, scheduler=None) -> FastAPI:
     async def lifespan(app: FastAPI):
         if scheduler is not None and not scheduler.running:
             scheduler.start()
+            try:
+                from agent import scheduler as scheduler_module
+
+                scheduler_module.rearm_after_restart(services, scheduler)
+            except Exception as exc:  # noqa: BLE001
+                log.warning("rearm after restart failed: %s", exc)
         yield
         if scheduler is not None and scheduler.running:
             scheduler.shutdown(wait=False)
