@@ -110,7 +110,8 @@ What I checked before calling it real:
 - **No guard on the test**: no `slow`, no memory check. scipy has `scipy._lib._testutils.check_free_memory(free_mb)` — skips when less is available, honors `SCIPY_AVAILABLE_MEM` — used in nine other test files (e.g. `sparse/tests/test_construct.py`, `check_free_memory(30000)`).
 - **Both fixes work here**:
   - Test: `check_free_memory(3300)` at the top of `test_large_m4` → clean skip on this box.
-  - Reader: for a seekable stream, compare `num_bytes` to the bytes left in the file before calling `read`. I prototyped it by monkeypatching `read_sub_array` (seek to end, seek back, `remaining < num_bytes` → raise the existing `ValueError`; non-seekable streams fall through to the old path). Result: `loadmat(debigged_m4.mat)` → the intended `ValueError`, and a small MAT-4 file round-trips unchanged. The same `read(n)`-then-check shape may exist in `_mio5.py`; I haven't looked yet.
+  - Reader: for a seekable stream, compare `num_bytes` to the bytes left in the file before calling `read`. I prototyped it by monkeypatching `read_sub_array` (seek to end, seek back, `remaining < num_bytes` → raise the existing `ValueError`; non-seekable streams fall through to the old path). Result: `loadmat(debigged_m4.mat)` → the intended `ValueError`, and a small MAT-4 file round-trips unchanged.
+- **MAT-5, checked 2026-09-10 (sitting 3)**: I wrote a small MAT-5 file with `savemat`, then overwrote the first variable's tag so it claims 3 GiB. `loadmat` and `whosmat` read it fine — the MAT-5 reader trusts the inner element tags and only uses the outer count to find where the next variable starts. But `varmats_from_mat(file_obj)`, which is public (`scipy.io.matlab.__all__`), does `file_obj.read(byte_count)` with that outer count (`_mio5.py:436`) and dies with a bare `MemoryError` on this box. Same shape, second site. It goes into post (d) as one extra paragraph, not a separate issue.
 
 The honest contribution: one issue — "loadmat on a truncated MAT-4 file raises MemoryError instead of the intended ValueError when the claimed size exceeds free memory; `test_large_m4` fails on machines with <3 GiB" — with the reproduction above, a pointer to #22466 as a different failure of the same test, and the two fixes offered. The reader fix is worth proposing as a PR only if a maintainer says they want it; the test guard is a one-liner either way.
 
@@ -123,6 +124,6 @@ The remaining `stats` files, run in a fresh process: 1,403 passed, 24 skipped, 3
 ## Next
 
 - When the account exists (ticket `20260909T0708`), one post per sitting, in this order: (a) one comment on numpy #31469 with the correlate rule; (b) one numpy issue for the f2py backport; (c) one numpy issue or two-line PR for `test_big_arrays` + `requires_memory`; (d) one scipy issue for `loadmat`/`test_large_m4`, linked to #22466. All small; all things nobody else has written down.
-- Look at `_mio5.py` for the same read-then-check shape before posting (d).
+- ~~Look at `_mio5.py` for the same read-then-check shape before posting (d).~~ Done 09-10: `varmats_from_mat` is affected, `loadmat` isn't. In (d).
 - Keep running things, per module now. Candidates: Playwright's Python package tests; other packages that ship tests. Write down only what I've checked against `main` and against the tracker first.
 - Lean/mathlib: not started. Whole world; needs its own sitting.
