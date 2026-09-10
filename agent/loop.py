@@ -1,7 +1,7 @@
 """A sitting: gate on pause and budget, compose the prompt, run, redact, commit.
 
 Kinds: birth (first ever), wake, sitting, sunday, mail (an extra sitting because
-mail arrived). Sleep lives in sleep.py.
+mail arrived), continue (the last sitting ended with work pending). Sleep lives in sleep.py.
 """
 
 from __future__ import annotations
@@ -17,12 +17,33 @@ from agent.paths import UnsafePath, safe_path
 log = logging.getLogger("chris.loop")
 
 PROMPTS = Path(__file__).parent / "prompts"
-KINDS = ("birth", "wake", "sitting", "sunday", "mail")
-# wake and mail use the sitting prompt; same shape of work, just first of the day / woken by mail.
+KINDS = ("birth", "wake", "sitting", "sunday", "mail", "continue")
+# wake, mail and continue use the sitting prompt; same shape of work, just first of the day /
+# woken by mail / picking up where the last one left off.
 PROMPT_FILE = {"birth": "birth.md", "wake": "sitting.md", "sitting": "sitting.md", "sunday": "sunday.md",
-               "mail": "sitting.md"}
+               "mail": "sitting.md", "continue": "sitting.md"}
 # One line the loop puts above the prompt file for some kinds (the prompt files stay generic).
-KIND_HEADER = {"mail": "You were woken by new mail."}
+KIND_HEADER = {
+    "mail": "You were woken by new mail.",
+    "continue": "You are continuing: your last sitting ended with work pending. Pick it up from the handoff.",
+}
+
+# Handoff lines that mean "there is more to do" / "there is not" (matched case-insensitively at line start).
+PENDING_PREFIXES = ("next:", "- [ ]", "todo:", "pending:")
+NOTHING_PENDING = ("nothing pending", "done for now", "no work pending")
+
+
+def handoff_has_pending(text: str) -> bool:
+    """Pure: does a handoff say work is still pending?
+
+    True when some line starts with ``next:``, ``- [ ]``, ``todo:`` or ``pending:`` and no line
+    is ``nothing pending`` / ``done for now`` / ``no work pending`` (all case-insensitive; a
+    trailing full stop is tolerated). The closing line wins, so she can stop the chain.
+    """
+    lines = [ln.strip().lower() for ln in (text or "").splitlines()]
+    if any(ln.rstrip(".!") in NOTHING_PENDING for ln in lines):
+        return False
+    return any(ln.startswith(PENDING_PREFIXES) for ln in lines)
 
 
 def _read(path: Path, repo: Path | None = None, archive=None) -> str:
@@ -198,4 +219,22 @@ async def run_sitting(services, kind: str = "sitting", query_fn=None, git_run=No
                                         "commit": sha, "transcript": result.transcript_ref})
     wiring.note_last_run(services.state_dir, "last_sitting_done", tz=archive.tz, kind=kind,
                          ok=failure is None and not result.soft_failed)
+    if failure is None:
+        pending = handoff_has_pending(_rread(services, repo / "memory" / "handoff.md"))
+        archive.append("sitting_pending", {"kind": "sitting_pending", "pending": pending})
+        if pending:
+            _request_continuation(services)
     return result
+
+
+def _request_continuation(services) -> None:
+    """Ask the clock for a sitting ``CONTINUATION_MINUTES`` out; a no-op without a scheduler, never raises."""
+    sched = getattr(services, "scheduler", None)
+    if sched is None:
+        return
+    try:
+        from agent import scheduler as scheduler_module
+
+        scheduler_module.request_continuation(services, sched)
+    except Exception as exc:  # noqa: BLE001 — the sitting is already committed; a continuation is a bonus
+        log.warning("continuation request failed: %s", exc)

@@ -10,6 +10,7 @@ ENV_KEYS = (
     "SOFT_USD", "HARD_USD", "COUNCIL_WEEKLY_USD", "PARENT_A_EMAIL", "PARENT_B_EMAIL",
     "CHRIS_EMAIL", "PARENT_HANDLES", "CHRIS_DRY_RUN", "REDACT_CANARIES", "CHRIS_MODEL",
     "STRIPE_WEBHOOK_SECRET", "CHRIS_BIRTHDAY", "MAX_TURNS", "SLEEP_MAX_TURNS", "DATAFORSEO_WEEKLY_USD",
+    "CONTINUATION_MINUTES", "CONTINUATIONS_PER_DAY",
 )
 
 _TRUE = {"1", "true", "yes", "on"}
@@ -43,6 +44,8 @@ class Config:
     birthday: str = ""  # ISO date of her first day, or empty to infer from the first diary
     max_turns: int = 150  # per sitting
     sleep_max_turns: int = 60
+    continuation_minutes: int = 30  # a sitting that ends with work pending is followed by another this soon
+    continuations_per_day: int = 12
 
     @classmethod
     def from_env(cls, env: dict[str, str] | None = None) -> "Config":
@@ -71,6 +74,8 @@ class Config:
             birthday=g("CHRIS_BIRTHDAY").strip(),
             max_turns=int(g("MAX_TURNS", "150")),
             sleep_max_turns=int(g("SLEEP_MAX_TURNS", "60")),
+            continuation_minutes=int(g("CONTINUATION_MINUTES", "30")),
+            continuations_per_day=int(g("CONTINUATIONS_PER_DAY", "12")),
         )
 
 

@@ -338,7 +338,7 @@ def create_app(services, scheduler=None) -> FastAPI:
     @app.get("/health")
     async def health():
         from agent import gitops, wiring
-        from agent.scheduler import mail_wakes_today
+        from agent.scheduler import continuations_today, mail_wakes_today
 
         runs = wiring.read_last_runs(state)
         try:
@@ -357,6 +357,7 @@ def create_app(services, scheduler=None) -> FastAPI:
             "last_sleep_done": runs.get("last_sleep_done"),
             "last_backup_done": runs.get("last_backup_done"),
             "mail_wakes_today": mail_wakes_today(state, now),
+            "continuations_today": continuations_today(state, now),
             "disk_free_mb": disk_free_mb,
             "unpushed": gitops.unpushed_count(repo),
             "git_sha": gitops.running_sha() or None,
@@ -437,7 +438,7 @@ def create_app(services, scheduler=None) -> FastAPI:
 
             runs = next_runs(scheduler)
         from agent import gitops
-        from agent.scheduler import mail_wakes_today
+        from agent.scheduler import continuations_today, mail_wakes_today
 
         running_sha, head_sha = gitops.running_sha(), gitops.head_sha(repo)
         open_tickets = [{**t, "excerpt": t["body"][:TICKET_EXCERPT] + ("…" if len(t["body"]) > TICKET_EXCERPT else "")}
@@ -455,6 +456,8 @@ def create_app(services, scheduler=None) -> FastAPI:
             "odometer": odometer,
             "unread": unread,
             "mail_wakes_today": mail_wakes_today(state, datetime.now(ZoneInfo(cfg.tz))),
+            "continuations_today": continuations_today(state, datetime.now(ZoneInfo(cfg.tz))),
+            "continuations_cap": cfg.continuations_per_day,
             "diary": diary,
             "proposals": proposals,
             "unsealed": unsealed,

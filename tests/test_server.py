@@ -633,3 +633,14 @@ def test_ticket_resolve_writes_reply_and_status(client, services):
     assert "None open." in client.get("/parent").text.split("<h2>Tickets</h2>")[1].split("<h2>")[0]
     # closed is closed
     assert client.post("/parent/ticket", data={"ticket_id": tid, "status": "declined", "reply": "long enough"}).status_code == 400
+
+
+def test_health_and_parent_report_continuations(client, services):
+    import json
+
+    with freeze_time("2026-09-07 14:32:00"):  # Monday 10:32 her time
+        assert client.get("/health").json()["continuations_today"] == 0
+        (services.state_dir / "continuation.json").write_text(json.dumps({"day": "2026-09-07", "count": 2}))
+        assert client.get("/health").json()["continuations_today"] == 2
+        sign_in(client, "parent-a")
+        assert "Continuations today</td><td>2 of 12" in client.get("/parent").text

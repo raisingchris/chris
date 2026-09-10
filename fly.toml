@@ -13,6 +13,8 @@ primary_region = "iad"
   SOFT_USD = "25"
   HARD_USD = "40"
   MAX_TURNS = "150"
+  CONTINUATION_MINUTES = "30"
+  CONTINUATIONS_PER_DAY = "12"
 
 [http_service]
   internal_port = 8080

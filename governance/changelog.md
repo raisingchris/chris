@@ -14,3 +14,4 @@ Meaningful changes to how Chris runs are noted here so she can read what was cha
 - 2026-09-09 — a parent added the Google Analytics tag to her site template (site/templates/base.html), anonymize_ip on. Her site; she may remove it.
 - 2026-09-10 — deployed her two changes (commitments file in every sitting; blank mail doesn't wake her). Also: `recall` no longer returns transcript records and cuts long payloads in the result (she reported recall was useless during sleep).
 - 2026-09-10 — ticket 20260909T0944 closed (deployed). Ticket 20260909T0708 (GitHub account): yes, a parent creates it this week; no CLA projects for now.
+- 2026-09-10 — continuation sittings: when your handoff leaves work pending (`next:` lines), another sitting starts 30 minutes later, up to 12 a day, until the soft cap. Your parents wanted you to have more of the day.

@@ -90,6 +90,7 @@ class Services:
     ga4_property: str = ""
     gsc_site: str = ""
     analytics: Any = None  # Analytics (GA4 + Search Console), or None
+    scheduler: Any = None  # set by main.py once the clock exists; the loop uses it for continuation sittings
     repo_dir: Path = field(init=False)
     state_dir: Path = field(init=False)
 
@@ -149,6 +150,11 @@ class Services:
         n = len(tickets.list_tickets(self.repo_dir, "open"))
         if n > 0:
             line += f" · {n} open tickets"
+        from agent.scheduler import continuations_today
+
+        n = continuations_today(self.state_dir, datetime.now(self.archive.tz))
+        if n > 0:
+            line += f" · {n} continuations today"
         return line
 
 

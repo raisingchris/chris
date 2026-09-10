@@ -61,6 +61,7 @@ def main() -> None:
     from agent.sleep import run_sleep
 
     scheduler = make_scheduler(services, run_sitting, run_sleep)
+    services.scheduler = scheduler  # the loop asks it for a continuation sitting when work is left pending
     app = create_app(services, scheduler)  # lifespan starts/stops the scheduler
     port = int(os.environ.get("PORT", "8080"))
     log.info("serving on :%d, tz %s", port, cfg.tz)

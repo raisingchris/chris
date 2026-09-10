@@ -10,6 +10,12 @@ commits land before she wakes, and ``council.unseal_due()`` at 07:05. A third,
 Mail wakes her too: when the Resend webhook ingests a message, ``request_mail_wake``
 adds a one-off ``mail`` sitting a minute out — at most one per 30 minutes and six a
 day, never in sleep hours or just before a scheduled sitting (see ``mail_wake_decision``).
+
+Continuations: when a sitting ends with work still pending in ``memory/handoff.md``,
+the loop calls ``request_continuation`` and the next sitting starts
+``CONTINUATION_MINUTES`` later instead of at the next clock slot — up to
+``CONTINUATIONS_PER_DAY``, never in sleep hours, past the soft cap, or within 45
+minutes of a scheduled sitting or sleep (see ``continuation_decision``).
 """
 
 from __future__ import annotations
@@ -46,6 +52,10 @@ MAIL_WAKE_DAILY_CAP = 6
 MAIL_WAKE_NEAR = timedelta(minutes=20)  # skip if a scheduled sitting/sleep is this close
 MAIL_WAKE_SLEEP_FROM = time(22, 0)
 MAIL_WAKE_SLEEP_TO = time(7, 0)
+
+# Continuation sittings (her timezone).
+CONTINUATION_FILE = "continuation.json"
+CONTINUATION_NEAR = timedelta(minutes=45)  # skip if a scheduled sitting/sleep is this close: it will pick the work up
 
 
 def _hm(s: str) -> tuple[int, int]:
@@ -263,6 +273,104 @@ def request_mail_wake(services, sched, run_sitting=None, now: datetime | None = 
                   DateTrigger(run_date=when), id="mail-wake", name="mail wake", replace_existing=True, **JOB_DEFAULTS)
     services.archive.append("mail_wake", {"kind": "mail_wake", "at": when.isoformat(timespec="seconds"),
                                           "n_today": count + 1})
+    return True, "ok"
+
+
+# --- continuation sittings -----------------------------------------------------
+
+
+def _continuation_path(state_dir: str | Path) -> Path:
+    return Path(state_dir) / CONTINUATION_FILE
+
+
+def read_continuation_state(state_dir: str | Path) -> dict:
+    """``{"day": "YYYY-MM-DD", "count": n}``; empty when never fired."""
+    try:
+        data = json.loads(_continuation_path(state_dir).read_text() or "null")
+    except (OSError, json.JSONDecodeError):
+        data = None
+    return data if isinstance(data, dict) else {}
+
+
+def continuations_today(state_dir: str | Path, now: datetime) -> int:
+    """Continuation sittings scheduled so far today (her tz)."""
+    state = read_continuation_state(state_dir)
+    return int(state.get("count", 0)) if state.get("day") == now.date().isoformat() else 0
+
+
+def continuation_decision(now: datetime, state: dict, cfg, born: bool, paused: bool,
+                          spent_today: float, soft_usd: float) -> tuple[bool, str]:
+    """Pure: may a sitting ending at ``now`` (her tz) with work pending be followed by another?
+
+    ``state`` is the ``continuation.json`` dict. Reasons: unborn, paused, sleep_hours,
+    soft_cap, near_scheduled, daily_cap, ok.
+    """
+    if not born:
+        return False, "unborn"
+    if paused:
+        return False, "paused"
+    t = now.time().replace(second=0, microsecond=0)
+    if t >= MAIL_WAKE_SLEEP_FROM or t < MAIL_WAKE_SLEEP_TO:
+        return False, "sleep_hours"
+    if spent_today >= soft_usd:
+        return False, "soft_cap"
+    for st in _scheduled_times(cfg):
+        due = now.replace(hour=st.hour, minute=st.minute, second=0, microsecond=0)
+        if now <= due < now + CONTINUATION_NEAR:
+            return False, "near_scheduled"
+    today = now.date().isoformat()
+    count = int(state.get("count", 0)) if state.get("day") == today else 0
+    if count >= int(getattr(cfg, "continuations_per_day", 12)):
+        return False, "daily_cap"
+    return True, "ok"
+
+
+def _spent_today(services) -> float:
+    """Today's food bill from the inference meter (``services.inference`` or ``services.meters``)."""
+    meter = getattr(services, "inference", None) or getattr(services, "meters", {}).get("inference")
+    try:
+        return float(meter.spent()) if meter is not None else 0.0
+    except Exception:  # noqa: BLE001
+        return 0.0
+
+
+def request_continuation(services, sched, run_sitting=None, now: datetime | None = None) -> tuple[bool, str]:
+    """Called by the loop when a sitting ends with work pending in the handoff.
+
+    If ``continuation_decision`` allows it, adds (or replaces) the one-off ``continuation``
+    job ``cfg.continuation_minutes`` out and counts it in ``continuation.json``;
+    otherwise archives ``continuation_skipped`` with the reason.
+    """
+    cfg = services.cfg
+    tz = ZoneInfo(cfg.tz)
+    now = now or datetime.now(tz)
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=tz)
+    if sched is None:
+        services.archive.append("continuation_skipped", {"kind": "continuation_skipped", "reason": "no_scheduler"})
+        return False, "no_scheduler"
+    if run_sitting is None:
+        from agent import loop
+
+        run_sitting = loop.run_sitting
+    state = read_continuation_state(cfg.state_dir)
+    ok, reason = continuation_decision(now, state, cfg, born(services), pause.is_paused(cfg.state_dir),
+                                       _spent_today(services), cfg.soft_usd)
+    if not ok:
+        log.info("continuation skipped: %s", reason)
+        services.archive.append("continuation_skipped", {"kind": "continuation_skipped", "reason": reason})
+        return False, reason
+    today = now.date().isoformat()
+    count = int(state.get("count", 0)) if state.get("day") == today else 0
+    path = _continuation_path(cfg.state_dir)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"day": today, "count": count + 1}, indent=1))
+    when = now + timedelta(minutes=int(getattr(cfg, "continuation_minutes", 30)))
+    sched.add_job(guarded(services, run_sitting, services, "continue", name="continuation"),
+                  DateTrigger(run_date=when), id="continuation", name="continuation", replace_existing=True,
+                  **JOB_DEFAULTS)
+    services.archive.append("continuation", {"kind": "continuation", "at": when.isoformat(timespec="seconds"),
+                                             "n_today": count + 1})
     return True, "ok"
 
 

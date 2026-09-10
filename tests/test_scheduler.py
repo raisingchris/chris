@@ -238,3 +238,70 @@ def test_request_mail_wake_without_scheduler(services):
 
     assert request_mail_wake(services, None, now=_mon(10, 30)) == (False, "no_scheduler")
     assert services.archive.entries[-1][1]["reason"] == "no_scheduler"
+
+
+# --- continuation sittings ------------------------------------------------------
+
+
+def test_continuation_decision(services):
+    from agent.scheduler import continuation_decision as d
+
+    cfg = services.cfg
+    ok = dict(born=True, paused=False, spent_today=5.0, soft_usd=25.0)
+    assert d(_mon(10, 30), {}, cfg, **ok) == (True, "ok")
+    assert d(_mon(10, 30), {}, cfg, **{**ok, "born": False}) == (False, "unborn")
+    assert d(_mon(10, 30), {}, cfg, **{**ok, "paused": True}) == (False, "paused")
+    # sleep hours 22:00–07:00
+    assert d(_mon(22, 0), {}, cfg, **ok) == (False, "sleep_hours")
+    assert d(_mon(3, 0), {}, cfg, **ok) == (False, "sleep_hours")
+    assert d(_mon(7, 0), {}, cfg, **ok)[0] is True
+    # at or past the soft cap the chain stops
+    assert d(_mon(10, 30), {}, cfg, **{**ok, "spent_today": 25.0}) == (False, "soft_cap")
+    assert d(_mon(10, 30), {}, cfg, **{**ok, "spent_today": 24.99})[0] is True
+    # within 45 minutes of a scheduled sitting or sleep, the clock one picks the work up
+    assert d(_mon(11, 16), {}, cfg, **ok) == (False, "near_scheduled")  # 12:00 sitting
+    assert d(_mon(11, 14), {}, cfg, **ok)[0] is True
+    assert d(_mon(12, 0), {}, cfg, **ok) == (False, "near_scheduled")
+    assert d(_mon(12, 1), {}, cfg, **ok)[0] is True
+    assert d(_mon(21, 20), {}, cfg, **ok) == (False, "near_scheduled")  # 22:00 sleep
+    # daily cap of twelve, reset the next day
+    state = {"day": "2026-09-07", "count": 12}
+    assert d(_mon(10, 30), state, cfg, **ok) == (False, "daily_cap")
+    assert d(_mon(10, 30), {**state, "count": 11}, cfg, **ok) == (True, "ok")
+    assert d(_mon(10, 30) + __import__("datetime").timedelta(days=1), state, cfg, **ok) == (True, "ok")
+    small = make_services(Path(services.cfg.state_dir).parent / "small", continuations_per_day=2).cfg
+    assert d(_mon(10, 30), {"day": "2026-09-07", "count": 2}, small, **ok) == (False, "daily_cap")
+
+
+async def test_request_continuation_adds_one_off_job_and_counts(services, calls):
+    from agent.scheduler import continuations_today, read_continuation_state, request_continuation
+
+    fs = FakeSched()
+    assert request_continuation(services, fs, run_sitting=calls.run_sitting, now=_mon(10, 30)) == (True, "ok")
+    fn, trigger, kw = fs.jobs[-1]
+    assert kw["id"] == "continuation" and kw["replace_existing"] is True and kw["misfire_grace_time"] == 600
+    assert trigger.run_date == _mon(11, 0)
+    await fn()
+    assert calls.sittings == ["continue"]
+    assert read_continuation_state(services.cfg.state_dir) == {"day": "2026-09-07", "count": 1}
+    assert continuations_today(services.cfg.state_dir, _mon(11, 5)) == 1
+    assert continuations_today(services.cfg.state_dir, _mon(11, 5).replace(day=8)) == 0
+    assert services.archive.entries[-1][1] == {"kind": "continuation", "at": "2026-09-07T11:00:00-04:00", "n_today": 1}
+
+    # over the soft cap → skipped and archived
+    services.meters["inference"]._spent = 30.0
+    assert request_continuation(services, fs, run_sitting=calls.run_sitting, now=_mon(11, 5)) == (False, "soft_cap")
+    assert len(fs.jobs) == 1
+    assert services.archive.entries[-1][1] == {"kind": "continuation_skipped", "reason": "soft_cap"}
+    services.meters["inference"]._spent = 4.2
+
+    # paused → skipped
+    pause.trigger(services, "Runaway loop, condition 4.", "parent-a")
+    assert request_continuation(services, fs, run_sitting=calls.run_sitting, now=_mon(11, 5)) == (False, "paused")
+
+
+def test_request_continuation_without_scheduler(services):
+    from agent.scheduler import request_continuation
+
+    assert request_continuation(services, None, now=_mon(10, 30)) == (False, "no_scheduler")
+    assert services.archive.entries[-1][1]["reason"] == "no_scheduler"
