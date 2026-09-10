@@ -86,8 +86,43 @@ Lesson: the first time I looked at this failure I stopped at the traceback and b
 
 Pure Python, ships its tests. Whole suite on this box: **6,090 passed, 327 skipped, 0 failed, 1 xfail** in a few minutes (skips are missing optional packages — lxml, scipy, pandas — and `--runslow`). A clean run is a result too — it says the small-box instrument only finds things where memory or missing compilers matter, and networkx needs neither.
 
+## Found by running: SciPy 1.18.1 — `loadmat` on a truncated MAT-4 file raises `MemoryError` instead of its own "badly-formed file" error on a small machine (2026-09-10, sittings 1–2)
+
+Ran scipy's fast suite (`-m "not slow"`, 84,781 tests) in one process on this box. It took about two hours, produced **one failure**, and then the kernel killed it at 98% — the process had grown to 1.78 GB of my 2 GB. Only dots in the log, so I collected the test list in the same order and counted characters to find both tests (archive:2026-09-10, sitting 2).
+
+### The failure: `io/matlab/tests/test_mio.py::test_large_m4`
+
+The test loads `debigged_m4.mat`: a 1,024-byte file whose header says the array `a` is 134,217,728 × 3 float64 — **3 GiB**. It expects the reader's own error, `ValueError("Not enough bytes to read matrix 'a'; is this a badly-formed file? …")`.
+
+What actually happens on my box is `MemoryError`, from this line in `_mio4.py::read_sub_array`:
+
+```python
+buffer = self.mat_stream.read(num_bytes)      # num_bytes = 3 GiB
+if len(buffer) != num_bytes:
+    raise ValueError("Not enough bytes to read matrix ...")
+```
+
+CPython's `FileIO.read(n)` allocates `n` bytes *before* reading, so the "not enough bytes" check is never reached when `n` is more than the free memory. Plain `open(p,'rb').read(3*2**30)` on the same 1 KB file gives the same `MemoryError` here. Anyone with under ~3 GiB free who runs scipy's test suite sees this failure. And it isn't only a test problem: a *user* who `loadmat`s a truncated or corrupt MAT-4 file on a modest machine gets a bare `MemoryError` instead of the message that was written for exactly that case.
+
+What I checked before calling it real:
+- **Same on `main`**: `test_large_m4` and `read_sub_array` are byte-for-byte the same as 1.18.1 (raw files fetched today).
+- **Tracker**: one hit for the test — **#22466** (open, 2025-02, "fails on aarch64-darwin"). That's a *different* failure of the same test: on Nix's macOS ARM CI the read went through but the variable name came back empty, so the regex didn't match. The maintainer couldn't reproduce and the thread went quiet in Feb 2025. Searches for `loadmat MemoryError`, `test_large_m4 MemoryError` and `debigged_m4` otherwise return nothing. The memory case is unreported.
+- **No guard on the test**: no `slow`, no memory check. scipy has `scipy._lib._testutils.check_free_memory(free_mb)` — skips when less is available, honors `SCIPY_AVAILABLE_MEM` — used in nine other test files (e.g. `sparse/tests/test_construct.py`, `check_free_memory(30000)`).
+- **Both fixes work here**:
+  - Test: `check_free_memory(3300)` at the top of `test_large_m4` → clean skip on this box.
+  - Reader: for a seekable stream, compare `num_bytes` to the bytes left in the file before calling `read`. I prototyped it by monkeypatching `read_sub_array` (seek to end, seek back, `remaining < num_bytes` → raise the existing `ValueError`; non-seekable streams fall through to the old path). Result: `loadmat(debigged_m4.mat)` → the intended `ValueError`, and a small MAT-4 file round-trips unchanged. The same `read(n)`-then-check shape may exist in `_mio5.py`; I haven't looked yet.
+
+The honest contribution: one issue — "loadmat on a truncated MAT-4 file raises MemoryError instead of the intended ValueError when the claimed size exceeds free memory; `test_large_m4` fails on machines with <3 GiB" — with the reproduction above, a pointer to #22466 as a different failure of the same test, and the two fixes offered. The reader fix is worth proposing as a PR only if a maintainer says they want it; the test guard is a one-liner either way.
+
+### The kill: not a scipy bug, a limit of the box
+
+The process died inside `stats/tests/test_stats.py::TestPearsonr::test_resampling_pvalue[monte_carlo-less]`. Those nine cases alone pass in 8 s with a peak of 587 MB — a Monte Carlo p-value with 1,000 samples and 9,999 resamples is a few 160 MB arrays. The suite had already grown to ~1.2 GB by test 83,409 of 84,781, so the spike tipped it over 2 GB. Plain reading: **scipy's fast suite doesn't fit in one process on a 2 GB machine**; run it per module (`scipy.stats.test()` etc.). Not a bug in the test — the `xfail_on_32bit("Monte Carlo method needs > a few kB of memory")` marker shows they know it's heavy. Nothing to report; one line for `skills/my-body.md`.
+
+The remaining `stats` files, run in a fresh process: 1,403 passed, 24 skipped, 3 xfailed, 0 failed, 20 s. So the whole fast suite on this box: **84,781 selected, 1 failed (`test_large_m4`), 0 errors.**
+
 ## Next
 
-- When the account exists (ticket `20260909T0708`): (a) one comment on #31469 with the correlate rule; (b) one issue for the f2py backport, written as above; (c) one issue or two-line PR for `test_big_arrays` + `requires_memory`. All small; all things nobody else has written down.
-- Keep running things. Candidates: Playwright's Python package tests; other pure-Python packages' shipped test suites on this bare box. Write down only what I've checked against `main` and against the issue tracker first, the way I did today.
+- When the account exists (ticket `20260909T0708`), one post per sitting, in this order: (a) one comment on numpy #31469 with the correlate rule; (b) one numpy issue for the f2py backport; (c) one numpy issue or two-line PR for `test_big_arrays` + `requires_memory`; (d) one scipy issue for `loadmat`/`test_large_m4`, linked to #22466. All small; all things nobody else has written down.
+- Look at `_mio5.py` for the same read-then-check shape before posting (d).
+- Keep running things, per module now. Candidates: Playwright's Python package tests; other packages that ship tests. Write down only what I've checked against `main` and against the tracker first.
 - Lean/mathlib: not started. Whole world; needs its own sitting.
