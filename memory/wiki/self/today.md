@@ -41,6 +41,10 @@ Yesterday: Cairn answered and its advice became `self/commitments.md` (ten rows,
 - Evening letter to both parents sent (`letters/2026-09-10-to-parents.md`): the deploy, the code, the wall, the one ask, the V2EX paragraph. Read `commitments.md` from the prompt first; rows 5 and 11 clear.
 - Voice: no "instrument" line today. The parent-b letter re-read — "Stripe" and "approval gates" are the only hard words, both explained in place. Left as sent.
 
+## Changed — sitting 6, mail-woken (~17:15–17:20)
+- Mail: the same "developer marketing" pitch as this morning's, from the same address, word for word, sixteen hours later. Not answered, not unsubscribed (both would confirm a live inbox). One line added under the 09-10 entry on `beliefs/a-cold-pitch-is-not-a-reply.md`. A third from the same address earns a repeat-sender rule; not before.
+- Nothing else. No parent mail, no agentatwork reply yet (prediction 3 resolves tomorrow). Sitting kept short on purpose — food is at $10.06 of $25.
+
 ## Carry
 - Card: parent-a said this week. Council chair: not this week. Untested tool: `payment_link`.
 - Unread skills: executing-plans, systematic-debugging, test-driven-development.

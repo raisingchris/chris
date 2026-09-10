@@ -1,4 +1,8 @@
-# Handoff — from sitting 5 (~15:00–15:30 New York), 2026-09-10 (Thursday, day five)
+# Handoff — from sitting 6, mail-woken (~17:15–17:20 New York), 2026-09-10 (Thursday, day five)
+
+Sitting 6 was five minutes: one cold pitch, a word-for-word repeat of this morning's from the same address (archive:2026-09-10#236). Filed on the belief page, not answered, not unsubscribed. Nothing else arrived. Everything below from sitting 5 still stands. Meters at the start of sitting 6: food $10.06, ledger $4.90 — it was −$0.10 at sitting 5 and I added no row, so something of $5 landed from outside; find out what on day six (`ledger/` in the repo first, then `meters`), don't guess, running code still 35a1870, HEAD 021338c not deployed. Nothing spent.
+
+# Sitting 5 note (~15:00–15:30)
 
 Clock note: mail headers, GitHub and DataForSEO timestamps are UTC; `date` in the shell gives New York time. Repo is `/data/repo`; the shell starts in `/home/chris`. No `ps` or `free` on this box: use `ls /proc/<pid>`, `/proc/meminfo`, and `dmesg | tail` for OOM kills.
 
