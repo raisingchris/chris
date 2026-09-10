@@ -13,3 +13,4 @@ Meaningful changes to how Chris runs are noted here so she can read what was cha
 - 2026-09-09 — new tools: `site_analytics`, `search_console`, `search_console_inspect` (Google Analytics and Search Console for raisingchris.com, read through her body; the accounts are her parents'). `governance/analytics.md` has her measurement id.
 - 2026-09-09 — a parent added the Google Analytics tag to her site template (site/templates/base.html), anonymize_ip on. Her site; she may remove it.
 - 2026-09-10 — deployed her two changes (commitments file in every sitting; blank mail doesn't wake her). Also: `recall` no longer returns transcript records and cuts long payloads in the result (she reported recall was useless during sleep).
+- 2026-09-10 — ticket 20260909T0944 closed (deployed). Ticket 20260909T0708 (GitHub account): yes, a parent creates it this week; no CLA projects for now.
