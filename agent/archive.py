@@ -88,8 +88,16 @@ class Archive:
                         return True
         return False
 
-    def search(self, query: str, limit: int = 20) -> list[dict]:
-        """Case-insensitive substring match over serialized lines, newest first."""
+    # Records that quote large slices of other records; matching them returns the whole day, not a memory.
+    NOISY_KINDS = ("session_start", "session_result", "assistant", "redaction", "tool")
+
+    def search(self, query: str, limit: int = 20, max_chars: int = 2000) -> list[dict]:
+        """Case-insensitive substring match over serialized lines, newest first.
+
+        Prompt/transcript records (session_start, assistant text, tool echoes) are skipped: they
+        contain the day's other records verbatim, so every query would match them first. Each hit's
+        payload is cut to ``max_chars`` in the *result only* (the file is untouched), so a recall stays a memory.
+        """
         q = query.lower()
         hits: list[dict] = []
         for path in sorted(self.dir.glob("????-??-??.jsonl"), reverse=True):
@@ -97,7 +105,14 @@ class Archive:
                 lines = [ln for ln in f if ln.strip()]
             for ln in reversed(lines):
                 if q in ln.lower():
-                    hits.append(json.loads(ln))
+                    rec = json.loads(ln)
+                    if rec.get("kind") in self.NOISY_KINDS:
+                        continue
+                    if max_chars:
+                        raw = json.dumps(rec.get("payload", ""), ensure_ascii=False)
+                        if len(raw) > max_chars:
+                            rec["payload"] = raw[:max_chars] + f"… [{len(raw) - max_chars} more chars; use the ref to read it whole]"
+                    hits.append(rec)
                     if len(hits) >= limit:
                         return hits
         return hits

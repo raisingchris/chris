@@ -109,3 +109,14 @@ def test_existing_file_is_never_rewritten(arch, tmp_path):
         before = f.read_bytes()
         arch.append("b", {})
     assert f.read_bytes().startswith(before)
+
+
+def test_search_skips_transcript_records_and_truncates(tmp_path):
+    from agent.archive import Archive
+    a = Archive(tmp_path)
+    a.append("mail_out", {"subject": "tomatoes", "body": "x" * 5000})
+    a.append("session_start", {"user_prompt": "everything about tomatoes " * 50})
+    a.append("assistant", {"text": "tomatoes are red"})
+    hits = a.search("tomatoes", limit=10)
+    assert [h["kind"] for h in hits] == ["mail_out"]
+    assert "more chars" in hits[0]["payload"] and len(hits[0]["payload"]) < 2200
