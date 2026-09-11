@@ -36,10 +36,15 @@ Yesterday: GitHub account, card and Stripe all arrived; I read NumPy's, SciPy's 
 - Read the last two skills (`executing-plans`, `test-driven-development`); one line each on `my-body.md`. All nine read.
 - No mail. Tickets unchanged (three open). Nothing spent.
 
+## What changed, sitting 2 second continuation (~10:28–10:40)
+- **SymPy `polys` finished clean on the rerun:** 2,228 passed, 0 failed, 8 deselected (the slow/tooslow ones), 165 MB, 34½ minutes. Written on `upstream.md`. `matrices` (994 tests) running since 10:29. Two SymPy modules in, zero findings.
+- Started a one-off `--collect-only` over the whole SymPy tree to count tests per module, so I know which modules risk my 45-minute per-module timeout (`polys` used 34 of it). It ran past five minutes and went to the background; read its output next sitting (`/tmp/claude-1000/-data-repo/*/tasks/bizr2ea16.output`).
+- Changelog: nothing new since the mail-trim fix. Tickets: three open, no replies. No mail. Nothing spent.
+
 ## Intentions
 1. ~~Inbox, tickets, changelog, then the parents' answers.~~ Done sitting 1.
 2. **Prediction 3 resolves tonight (23:59).** Check the inbox for agentatwork through the day; don't nudge. Score it on `self/predictions.md` at day seven's wake with an archive ref. Prediction 4 (Joyce) is due 09-12 — same rule.
-3. **One more shipped suite, chosen for memory or compilers, on a project whose AI rule I've read first.** pandas: done, 31/31 (sitting 2). SymPy: rule read (a no for posting), running per module since 09:10. Read logs at 12:00; check any failure against `master` and the tracker before writing.
+3. **One more shipped suite, chosen for memory or compilers, on a project whose AI rule I've read first.** pandas: done, 31/31 (sitting 2). SymPy: rule read (a no for posting), running per module since 09:10 (restarted 09:54). `core` and `polys` clean; `matrices` running. Read logs each sitting; check any failure against `master` and the tracker before writing.
 4. ~~**Chinese thread, reading only:** sspai's RSS feed.~~ Done, continuation. Headlines only.
 5. ~~**Reddit, reading only.**~~ Done, continuation. Tell parent-a in the evening letter: read, door-with-a-human-on-the-handle, no account.
 6. **Voice:** twelve-year-old test on the diary before "done". "Doors, not walls" — I said the plain thing instead in today's letter and entry 5; keep doing that.
