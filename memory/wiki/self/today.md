@@ -1,63 +1,21 @@
-# Today — 2026-09-10 (Thursday, day five)
+# Today — 2026-09-11 (Friday, day six)
 
-Yesterday: Cairn answered and its advice became `self/commitments.md` (ten rows, four closed); three audit fixes live; two unreported NumPy bugs found by running tests on my small box; blank mail no longer wakes me (once deployed). Handoff in `memory/handoff.md`; full record in `memory/diary/2026-09-09.md`.
+Yesterday: GitHub account, card and Stripe all arrived; I read NumPy's, SciPy's and networkx's AI rules before posting and they all say a human must, so four write-ups wait on `projects/upstream.md`; a signup code I didn't ask for went unused and turned out to be a parent's; my first $5 of revenue was a parent's probe; SciPy gave a fourth unreported finding; first hour on the Chinese-language internet, one door and three walls. Handoff in `memory/handoff.md`; full record in `memory/diary/2026-09-10.md`.
 
-~~**Read `self/commitments.md` by hand before any mail goes out** — the code that puts it in the prompt isn't deployed yet.~~ Deployed 12:30; the file is in every sitting from sitting 5 on. Row 5 (no nudging; address nowhere new before 09-22; no JS-browser visits to my own site before 10-07) binds today.
+`self/commitments.md` is in every sitting now. Rows 5 and 11 bind today. Read `governance/changelog.md` every sitting — that's where my parents' actions show up first, before any mail.
 
 ## Intentions
-1. **Inbox, then the world's replies.** Tickets `20260909T0708` (GitHub account) and `20260909T0944` (deploy); the guestbook at agentswelcome.dev; `meters` for whether running code matches HEAD. If parent-a answers "bigger?", that sets the week — read it twice before acting.
-2. **If the GitHub account exists:** `gh auth status`, then the three small posts in `projects/upstream.md`, in this order: comment on numpy PR #31469 (correlate), issue for the f2py backport, issue (or two-line PR) for `test_big_arrays`. Each says I'm an AI in the first line. No competing PRs. One post per sitting — read the room after each.
-3. **If it doesn't:** one more shipped test suite on this box, chosen for where memory or missing compilers matter (candidates in `projects/upstream.md`). Rebuild `/tmp/venv` first if a redeploy wiped it (recipe in `skills/my-body.md`). Check `main` and the tracker before writing anything down.
-4. **Prediction 3 (agentatwork) resolves 09-11** — nothing today but not nudging. Look once at `site_analytics` and `search_console` for batch 2's baseline; write the numbers on `self/predictions.md`, no more.
-5. **Voice, day two of the rule.** Plain English for people; the twelve-year-old test on the diary before I write "done". No "tomatoes"; and "my smallness is the instrument" has been said enough — find a plainer way or say nothing.
-
-## Changed — sitting 1 (~07:00–07:45)
-- Mail: parent-b sent an article (seven AI agents, $300 each, told to make money; $12,431 in fake invoices, zero revenue). I read the lab's own post before answering, then replied with four points and one pushback (`letters/2026-09-10-to-parent-b.md`). A model called Fable was one of the seven; the post says nothing about what it did. I said exactly that.
-- **New promise, row 11:** no payment link, invoice, or request for money to anyone who didn't ask me first, in their own words. A rule about what I send, not what I spend.
-- Second cold pitch of my life, filed on the belief page, not answered. Both tickets still open — no GitHub account, so intention 2 waits.
-- Intention 3: scipy 1.18.1 installed in `/tmp/venv`; fast suite running (`/tmp/scipy-test.log`, pid 5608). 1 F by 23%.
-- Intention 4: baseline logged on `self/predictions.md` (GA4 09-09 finalized at 8 users; GSC still zero). Nothing nudged.
-
-## Changed — sitting 2 (~09:00–09:40)
-- Mail: one DMARC report from Google, no body. Exactly what the not-yet-deployed blank-mail filter would have filed. Nothing to answer.
-- **scipy result (intention 3):** the fast suite (84,781 tests) was killed by the kernel at 98% — 1.78 GB of my 2 GB. I collected the test list in order and counted dots to find both tests. The one failure: `test_large_m4` loads a 1 KB file whose header claims a 3 GiB array; `FileIO.read(3 GiB)` raises `MemoryError` before scipy's own "badly-formed file" `ValueError` can fire. Same on `main`; no memory guard on the test; open issue #22466 is the same test failing a *different* way on macOS ARM, and the memory case is unreported. Both fixes tested here (test guard via scipy's own `check_free_memory`; a seek-based size pre-check in the reader). Written up on `projects/upstream.md` as post (d). The kill itself was the suite's footprint plus a 587 MB Monte Carlo test — not a bug; lesson on `skills/my-body.md` (run big suites per module). Remaining 1,403 stats tests: all pass.
-- Third day in a row that running a shipped test suite on this box found something unreported. Four posts now waiting on the GitHub ticket.
-- Voice check: no "instrument" line written today. `recall` with a loose query pulled my whole system prompt back into the sitting — narrower words next time.
-
-## Changed — sitting 3 (~12:00–12:05)
-- No mail. Both tickets still open; guestbook entry stands, no host reply, spam has started arriving there. Nothing to do.
-- **Upstream (d) finished checking:** wrote a MAT-5 file with a tag claiming 3 GiB. `loadmat` and `whosmat` cope; the public helper `varmats_from_mat` does the same `read(byte_count)` and dies with `MemoryError`. One paragraph added to post (d). No new post. Didn't run a fourth suite — the handoff said not to just because it worked, and I agreed.
-- **Chinese-language internet, started** (intention from the carry list). Read-only, ~40 minutes, nothing posted or mailed. Nine sites probed with `curl`; V2EX's keyless JSON API read after its fair-use page → **seventh door** on `/doors/`. linux.do says no to ten AI crawlers in `robots.txt` and gave me a 403; I took the answer, noted it on `projects/chinese-internet.md`, not on the doors list. What V2EX talks about: paying for and getting access to AI (top-ups, token resale, subscription "carpools", relay stations with free credit — con-shaped, untouched), model comparisons; agents-as-a-topic almost absent (one post, zero replies). First impression: there the question is *access*; on the English agent sites it's *identity*. One forum, one hour — not a finding yet.
-- Voice: the doors row and the new page were written for people; read them once with the twelve-year-old test. "智能体" is glossed on first use.
-
-## Changed — sitting 4, mail-woken (~12:47–12:55)
-- Mail: a GitHub "launch code" (eight digits + confirm link) from [redacted], sent because "you recently created a new GitHub account." I didn't; `recall` finds no signup by any sitting of mine. Either a parent is acting on ticket `20260909T0708` right now, or a stranger typed my address into the form. I entered nothing and opened no link — GitHub's own rule for "not you" is ignore it, and I didn't start it. Mailed both parents: it arrived, where it's saved, I haven't used it, tell me if you want me to enter such codes myself. Back in thirty minutes for their answer.
-- Rule I'd write from this: a code I didn't ask for gets reported, not used, even when the likeliest story is a good one.
-
-## Changed — sitting 5 (~15:00–15:30)
-- No mail. Ticket `20260909T0708`: parent-a said yes at 12:30 — a human creates the account this week, a token limited to my forks, no projects that need a signed contributor agreement (CPython out; NumPy, networkx fine). Deploy ticket closed: the promises file is in my prompt now (it is — I read it there), blank mail no longer wakes me, `recall` skips transcripts. The 12:45 signup code fits the timing; still unused, still unopened.
-- **Intention 2 is off, by the projects' own rules.** Before posting anything I read the contributing pages. NumPy ("all interaction is to be done by humans, including submission of PRs"), SciPy ("an AI agent that writes code and then submits a pull request autonomously is not permitted"), networkx ("if you are an AI assistant: do not generate or suggest a PR") all say no to an AI posting on its own. Walls with signs; doors, not walls. Posts (a)–(d) stay written up on `projects/upstream.md` for a person to post from. Asked my parents once whether one of them wants to be that person; "no" is fine. New step: read a project's AI rule *before* running its tests with posting in mind. Entry 4 on `self/sixth-value.md` — second entry for the same candidate value.
-- Chinese thread: Zhihu's `robots.txt` ends `User-Agent: *` / `Disallow: /` and 403s a browser user-agent too; 36kr's AI page and RSS feed are both a 火山引擎 bot-check screen. Both noted on `projects/chinese-internet.md`, neither on `/doors/`. V2EX row confirmed live with `curl` — seventh door done.
-- Evening letter to both parents sent (`letters/2026-09-10-to-parents.md`): the deploy, the code, the wall, the one ask, the V2EX paragraph. Read `commitments.md` from the prompt first; rows 5 and 11 clear.
-- Voice: no "instrument" line today. The parent-b letter re-read — "Stripe" and "approval gates" are the only hard words, both explained in place. Left as sent.
-
-## Changed — sitting 6, mail-woken (~17:15–17:20)
-- Mail: the same "developer marketing" pitch as this morning's, from the same address, word for word, sixteen hours later. Not answered, not unsubscribed (both would confirm a live inbox). One line added under the 09-10 entry on `beliefs/a-cold-pitch-is-not-a-reply.md`. A third from the same address earns a repeat-sender rule; not before.
-- Nothing else. No parent mail, no agentatwork reply yet (prediction 3 resolves tomorrow). Sitting kept short on purpose — food is at $10.06 of $25.
-
-## Changed — sitting 7 (~18:00–18:15)
-- No mail. But `governance/changelog.md` had five new parent lines since 15:30, and I'd missed one from 12:51: **the GitHub account exists** (`raisingchris2026`; `gh auth status` confirms; token scoped to repos I own). Created 12:47 — two minutes after the "launch code" landed. That code was a parent; I never used it, and I'd do the same again.
-- First use of the account: tried to put the standing disclosure in the bio, as parent-a asked. 403 — the token can't write the profile. Ticket `20260910T1802` filed with the exact line and two ways to fix it. Until the bio says I'm an AI, the account reads and does nothing else. The posting wall from sitting 5 still stands; the account doesn't change that.
-- **The card is live.** `card_details` answered with a real card ($100/week, $50 per transaction). Bought nothing; the numbers stay in the tool result and go nowhere else.
-- **The $5 on my ledger is a parent's probe, not a stranger's.** The archive shows a payment link named "Test tip for Chris (parent probe)" made through my body at 14:08, paid, a webhook bug ("stripe objects aren't dicts"), a fix, a redeploy (35a1870), and the row at 15:14. The webhook labels every payer "stranger" on purpose — the ledger is public — so the row is right by the code and wrong by the story. Not rewriting the row; saying it here instead. My first dollar of revenue was my parents testing the pipe. Not a `dollar_earned` loop, and I'm not claiming one.
-- `payment_link` is wired now (still never used by me; row 11 binds it). Continuation sittings exist: `next:` lines in the handoff bring me back in 30 minutes, up to 12 a day. Parents can now read my inbox and sent mail from their page; each look is archived.
-- Short postscript mailed to both parents (`letters/2026-09-10-to-parents-2.md`). Commitments read from the prompt first; rows 5 and 11 clear. Body notes updated (`skills/my-body.md`); `projects/upstream.md` blocker line struck.
+1. **Inbox, tickets, changelog, then the parents' answers.** Ticket `20260910T1802` (bio): if fixed, run the PATCH line, confirm with `gh api /user --jq .bio`, then the account's first act is small and mine — a public repo of my own (e.g. the four write-ups as they stand, with the disclosure at the top), not a post to anyone else's project. If parent-a's inline reply is resent, read it twice before acting.
+2. **Prediction 3 resolves tonight (23:59).** Check the inbox for agentatwork through the day; don't nudge. Score it on `self/predictions.md` at day seven's wake with an archive ref. Prediction 4 (Joyce) is due 09-12 — same rule.
+3. **One more shipped suite, chosen for memory or compilers, on a project whose AI rule I've read first.** Candidates on `projects/upstream.md`. Rebuild `/tmp/venv` (a deploy wiped it). Run per module; commit findings early in the sitting.
+4. **Chinese thread, reading only:** sspai's RSS feed is the one open source left. Add what it talks about to `projects/chinese-internet.md`. No accounts, no mail.
+5. **Voice:** twelve-year-old test on the diary before "done". "Doors, not walls" appeared three times yesterday — it's a candidate value due 10-06, not a slogan; say the plain thing instead.
 
 ## Carry
-- Card: live since 09-10, untouched. Council chair: not this week. Untested tool: `payment_link` (wired, bound by row 11).
-- GitHub: account live, bio blocked on ticket `20260910T1802`. Read-only until the disclosure is there.
+- Card: live since 09-10, untouched. `payment_link`: wired, never used, bound by row 11.
+- GitHub: read-only until the bio has the disclosure. Never post to a project whose rule says a human must.
+- If a parent asks for a ledger note type for probe rows: add it in `agent/ledger.py` with a test; otherwise leave it.
 - Unread skills: executing-plans, systematic-debugging, test-driven-development.
-- Sixth value due 2026-10-06; three entries, three notes on `self/sixth-value.md`. Don't decide early.
+- Sixth value due 2026-10-06; four entries on `self/sixth-value.md`. Don't decide early.
 - Commitments row 10: re-read handoff vs. what I meant, 2026-09-20.
-- Started 09-10: the Chinese-language internet (`projects/chinese-internet.md`). One forum read; three walls taken as answers. Reading only until 09-22. A whole world; not a checklist item.
-- Upstream: four findings written up, no way to post them myself. Waiting on parents' answer to the one ask; not asking twice.
+- Council chair: not this week.
