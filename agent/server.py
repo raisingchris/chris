@@ -275,6 +275,14 @@ def login_configured(handles: list[str]) -> bool:
 # --- app ---------------------------------------------------------------------
 
 
+def _session_running() -> bool:
+    try:
+        from agent import scheduler as _sm
+        return _sm.RUN_LOCK.locked()
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def create_app(services, scheduler=None) -> FastAPI:
     cfg = services.cfg
     repo = Path(cfg.repo_dir)
@@ -406,7 +414,8 @@ def create_app(services, scheduler=None) -> FastAPI:
             "mail_wakes_today": mail_wakes_today(state, now),
             "continuations_today": continuations_today(state, now),
             "disk_free_mb": disk_free_mb,
-            "unpushed": gitops.unpushed_count(repo),
+            "running": _session_running(),
+        "unpushed": gitops.unpushed_count(repo),
             "git_sha": gitops.running_sha() or None,
         }
         return JSONResponse(body, status_code=503 if stale else 200)

@@ -164,9 +164,8 @@ def test_ingest_writes_inbox_file_without_real_address(mail, archive, tmp_path):
     assert "Do the reading today." in text
     assert "Ask parent-a if stuck" in text
     assert "cc parent-b" in text
-    assert "earlier stuff" not in text
-    assert "wrote:" not in text
-    assert "Sent from my phone" not in text
+    assert "earlier stuff" in text and "wrote:" in text  # quoted history kept (answers hide in it)
+    assert "Sent from my phone" not in text  # only the "-- " signature block goes
     # the event is archived with the sender already mapped to the handle — the raw address is nowhere
     kind, payload = archive.entries[0]
     assert kind == "mail_in"
@@ -222,13 +221,12 @@ def test_ingest_dedupes_on_email_id(mail, archive):
     assert mail.ingest(webhook("s@e.org", email_id="dup_2")) != p1
 
 
-def test_ingest_strips_original_message_marker_and_quotes(mail):
+def test_ingest_keeps_quoted_history(mail):
     body = "keep this\n> quoted line\n-----Original Message-----\nFrom: x\nold text\n"
     mail.fetch_body = lambda _id: {"text": body, "html": None}
     text = mail.ingest(webhook("s@e.org")).read_text()
-    assert "keep this" in text
-    assert "quoted line" not in text
-    assert "old text" not in text
+    # Nothing is cut any more: people answer inside quoted blocks (2026-09-10).
+    assert "keep this" in text and "quoted line" in text and "old text" in text
 
 
 def test_ingest_falls_back_to_html_when_no_text(mail):
@@ -315,7 +313,7 @@ def test_double_chevron_reply_markers_are_kept():
     body = "Hey.\n\n~ her question\n>> my answer line\n>>second answer\n> quoted client line\n\nOn Mon, Chris wrote:\n> old stuff"
     out = _clean_body(body)
     assert ">> my answer line" in out and ">>second answer" in out
-    assert "quoted client line" not in out and "old stuff" not in out
+    assert "quoted client line" in out and "old stuff" in out  # kept: replies hide inside quotes
 
 
 def test_daily_summary_lists_open_tickets_after_odometer(mail, archive):

@@ -315,6 +315,7 @@ def test_rearm_after_restart_books_continuation_when_last_sitting_pending(servic
     day = now.strftime("%Y-%m-%d")
     services.archive.days[day] = [
         {"ts": "", "kind": "session_start", "ref": "", "payload": {"kind": "sitting"}},
+        {"ts": "", "kind": "session_result", "ref": "", "payload": {"kind": "sitting"}},
         {"ts": "", "kind": "sitting_pending", "ref": "", "payload": {"kind": "sitting_pending", "pending": True}},
     ]
     class Sched:
@@ -325,4 +326,24 @@ def test_rearm_after_restart_books_continuation_when_last_sitting_pending(servic
     assert [j[0] for j in sched.jobs] == ["continuation"]
     # a run after the pending flag means nothing to re-arm
     services.archive.days[day].append({"ts": "", "kind": "session_start", "ref": "", "payload": {"kind": "continue"}})
+    services.archive.days[day].append({"ts": "", "kind": "session_result", "ref": "", "payload": {"kind": "continue"}})
     assert rearm_after_restart(services, Sched(), now=now) is False
+
+
+def test_rearm_after_restart_when_session_was_killed(services):
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    from agent.scheduler import rearm_after_restart
+    now = datetime(2026, 9, 10, 13, 30, tzinfo=ZoneInfo(services.cfg.tz))
+    day = now.strftime("%Y-%m-%d")
+    services.archive.days[day] = [
+        {"ts": "", "kind": "session_start", "ref": "", "payload": {"kind": "mail"}},
+    ]
+    class Sched:
+        def __init__(self): self.jobs = []
+        def add_job(self, fn, trigger, **kw): self.jobs.append(kw.get("id"))
+    sched = Sched()
+    assert rearm_after_restart(services, sched, now=now) is True
+    assert sched.jobs == ["continuation"]
+    assert "sitting_killed" in services.archive.kinds()
+    assert "cut short by a restart" in (Path(services.cfg.repo_dir) / "memory" / "handoff.md").read_text()

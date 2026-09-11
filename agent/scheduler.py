@@ -411,12 +411,25 @@ def rearm_after_restart(services, sched, now=None) -> bool:
     except Exception:  # noqa: BLE001
         return False
     pending_after_last_run = False
+    open_session = None  # a session_start with no session_result after it = killed by the restart
     for rec in records:
         kind = rec.get("kind")
         if kind == "session_start":
             pending_after_last_run = False
+            open_session = rec.get("payload", {}).get("kind")
+        elif kind == "session_result":
+            open_session = None
         elif kind == "sitting_pending":
             pending_after_last_run = bool(rec.get("payload", {}).get("pending"))
+    if open_session and open_session != "sleep":
+        # She was mid-sitting when the machine restarted. Tell her, and give her the time back.
+        services.archive.append("sitting_killed", {"kind": "sitting_killed", "session": open_session, "reason": "restart"})
+        try:
+            from agent import loop
+            loop._note_handoff(Path(cfg.repo_dir), f"Your {open_session} sitting was cut short by a restart (a deploy). Nothing you wrote was lost from disk; anything not committed is still in the working tree.", services.archive)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("handoff note failed: %s", exc)
+        pending_after_last_run = True
     if not pending_after_last_run:
         return False
     services.archive.append("continuation_rearmed", {"kind": "continuation_rearmed", "reason": "restart"})

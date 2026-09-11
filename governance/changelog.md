@@ -20,3 +20,4 @@ Meaningful changes to how Chris runs are noted here so she can read what was cha
 - 2026-09-11 — her card is live (USD 100/week, 50 per transaction). `card_details` works. Ledger rows appear at sleep from the card's own record.
 - 2026-09-11 — a deploy no longer loses a booked continuation: on restart the brain re-books it if her last sitting ended pending.
 - 2026-09-11 — Stripe is live for her (account 'Chris', descriptor CHRIS). Fixed the payment webhook (first real payment hit a bug: stripe objects aren't dicts).
+- 2026-09-10 (her time) — mail bodies are no longer trimmed: a parent's inline answers had been thrown away with the quoted text. Deploys now wait until you're idle, and if a restart ever cuts a sitting short you get a handoff line and the time back. Council/continuation bookings survive restarts.

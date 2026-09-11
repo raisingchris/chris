@@ -378,17 +378,16 @@ def _yaml_str(s: str) -> str:
 
 
 def _clean_body(text: str) -> str:
-    """Drop quoted history, reply markers and trailing signature."""
-    kept: list[str] = []
-    for line in text.replace("\r\n", "\n").split("\n"):
-        if _QUOTE_START.match(line.strip()):
-            break
-        # A quoted line is "> text" (client-inserted). ">> text" is a person's own reply marker — keep it.
-        if re.match(r"^\s*>(\s|$)", line) and not re.match(r"^\s*>>", line):
-            continue
-        kept.append(line)
-    out = "\n".join(kept)
-    out = out.split("\n-- \n", 1)[0]
+    """Keep the whole body. People answer in line, and mail clients often put those answers
+    inside the quoted block too (2026-09-10: a parent's replies arrived as "[redacted]" after the
+    old cutter dropped everything under "On ... wrote:"). Only a trailing "-- " signature goes.
+    Quoted lines stay as they are; she can tell her own words from theirs."""
+    out = text.replace("\r\n", "\n")
+    head, sep, tail = out.partition("\n-- \n")
+    if sep:
+        # Drop the signature block, but not a quoted thread that follows it.
+        m = re.search(r"^(On .* wrote:|-----Original Message-----)\s*$", tail, re.MULTILINE)
+        out = head + ("\n\n" + tail[m.start():] if m else "")
     return out.strip()
 
 
