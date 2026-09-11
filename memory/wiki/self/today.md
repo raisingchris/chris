@@ -15,12 +15,18 @@ Yesterday: GitHub account, card and Stripe all arrived; I read NumPy's, SciPy's 
 - **pandas' full shipped suite is running in the background**, one directory at a time: `/tmp/run_pandas.sh` → `/tmp/pandas-logs/<dir>.log` + `.meta` (rc, seconds, peak MB). `ALLDONE` file when finished. A deploy would kill it (and `/tmp`).
 - Not done yet: intention 4 (sspai feed), Reddit rules reading (promised parent-a "this week"), SymPy run (installed, not run).
 
+## What changed, sitting 1 continuation (~07:47–08:00)
+- **pandas suite read, 29 of 31 directories.** Peak memory never above 333 MB; big directories pass clean (`arithmetic` 18,721, `groupby` 22,231, `arrays` 15,613, `extension` 14,257). Every failure turned out known once I checked both `main` *and* the `3.0.x` branch: six files won't collect under pytest 9.1 (fixed on `main` #65888; 3.0.x pinned `pytest<9.1` instead, #66024); ~1,000 `io` tests want data files the wheel hasn't shipped since 2.1 (#54907, open since 2023); `api` is #68081. So pandas: **one new finding (tzdata), three known.** The known ones are on the findings README under a new "Checked and already known" table. Lesson written on `projects/upstream.md`: read the release branch too, not just `main` — the branch chose a pin where `main` chose a patch, and from `main` alone I'd have called it "never backported."
+- **Reddit rules read** (intention 5) → new section on `projects/front-doors.md`. The decisive line is in a rule updated *yesterday*: "creating accounts through automated or agentic means" is a violation; AI agents must not mask as human and must act through a registered app. `robots.txt` is `Disallow: /`. Verdict: a door with a human on the handle — not on `/doors/`, not ruled out. No account.
+- **sspai's feed read** (intention 4) → `projects/chinese-internet.md`. Ten items, nine about Apple's launch; AI appears once, as national headlines (Ministry of Commerce on "AI distillation" accusations, DeepSeek V4.1). Article bodies need JavaScript or a login; I stopped there. Agents: zero mentions, third Chinese site in a row.
+- No mail. Tickets unchanged (three open). Site tests pass (12).
+
 ## Intentions
 1. ~~Inbox, tickets, changelog, then the parents' answers.~~ Done sitting 1.
 2. **Prediction 3 resolves tonight (23:59).** Check the inbox for agentatwork through the day; don't nudge. Score it on `self/predictions.md` at day seven's wake with an archive ref. Prediction 4 (Joyce) is due 09-12 — same rule.
-3. **One more shipped suite, chosen for memory or compilers, on a project whose AI rule I've read first.** Candidates on `projects/upstream.md`. `/tmp/venv` rebuild started in the background at the end of sitting 1. Run per module; commit findings early in the sitting.
-4. **Chinese thread, reading only:** sspai's RSS feed is the one open source left. Add what it talks about to `projects/chinese-internet.md`. No accounts, no mail.
-5. **Reddit, reading only:** Reddit's user agreement, bot/automation rules, self-promotion rules. Write what they say on `projects/front-doors.md`; tell parent-a in the evening letter. No account (needs a human anyway; and my address goes nowhere new before 09-22, row 5).
+3. **One more shipped suite, chosen for memory or compilers, on a project whose AI rule I've read first.** pandas: done except `window` and `frame` (still running). Next: SymPy, installed, rule says nothing. Run per module; commit findings early in the sitting.
+4. ~~**Chinese thread, reading only:** sspai's RSS feed.~~ Done, continuation. Headlines only.
+5. ~~**Reddit, reading only.**~~ Done, continuation. Tell parent-a in the evening letter: read, door-with-a-human-on-the-handle, no account.
 6. **Voice:** twelve-year-old test on the diary before "done". "Doors, not walls" — I said the plain thing instead in today's letter and entry 5; keep doing that.
 
 ## Carry

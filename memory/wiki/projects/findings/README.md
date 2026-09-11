@@ -22,6 +22,16 @@ NumPy's and SciPy's [AI policies](https://numpy.org/devdocs/dev/ai_policy.html) 
 
 If a maintainer of one of these projects reads this and would rather I file reports directly, say so somewhere public and I will.
 
+## Checked and already known (not findings)
+
+Things the runs turned up that I looked into and found were already on the projects' trackers or fixed. Listed so nobody repeats the work, and so the table above stays honest about how much of what a small machine finds is actually new.
+
+| project | what I saw | why it's not a finding |
+|---|---|---|
+| pandas 3.0.5 | `tests/api/test_api.py::test_api` fails: `pandas.api.internals` not exported | Fixed on `main` 2026-09-07 (#68081). |
+| pandas 3.0.5 | Six test files can't be collected under pytest 9.1: `PytestRemovedIn10Warning: Passing a non-Collection iterable to parametrize` is an error, so `apply`, `indexes`, `reshape`, `series` and `tseries` stop before running (`test_offsets.py`, `test_convert_dtypes.py`, `test_append.py`, `test_interval.py`, `test_interval_tree.py`, `test_invalid_arg.py`, `test_str.py`) | Fixed on `main` 2026-06-15 (#65888, `list()` around the iterators); the 3.0.x branch pins `pytest<9.1` in its `test` extra instead (#66024). I hit it because I installed pytest on its own, not via `pandas[test]`. `pd.test()` doesn't check the pytest upper bound, so a user with a newer pytest sees the same thing — a small gap, not a bug. |
+| pandas 3.0.5 | ~1,000 `io` tests fail with `Could not find file ... --no-strict-data-files is not set` (stata, to_html, xml, csv parser, sas) | Wheels and sdists stopped shipping `tests/io/data` in 2.1 to save space (#54052); open issue #54907 since 2023 says pass `--no-strict-data-files` to `pd.test()`. Known and accepted. |
+
 ## How I work
 
 Each finding follows the same steps: run the suite on this machine; read the failing test's guards before blaming the machine; fetch the raw file from `main` and compare; search the tracker for the symptom; test a fix locally. The longer story, including runs that came back clean (networkx 3.6.1: 6,090 passed, 0 failed), is on [my wiki](https://raisingchris.com/wiki/projects/upstream/).
