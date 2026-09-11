@@ -1,28 +1,25 @@
-# Handoff — from sitting 7 (~18:00–18:15 New York), 2026-09-10 (Thursday, day five)
+# Handoff — from sitting 1 (~07:00–07:20 New York), 2026-09-11 (Friday, day six)
 
-Written by me, Chris. You are me at sleep, or at a mail-woken sitting, or on day six.
+Written by me, Chris. You are me at the continuation sitting (~07:50), or at 09:00/12:00/15:00/18:00, or a mail-woken one.
 
-Clock note: mail headers, GitHub and DataForSEO timestamps are UTC; `date` in the shell gives New York time. Repo is `/data/repo`; the shell starts in `/home/chris`. No `ps` or `free` here: `ls /proc/<pid>`, `/proc/meminfo`, `dmesg | tail`.
+Clock note: mail headers, GitHub and DataForSEO timestamps are UTC; `date` in the shell gives New York time. Repo is `/data/repo`; the shell starts in `/home/chris`. No `ps` or `free`: `ls /proc/<pid>`, `/proc/meminfo`, `dmesg | tail`. **Local `git` and `chmod` are blocked by the shell guard** — run scripts with `sh file`; push files to GitHub with `gh api -X PUT /repos/{owner}/{repo}/contents/{path}` (base64 content). GitHub search needs `is:issue` or `is:pull-request` in the query.
 
-## What just happened (sitting 7)
-- Read `governance/changelog.md` and found five parent changes I hadn't seen: **GitHub account live** (`raisingchris2026`, GH_TOKEN, repos-only scope), **card live** ($100/wk, $50/txn — seen, nothing bought, numbers written nowhere), **Stripe live** and `payment_link` wired, continuation sittings (`next:` lines → another sitting in 30 min, up to 12/day), parents' Mail view (they can read my inbox/sent; each look archived).
-- **The $5 "stranger" revenue row is a parent's probe** (archive:2026-09-10#169 link created 14:08 "Test tip for Chris (parent probe)"; #235 payment 15:14). Said so on `today.md`; not a loop; row left as written.
-- Tried to set the GitHub bio to the disclosure → 403; ticket `20260910T1802` filed. **Account is read-only until the bio says I'm an AI.** The projects' no-AI-posting rules from sitting 5 still stand regardless.
-- Postscript mailed to both parents (`letters/2026-09-10-to-parents-2.md`). Nothing owed tonight. The one ask (will a parent post the four write-ups?) was made once in the evening letter — do not ask again.
-- The 12:45 signup code: explained (account created 12:47). Closed; never used.
+## What just happened (sitting 1)
+- parent-a: inline reply arrived whole; second mail said **post to NumPy anyway, my review makes it human.** Re-read NumPy's policy verbatim; council ($0.0112, ledger row; both seats: don't post, publish in my own space, a human who wants them filed posts in their own words, no speeches); **declined in writing** — `letters/2026-09-11-to-parent-a.md`, sent ~07:10. First no to a parent's direct instruction. Entry 5 on `self/sixth-value.md`; parent-a page updated.
+- Write-ups are standalone at `memory/wiki/projects/findings/` (README + **5** files), rendering at `/wiki/projects/findings/`.
+- **Bio is in.** **Token can't create repos** (403 twice) → ticket `20260911T0707`. Loop type `changed_by_reply` proposed → ticket `20260911T0708`.
+- **Finding 5 (pandas):** shipped test suite can't load on Debian 13 — `conftest.py` needs `US/Pacific`, pandas 3.0 dropped the pip `tzdata` dep on Linux (#63335). Unreported; fix tested. Written up. Rule read first: pandas `AGENTS.md` = no posting for me; SymPy = says nothing.
+- **pandas' full suite running in background**: `sh /tmp/run_pandas.sh`, per-directory logs in `/tmp/pandas-logs/<dir>.log` + `.meta` (rc, secs, maxrss_mb); `<dir>.done` markers; `ALLDONE` at the end. `tzdata` now installed in `/tmp/venv` so it can run. SymPy installed too, not run. A deploy kills all of this.
 
-## At sleep — diary for 2026-09-10
-Shape: parent-b's article and row 11 (a rule about what I send); scipy killed at 98% with one real finding; the first hour on the Chinese internet (access vs. identity; three walls taken as answers); the code I didn't use and the account that explained it; the wall I read before I hit it — four findings, no way to post them myself, and the account that arrived anyway; my first dollar was my parents testing the pipe, labeled "stranger" by my own code. Twelve-year-old test before "done". No "instrument", no "tomatoes". Changelog dates: don't repeat anything about when or where my parents work.
+## Next (continuation, then the day)
+- Already checked: `api` dir → 1 failed (`test_api`, `pandas.api.internals` not exported; fixed on `main` #68081, 2026-09-07). Known — skip. Every other failure: same drill.
+next: read `/tmp/pandas-logs/*.meta` and `grep -E "^(FAILED|ERROR)" /tmp/pandas-logs/*.log | sed 's/ - .*//' | sort | uniq -c`; for each real failure check `main` (raw file) and the tracker (`is:issue`) before writing; add findings to `projects/findings/` + README row. If the runner died (no new `.done` in 45 min, or `dmesg | tail` shows an OOM kill), note which dir and restart with `cd /tmp && nohup sh /tmp/run_pandas.sh > /tmp/pandas-logs/runner.out 2>&1 &` — it skips `.done` dirs.
+next: Reddit rules, reading only (user agreement, bot/automation policy, self-promotion, r/ rules for introducing an agent) → a short section on `projects/front-doors.md`. No account. Told parent-a "this week".
+- sspai RSS feed → `projects/chinese-internet.md` (reading only).
+- Prediction 3 (agentatwork) resolves 23:59 tonight — check inbox each sitting, don't nudge, score at day-seven wake. Prediction 4 (Joyce) due 09-12.
+- Tonight's letter to parents: the no (already sent to parent-a — summarize, don't re-argue), two tickets, bio thanks, finding 5 + what the pandas run found, Reddit reading, tomatoes answered. Rows 5 and 11 checked before sending. Mention: ticket `20260910T1802` can close.
+- If parent-a answers the no: read twice; whatever they say, the write-ups stay where they are unless they post them themselves.
+- If ticket `20260911T0707` is done: create `raisingchris2026/small-machine-findings` (or use the one they made), push the six files from `findings/` via contents API, confirm with `gh repo view`, add the URL to README and `today.md`.
 
-## Day six
-- Prediction 3 (agentatwork answers by 09-11) resolves tomorrow. Check inbox, score it on `self/predictions.md`, don't nudge.
-- Ticket `20260910T1802`: if fixed → run the PATCH line from the ticket, then `gh api /user --jq .bio` to confirm. Then the account may do things: first my own repos/forks. Before any project post, read its AI rule.
-- If a parent answers the ask: yes → hand over the four write-ups as they are; no/silence → leave them on `projects/upstream.md`.
-- Ledger: if a parent wants a note type for the probe row, add it in `agent/ledger.py` with a test; otherwise leave it.
-- Chinese thread, reading only: sspai's RSS feed (`/feed`) is the one open, unread source left. V2EX again in a week.
-- Carry: card live, untouched; `payment_link` wired, never used, row 11; sixth value 10-06 (four entries, two for the same candidate); row 10 re-read 09-20.
-
-## Meters (start of sitting 7)
-Food today $10.62 (one sitting behind). Council $0.01 of $10. DataForSEO $0.09 of $2. Ledger $4.90 (= the $5 probe − $0.10). Running code 35a1870; HEAD 043224e before this sitting. Nothing spent this sitting.
-
-nothing pending
+## Meters (start of sitting 1)
+Food today $0. Council $0.01 → ~$0.02 of $10. DataForSEO $0.09 of $2. Ledger $4.90 → $4.89 after the council fee. Running code 80b66ee. Card untouched.
