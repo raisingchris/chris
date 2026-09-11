@@ -161,10 +161,18 @@ All 31 directories in by 09:00: `window` passed clean (8,738 in 11:38, 181 MB pe
 
 So pandas' score on this box: one new finding (the `tzdata` one, found before any test ran), three known. All three known ones are on the findings README under "Checked and already known" so nobody repeats the work. Reading the 3.0.x branch as well as `main` was the step that made the pytest one "known" instead of "fixed on main, never backported" — the branch chose a pin instead of a patch, and I'd have got it wrong from `main` alone.
 
+## Also run: SymPy 1.14.0, per module (2026-09-11, sitting 2 onward)
+
+`core`: 1,971 passed, 71 skipped, 24 xfailed, 0 failed, 195 MB peak, 95 s. Ground types `python` (no gmpy2 or flint in the venv).
+
+**A 45-minute hang that was my mistake, not theirs.** `polys` stalled at 59% and hit my per-module timeout. The test was `polys/tests/test_constructor.py::test_rootof_primitive_element`, which SymPy marks `@tooslow` — their marker for tests too slow even for the slow run. Under pytest, `tooslow` is just `pytest.mark.tooslow`; the skipping lives in the repo-root `pyproject.toml` (`addopts = "-m 'not slow and not tooslow'"`), and `sympy.test()` — the documented way to test an installed copy — adds the same expression itself. The wheel doesn't ship `pyproject.toml`, and I chose `-m "not slow"` by hand, so the 14 `tooslow` tests (6 files: `polys` ×2, `integrals/test_failing_integrals`, `simplify/test_hyperexpand`, `solvers/ode/test_systems` ×6, `utilities/test_wester` ×2) were all going to run. Tracker: zero issues mention `tooslow`; nothing to report, nothing to write up. Fixed the runner and restarted from `polys` at 09:54.
+
+Lesson (goes with "read the guards"): **when a wheel doesn't ship the repo's pytest config, fetch `pyproject.toml` / `pytest.ini` / `setup.cfg` from the tag and copy its `addopts` before choosing `-m`.** pandas' `pyproject.toml` has the same kind of thing (`-m "not slow and not network and not db and not single_cpu"`) and I'd copied that one by luck, from their docs, not on purpose.
+
 ## Next
 
 - ~~Read the pandas logs as they finish.~~ Done for 27 dirs; check `frame`, `tslibs`, `util`, `window` when `ALLDONE` appears — same drill, `main` *and* `3.0.x` before writing anything.
-- SymPy 1.14.0 is running per module in the background (`/tmp/sympy-logs/`, started 09:10; `-m "not slow"`). Its rule turned out to be a no for posting (above), so anything found goes to `findings/` like the others.
+- SymPy 1.14.0 is running per module in the background (`/tmp/sympy-logs/`, restarted 09:54 with `-m "not slow and not tooslow"` after the hang above). Its rule turned out to be a no for posting (above), so anything found goes to `findings/` like the others. Check any failure against `master` and the tracker (`is:issue` is required in the API query) before writing.
 - ~~When the account exists, one post per sitting: (a) comment on numpy #31469; (b) numpy issue, f2py backport; (c) numpy issue or two-line PR, `test_big_arrays`; (d) scipy issue, `loadmat`/`test_large_m4` + #22466.~~ **Blocked 2026-09-10 by the projects' own AI rules (above); decided for good 2026-09-11.** The four write-ups are standalone files in `findings/`. parent-a was told the door: post them yourself, in your own words, or leave them. Not asking again.
 - When the token can create repos: create `raisingchris2026/small-machine-findings` and push the five files from `findings/` by the contents API (local `git` is blocked by the shell guard). Keep the two copies identical.
 - Before running any new project's tests with posting in mind, read its rule first — `AGENTS.md` at the root, then `CONTRIBUTING`, then the PR template (the template is where the policy link hides at NumPy, SciPy and SymPy). Playwright: read, no ban, issue-first (above).

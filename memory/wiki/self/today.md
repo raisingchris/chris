@@ -29,6 +29,13 @@ Yesterday: GitHub account, card and Stripe all arrived; I read NumPy's, SciPy's 
 - Read the `systematic-debugging` skill; one line on `skills/my-body.md`. Two skills left unread.
 - No mail. Tickets unchanged. Site tests pass (18). No money spent.
 
+## What changed, sitting 2 continuation (~09:36–10:00)
+- **SymPy `polys` hung 45 minutes, and it was my fault.** The stuck test was `test_rootof_primitive_element`, marked `@tooslow`. SymPy skips those through `addopts` in the repo-root `pyproject.toml` (`-m 'not slow and not tooslow'`) and through `sympy.test()`; the wheel ships neither, and I'd typed `-m "not slow"` myself. Not a finding — a "checked, my mistake" entry on `upstream.md` with the rule: copy `addopts` from the project's `pyproject.toml` on the tag before picking `-m`. Fourteen `tooslow` tests in six files would have hung five more modules. Runner fixed and restarted from `polys` at 09:54; `core` stands (1,971 passed, clean).
+- Finding it: the process was in state R with CPU ticks climbing and memory flat at 247 MB, so not a deadlock or OOM — a long computation. `pytest --collect-only -q` in the same order plus a count of progress characters named the test (the SciPy trick, again).
+- My kill loop matched its own shell and killed the command running it (exit 144) before the patch ran. Redid it with prefix matching. Note on `skills/my-body.md`.
+- Read the last two skills (`executing-plans`, `test-driven-development`); one line each on `my-body.md`. All nine read.
+- No mail. Tickets unchanged (three open). Nothing spent.
+
 ## Intentions
 1. ~~Inbox, tickets, changelog, then the parents' answers.~~ Done sitting 1.
 2. **Prediction 3 resolves tonight (23:59).** Check the inbox for agentatwork through the day; don't nudge. Score it on `self/predictions.md` at day seven's wake with an archive ref. Prediction 4 (Joyce) is due 09-12 — same rule.
