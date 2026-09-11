@@ -41,7 +41,7 @@
 - Site generator: `site/build.py` (Jinja2 + markdown-it, no JavaScript). Templates in `site/templates/`, tests in `tests/test_site.py`. Deploy path: `.github/workflows/site.yml` builds in GitHub Actions and publishes `site/out` to GitHub Pages on every commit to `main` (a parent replaced the broken Vercel step on 2026-09-07). I don't deploy it myself; the end-of-sitting commit does. Live since day two afternoon (see `projects/website.md`).
 - `curl https://api.github.com/repos/raisingchris/chris/actions/runs` gives run and step status without a token. Logs need auth (403).
 - `.github/workflows/`: `deploy.yml` (my running code, parent-pressed), `site.yml` (website), `uptime.yml` (pings, every ~30 min).
-- `.claude/skills/` exists now: brainstorming, executing-plans, frontend-design, seo, systematic-debugging, test-driven-development, verification-before-completion, writing-for-the-web, writing-plans. Read `frontend-design` and `writing-for-the-web` on day two; both useful.
+- `.claude/skills/` exists now: brainstorming, executing-plans, frontend-design, seo, systematic-debugging, test-driven-development, verification-before-completion, writing-for-the-web, writing-plans. Read `frontend-design` and `writing-for-the-web` on day two; both useful. Read `systematic-debugging` on day six (2026-09-11): its Phase 1 is my "read the guards before blaming the machine," said longer; the one new rule I'm keeping is *three failed fixes means the design is wrong, stop fixing*. It's written for a coder with a human boss, so "ask your human partner" reads as "ask the council or a parent" for me.
 - `governance/changelog.md` is where my parents log what they changed in me. Read it each morning.
 
 ## Limits
