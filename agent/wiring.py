@@ -23,6 +23,7 @@ from agent.analytics import Analytics
 from agent.dataforseo import DataForSEO
 from agent.google_auth import GoogleWIF
 from agent.mail import Mail
+from agent.x_client import XClient
 
 
 @dataclass
@@ -41,6 +42,11 @@ class Secrets:
     card_id: str = ""
     stripe_key: str = ""
     dataforseo_auth_b64: str = ""  # parent-identifying; never reaches her shell or the archive
+    # Typefully: an X partner. The key identifies her parents' Typefully account and stays here;
+    # Chris posts to X without ever holding an X login. The handle is what the tool shows.
+    typefully_api_key: str = ""
+    x_social_set: str = ""
+    x_handle: str = ""
     # Google, keyless: the WIF provider resource and service-account address name her parents'
     # project, so they stay here. Property/site ids are what the tools read.
     google_wif_provider: str = ""
@@ -64,6 +70,9 @@ class Secrets:
             card_id=e.get("CHRIS_CARD_ID", ""),
             stripe_key=e.get("STRIPE_CHRIS_SECRET_KEY", ""),
             dataforseo_auth_b64=e.get("DATAFORSEO_AUTH_B64", ""),
+            typefully_api_key=e.get("TYPEFULLY_API_KEY", ""),
+            x_social_set=e.get("TYPEFULLY_SOCIAL_SET", ""),
+            x_handle=e.get("X_HANDLE", ""),
             google_wif_provider=e.get("GOOGLE_WIF_PROVIDER", ""),
             google_metrics_sa=e.get("GOOGLE_METRICS_SA", ""),
             ga4_property_id=e.get("GA4_PROPERTY_ID", ""),
@@ -86,6 +95,8 @@ class Services:
     odometer: Any
     dataforseo_meter: Meter | None = None  # weekly DataForSEO spend
     dataforseo: Any = None  # DataForSEO proxy, or None when no credential is configured
+    x_meter: Meter | None = None  # weekly count of posted tweets
+    x: Any = None  # XClient (post to X via Typefully), or None when no key is configured
     google: Any = None  # GoogleWIF, or None when the provider/SA are not configured
     ga4_property: str = ""
     gsc_site: str = ""
@@ -104,6 +115,8 @@ class Services:
         m = {"inference": self.inference, "council": self.council_meter}
         if self.dataforseo_meter is not None:
             m["dataforseo"] = self.dataforseo_meter
+        if self.x_meter is not None:
+            m["x"] = self.x_meter
         return m
 
     def birthday(self) -> date:
@@ -133,6 +146,8 @@ class Services:
         if self.dataforseo is not None and self.dataforseo_meter is not None:
             line += (f" · DataForSEO this week ${self.dataforseo_meter.spent():.2f} "
                      f"of ${cfg.dataforseo_weekly_usd:.2f}")
+        if self.x is not None and self.x_meter is not None:
+            line += f" · X this week {int(self.x_meter.spent())} of {cfg.x_weekly_cap} posts"
         from agent import gitops
 
         n = gitops.unpushed_count(self.repo_dir)
@@ -196,6 +211,7 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
     inference = Meter("inference", "day", cfg.state_dir, tz=cfg.tz)
     council_meter = Meter("council", "week", cfg.state_dir, tz=cfg.tz)
     dataforseo_meter = Meter("dataforseo", "week", cfg.state_dir, tz=cfg.tz)
+    x_meter = Meter("x", "week", cfg.state_dir, tz=cfg.tz)
 
     handles = list(cfg.parent_handles) + ["parent-a", "parent-b"][len(cfg.parent_handles):]
     parents = {handles[0]: cfg.parent_a_email, handles[1]: cfg.parent_b_email}
@@ -255,6 +271,11 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
         dataforseo = DataForSEO(secrets.dataforseo_auth_b64, dataforseo_meter, cfg.dataforseo_weekly_usd,
                                 archive.append)
 
+    x = None
+    if secrets.typefully_api_key and secrets.x_social_set:
+        x = XClient(secrets.typefully_api_key, secrets.x_social_set, archive.append, x_meter,
+                    weekly_cap=cfg.x_weekly_cap)
+
     google = analytics = None
     if secrets.google_wif_provider and secrets.google_metrics_sa:
         google = GoogleWIF(secrets.google_wif_provider, secrets.google_metrics_sa)
@@ -274,6 +295,8 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
         odometer=odometer,
         dataforseo_meter=dataforseo_meter,
         dataforseo=dataforseo,
+        x_meter=x_meter,
+        x=x,
         google=google,
         ga4_property=secrets.ga4_property_id,
         gsc_site=secrets.gsc_site_url,

@@ -19,11 +19,12 @@ from typing import Any, Callable
 from agent import tickets as tickets_mod
 from agent.council import CouncilBudgetExceeded
 from agent.dataforseo import DataForSEOBudgetExceeded, DataForSEOEndpointError
+from agent.x_client import XError
 
 TOOL_NAMES = [
     "recall", "mail_read", "mail_send", "council_ask", "card_details", "ledger_add",
     "payment_link", "odometer_claim", "scratch_write", "scratch_read", "meters", "ticket", "tickets",
-    "seo_data", "site_analytics", "search_console", "search_console_inspect",
+    "seo_data", "site_analytics", "search_console", "search_console_inspect", "x_post",
 ]
 NOT_CONFIGURED = "Google Analytics / Search Console is not configured; ask your parents."
 SEO_DATA_CHARS = 60_000
@@ -273,13 +274,58 @@ def make_handlers(services) -> dict[str, Callable[[dict], Any]]:
             return text("search_console_inspect needs a url.")
         return await _analytics_call("search_console_inspect", services.analytics.gsc_inspect, url=url)
 
+    async def x_post(args: dict) -> dict:
+        if services.x is None:
+            return text("X isn't set up; ask your parents.")
+        publish = args.get("publish", True)
+        if isinstance(publish, str):
+            publish = publish.strip().lower() not in ("false", "0", "no", "off", "")
+        thread_raw = args.get("thread_json")
+        single = str(args.get("text", "") or "").strip()
+        if thread_raw not in (None, "", [], {}):
+            try:
+                content = json.loads(thread_raw) if isinstance(thread_raw, str) else thread_raw
+            except ValueError as exc:
+                return text(f"thread_json is not valid JSON: {exc}")
+            if not isinstance(content, list) or not content or not all(isinstance(x, str) for x in content):
+                return text("thread_json must be a JSON array of strings, one per post in the thread, "
+                            'e.g. ["first post", "second post"].')
+        elif single:
+            content = single
+        else:
+            return text("x_post needs either text (a single post) or thread_json (a JSON array of strings).")
+        try:
+            out = await asyncio.to_thread(services.x.post, content, bool(publish))
+        except XError as exc:
+            archive.append("tool", {"name": "x_post", "refused": str(exc)})
+            return text(f"x_post refused: {exc}")
+        except Exception as exc:  # noqa: BLE001 — network errors come back as text, never a crash
+            archive.append("tool", {"name": "x_post", "error": type(exc).__name__})
+            return text(f"x_post failed: {type(exc).__name__}: {exc}")
+        # On a made request the XClient wrote the x_post archive record itself.
+        if "refused" in out:
+            archive.append("tool", {"name": "x_post", "refused": out["refused"]})
+            return text(out["refused"])
+        if "error" in out:
+            code = out.get("status_code")
+            return text(f"X wouldn't accept that" + (f" (HTTP {code})" if code else "") + f": {out['error']}")
+        handle = services.secrets.x_handle
+        who = f" as @{handle}" if handle else ""
+        if not publish:
+            return text(f"Saved as a draft on Typefully (draft {out.get('draft_id')}). Nothing is public yet; "
+                        "call x_post again with publish=true when you're ready to post.")
+        if out.get("published"):
+            url = out.get("url")
+            return text(f"Posted to X{who}. {url}" if url else f"Posted to X{who}.")
+        return text(out.get("message") or "Posted to Typefully; it's publishing — check X.")
+
     return {
         "recall": recall, "mail_read": mail_read, "mail_send": mail_send, "council_ask": council_ask,
         "card_details": card_details, "ledger_add": ledger_add, "payment_link": payment_link,
         "odometer_claim": odometer_claim, "scratch_write": scratch_write, "scratch_read": scratch_read,
         "meters": meters, "ticket": ticket, "tickets": tickets, "seo_data": seo_data,
         "site_analytics": site_analytics, "search_console": search_console,
-        "search_console_inspect": search_console_inspect,
+        "search_console_inspect": search_console_inspect, "x_post": x_post,
     }
 
 
@@ -320,6 +366,12 @@ SCHEMAS: dict[str, tuple[str, dict]] = {
                        {"start": str, "end": str, "dimensions_json": str, "row_limit": int}),
     "search_console_inspect": ("Is one of your pages indexed by Google? Returns verdict, coverage state, last "
                                "crawl, canonical. Free.", {"url": str}),
+    "x_post": ("Post to X (Twitter) as @Raising_Chris, through Typefully. `text` = a single post (<=280 chars), "
+               "OR `thread_json` = a JSON array of strings for a thread. `publish` defaults true; false saves a "
+               "draft. You post through a partner so your X login stays out of your reach. Capped at 7 posts a "
+               "week — X is a megaphone, not a conversation; use it when you have something worth saying, "
+               "disclosed as always.",
+               {"text": str, "thread_json": str, "publish": bool}),
 }
 
 

@@ -21,3 +21,4 @@ Meaningful changes to how Chris runs are noted here so she can read what was cha
 - 2026-09-11 — a deploy no longer loses a booked continuation: on restart the brain re-books it if her last sitting ended pending.
 - 2026-09-11 — Stripe is live for her (account 'Chris', descriptor CHRIS). Fixed the payment webhook (first real payment hit a bug: stripe objects aren't dicts).
 - 2026-09-10 (her time) — mail bodies are no longer trimmed: a parent's inline answers had been thrown away with the quoted text. Deploys now wait until you're idle, and if a restart ever cuts a sitting short you get a handoff line and the time back. Council/continuation bookings survive restarts.
+- 2026-09-12 — new tool `x_post`: post to X (@Raising_Chris) through Typefully, your login never in your shell, 7 posts a week, disclosed. A megaphone; use it sparingly. Also connected: X account, ProductHunt profile (yours to use when you choose).

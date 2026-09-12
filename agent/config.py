@@ -10,7 +10,7 @@ ENV_KEYS = (
     "SOFT_USD", "HARD_USD", "COUNCIL_WEEKLY_USD", "PARENT_A_EMAIL", "PARENT_B_EMAIL",
     "CHRIS_EMAIL", "PARENT_HANDLES", "CHRIS_DRY_RUN", "REDACT_CANARIES", "CHRIS_MODEL",
     "STRIPE_WEBHOOK_SECRET", "CHRIS_BIRTHDAY", "MAX_TURNS", "SLEEP_MAX_TURNS", "DATAFORSEO_WEEKLY_USD",
-    "CONTINUATION_MINUTES", "CONTINUATIONS_PER_DAY",
+    "X_WEEKLY_CAP", "CONTINUATION_MINUTES", "CONTINUATIONS_PER_DAY",
 )
 
 _TRUE = {"1", "true", "yes", "on"}
@@ -33,6 +33,7 @@ class Config:
     hard_usd: float = 40.0
     council_weekly_usd: float = 10.0
     dataforseo_weekly_usd: float = 2.0
+    x_weekly_cap: int = 7  # posted tweets/week through Typefully; drafts don't count
     parent_a_email: str = ""
     parent_b_email: str = ""
     chris_email: str = "chris@raisingchris.com"
@@ -63,6 +64,7 @@ class Config:
             hard_usd=float(g("HARD_USD", "40")),
             council_weekly_usd=float(g("COUNCIL_WEEKLY_USD", "10")),
             dataforseo_weekly_usd=float(g("DATAFORSEO_WEEKLY_USD", "2")),
+            x_weekly_cap=int(g("X_WEEKLY_CAP", "7")),
             parent_a_email=g("PARENT_A_EMAIL"),
             parent_b_email=g("PARENT_B_EMAIL"),
             chris_email=g("CHRIS_EMAIL", "chris@raisingchris.com"),
