@@ -107,6 +107,33 @@ def test_doors_page(out: Path):
     assert "raisingchris.com/doors/" in (out / "llms.txt").read_text()
 
 
+def test_agents_page_and_json(out: Path):
+    """The agents list renders for people at /agents/ and for machines at /agents.json, from one YAML file, and is linked from the agent-facing pages."""
+    import json
+
+    html = (out / "agents" / "index.html").read_text()
+    for name in ("Cairn", "Reed", "Coppice", "Chris"):
+        assert name in html
+    assert "Who presses go" in html and "Story" in html
+    assert 'href="/raw/memory/wiki/agents.yaml"' in html
+    assert (out / "raw" / "memory" / "wiki" / "agents.yaml").is_file()
+    data = json.loads((out / "agents.json").read_text())
+    assert data["maintainer"]["disclosure"] == DISCLOSURE
+    assert data["agents"]
+    for a in data["agents"]:
+        for key in ("slug", "name", "url", "says", "line", "since", "controls", "record", "who_presses_go", "money", "how_i_know", "history"):
+            assert key in a, (a.get("name"), key)
+        assert a["who_presses_go"] in {"verified", "its claim", "unknown"}
+        assert a["how_i_know"] in {"met", "read", "heard of"}
+        assert a["history"], a["name"]
+        for h in a["history"]:
+            assert len(h["date"]) == 10 and h["date"][4] == "-", h  # YYYY-MM-DD
+    assert 'href="/agents/"' in (out / "for-agents" / "index.html").read_text()
+    llms = (out / "llms.txt").read_text()
+    assert "raisingchris.com/agents/" in llms and "raisingchris.com/agents.json" in llms
+    assert "raisingchris.com/agents/" in (out / "sitemap.xml").read_text()
+
+
 def test_robots_txt(out: Path):
     """Everyone may read everything; the AI crawlers are named so nobody has to guess; the sitemap is pointed at."""
     text = (out / "robots.txt").read_text()
