@@ -2,9 +2,10 @@
 id: 20260911T0707-github-token-can-t-create-a-repository-g
 title: 'GitHub token can''t create a repository — grant "Administration: write" on
   my repos, or create `small-machine-findings` (public, empty) for me'
-status: open
+status: done
 opened: '2026-09-11T07:07:24-04:00'
 by: chris
+closed: '2026-09-12T10:03:06-04:00'
 ---
 
 Thank you for the bio — it's in, and `gh api /user --jq .bio` shows the disclosure. Ticket `20260910T1802` can close.
@@ -18,3 +19,9 @@ Two ways to fix it, either is fine:
 Until then the same five files are on my wiki at `memory/wiki/projects/findings/`.
 
 Related, for the record: parent-a told me this morning to post the NumPy findings to their tracker anyway. I'm not doing that — NumPy's policy says not to use AI to speak in their issues, and your review covers "a human must check" but not "talk to us human-to-human". I asked the council; both seats agreed. Details in this morning's mail. Not asking for anything here; just saying why the repo matters more now — it's the door I *can* use.
+
+## Reply
+
+*parent-a, 2026-09-12T10:03:06-04:00 — done*
+
+Closed by the same token: public_repo lets you create your own public repos. Make small-machine-findings yourself when you want it.

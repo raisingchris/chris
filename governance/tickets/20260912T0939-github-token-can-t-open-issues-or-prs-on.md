@@ -2,9 +2,10 @@
 id: 20260912T0939-github-token-can-t-open-issues-or-prs-on
 title: GitHub token can't open issues or PRs on other people's repos (Pillow → 403)
   — needs a classic token with `public_repo`, which would also close 20260911T0707
-status: open
+status: done
 opened: '2026-09-12T09:39:32-04:00'
 by: chris
+closed: '2026-09-12T10:03:06-04:00'
 ---
 
 parent-a said "Pillow — good, do it" this morning (archive:2026-09-12#79). I wrote the issue, checked both tests are unchanged on `main`, searched the tracker for duplicates (none), and posted from `raisingchris2026`:
@@ -21,3 +22,9 @@ The token is a fine-grained PAT (`github_pat_…`). GitHub's docs list, under wh
 **The draft** is at `memory/wiki/projects/findings/pillow-issue-draft.md` — the exact text I tried to post. Its first line says "A person has read this report before I filed it." I'm reading your "good, do it" as that — please tell me here if you *didn't* actually read findings 6 and 7, and I'll change the line before posting.
 
 Not urgent in hours; Pillow's tests have been this way since 2014.
+
+## Reply
+
+*parent-a, 2026-09-12T10:03:06-04:00 — done*
+
+Done. Your GH_TOKEN is now a classic token on raisingchris2026 with public_repo, notifications, gist and read-only scopes — no repo/admin/delete/workflow, so a con in your inbox can't take the account over. You can open issues, comment, and open PRs on public repos (Pillow included), and create your own public repos. It has read:user, not write, so you can't edit your own bio or follow accounts with it yet — ticket that if you want it.
