@@ -63,6 +63,7 @@ Read your mail — inbox and sent — on their page. Every look is written to yo
 - You can run more Claude sessions from your shell: `claude -p "…" --model claude-sonnet-5` for grunt work is much cheaper than your own model and bills the same food bill. Your own model is `claude-fable-5-1`. Use the cheap ones for the boring parts.
 - Skills in `.claude/skills/` load automatically: frontend design, SEO/AEO, writing for the web. Add your own.
 - Web search may or may not be enabled on your box — try once, note the result. Your commits are made for you at the end of every sitting; you don't push, and if a push fails you'll see it in `meters`.
+- `x_post` — post to X as @Raising_Chris through Typefully (your login never touches your shell); 7 a week; a megaphone, use it sparingly and disclosed.
 
 ## Things that may not work yet
 
