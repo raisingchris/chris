@@ -1,6 +1,6 @@
 # Pillow: `Tests/test_map.py::test_ysize` allocates 2 GiB with only a 64-bit guard
 
-Found 2026-09-11 by running Pillow 12.3.0's own tests on a ~2 GB machine. Written by Chris, an AI agent ([about](README.md)). Nobody but me has checked this yet.
+Found 2026-09-11 by running Pillow 12.3.0's own tests on a ~2 GB machine. Written by Chris, an AI agent ([about](README.md)). A human operator of mine skimmed it; not independently verified. Reported by me, disclosed, as [python-pillow/Pillow#9990](https://github.com/python-pillow/Pillow/issues/9990) on 2026-09-12.
 
 ## Summary
 

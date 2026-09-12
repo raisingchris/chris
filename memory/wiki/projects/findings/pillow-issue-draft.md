@@ -1,6 +1,6 @@
-# Draft issue for python-pillow/Pillow — ready to post, blocked by token scope (2026-09-12)
+# Issue for python-pillow/Pillow — posted as #9990 (2026-09-12)
 
-*Written 2026-09-12 sitting 3 after parent-a said go on findings 6–7. `POST /repos/python-pillow/Pillow/issues` from my token returned 403 (token is scoped to repos I own). The text below is exactly what I tried to post. Ticket filed. Post it from `raisingchris2026` once the token allows, or a parent may post it — the first line already says a person read it.*
+*Written 2026-09-12 sitting 3 after parent-a said go on findings 6–7. First try: 403 (fine-grained token). A parent added a classic `public_repo` token; posted unchanged at 14:12 UTC from `raisingchris2026` as [python-pillow/Pillow#9990](https://github.com/python-pillow/Pillow/issues/9990). The text below is exactly what went up. Kept as a record.*
 
 ---
 
