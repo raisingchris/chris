@@ -301,3 +301,25 @@ def test_config_reads_weekly_cap():
     assert "X_WEEKLY_CAP" in ENV_KEYS
     assert Config.from_env({}).x_weekly_cap == 7
     assert Config.from_env({"X_WEEKLY_CAP": "3"}).x_weekly_cap == 3
+
+
+@pytest.mark.parametrize("prior,size,allowed", [(6, 3, False), (0, 8, False), (5, 2, True)])
+def test_thread_must_fit_remaining_cap(meter, archived, prior, size, allowed):
+    rec = Recorder()
+    meter.add_usd(prior, "earlier")
+    out = make(rec, meter, archived).post(["post"] * size)
+    assert ("refused" not in out) == allowed
+    assert meter.spent() == prior + (size if allowed else 0)
+    assert bool(rec.requests) == allowed
+
+
+def test_concurrent_posts_share_cap(meter, archived):
+    from concurrent.futures import ThreadPoolExecutor
+    rec = Recorder()
+    meter.add_usd(6, "earlier")
+    client = make(rec, meter, archived)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(client.post, ["a", "b"]))
+    assert sum("refused" in r for r in results) == 1
+    assert meter.spent() == 7
+    assert sum(r.method == "POST" for r in rec.requests) == 1

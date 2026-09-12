@@ -8,15 +8,16 @@ public table at governance/odometer.md, one-line summary in memory/wiki/self/odo
 from __future__ import annotations
 
 import json
-import re
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from enum import Enum
 from pathlib import Path
 from typing import Callable
+from threading import Lock
+
+from agent.archive import is_valid_ref
 
 import yaml
 
-REF_RE = re.compile(r"^archive:\d{4}-\d{2}-\d{2}#\d+$")
 DEFAULT_LOOPS = 40
 
 
@@ -39,12 +40,15 @@ PUBLIC_HEADER = "# Odometer\n\nLoops closed with the real world. One row per loo
 
 class Odometer:
     def __init__(self, repo_dir: str | Path, state_dir: str | Path,
-                 archive_append: Callable[[str, dict], str], now: Callable[[], datetime]):
+                 archive_append: Callable[[str, dict], str], now: Callable[[], datetime],
+                 archive_get: Callable[[str], dict]):
         self.repo = Path(repo_dir)
         self.log = Path(state_dir) / "odometer.jsonl"
         self.public = self.repo / "governance" / "odometer.md"
         self._archive = archive_append
         self._now = now
+        self._get = archive_get
+        self._claim_lock = Lock()
 
     def _entries(self) -> list[dict]:
         if not self.log.exists():
@@ -52,13 +56,52 @@ class Odometer:
         return [json.loads(l) for l in self.log.read_text().splitlines() if l.strip()]
 
     def claim(self, loop_type: str, evidence_refs: list[str], note: str) -> dict:
+        with self._claim_lock:
+            return self._claim(loop_type, evidence_refs, note)
+
+    def _claim(self, loop_type: str, evidence_refs: list[str], note: str) -> dict:
         try:
             lt = LoopType(loop_type)
         except ValueError:
             raise ValueError(f"unknown loop type {loop_type!r}; allowed: {[t.value for t in LoopType]}")
-        refs = [r for r in (evidence_refs or []) if isinstance(r, str) and REF_RE.match(r)]
-        if not refs:
-            raise ValueError("a loop claim needs at least one evidence ref like archive:YYYY-MM-DD#N")
+        if not isinstance(evidence_refs, list) or not evidence_refs or not all(is_valid_ref(r) for r in evidence_refs):
+            raise ValueError("every evidence ref must be an archive:YYYY-MM-DD#N reference")
+        refs = list(evidence_refs)
+        if len(set(refs)) != len(refs):
+            raise ValueError("evidence refs must be distinct")
+        if not isinstance(note, str) or not note.strip():
+            raise ValueError("explain the completed loop in a non-empty note")
+        records, times = [], []
+        for ref in refs:
+            try:
+                record = self._get(ref)
+                stamp = datetime.fromisoformat(record["ts"])
+                if record.get("ref") != ref or stamp.tzinfo is None:
+                    raise ValueError("invalid record")
+            except (KeyError, ValueError, TypeError):
+                raise ValueError(f"evidence is missing or invalid: {ref}") from None
+            if stamp > self._now():
+                raise ValueError(f"evidence is in the future: {ref}")
+            records.append(record)
+            times.append(stamp)
+        # Evidence is single-use across types, including old claims without new metadata.
+        used = {r for entry in self._entries() for r in entry.get("evidence", [])}
+        if used.intersection(refs):
+            raise ValueError("evidence already belongs to a claimed loop")
+        if lt == LoopType.changed_by_reply:
+            if len(refs) != 3:
+                raise ValueError("changed_by_reply needs three refs in order: outside message, change, follow-up")
+            payload = records[0].get("payload") or {}
+            sender = str(payload.get("data", payload).get("from", "")).lower()
+            if records[0].get("kind") != "mail_in" or not sender or "parent-" in sender:
+                raise ValueError("the first ref must be an incoming message from outside the family")
+            if not times[0] <= times[1] <= times[2] or times[2] - times[1] < timedelta(days=7):
+                raise ValueError("follow-up evidence must be at least seven days after the change")
+            # This establishes a traceable citation, not a semantic judgment of growth.
+            if refs[0] not in json.dumps(records[1].get("payload", {}), ensure_ascii=False):
+                raise ValueError("the change record must cite the outside message ref")
+            if refs[1] not in json.dumps(records[2].get("payload", {}), ensure_ascii=False):
+                raise ValueError("the follow-up record must cite the change ref")
         today = self._now().date().isoformat()
         entry = {"date": today, "loop": lt.value, "note": note, "evidence": refs,
                  "n": self.count() + 1}

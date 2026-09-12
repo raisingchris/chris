@@ -26,3 +26,12 @@ def test_birthday_prefers_config_then_first_diary(tmp_path):
     assert s.birthday() == date(2026, 9, 2)
     s2 = wiring.build(_cfg(tmp_path, birthday="2026-08-30"), secrets=wiring.Secrets())
     assert s2.birthday() == date(2026, 8, 30)
+
+
+def test_odometer_uses_real_archive_lookup(tmp_path):
+    import pytest
+    s = wiring.build(_cfg(tmp_path), secrets=wiring.Secrets())
+    with pytest.raises(ValueError, match="missing or invalid"):
+        s.odometer.claim("promise_kept", ["archive:2026-01-01#1"], "missing")
+    ref = s.archive.append("tool", {"result": "promise kept"})
+    assert s.odometer.claim("promise_kept", [ref], "done")["n"] == 1

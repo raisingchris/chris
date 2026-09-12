@@ -343,7 +343,7 @@ SCHEMAS: dict[str, tuple[str, dict]] = {
                    {"type": str, "amount": float, "ccy": str, "counterparty": str, "memo": str}),
     "payment_link": ("Create a Stripe card-payment link so someone can pay you.",
                      {"amount_cents": int, "ccy": str, "name": str, "description": str}),
-    "odometer_claim": ("Claim a closed loop for your odometer. Needs at least one archive:YYYY-MM-DD#N evidence ref.",
+    "odometer_claim": ("Claim a closed loop with real, past, unused archive:YYYY-MM-DD#N evidence refs. For changed_by_reply supply exactly three refs in order: outside incoming mail, change citing that mail ref, and follow-up citing the change ref at least seven days after the change. Explain the changed file/commit and how the follow-up shows it still stands in the note.",
                        {"loop_type": str, "evidence_refs": list, "note": str}),
     "scratch_write": ("Append to your private scratchpad. Nobody reads it; it is not archived.", {"text": str}),
     "scratch_read": ("Read your private scratchpad.", {}),

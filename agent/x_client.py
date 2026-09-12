@@ -13,6 +13,7 @@ megaphone, not a conversation, so the cap is deliberately small.
 from __future__ import annotations
 
 import time
+from threading import Lock
 from typing import Any, Callable, Iterable
 
 import httpx
@@ -44,6 +45,7 @@ class XClient:
         self._social_set = str(social_set)
         self._archive = archive_append
         self.meter = meter
+        self._post_lock = Lock()
         self.weekly_cap = int(weekly_cap)
         self._http = http or httpx.Client(base_url=BASE_URL, timeout=TIMEOUT_S)
         # Poll pacing is instance state so tests can drive it to zero (poll once, don't sleep).
@@ -74,10 +76,15 @@ class XClient:
         return {"Authorization": f"Bearer {self._api_key}", "Content-Type": "application/json"}
 
     def _create(self, text_or_list: str | Iterable[str], publish: bool) -> dict:
+        # Tool calls may run concurrently in worker threads. Serialize check + send + charge.
+        with self._post_lock:
+            return self._create_locked(text_or_list, publish)
+
+    def _create_locked(self, text_or_list: str | Iterable[str], publish: bool) -> dict:
         posts = self._posts(text_or_list)  # raises XError before any request
         n = len(posts)
-        if publish and self.meter.exceeded(self.weekly_cap):
-            return {"refused": (f"You've already posted {int(self.meter.spent())} to X this week; "
+        if publish and n > self.meter.remaining(self.weekly_cap):
+            return {"refused": (f"This request has {n} posts and you've already posted {int(self.meter.spent())} this week; "
                                 f"the cap is {self.weekly_cap} posts a week. It resets Monday. "
                                 "X is a megaphone — save it for something worth saying."),
                     "published": False, "n_posts": n}

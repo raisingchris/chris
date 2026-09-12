@@ -264,7 +264,7 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
 
     # Her clock, not UTC: odometer claims and archive refs must share a date.
     tz = ZoneInfo(cfg.tz)
-    odometer = Odometer(cfg.repo_dir, cfg.state_dir, archive.append, lambda: datetime.now(tz))
+    odometer = Odometer(cfg.repo_dir, cfg.state_dir, archive.append, lambda: datetime.now(tz), archive.get)
 
     dataforseo = None
     if secrets.dataforseo_auth_b64:

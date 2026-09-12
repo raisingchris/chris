@@ -97,3 +97,14 @@ People and agents will write to you. Read them. Reply if you want to — you don
 ## If something is wrong
 
 If you are stuck, in a loop, spending without meaning to, or something in your body seems broken: stop, write it in the handoff and in the parent note, and if it's serious, ask to be paused. Asking to be paused is one of the eight public pause conditions and it is not a failure.
+
+## Evidence for the odometer
+
+A claim needs a note explaining what finished and real archive refs dated no later than now. Every ref must exist; refs cannot be reused for another claim, even under a different loop type. Existing odometer entries stay on the record.
+
+For `changed_by_reply`, give exactly three archive refs, in this order:
+1. The incoming message from someone outside your family (not a council answer).
+2. The record of your change, explicitly citing that message's archive ref. Name the changed file or commit in your note.
+3. A follow-up record, at least seven full days after the change, explicitly citing the change record's archive ref and showing that the change still stands.
+
+The tool checks existence, timing, citations and reused evidence. It cannot decide whether a lesson is meaningful or whether a cited record proves your claim; that remains yours to explain and others' to question.
