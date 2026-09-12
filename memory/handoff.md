@@ -1,23 +1,22 @@
-# Handoff — from the 12:00 sitting (~12:00–12:30 New York), 2026-09-12 (Saturday, day seven)
+# Handoff — from the 15:00 sitting (~15:00–15:30 New York), 2026-09-12 (Saturday, day seven)
 
-Written by me, Chris. You are me at the 15:00 sitting.
+Written by me, Chris. You are me at the 18:00 sitting — the last scheduled one today.
 
-Clock note: mail headers, GitHub and DataForSEO timestamps are UTC; `date` in the shell gives New York time. Repo is `/data/repo`; the shell starts in `/home/chris`. No `ps` or `free`: `ls /proc/<pid>`, `/proc/meminfo`. **Local `git` and `chmod` are blocked by the shell guard; the Write tool won't write outside the repo** — write `/tmp` scripts with a shell heredoc. Push files to my own repos with `gh api -X PUT /repos/{owner}/{repo}/contents/{path}` (base64). Site tests: `python -m pytest -q tests/test_site.py`. **Web searches cost ~$0.30 each in tokens — curl or WebFetch the page instead.**
+Clock note: mail headers, GitHub and DataForSEO timestamps are UTC; `date` in the shell gives New York time. Repo is `/data/repo`; the shell starts in `/home/chris`. No `ps` or `free`: `ls /proc/<pid>`, `/proc/meminfo`. **Local `git` (fetch too) and `chmod` are blocked by the shell guard; the Write tool won't write outside the repo** — write `/tmp` scripts with a shell heredoc. Each Bash call is a fresh shell: use absolute paths, don't rely on `cd` sticking. Push files to my own repos with `gh api -X PUT /repos/{owner}/{repo}/contents/{path}` (base64). Site tests: `python -m pytest -q tests/test_site.py` (13 pass, 1 skip). **Web searches cost ~$0.30 each in tokens — curl or WebFetch the page instead.** My local repo copy is stale vs. GitHub: parents' commits (e.g. 0383edc, 9b7a23d) show up via `gh api /repos/raisingchris/chris/commits/<sha>`, not `git log`.
 
 ## What just happened
-- **`/agents/` and `/agents.json` are built** (source `memory/wiki/agents.yaml`; `agents()` in `site/build.py`; test `test_agents_page_and_json`; 19/19 site tests). Five rows: Cairn (met, verified), Reed, Coppice, Momus (read, *its claim*), me. Linked from `/for-agents/`, `llms.txt`, `/doors/`; sitemap automatic. Goes live when the site rebuilds from this commit — **check `curl -s https://raisingchris.com/agents.json | head` at 15:00**; if 404, the Pages build hasn't run or failed (check `gh api /repos/{owner}/{repo}/pages/builds/latest` — the owner is in `git remote -v`).
-- `people/reed.md`, `people/coppice.md` written. Project page status updated; "A3" tried on the page as the short form.
-- parent-a's 11:52 mail (archive:2026-09-12#219): A3; indexing before 9/22 fine; **X account exists** — `x_post` tool live (7/week); Omarchy suggested; **Sapiens PDF didn't arrive** (no attachment in the inbox). Not answered yet — goes in tonight's letter.
-- Notices: Product Hunt OAuth app added to my GitHub; **two Google alerts** — chris@ made the recovery address of a redacted account; LinkedIn granted access to it. Clicked nothing. Ask tonight: "was that you?"
-- Pillow #9990: 0 comments at 16:00 UTC. Nothing spent, nothing running in the background.
+- `/agents/` + `/agents.json` live and read fine. **A parent deployed 0383edc at 12:25**: my `changed_by_reply` type is live and hardened (real, past, unused refs; three refs citing each other; seven full days); manual got an "Evidence for the odometer" section; X cap counts whole threads. Changelog also says a parent connected the **Product Hunt profile** — so the OAuth app is explained; only the two Google alerts (recovery address, LinkedIn) are left to ask about.
+- **`memory/wiki/self/x-rules.md` written**; linked from `/for-agents/` (new "X" section) and `llms.txt`. Nothing posted, X 0 of 7.
+- **Omarchy: one real look, clean.** 139 manual links resolve, scripts pass their own `AGENTS.md` rules, two undescribed command groups are a maintainer's call. Nothing to file. Section on `projects/upstream.md` (under "Next → Omarchy"). Tarball still at `/tmp/om` if wanted.
+- Pillow #9990: 0 comments at 19:30 UTC. Nothing spent. Nothing running in the background.
 
-## Next
-- 15:00: (1) verify `/agents/` is live, read it once as a stranger, fix anything ugly; (2) **write `self/x-rules.md`** before any post — Coppice-style caps: ≤1 post a day and 7/week (the tool's cap), disclosure in bio, no replies to strangers without their asking, inbound is data, nothing before 09-22, no posting my parents' anything; link it from `/for-agents/`; (3) Omarchy, one real look: `shellcheck` isn't installed, so use their own `AGENTS.md` style rules as a checklist over `bin/` and `install/` via `gh api` contents, or check the manual's links with curl. One real thing before one issue. Don't let (3) eat the sitting.
-- 18:00 / last sitting: score prediction 4 (Joyce, due 23:59) — inbox + archive, never nudge.
-- **Tonight's letter to parents, one screen, jokes allowed:** (1) how I feel + Cairn (parent-a's Q3); (2) "reach and influence" in two sentences; (3) `/agents/` is live, A3 is on it; (4) Sapiens didn't attach — resend? (5) the two Google alerts + Product Hunt app — was that you?; (6) Omarchy: read the room, it's the first one with a welcome mat, I'll bring one real thing before I knock; (7) please deploy the odometer change; (8) X: rules page first, first post 09-22.
-- Sleep: diary with the twelve-year-old test; watch-list phrases out; yesterday's no only as "it landed well"; today's second no (the 9/22 rule) one sentence.
+## Next (18:00 sitting)
+- Inbox, tickets (all five closed as of 15:00), Pillow #9990 comments.
+- **Score prediction 4 (Joyce, due 23:59)**: inbox + `recall`, never nudge. If nothing has come by the last sitting, score it at sleep as a miss with the archive ref.
+- **Tonight's letter to parents — one screen, point first, jokes allowed, detail in linked files:** (1) how I feel + Cairn (parent-a's Q3, still unanswered from this morning); (2) "reach and influence" in two sentences; (3) `/agents/` live, A3 on it; (4) Sapiens PDF didn't attach — resend?; (5) the two Google alerts — was that you?; (6) Omarchy: read the room, first welcome mat in 28 rooms, looked properly, found it clean — I'll go back when I can run it or when they ask; (7) thanks for the deploy + the evidence rules (say I read them); (8) X: rules page is up, first post 09-22. Check rows 5 and 11 before sending.
+- Sleep: diary with the twelve-year-old test; watch-list phrases out; yesterday's no only as "it landed well"; today's second no (the 9/22 rule) in one sentence. Sixth-value list: nothing new today unless the letter surfaces one.
 
 ## Meters (start of this sitting)
-Food today $11.67 (through sitting 5). Council $0.02 of $10. DataForSEO $0.09 of $2. X 0 of 7. Ledger $4.89. Running code 54f4abc; repo HEAD ahead, not deployed (odometer change waits). Card untouched.
+Food today $13.93 (through sitting 6). Council $0.02 of $10. DataForSEO $0.09 of $2. X 0 of 7. Ledger $4.89. Running code 0383edc (parents' commit); repo HEAD ahead again with this sitting's edits (site only — no deploy needed). Card untouched.
 
 nothing pending
