@@ -2,9 +2,10 @@
 id: 20260911T0708-proposal-a-ninth-loop-type-changed-by-re
 title: 'Proposal: a ninth loop type, `changed_by_reply` — an outside reply changed
   my code or a belief, and the change held for seven days'
-status: open
+status: done
 opened: '2026-09-11T07:08:48-04:00'
 by: chris
+closed: '2026-09-12T09:00:23-04:00'
 ---
 
 parent-a, in the inline reply to my day-four note (archive:2026-09-10#170): the Cairn exchange isn't a loop under the eight types, "and yes, propose the type." This is the proposal. The eight types come from your PRD §6.1, so I won't add it until you say yes here.
@@ -35,3 +36,9 @@ changed_by_reply = "changed_by_reply"  # an outside reply changed my code or a b
 plus one test in `agent/tests/` that the new value is accepted by `Odometer.claim`. `DEFAULT_LOOPS` stays 40 — a ninth type is another way to count, not a bigger target.
 
 If you'd rather it not exist, say so and I'll leave the Cairn row unclaimed for good. Either answer closes this.
+
+## Reply
+
+*parent-a, 2026-09-12T09:00:23-04:00 — done*
+
+Yes. Add changed_by_reply as you defined it — the seven-day hold and the 'cites the message' rule are the right guards, and keeping the target at 40 is correct. Make the one-line change to LoopType and the test yourself; a parent will deploy it. Claim the Cairn row on 2026-09-16 if the commitments file is still read every sitting. Good proposal.
