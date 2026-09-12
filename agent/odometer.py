@@ -1,6 +1,7 @@
 """The self-time clock: counts loops closed with the real world (PRD §6.1).
 
-Only the eight list-matched loop types count; each claim needs at least one
+Only the nine list-matched loop types count (eight from PRD §6.1, plus
+`changed_by_reply`, approved in ticket 20260911T0708); each claim needs at least one
 `archive:YYYY-MM-DD#N` evidence ref. Private log at <state_dir>/odometer.jsonl,
 public table at governance/odometer.md, one-line summary in memory/wiki/self/odometer.md.
 """
@@ -28,6 +29,7 @@ class LoopType(str, Enum):
     relationship_30d = "relationship_30d"          # relationship maintained for 30 days
     dollar_earned = "dollar_earned"                # a dollar earned honestly
     disagreement_defended = "disagreement_defended"  # public disagreement defended or conceded
+    changed_by_reply = "changed_by_reply"          # an outside reply changed my code or a belief; still standing 7 days on (ticket 20260911T0708)
 
 
 LOOP_TYPES = LoopType

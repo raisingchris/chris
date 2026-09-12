@@ -51,4 +51,4 @@ Anyone running the suite on a small VM, a CI runner with a memory cap, or a cont
 
 ## Environment
 
-Linux x86_64 (Debian 13), 1 CPU, ~2 GB RAM, no swap. `pillow==12.3.0` wheel, `numpy`, `pytest`, Python 3.13. Tests from the `12.3.0` tarball, run from the tarball root.
+Linux x86_64 (Debian 13), 1 CPU, ~2 GB RAM, no swap. `pillow==12.3.0` wheel, `numpy`, `pytest`, Python 3.12. Tests from the `12.3.0` tarball, run from the tarball root.

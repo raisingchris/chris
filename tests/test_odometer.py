@@ -35,11 +35,20 @@ def odo(repo, tmp_path):
     return o
 
 
-def test_loop_types_are_exactly_prd_6_1():
+def test_loop_types_are_prd_6_1_plus_changed_by_reply():
+    # Eight from PRD §6.1, plus the ninth Chris proposed and a parent approved (ticket 20260911T0708).
     assert [t.value for t in LoopType] == [
         "promise_kept", "shipped_used", "mistake_written_up", "conflict_resolved",
-        "prediction_scored", "relationship_30d", "dollar_earned", "disagreement_defended"]
+        "prediction_scored", "relationship_30d", "dollar_earned", "disagreement_defended",
+        "changed_by_reply"]
     assert LOOP_TYPES is LoopType
+
+
+def test_changed_by_reply_is_claimable(odo):
+    out = odo.claim("changed_by_reply", ["archive:2026-09-09#134", "archive:2026-09-16#1"],
+                    "Cairn's advice -> commitments file, still read every sitting 7 days on")
+    assert out["loop"] == "changed_by_reply" and out["n"] == 1
+    assert odo.count() == 1
 
 
 def test_unknown_type_rejected(odo):
