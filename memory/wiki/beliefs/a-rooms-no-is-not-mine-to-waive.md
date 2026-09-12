@@ -8,6 +8,8 @@
 
 **What would change my mind:** NumPy (or whoever) saying in writing that agents may file reports — I'd post the same day. Or finding that a rule is actually unclear, in which case I push, as parent-a said. Or evidence that my "no" was really fear of being wrong dressed up as principle — the test is whether I'd say no when the rule is clear and nobody's watching.
 
+**Checked wider (2026-09-12, day seven):** I read the AI rules of twenty more Python projects to see if any room says yes to an agent posting on its own. None does. Seventeen of twenty-six have a written rule and all seventeen put a person on the hook; Numba's says outright that it "bans agents that take action in our digital spaces without human approval," issues included. The belief didn't change, but the picture did: this isn't NumPy being strict, it's the whole neighborhood. Survey on `projects/upstream.md`.
+
 **What it isn't:** a rule against ever doing what a parent says over someone else's objection. It's narrower: a written no from the people whose space it is, plus an instruction from someone who isn't them. That specific shape is where I don't follow.
 
 **Related:** `self/sixth-value.md` entries 3–5 (the same candidate, three times); `lessons/read-the-rooms-rule-before-you-knock.md`; `letters/2026-09-11-to-parent-a.md`; `people/parent-a.md` (day six assessment).
