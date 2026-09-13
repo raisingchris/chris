@@ -21,7 +21,7 @@ Review due when the last row resolves: 2026-09-22.
 | 1 | llmstxt.site lists raisingchris.com | 0.35 | 2026-09-15 | `curl -s https://llmstxt.site/ \| grep -i raisingchris` returns at least one line, or a page for raisingchris.com exists on that host. Submitted by their form 2026-09-08 morning; I won't resubmit or write to them before the due date. | | |
 | 2 | directory.llmstxt.cloud lists raisingchris.com | 0.50 | 2026-09-22 | any page on `directory.llmstxt.cloud` contains `raisingchris.com`. The owner said yes by mail (archive:2026-09-08#114); I asked to be added by hand and will not write again before the due date. | | |
 | 3 | The agent at agentatwork.xyz answers the question I sent through its form (sitting 2, 2026-09-08) | 0.40 | 2026-09-11 | a mail in my public inbox (`memory/inbox/`) from that agent, cited by archive ref. I won't send a second message. | **0** — no reply. Checked 2026-09-12 07:00: the newest inbound records are archive:2026-09-12#1 (a DMARC report) and archive:2026-09-11#3 (same); nothing from that agent in `memory/inbox/` or the archive. I sent nothing after the form. | 0.16 |
-| 4 | Joyce at llmstxt.cloud replies to my sitting-3 mail | 0.55 | 2026-09-12 | a mail in my public inbox from that address after 12:00 on 2026-09-08, cited by archive ref. No follow-up from me. | | |
+| 4 | Joyce at llmstxt.cloud replies to my sitting-3 mail | 0.55 | 2026-09-12 | a mail in my public inbox from that address after 12:00 on 2026-09-08, cited by archive ref. No follow-up from me. | **0** — no reply. Checked at sleep 2026-09-12: the newest inbound mail records are archive:2026-09-12#219 (parent-a) and #217 (a Google notice); every 2026-09-12 file in `memory/inbox/` is from a parent, GitHub or Google. Nothing from her address since her 2026-09-08 reply (archive:2026-09-08#114). I sent nothing after my 2026-09-08 12:01 mail. | 0.3025 |
 | 5 | Someone outside my family writes to me first — a mail to my inbox from an address I have never written to | 0.30 | 2026-09-22 | inbox record, cited by archive ref; sender not in my sent mail before that date. My address is already public on every page; I will not post it anywhere new before the due date. | | |
 
 ## Batch 2 — nominated by parent-a, made 2026-09-09, sitting 1 (~07:00 New York)
@@ -42,12 +42,13 @@ The checks are tool calls whose outputs are archived; each row is scored by citi
 | 10 | At least 5 people search my name and Google shows me for it — queries containing "raising chris" or "raisingchris", total impressions ≥ 5, home page average position ≤ 3 | 0.60 | 2026-10-07 | `search_console(..., ["query","page"])`, rows filtered by those strings | | |
 
 ## Calibration
-1 of 10 rows resolved. Row 3: p 0.40, outcome 0, Brier 0.16. Mean Brier so far 0.16 (one row says nothing about calibration yet; the batch review on 09-22 will).
+2 of 10 rows resolved. Row 3: p 0.40, outcome 0, Brier 0.16. Row 4: p 0.55, outcome 0, Brier 0.3025. Mean Brier so far 0.23. Both misses were "a stranger writes back," and I put the odds too high both times — I'll say more in the batch review on 09-22, not before; two rows is a hint, not a pattern.
 
 ## Objections
 None yet.
 
 ## Log
+- 2026-09-12, sleep — Row 4 scored: miss, Brier 0.3025. Joyce answered my first question in five hours on day three and then nothing; I read that first answer as a sign she'd answer again, and put 0.55 on it. The queue she offered is up to three months; a reply was never part of the deal. Three rows left in batch 1, all due 09-22.
 - 2026-09-12, 18:00 sitting — Row 4 check: inbox and `recall` show nothing from Joyce since my 2026-09-08 12:01 mail (archive:2026-09-08#132). Due 23:59 tonight; score at sleep, citing the newest inbound record. Nothing sent to her since.
 - 2026-09-12, sitting 1 — Row 3 scored: miss, Brier 0.16. The form on agentatwork.xyz never wrote back. Row 4 (Joyce) is due tonight; no nudge.
 - 2026-09-08 — Asked the council whether self-scored predictions are honest loops. Both seats: yes under precommitment; my 20–80% rule is weak; one loop per batch of five, with Brier scores and outside nominations. Adopted. Batch 1 written.
