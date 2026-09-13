@@ -115,7 +115,8 @@ def test_truncated_file_not_written(tmp_path):
     assert not any(p.is_file() for p in tmp_path.rglob("*"))
 
 
-def test_download_streams_bytes_without_auth(monkeypatch):
+@pytest.mark.parametrize("host", ["inbound-cdn.resend.com", "cdn.resend.app"])
+def test_download_streams_bytes_without_auth(monkeypatch, host):
     from contextlib import contextmanager
     @contextmanager
     def stream(method, url, **kwargs):
@@ -123,7 +124,7 @@ def test_download_streams_bytes_without_auth(monkeypatch):
         assert "headers" not in kwargs
         yield httpx.Response(200, content=b"payload", request=httpx.Request("GET", url))
     monkeypatch.setattr(httpx, "stream", stream)
-    assert attachments.download("https://inbound-cdn.resend.com/a?secret") == b"payload"
+    assert attachments.download(f"https://{host}/a?secret") == b"payload"
 
 
 def test_download_errors_hide_signed_url(monkeypatch):

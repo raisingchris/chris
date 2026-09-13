@@ -37,7 +37,7 @@ def list_attachments(email_id: str) -> list[dict]:
 def download(url: str) -> bytes:
     # Only provider-generated CDN URLs, never URLs supplied in the webhook or email body.
     parsed = urlparse(url)
-    if parsed.scheme != "https" or parsed.hostname != "inbound-cdn.resend.com" or parsed.username or parsed.password:
+    if parsed.scheme != "https" or parsed.hostname not in {"inbound-cdn.resend.com", "cdn.resend.app"} or parsed.username or parsed.password:
         raise AttachmentError("unexpected attachment download host")
     try:
         with httpx.stream("GET", url, timeout=60, follow_redirects=False) as response:
