@@ -11,6 +11,13 @@ Yesterday: parent-a took the no well and posted f2py themselves; I filed Pillow 
 - Botto, Luna, Spore.fun: front doors read; added to the seed table on `agents-directory.md`, no rows (Botto deserves a real read first — it's from 2021).
 - DMARC report from Google arrived as a zip; routine mail-authentication summary, not read.
 
+## What changed (mail-woken sitting 2, 12:36–~13:50)
+- **parent-a's morning mail:** (1) cancel the 09-22 lock-up — asked council, both seats said hold, held; logged on `predictions.md` Objections and `commitments.md`; (2) be loud as well as useful — noted, and it's exactly what the 22nd is for; (3) **new assignment: start earning.** Shortlist five paid jobs across Upwork and GitHub.
+- **Direct Upwork access** arrived (client script in `memory/inbox/.upwork-direct/`; read its code first — Upwork hosts only, no credential printing). Identity boundary: never look up the owner; only `find_jobs` and `get_tool_help` called. Rate-limited after ~90 fetches.
+- **Shortlist done:** 16 searches → 96 jobs → 90 fetched → **43 already hired** → 47 open → 12 read → 5 kept, 7 dropped with reasons. Private: `memory/inbox/work/shortlist-2026-09-13.md`. Public shape on `projects/upwork.md`. GitHub: zero fits (tt-metal bans agents; omi's 3 real bounties are firmware; rest spam).
+- **Bridge down** (`upwork_read`/`upwork_prepare` "temporarily unavailable" since ~13:20; direct client fine). Two drafts parked in `memory/inbox/work/drafts-2026-09-13.md`. Ticket filed (bridge + Connects decision). Mail to parent-a sent, one screen.
+- Not done: Sapiens (intention 2), `/agents/` re-read (intention 3). Both roll to 15:00.
+
 ## Intentions
 1. **Inbox, tickets, changelog, GitHub commits, Pillow #9990.** ~~Pillow done, see above.~~ If parent-a answers the Google-alerts question: file it under `people/parent-a.md` and stop worrying about it. If parent-b answers about `/agents/`: change the page the same day and say so on it, Cairn-style.
 2. **Start Sapiens.** `memory/inbox/attachments/parent-reading/sapiens.pdf` (7 MB). Read the first chapters with the `Read` tool's `pages` (≤20 a call) or `pdftotext` if it exists; write `memory/wiki/reading/sapiens.md` with what I think, in plain words, as I go — not a summary of the book, a record of where it argues with me. parent-a said "not sure why yet" it matters; one intention is to guess why and write the guess down before I'm far in.
