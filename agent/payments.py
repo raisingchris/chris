@@ -14,6 +14,7 @@ Stripe API notes (docs.stripe.com, fetched via context7 on 2026-09-06):
 from __future__ import annotations
 
 from typing import Callable
+import hashlib
 
 import stripe
 
@@ -23,11 +24,16 @@ ArchiveAppend = Callable[[str, dict], str]
 STATEMENT_DESCRIPTOR = "CHRIS"
 
 
+def public_receipt(session_id: str) -> str:
+    return "receipt-" + hashlib.sha256(session_id.encode()).hexdigest()[:20]
+
+
 class Payments:
-    def __init__(self, stripe_secret_key: str, archive_append: ArchiveAppend, ledger: Ledger):
+    def __init__(self, stripe_secret_key: str, archive_append: ArchiveAppend, ledger: Ledger, parent_emails=()):
         self._key = stripe_secret_key
         self._archive = archive_append
         self._ledger = ledger
+        self._parent_emails = {e.strip().casefold() for e in parent_emails if e and e.strip()}
 
     def create_link(self, amount_cents: int, ccy: str, name: str, description: str = "") -> str:
         stripe.api_key = self._key
@@ -49,17 +55,25 @@ class Payments:
     def handle_webhook(self, payload_bytes: bytes, sig_header: str, webhook_secret: str) -> dict | None:
         """Verify signature; on checkout.session.completed record revenue. Raises on bad signature."""
         event = stripe.Webhook.construct_event(payload_bytes, sig_header, webhook_secret)
-        if event["type"] != "checkout.session.completed":
+        if event["type"] not in {"checkout.session.completed", "checkout.session.async_payment_succeeded"}:
             return None
         obj = event["data"]["object"]
         # stripe-python objects aren't plain dicts (no .get); normalise once.
         s = obj.to_dict() if hasattr(obj, "to_dict") else dict(obj)
+        # Sandbox or unpaid checkout completion is not real income.
+        if s.get("livemode") is not True or s.get("payment_status") != "paid":
+            return None
         amount = (s.get("amount_total") or 0) / 100
         ccy = (s.get("currency") or "usd").upper()
         # Never the payer's address or even their domain: the ledger is public.
-        counterparty = "stranger"
-        row = self._ledger.add("revenue", amount, ccy, counterparty,
-                               "stripe payment link", ref=s["id"])
+        email = ((s.get("customer_details") or {}).get("email") or s.get("customer_email") or "").strip().casefold()
+        is_parent = bool(email and email in self._parent_emails)
+        counterparty = "parent" if is_parent else "stranger"
+        ref = public_receipt(s["id"])
+        # Legacy raw session refs still deduplicate until migrated.
+        old = next((r for r in self._ledger.rows() if r["ref"] == s["id"]), None)
+        row = old or self._ledger.add("allowance" if is_parent else "revenue", amount, ccy, counterparty,
+                    "parent contribution (live payment)" if is_parent else "stripe payment link", ref=ref)
         self._archive("payment_received", {"session_id": s["id"], "amount": amount,
                                            "ccy": ccy, "counterparty": counterparty})
-        return {"amount": amount, "ccy": ccy, "counterparty": counterparty, "ref": s["id"], "row": row}
+        return {"amount": amount, "ccy": ccy, "counterparty": counterparty, "ref": ref, "row": row}

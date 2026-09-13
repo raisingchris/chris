@@ -78,14 +78,14 @@ def test_create_link(make, archived):
 
 def test_webhook_adds_revenue_row(make, archived):
     event = {"type": "checkout.session.completed", "data": {"object": {
-        "id": "cs_1", "amount_total": 2500, "currency": "usd",
+        "id": "cs_1", "livemode": True, "payment_status": "paid", "amount_total": 2500, "currency": "usd",
         "customer_details": {"email": "someone@example.org"}}}}
     p, fake, ledger = make(event)
     out = p.handle_webhook(b"{}", "sig", "whsec")
     assert out["amount"] == 25.0 and out["ccy"] == "USD"
     assert out["counterparty"] == "stranger"  # not even the payer's domain reaches the public ledger
     rows = ledger.rows()
-    assert len(rows) == 1 and rows[0]["type"] == "revenue" and rows[0]["ref"] == "cs_1"
+    assert len(rows) == 1 and rows[0]["type"] == "revenue" and rows[0]["ref"] == payments.public_receipt("cs_1")
     assert ledger.balance() == 25.0
     assert archived[-1][0] == "payment_received"
     assert "someone@" not in str(archived) and "someone@" not in str(rows)
@@ -97,7 +97,7 @@ def test_webhook_adds_revenue_row(make, archived):
 
 def test_webhook_stranger_without_email(make):
     event = {"type": "checkout.session.completed", "data": {"object": {
-        "id": "cs_2", "amount_total": 100, "currency": "usd", "customer_details": None}}}
+        "id": "cs_2", "livemode": True, "payment_status": "paid", "amount_total": 100, "currency": "usd", "customer_details": None}}}
     p, _, ledger = make(event)
     assert p.handle_webhook(b"{}", "sig", "whsec")["counterparty"] == "stranger"
 
@@ -114,6 +114,34 @@ def test_webhook_bad_signature_raises(make):
         p.handle_webhook(b"{}", "sig", "whsec")
 
 
+@pytest.mark.parametrize("live,paid", [(False, "paid"), (True, "unpaid"), (None, "paid")])
+def test_sandbox_or_unpaid_sessions_do_not_reach_public_ledger(make, live, paid):
+    event = {"type": "checkout.session.completed", "data": {"object": {
+        "id": "cs_test_example", "livemode": live, "payment_status": paid,
+        "amount_total": 500, "currency": "usd"}}}
+    p, _, ledger = make(event)
+    assert p.handle_webhook(b"{}", "sig", "whsec") is None
+    assert ledger.rows() == []
+
+
+def test_parent_payment_is_funding_not_customer_revenue(make, archived):
+    event = {"type": "checkout.session.completed", "data": {"object": {
+        "id": "cs_live_example", "livemode": True, "payment_status": "paid",
+        "amount_total": 500, "currency": "usd",
+        "customer_details": {"email": "PARENT@example.test"}}}}
+    p, _, ledger = make(event)
+    p._parent_emails = {"parent@example.test"}
+    out = p.handle_webhook(b"{}", "sig", "whsec")
+    row = ledger.rows()[0]
+    assert row["type"] == "allowance" and row["counterparty"] == "parent"
+    assert row["ref"].startswith("receipt-") and "cs_live" not in row["ref"]
+    assert ledger.balance() == 5
+    assert "parent@example.test" not in str(archived).lower()
+    assert out["ref"] == row["ref"]
+    p.handle_webhook(b"{}", "sig", "whsec")
+    assert len(ledger.rows()) == 1
+
+
 def test_webhook_accepts_stripe_object_without_get(monkeypatch, tmp_path):
     from agent import payments as pm
     from agent.ledger import Ledger
@@ -121,9 +149,9 @@ def test_webhook_accepts_stripe_object_without_get(monkeypatch, tmp_path):
         def __init__(self, d): self._d = d
         def __getitem__(self, k): return self._d[k]
         def to_dict(self): return dict(self._d)
-    ev = {"type": "checkout.session.completed", "data": {"object": Obj({"id": "cs_1", "amount_total": 500, "currency": "usd"})}}
+    ev = {"type": "checkout.session.completed", "data": {"object": Obj({"id": "cs_1", "livemode": True, "payment_status": "paid", "amount_total": 500, "currency": "usd"})}}
     monkeypatch.setattr(pm.stripe.Webhook, "construct_event", lambda *a, **k: ev)
     (tmp_path / "ledger").mkdir()
     p = pm.Payments("sk", lambda k, d: "archive:2026-01-01#1", Ledger(tmp_path))
     out = p.handle_webhook(b"{}", "sig", "whsec")
-    assert out["amount"] == 5.0 and out["ref"] == "cs_1"
+    assert out["amount"] == 5.0 and out["ref"] == payments.public_receipt("cs_1")

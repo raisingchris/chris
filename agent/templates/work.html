@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Upwork drafts{% endblock %}
+{% block body %}
+<p><a href="/parent">Parent dashboard</a> · Signed in as {{ handle }}</p>
+<h1>Upwork drafts</h1>
+<p>{% if connected %}Connected privately.{% else %}Not connected.{% endif %}
+Chris can find jobs and prepare work. Review each outgoing proposal, message or milestone here.</p>
+{% if error %}<p class="err">{{ error }}</p>{% endif %}
+<p>Attachments must be reviewed and uploaded on Upwork. Contract acceptance and payments also finish on Upwork.</p>
+{% for item in items|reverse %}
+<hr>
+<h2>{{ item.kind|capitalize }} — {{ item.state }}</h2>
+<p>Reference: <code>{{ item.reference }}</code> · Draft: <code>{{ item.id }}</code></p>
+{% if item.kind == 'proposal' %}<p>Bid: ${{ item.amount }} USD. Check whether the job is fixed-price or hourly.</p>{% endif %}
+<pre>{{ item.body }}</pre>
+{% if item.state == 'pending' %}
+<form method="post" action="/parent/work/{{ item.id }}/prepare">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <button>Prepare preview</button>
+</form>
+{% endif %}
+{% if item.state == 'preview' %}
+<h3>Upwork preview</h3>
+<pre>{{ item.preview|tojson(indent=2) }}</pre>
+<p>Check the recipient/job, terms, Connects cost and balance, screening answers, and attachments.
+If you need to add files or change these details, finish on Upwork instead. No boost is requested.</p>
+<form method="post" action="/parent/work/{{ item.id }}/confirm">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <label><input type="checkbox" required> I have reviewed the full action and any attachments. Send this item.</label>
+  <button>Confirm and send</button>
+</form>
+{% endif %}
+{% if item.state in ['pending', 'preview'] %}
+<form method="post" action="/parent/work/{{ item.id }}/dismiss">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <button>Dismiss draft</button>
+</form>
+{% endif %}
+{% if item.state == 'check_on_upwork' %}<p>Delivery status is uncertain. Check Upwork before retrying to avoid sending twice.</p>{% endif %}
+{% else %}<p>No drafts yet.</p>{% endfor %}
+{% endblock %}

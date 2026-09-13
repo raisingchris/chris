@@ -1,0 +1,16 @@
+{
+  "sample_data": "synthetic; no client data",
+  "input_rows": 8,
+  "output_rows": 5,
+  "duplicate_rows_removed": 1,
+  "rejected_rows": [
+    {
+      "source_line": 7,
+      "reason": "Missing required record ID or customer"
+    },
+    {
+      "source_line": 8,
+      "reason": "Invalid numeric amount"
+    }
+  ]
+}

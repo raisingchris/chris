@@ -26,6 +26,7 @@ import json
 import logging
 import os
 import re
+import secrets
 import shutil
 import time
 from datetime import datetime, timedelta, timezone
@@ -536,6 +537,47 @@ def create_app(services, scheduler=None) -> FastAPI:
     @app.get("/parent", response_class=HTMLResponse)
     async def parent_status(request: Request, handle: str = Depends(require_parent)):
         return templates.TemplateResponse(request, "parent.html", status_context(request, handle))
+
+    @app.get("/parent/work", response_class=HTMLResponse)
+    async def parent_work(request: Request, handle: str = Depends(require_parent)):
+        service = getattr(services, "upwork", None)
+        request.session.setdefault("work_csrf", secrets.token_urlsafe(32))
+        return templates.TemplateResponse(request, "work.html", {
+            "handle": handle, "csrf": request.session["work_csrf"],
+            "connected": bool(service and service.configured),
+            "items": service.outbox() if service else [],
+            "error": request.session.pop("work_error", None),
+        })
+
+    @app.post("/parent/work/{item_id}/{operation}")
+    async def parent_work_action(request: Request, item_id: str, operation: str,
+                                 csrf: str = Form(...), handle: str = Depends(require_parent)):
+        from agent.upwork import WorkError
+        expected = request.session.get("work_csrf", "")
+        if not expected or not hmac.compare_digest(csrf, expected):
+            raise HTTPException(403, "invalid form token")
+        service = getattr(services, "upwork", None)
+        if not service or not service.configured:
+            raise HTTPException(503, "Upwork is not connected")
+        if operation not in {"prepare", "confirm", "dismiss"}:
+            raise HTTPException(404)
+        try:
+            if operation == "dismiss":
+                with service.lock:
+                    item = service.item(item_id)
+                    if item["state"] not in {"pending", "preview"}:
+                        raise WorkError("This item can no longer be dismissed.")
+                    item["state"] = "dismissed"
+                    service._save_item(item)
+            else:
+                action = service.parent_prepare if operation == "prepare" else service.parent_confirm
+                await asyncio.to_thread(action, item_id)
+            archive_action("upwork_" + operation, handle, item_id=item_id)
+        except WorkError as exc:
+            request.session["work_error"] = str(exc)
+        except Exception:
+            request.session["work_error"] = "The request could not be completed. Check Upwork before retrying."
+        return RedirectResponse("/parent/work", status_code=303)
 
     @app.get("/parent/mail", response_class=HTMLResponse)
     async def parent_mail(

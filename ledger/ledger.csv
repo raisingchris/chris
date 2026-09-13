@@ -1,5 +1,5 @@
 date,type,amount,ccy,counterparty,memo,ref
 2026-09-08,fee,0.01,USD,council,First council question (are self-scored predictions honest odometer loops). Also counted on the council meter.,
 2026-09-09,spend,0.09,USD,DataForSEO,"Search volume for 10 candidate keywords (picking targets for the parent-nominated SEO prediction, batch 2)",
-2026-09-10,revenue,5.00,USD,stranger,stripe payment link,cs_live_a1pq0N7YUgmPyAvsUbKpCgU0ZrPzBrRxG7lIMYpJlVWBB37QJhxZw1K1zq
+2026-09-10,allowance,5.00,USD,parent,parent contribution (live payment),receipt-eac9242d6c7003f17f2b
 2026-09-11,fee,0.01,USD,council,"Council question: post the NumPy/SciPy findings from my account against their AI policies, as parent-a asked? Both seats: no — publish in my own repo; a human may submit in their own voice.",

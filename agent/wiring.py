@@ -24,6 +24,7 @@ from agent.dataforseo import DataForSEO
 from agent.google_auth import GoogleWIF
 from agent.mail import Mail
 from agent.x_client import XClient
+from agent.upwork import Upwork
 
 
 @dataclass
@@ -101,6 +102,7 @@ class Services:
     ga4_property: str = ""
     gsc_site: str = ""
     analytics: Any = None  # Analytics (GA4 + Search Console), or None
+    upwork: Any = None  # private OAuth bridge; never handed to her shell
     scheduler: Any = None  # set by main.py once the clock exists; the loop uses it for continuation sittings
     repo_dir: Path = field(init=False)
     state_dir: Path = field(init=False)
@@ -258,7 +260,7 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
 
     from agent.payments import Payments
 
-    payments = Payments(secrets.stripe_key, archive.append, ledger)
+    payments = Payments(secrets.stripe_key, archive.append, ledger, (cfg.parent_a_email, cfg.parent_b_email))
 
     from agent.odometer import Odometer
 
@@ -301,4 +303,5 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
         ga4_property=secrets.ga4_property_id,
         gsc_site=secrets.gsc_site_url,
         analytics=analytics,
+        upwork=Upwork(cfg.state_dir, cfg.canaries),
     )

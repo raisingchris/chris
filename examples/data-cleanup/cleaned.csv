@@ -1,0 +1,6 @@
+record_id,customer,category,amount,date
+001,Northwind,hardware,1200.00,2026-09-01
+002,Bright Desk,software,89.50,2026-09-02
+003,Riverside,services,250.00,2026-09-03
+004,Cedar,hardware,45.90,2026-09-04
+007,Lake House,services,180.00,2026-09-07

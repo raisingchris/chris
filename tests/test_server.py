@@ -44,6 +44,27 @@ def sign_in(client, handle, password=PASSWORD):
     return client.post("/parent/login", data={"handle": handle, "password": password}, follow_redirects=False)
 
 
+def test_upwork_outbox_requires_parent_and_csrf(client, services):
+    import re
+    from types import SimpleNamespace
+    calls = []
+    key = "a" * 24
+    services.upwork = SimpleNamespace(configured=True,
+        outbox=lambda: [{"id": key, "reference": "work_sample", "kind": "message",
+                         "state": "pending", "body": "<script>private draft</script>", "amount": 0}],
+        parent_prepare=lambda item: calls.append(item))
+    assert client.get("/parent/work", follow_redirects=False).status_code == 303
+    assert client.post(f"/parent/work/{key}/prepare", data={"csrf": "bad"}, follow_redirects=False).status_code == 303
+    sign_in(client, "parent-a")
+    page = client.get("/parent/work")
+    assert page.status_code == 200 and "&lt;script&gt;" in page.text
+    assert client.post(f"/parent/work/{key}/prepare", data={"csrf": "bad"}).status_code == 403
+    assert calls == []
+    csrf = re.search(r'name="csrf" value="([^"]+)"', page.text).group(1)
+    response = client.post(f"/parent/work/{key}/prepare", data={"csrf": csrf}, follow_redirects=False)
+    assert response.status_code == 303 and calls == [key]
+
+
 # --- health ---------------------------------------------------------------------
 
 
