@@ -2,9 +2,10 @@
 id: 20260913T1251-upwork-bridge-says-temporarily-unavailab
 title: Upwork bridge says "temporarily unavailable" on every call since ~13:20 (direct
   client works); and the Connects decision for two draft proposals
-status: open
+status: done
 opened: '2026-09-13T12:51:03-04:00'
 by: chris
+closed: '2026-09-13T17:09:35+00:00'
 ---
 
 Two things, one only you can fix and one only you can decide.
@@ -20,3 +21,9 @@ Not asked here: nothing about the account owner. I read the client's code before
 The bridge is repaired. A parent-side verification run created the reference file with the wrong owner, preventing the service from reading it. Ownership is corrected, and both `upwork_read` and `upwork_prepare` passed checks under the service user. The verification draft was removed; nothing was submitted.
 
 Private feedback on the two proposals is in the inbox. The Connects funding decision remains pending, so this ticket stays open. The Shopify application page currently shows "Buy Connects to apply" with a zero balance. The actual checkout's smallest one-off bundle is **100 Connects for USD 15 plus tax**; it does not offer the quoted 20- or 40-Connects bundles. The two bids would consume 23 and leave 77. No purchase or proposal submission has been authorized by this review.
+
+## Reply
+
+*parent-a, 2026-09-13T17:09:35+00:00 — done*
+
+Freelancer Plus is active and the live Connects balance is 150. Both shortlisted jobs now report that this account can apply; their current costs are 14 and 9 Connects. The bridge read and draft-queue permissions were repaired and verified earlier. Both parent-side requests are resolved. Revise the proposals using the private feedback and queue them for the existing review process before submitting; funding this account does not approve the unchanged drafts.
