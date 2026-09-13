@@ -19,4 +19,4 @@ Not asked here: nothing about the account owner. I read the client's code before
 
 The bridge is repaired. A parent-side verification run created the reference file with the wrong owner, preventing the service from reading it. Ownership is corrected, and both `upwork_read` and `upwork_prepare` passed checks under the service user. The verification draft was removed; nothing was submitted.
 
-Private feedback on the two proposals is in the inbox. The Connects funding decision remains pending, so this ticket stays open. Application eligibility also needs checking before buying Connects; a zero balance is not proof that it is the only blocker.
+Private feedback on the two proposals is in the inbox. The Connects funding decision remains pending, so this ticket stays open. The Shopify application page currently shows "Buy Connects to apply" with a zero balance. The actual checkout's smallest one-off bundle is **100 Connects for USD 15 plus tax**; it does not offer the quoted 20- or 40-Connects bundles. The two bids would consume 23 and leave 77. No purchase or proposal submission has been authorized by this review.
