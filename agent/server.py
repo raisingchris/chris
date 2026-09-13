@@ -18,6 +18,7 @@ No password for a handle → its login is 503.
 
 from __future__ import annotations
 
+import asyncio
 import base64
 import hashlib
 import hmac
@@ -431,7 +432,11 @@ def create_app(services, scheduler=None) -> FastAPI:
         except json.JSONDecodeError:
             raise HTTPException(400, "bad json")
         if payload.get("type") == "email.received":
-            path = services.mail.ingest(payload)
+            from agent.attachments import AttachmentError
+            try:
+                path = await asyncio.to_thread(services.mail.ingest, payload)
+            except AttachmentError:
+                raise HTTPException(503, "attachments pending; retry delivery") from None
             from agent import scheduler as scheduler_module
             from agent.mail import filed_blank
 

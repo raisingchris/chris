@@ -18,6 +18,7 @@ import copy
 import html as _html
 import re
 from datetime import datetime, timezone
+from threading import Lock
 from pathlib import Path
 from typing import Callable, Iterable
 
@@ -45,7 +46,7 @@ def _default_fetch_body(email_id: str) -> dict:
     import resend
 
     got = resend.Emails.Receiving.get(email_id)
-    return {"text": got.get("text"), "html": got.get("html")}
+    return {"text": got.get("text"), "html": got.get("html"), "attachments": got.get("attachments", [])}
 
 
 class Mail:
@@ -59,7 +60,13 @@ class Mail:
         dry_run: bool = False,
         fetch_body: Callable[[str], dict] | None = None,
         canaries: Iterable[str] = (),
+        fetch_attachments=None,
+        download_attachment=None,
     ):
+        from agent.attachments import list_attachments, download
+        self.fetch_attachments = fetch_attachments or list_attachments
+        self.download_attachment = download_attachment or download
+        self._ingest_lock = Lock()
         self.repo_dir = Path(repo_dir)
         self.archive_append = archive_append
         self.parents = {h: a for h, a in parents.items() if a}
@@ -139,6 +146,9 @@ class Mail:
                 data[key] = self._anonymise_address(value)
         if isinstance(data.get("subject"), str):
             data["subject"] = self.map_addresses(data["subject"])
+        if isinstance(data.get("attachments"), list):
+            data["attachments"] = [{"id": a.get("id"), "size": a.get("size"),
+                "content_type": a.get("content_type")} for a in data["attachments"]]
         return event
 
     def _anonymise_address(self, value):
@@ -232,6 +242,10 @@ class Mail:
     # --- inbound -------------------------------------------------------------
 
     def ingest(self, payload: dict) -> Path:
+        with self._ingest_lock:
+            return self._ingest(payload)
+
+    def _ingest(self, payload: dict) -> Path:
         """Ingest a Resend ``email.received`` webhook event; return the inbox path.
 
         Idempotent on ``data.email_id``: a redelivered event returns the existing inbox file
@@ -239,19 +253,30 @@ class Mail:
         """
         data = payload.get("data", payload)
         email_id = str(data.get("email_id") or "")
+        existing = None
         if email_id:
             existing = self._find_by_email_id(email_id)
-            if existing is not None:
+            if existing is not None and (
+                    "attachments_complete: true" in _frontmatter(existing.read_text())
+                    or ("attachments_complete: false" not in _frontmatter(existing.read_text())
+                        and not data.get("attachments"))):
                 self.archive_append("mail_in_duplicate", {"kind": "mail_in_duplicate", "email_id": email_id})
                 return existing
 
         # Parent addresses become handles *before* the raw event is archived.
-        ref = self.archive_append("mail_in", self._anonymise_event(payload))
+        if existing is not None:
+            import frontmatter
+            ref = frontmatter.loads(existing.read_text())["archive"]
+        else:
+            ref = self.archive_append("mail_in", self._anonymise_event(payload))
 
         sender = data.get("from", "")
         subject = data.get("subject") or "(no subject)"
         received = data.get("created_at") or payload.get("created_at") or _now_iso()
 
+        if self.resend_api_key:
+            import resend
+            resend.api_key = self.resend_api_key
         body = self.fetch_body(email_id) if email_id else {}
         text = body.get("text") or _html_to_text(body.get("html") or "")
 
@@ -261,12 +286,15 @@ class Mail:
         body_out = self.clean(_clean_body(text))
 
         date = received[:10]
-        path = self._unique_path(date, subject_out)
+        path = existing or self._unique_path(date, subject_out)
         safe = self._safe(path)
         if safe is None:
             raise UnsafePath(f"inbox path refused: {path.name}")
         path = safe
         self.inbox_dir.mkdir(parents=True, exist_ok=True)
+        old_text = existing.read_text() if existing else ""
+        has_attachments = bool(data.get("attachments") or body.get("attachments")
+                               or "attachments_complete: false" in _frontmatter(old_text))
         path.write_text(
             "---\n"
             f"from: {sender_out}\n"
@@ -274,9 +302,38 @@ class Mail:
             f"received: {received}\n"
             f"archive: {ref}\n"
             + (f"email_id: {_yaml_str(email_id)}\n" if email_id else "")
+            + ("read: true\n" if "\nread: true\n" in _frontmatter(old_text) else "")
+            + ("attachments_complete: false\n" if has_attachments else "attachments_complete: true\n")
             + "---\n\n"
             f"{body_out}\n"
         )
+        if has_attachments:
+            from agent.attachments import save, AttachmentError
+            links, failures = [], []
+            try:
+                attachments = self.fetch_attachments(email_id)
+                if not attachments:
+                    raise AttachmentError("attachment list is empty; will retry")
+                for attachment in attachments:
+                    try:
+                        target, name = save(self.repo_dir, email_id, attachment,
+                                            self.clean, self.download_attachment)
+                        rel = target.relative_to(self.repo_dir).as_posix()
+                        links.append(f"- {name}: `{rel}`")
+                    except Exception as exc:
+                        failures.append(type(exc).__name__)
+            except Exception as exc:
+                failures.append(type(exc).__name__)
+            text_out = path.read_text() + "\n## Attachments (private files)\n\n" + "\n".join(links) + "\n"
+            if failures:
+                text_out += "\nSome attachments could not be downloaded. Delivery is pending and will retry.\n"
+            else:
+                text_out = text_out.replace("attachments_complete: false\n", "attachments_complete: true\n", 1)
+            path.write_text(text_out)
+            self.archive_append("mail_attachments", {"email_id": email_id,
+                "saved": len(links), "failed": len(failures)})
+            if failures:
+                raise AttachmentError("email filed, but attachments are pending; retry delivery")
         return path
 
     def _find_by_email_id(self, email_id: str) -> Path | None:

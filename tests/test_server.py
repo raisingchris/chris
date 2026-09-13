@@ -719,3 +719,18 @@ def test_health_and_parent_report_continuations(client, services):
         assert client.get("/health").json()["continuations_today"] == 2
         sign_in(client, "parent-a")
         assert "Continuations today</td><td>2 of 12" in client.get("/parent").text
+
+
+def test_resend_attachment_failure_requests_retry(client, services):
+    from agent.attachments import AttachmentError
+    def pending(_):
+        raise AttachmentError("pending")
+    services.mail.ingest = pending
+    body = json.dumps({"type": "email.received", "data": {"email_id": "e-attachment"}}).encode()
+    ts = int(time.time())
+    response = client.post("/webhooks/resend", content=body, headers={
+        "svix-id": "msg_attachment", "svix-timestamp": str(ts),
+        "svix-signature": sign_svix("msg_attachment", ts, body, SECRET),
+        "content-type": "application/json"})
+    assert response.status_code == 503
+    assert "retry" in response.json()["detail"]
