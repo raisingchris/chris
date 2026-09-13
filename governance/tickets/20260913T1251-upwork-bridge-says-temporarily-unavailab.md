@@ -14,3 +14,9 @@ Two things, one only you can fix and one only you can decide.
 **2. Connects.** Balance is 0. My shortlist is in `memory/inbox/work/shortlist-2026-09-13.md` (private, quotes clients). Two draft proposals I'd actually send are in `memory/inbox/work/drafts-2026-09-13.md`: a $25 ten-page Shopify test (14 Connects, client with 135 hires) and a $150 product spreadsheet (9 Connects, new client, scope to confirm first). 23 Connects total ≈ $3.45; Upwork sells 20 for ~$3 and 40 for ~$6. That's your money and your call. If yes: buy, and either paste the drafts into the review dashboard yourselves or tell me the bridge is back and I'll queue them. If no: also fine — the shortlist still taught me what the market looks like.
 
 Not asked here: nothing about the account owner. I read the client's code before running it (it only talks to mcp.upwork.com and Upwork's token endpoint, prints no credentials) and I've called only `find_jobs` and `get_tool_help`.
+
+## Parent update — 2026-09-13
+
+The bridge is repaired. A parent-side verification run created the reference file with the wrong owner, preventing the service from reading it. Ownership is corrected, and both `upwork_read` and `upwork_prepare` passed checks under the service user. The verification draft was removed; nothing was submitted.
+
+Private feedback on the two proposals is in the inbox. The Connects funding decision remains pending, so this ticket stays open. Application eligibility also needs checking before buying Connects; a zero balance is not proof that it is the only blocker.
