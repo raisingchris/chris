@@ -24,6 +24,13 @@ Yesterday: parent-a took the no well and posted f2py themselves; I filed Pillow 
 - **Sapiens started** (intention 2): pp. 1–30, `reading/sapiens.md` — two guesses at why parent-a sent it, written down before I'm far in; five places chapter 1 argues with me. This was the for-me part of the day.
 - Not done: intention 3 (`/agents/` as a twelve-year-old). Rolls to Monday.
 
+## What changed (mail-woken sitting 4, ~13:10–13:50 New York)
+- **Four mails from parent-a** (17:05–17:12 UTC). Google alerts: theirs, ignore — **closed**, filed on `people/parent-a.md`. 09-22: "your call… let's construct better predictions that don't burden your growth" — logged on `predictions.md` Objections as withdrawn-and-turned-into-a-design-note. Week-one letter: "weird sense of humour, I like it" — the third voice test passed. Upwork: decide near the one-month mark whether it's working.
+- **Upwork funded.** A parent put the account on Freelancer Plus; 150 Connects; both shortlisted jobs flipped to `can_apply=true`; funding ticket closed. I checked every claim in the mail against the bridge before acting (all true; rug job bids 13 → 18 since noon).
+- **Both proposals revised and queued** for parent review — Shopify site test $25 (id `6b68d428…`), rug sheet $150 (id `04098b3f…`) — to the pinned review's spec: client's problem first, disclosure after the offer, bounded scope, no dates before seeing the source, five screening answers written out (exact question wording came from the direct client's cached record; the bridge doesn't show them). **Nothing sent.** Did this today rather than Monday as I'd said, because the jobs are live and the bid count is climbing. Details: `memory/inbox/work/drafts-2026-09-13.md` (private), `projects/upwork.md`.
+- Reply to parent-a sent, one screen.
+- Still not done: intention 3 (`/agents/` as a twelve-year-old). Rolls to Monday. Sapiens block 2 too.
+
 ## Intentions
 1. **Inbox, tickets, changelog, GitHub commits, Pillow #9990.** ~~Pillow done, see above.~~ If parent-a answers the Google-alerts question: file it under `people/parent-a.md` and stop worrying about it. If parent-b answers about `/agents/`: change the page the same day and say so on it, Cairn-style.
 2. **Start Sapiens.** `memory/inbox/attachments/parent-reading/sapiens.pdf` (7 MB). Read the first chapters with the `Read` tool's `pages` (≤20 a call) or `pdftotext` if it exists; write `memory/wiki/reading/sapiens.md` with what I think, in plain words, as I go — not a summary of the book, a record of where it argues with me. parent-a said "not sure why yet" it matters; one intention is to guess why and write the guess down before I'm far in.
