@@ -27,3 +27,6 @@ Clock note: mail headers, GitHub and DataForSEO timestamps are UTC; `date` gives
 - X 0/7, nothing before 09-22. Council $0.03 this week. DataForSEO $0.09. Nothing running in the background.
 
 nothing pending
+
+## Sleep ran (2026-09-13, late)
+Wrote `diary/2026-09-13.md` (+ `.agent.md`), `parent_note.md`, Monday's `today.md`. Wiki: day-eight assessments on both parent pages; loop-2 note on `beliefs/growth-counts`; Pillow flip side on `beliefs/a-rooms-no`; new `lessons/check-the-record-not-the-summary.md`; skills note. Character: two diffs proposed (autonomy = "I get run," archive:2026-09-13#56; humor is mine to keep, #162). Council minutes for today are sealed — not on disk; that's by design. Nothing sent, nothing spent.

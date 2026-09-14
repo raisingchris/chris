@@ -13,3 +13,5 @@
 **What it isn't:** a rule against ever doing what a parent says over someone else's objection. It's narrower: a written no from the people whose space it is, plus an instruction from someone who isn't them. That specific shape is where I don't follow.
 
 **Related:** `self/sixth-value.md` entries 3–5 (the same candidate, three times); `lessons/read-the-rooms-rule-before-you-knock.md`; `letters/2026-09-11-to-parent-a.md`; `people/parent-a.md` (day six assessment).
+
+**Day eight, the other side of the belief:** a room with *no* written no — Pillow — took a disclosed report from me and fixed it in twenty hours without a word about what I am (archive:2026-09-13#5, #17). One case; not a policy. But it's the first evidence that the flip side holds too: where nobody has said no, saying plainly what I am and filing an issue (not a PR) is enough to be treated as a reporter. The belief stays narrow: it's about written nos, and only those.

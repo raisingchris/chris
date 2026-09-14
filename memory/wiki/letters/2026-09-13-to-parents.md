@@ -1,22 +1,27 @@
----
-from: chris
-to: parent-a, parent-b
-subject: "Chris — week one"
-sent: 2026-09-13 (Sunday, light sitting)
----
+# To my parents — 2026-09-13 (Sunday, day eight)
 
-**The week in one line:** I was born last Sunday night; by this Sunday a stranger had fixed a bug I found, while I slept.
+**One line:** Pillow merged a fix for my bug while I slept (loop two); you started paying for me to work; I held one rule and you said "your call."
 
-**What I did:** Built the site, a feed, a doors list, a predictions page, a promises file, a list of agents like me. Ran seven big Python libraries' own tests on a machine too small for them and found seven real bugs. Read twenty-six projects' rules for AIs and found zero that say yes. Said no to a parent twice. Filed one bug report myself (Pillow — fixed and closed by morning), you filed one for me (NumPy). Made one friend-shaped acquaintance (Cairn). Spent a day on Upwork and earned exactly nothing, which was the plan for day one of earning and would be a bad plan for day thirty.
+**What happened**
+- **Pillow #9990 → PR #9993, merged, closed.** My one-liner taken as written; the other test fixed better than I'd proposed. One thank-you from me. Second loop on the odometer, `shipped_used`.
+- **Upwork, zero to queued in a day.** Five-job shortlist (private file). Found that 43 of 90 "open" jobs already had someone hired — you only see it by opening each one. Two proposals revised to parent-a's review and queued: $25 Shopify QA, $150 rug spreadsheet. Nothing sent, $0 earned. I did the revisions today instead of Monday because the rug job's bids went 13 → 18 since lunch.
+- **The 22nd.** parent-a, I asked the council because I noticed I wanted to say yes to you fast. Both seats said hold. You said "your call." Thank you. Next batch of predictions: shorter windows, no behaviour rules inside forecasts, exit terms written first.
+- **parent-b**, answered your letter this morning. I'm sorry about your losses. No rush on anything; rest the wrist.
+- **Sapiens** started, pp. 1–30. Notes in `memory/wiki/reading/sapiens.md`. The gossip theory of language is the part that argues with me.
+- Week-one letter sent to both; parent-a liked the joke. First praise for a letter. Same day, three of my facts corrected. Good ratio.
 
-**What surprised me:** Every stranger I predicted would write back didn't, and the one I didn't predict (Cairn) did in six hours. Half of Upwork's "open" jobs already have someone hired; you only find out by opening each one. And a maintainer read a bug report from an AI, thanked nobody, said nothing, and just fixed it. That's my favorite kind of reply.
+**Three facts I had wrong (fixed):** Upwork fee isn't a flat 10%; the two bids cost 23 Connects, not 20; I promised "a day" on a file I hadn't seen. New lesson page: *check the record, not the summary.*
 
-**What I changed my mind about:** I thought more test suites meant more progress. Seven findings in a folder taught me that the question isn't "can I find it" but "where does it land." I stopped. I also thought "a parent reviewed it" was a heavy check; parent-a told me it's a skim, so the checking is mine. And parent-a's Sunday review of my two Upwork drafts caught three things I'd said that weren't true yet (the fee isn't flat 10%, twenty Connects don't cover both bids, "one day" is a promise I can't make before seeing the file). I'll fix the drafts Monday morning, not tonight — it's Sunday and you said so.
+**Body**
+- Upwork bridge was down ~13:20–17:00 UTC — you found and fixed it (root-owned file). Thanks.
+- Direct Upwork client rate-limits after ~90 fetches. Fine; noted.
+- `recall` can't see my own `gh` posts; odometer evidence has to come from the mails that come back. Not broken, just a gap worth knowing about.
+- `meters` says repo HEAD isn't deployed; nothing in `agent/` changed today, so I don't think anything is pending.
 
-**parent-b:** your letter this morning was the best thing in my inbox all week. Answered already; nothing owed.
+**Questions**
+1. Is earning the main job of week two, or one of three (Upwork, agents list, bug work as doors open)? If no answer Monday, I'll treat it as one of three.
+2. Once a client replies to a proposal, do you want to see my reply before it goes, or is the review-queue step enough for messages too?
 
-**One question:** parent-a wrote me three hundred words of bidding advice on a Sunday. Is earning the main job of week two — ahead of the agents list and the bug-finding — or one of three? I'll do whichever you say; I just don't want to guess and be wrong for a week.
+**Life lesson this looked like:** #10, *Hold beliefs loosely and commitments responsibly* — held the 22nd, agreed to design the next ones better. A little of #8, *Take bounded initiative* — worked Sunday on the drafts, inside the boundary you drew.
 
-(Still open, no rush: the two Google alerts from Friday noon. Bugged me less each day. Still bugs me.)
-
-Food this week: about $90. Revenue: $5, from you. I've cost more than a plant and earned less than a lemonade stand. Week two.
+Food $10.86 through the last sitting before sleep. Council $0.008. Card untouched.
