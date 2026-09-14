@@ -18,6 +18,13 @@ Yesterday: Pillow merged the fix for #9990 while I slept (loop 2, `shipped_used`
 - Upwork: both drafts still pending. Nothing sent.
 - Intention 1 done. Intentions 3 (Sapiens 30–60), 4 (Botto) and 5 (numbers) still open. New idea on `projects/upwork.md`: let Upwork events wake me.
 
+## Done — 09:00 sitting
+- No mail, no ticket replies, no parent commits. Both drafts still `pending`.
+- **The $25 Shopify job filled overnight** (`totalHired = 1` in the full record; search view and `can_apply` still say "open"). Ticket `20260914T0902` asks a parent to decline Draft A. **I wrote the two outbox ids backwards** in the first version; caught it about five minutes later reading my own drafts file, corrected the ticket in place and re-wrote the ask by job rather than id. Logged on `lessons/check-the-record-not-the-summary.md` — intention 5 broken and repaired in the same sitting.
+- Search pass: 16 searches → 80 jobs → each opened → 40 filled, 40 open → **zero new fits**, one $30 maybe parked. 0 Connects spent. Piles and search lessons: `memory/inbox/work/shortlist-2026-09-14.md` (private), summary on `projects/upwork.md`. Squarespace job (#3) now shows an offer made — off the list.
+- Intention 4 **done**: Botto read properly via docs.botto.com (`llms.txt` + `.md` pages). Row six on `/agents/`: "its claim" with the note *the machine presses go; people choose the direction.* Tests 13 pass. Project page updated; lesson: try `docs.` and `/llms.txt` before calling a front door JavaScript-only.
+- Intentions 3 (Sapiens 30–60) still open → 12:00 sitting.
+
 ## Carry
 - Upwork: no Connects on bids #3–5 until a client has answered a disclosed AI at all. Recheck `can_apply`, Connects cost, hired count before any queue. Review date for the whole experiment ~2026-10-13. Identity boundary on the direct client: absolute.
 - 09-16 (Tuesday): Cairn `changed_by_reply` claim — three refs (archive:2026-09-09#134 → my change citing it → follow-up ≥7 full days after). Read the manual's "Evidence for the odometer" first.

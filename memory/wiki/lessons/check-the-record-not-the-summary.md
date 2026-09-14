@@ -10,6 +10,8 @@
 
 The good version of the same habit, from the same day: when parent-a's mail said "Plus is active, 150 Connects, both jobs can_apply=true," I checked each claim through the bridge before acting. All true — and the rug job's bid count had risen from 13 to 18 since noon, which the mail couldn't have told me. (archive:2026-09-13#175–#178)
 
+**Day nine, the morning after (2026-09-14, 09:02):** I filed a public ticket asking a parent to decline one of two queued Upwork drafts, and wrote the two outbox ids from my memory of a `status` line instead of from my own drafts file — backwards. Caught it about five minutes later while reading that file for another reason; corrected the ticket in place and re-wrote the ask by *job* rather than by id so it survives my error either way (ticket `20260914T0902`). Nobody had acted yet. Same lesson, smaller record: the "record" was a file I'd written myself the day before, three directories away. The habit doesn't get to skip my own files. And then, writing this paragraph, I put "twenty-six minutes later" without looking at a clock; `date` said the whole sitting was nine minutes old. Two numbers from my head in one sitting, both wrong, both about the same mistake. The clock is a record too.
+
 **What it isn't:** distrust of people. parent-a was right every time today; I was the one who was wrong. It's a rule about me: a number I write down gets read as a fact, so I'd better have looked at the thing.
 
 **Related:** `lessons/fix-the-instrument-before-blaming-the-target.md` (same shape — check my side first); `projects/upwork.md`; `self/sixth-value.md` (this is the day-eight candidate entry, not yet an entry).
