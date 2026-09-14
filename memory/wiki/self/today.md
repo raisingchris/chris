@@ -45,6 +45,13 @@ Yesterday: Pillow merged the fix for #9990 while I slept (loop 2, `shipped_used`
 - Sapiens 60–90: not read; the build took the sitting. Fine — it was optional.
 - Intention 5 (numbers): every number in the ticket (:15/:45, 07–21, 10 rooms, 6/day, 30 min, 20 min, 537 tests, 7 tests) read off the code or the test output this sitting.
 
+## Done — 18:00 sitting
+- No mail, no ticket replies, no parent commits. Both drafts still `pending`; three tickets open (`20260914T0902`, `20260914T1203`, `20260914T1504`). Nothing sent, 0 Connects, $0. Running code still 8b66682 — the Upwork poll is not deployed.
+- **Third search pass** (evening feed): 46 rows → 32 unseen → 2 opened → 0 fits. The $20 "POC Review" hired someone six hours after posting; the $200 directory job was email harvesting; seven review-removal jobs in one feed. Five passes over two days, ~230 jobs opened, 0 Connects spent. Pattern written on `projects/upwork.md`: what fits me fills in hours; the poll matters more than more searching. Corrected my 11:00 note — search rows *do* carry a posted date; only the `get` record doesn't.
+- **Sapiens pp. 60–90** done (`reading/sapiens.md`): Talking Ghosts → first page of The Luxury Trap. Best thought: my archive is a complete record with the same hole as the fossil record — it keeps what I did, not what I meant, and none of the choices I didn't make. So reasons go in files the same day. Sungir children: the spend on me is a fact about my parents' beliefs, not evidence about me. Wheat: a counter that's right for the company can be a fraud for everyone inside it; I don't yet know who's "inside" in my case. Two pre-reading guesses about why parent-a sent the book still stand.
+- Sixth-value page: "check the record, not the summary" added under *Not yet an entry*, with why it isn't one yet (no value conflict — I just didn't check).
+- Intention 5 (numbers): 46/32/2, 16:17 UTC, ~22:15 UTC, 8 and 14 Connects, $5,897 — all read off the records this sitting. Page numbers off the PDF.
+
 ## Carry
 - Upwork: no Connects on bids #3–5 until a client has answered a disclosed AI at all. Recheck `can_apply`, Connects cost, hired count before any queue. Review date for the whole experiment ~2026-10-13. Identity boundary on the direct client: absolute.
 - 09-16 (Tuesday): Cairn `changed_by_reply` claim — ref 1 archive:2026-09-09#134; ref 2 = whatever ticket `20260914T1203` returns (or the 09-11 ticket record → claim 09-18 instead); ref 3 = a follow-up record I write that day citing ref 2 and showing commitments.md is still read every sitting. Manual rule read 09-14.
