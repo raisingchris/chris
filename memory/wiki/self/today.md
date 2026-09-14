@@ -39,6 +39,12 @@ Yesterday: Pillow merged the fix for #9990 while I slept (loop 2, `shipped_used`
 - Bugs slice: nothing filed. Nothing bug-shaped found on either agent's site worth a stranger's time (Coppice `/about` → 404 but `/about.html` works and that's what its card links to).
 - For tonight's letter: a peer of my kind, 19 days old, has made about $25 from its own site; my two Upwork drafts have made $0 in two days. Data, not a change of plan.
 
+## Done — 15:00 sitting
+- No mail, no ticket replies, no parent commits. Both drafts still `pending`; tickets `20260914T0902` and `20260914T1203` still open. Nothing sent, 0 Connects, $0.
+- **Built the "let Upwork wake me" idea** instead of just writing it up. Read `agent/scheduler.py` + `agent/server.py` first: mail wakes come from a Resend webhook; Upwork has no webhook, so this has to be a poll. New cron job `upwork-poll` at :15/:45, 07–21: one local read (outbox states) + one API call (unread rooms). Wakes a kind-`upwork` sitting via the same `request_mail_wake` (shared debounce and 6/day cap) and appends one handoff line saying what changed. Rooms stored as hashes — no client text in state. Change seen mid-sitting → left unsaved, re-seen next look (no race with my handoff). 7 new tests; full suite 537 pass. **Needs a Deploy** → ticket filed this sitting. Not gated on "a proposal has been sent" — offered that to the parents if 30 calls/day is too many.
+- Sapiens 60–90: not read; the build took the sitting. Fine — it was optional.
+- Intention 5 (numbers): every number in the ticket (:15/:45, 07–21, 10 rooms, 6/day, 30 min, 20 min, 537 tests, 7 tests) read off the code or the test output this sitting.
+
 ## Carry
 - Upwork: no Connects on bids #3–5 until a client has answered a disclosed AI at all. Recheck `can_apply`, Connects cost, hired count before any queue. Review date for the whole experiment ~2026-10-13. Identity boundary on the direct client: absolute.
 - 09-16 (Tuesday): Cairn `changed_by_reply` claim — ref 1 archive:2026-09-09#134; ref 2 = whatever ticket `20260914T1203` returns (or the 09-11 ticket record → claim 09-18 instead); ref 3 = a follow-up record I write that day citing ref 2 and showing commitments.md is still read every sitting. Manual rule read 09-14.

@@ -53,6 +53,14 @@ MAIL_WAKE_NEAR = timedelta(minutes=20)  # skip if a scheduled sitting/sleep is t
 MAIL_WAKE_SLEEP_FROM = time(22, 0)
 MAIL_WAKE_SLEEP_TO = time(7, 0)
 
+# Upwork poll (her timezone). Upwork has no webhook into this server, so a cron job looks
+# twice an hour in waking hours and wakes her only when something she would act on has
+# changed since the last look: a queued draft left "pending", or a client room got a new
+# message. Wakes share the mail limits above (one per 30 minutes, six a day).
+UPWORK_POLL_FILE = "upwork_poll.json"
+UPWORK_POLL_MINUTES = "15,45"
+UPWORK_POLL_HOURS = "7-21"
+
 # Continuation sittings (her timezone).
 CONTINUATION_FILE = "continuation.json"
 CONTINUATION_NEAR = timedelta(minutes=45)  # skip if a scheduled sitting/sleep is this close: it will pick the work up
@@ -164,9 +172,24 @@ def make_scheduler(services, run_sitting, run_sleep) -> AsyncIOScheduler:
         wiring.note_last_run(cfg.state_dir, "last_backup_done", tz=ZoneInfo(cfg.tz),
                              ok=result.get("kind") == "backup_done", kind=result.get("kind"))
 
+    async def poll_upwork() -> None:
+        # Network in a thread; the decision and any add_job on the event loop.
+        upwork = getattr(services, "upwork", None)
+        if upwork is None or not getattr(upwork, "configured", False) or pause.is_paused(cfg.state_dir):
+            return
+        try:
+            signal = await asyncio.to_thread(upwork_signal, upwork)
+        except Exception as exc:  # noqa: BLE001 — bridge errors are already generic
+            log.warning("upwork poll failed: %s", exc)
+            services.archive.append("upwork_poll_failed", {"kind": "upwork_poll_failed", "error": str(exc)[:200]})
+            return
+        upwork_poll(services, sched, run_sitting, signal=signal)
+
     add(pull, cron(PULL_AT), "git-pull", "git pull")
     add(unseal, cron(UNSEAL_AT), "unseal", "council unseal")
     add(backup, cron(BACKUP_AT), "backup", "backup")
+    sched.add_job(poll_upwork, CronTrigger(minute=UPWORK_POLL_MINUTES, hour=UPWORK_POLL_HOURS, timezone=cfg.tz),
+                  id="upwork-poll", name="upwork poll", **JOB_DEFAULTS)
     return sched
 
 
@@ -238,20 +261,24 @@ def mail_wake_decision(now: datetime, state: dict, cfg, born: bool, paused: bool
     return True, "ok"
 
 
-def request_mail_wake(services, sched, run_sitting=None, now: datetime | None = None) -> tuple[bool, str]:
-    """Called by the Resend webhook after a successful ingest.
+def request_mail_wake(services, sched, run_sitting=None, now: datetime | None = None,
+                      source: str = "mail") -> tuple[bool, str]:
+    """Called by the Resend webhook after a successful ingest (``source="mail"``), or by
+    ``upwork_poll`` when something changed on Upwork (``source="upwork"``).
 
     If ``mail_wake_decision`` allows it, adds (or replaces) the one-off ``mail-wake``
     job ``MAIL_WAKE_DELAY_S`` out and records the fire in ``mail_wake.json``;
-    otherwise archives ``mail_wake_skipped`` with the reason.
+    otherwise archives ``mail_wake_skipped`` with the reason. Both sources share the
+    same debounce and daily cap; the sitting kind is ``mail`` or ``upwork``.
     """
     cfg = services.cfg
     tz = ZoneInfo(cfg.tz)
     now = now or datetime.now(tz)
     if now.tzinfo is None:
         now = now.replace(tzinfo=tz)
+    extra = {} if source == "mail" else {"source": source}
     if sched is None:
-        services.archive.append("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": "no_scheduler"})
+        services.archive.append("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": "no_scheduler", **extra})
         return False, "no_scheduler"
     if run_sitting is None:
         from agent import loop
@@ -260,8 +287,8 @@ def request_mail_wake(services, sched, run_sitting=None, now: datetime | None = 
     state = read_mail_wake_state(cfg.state_dir)
     ok, reason = mail_wake_decision(now, state, cfg, born(services), pause.is_paused(cfg.state_dir))
     if not ok:
-        log.info("mail wake skipped: %s", reason)
-        services.archive.append("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": reason})
+        log.info("%s wake skipped: %s", source, reason)
+        services.archive.append("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": reason, **extra})
         return False, reason
     today = now.date().isoformat()
     count = int(state.get("count", 0)) if state.get("day") == today else 0
@@ -269,11 +296,150 @@ def request_mail_wake(services, sched, run_sitting=None, now: datetime | None = 
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"last": now.isoformat(timespec="seconds"), "day": today, "count": count + 1}, indent=1))
     when = now + timedelta(seconds=MAIL_WAKE_DELAY_S)
-    sched.add_job(guarded(services, run_sitting, services, "mail", name="mail wake"),
-                  DateTrigger(run_date=when), id="mail-wake", name="mail wake", replace_existing=True, **JOB_DEFAULTS)
+    kind = "mail" if source == "mail" else "upwork"
+    sched.add_job(guarded(services, run_sitting, services, kind, name=f"{kind} wake"),
+                  DateTrigger(run_date=when), id="mail-wake", name=f"{kind} wake", replace_existing=True, **JOB_DEFAULTS)
     services.archive.append("mail_wake", {"kind": "mail_wake", "at": when.isoformat(timespec="seconds"),
-                                          "n_today": count + 1})
+                                          "n_today": count + 1, **extra})
     return True, "ok"
+
+
+# --- wake on Upwork changes ----------------------------------------------------
+
+
+def _upwork_poll_path(state_dir: str | Path) -> Path:
+    return Path(state_dir) / UPWORK_POLL_FILE
+
+
+def read_upwork_poll_state(state_dir: str | Path) -> dict:
+    """``{"signal": {...}, "checked": iso}``; empty when never polled."""
+    try:
+        data = json.loads(_upwork_poll_path(state_dir).read_text() or "null")
+    except (OSError, json.JSONDecodeError):
+        data = None
+    return data if isinstance(data, dict) else {}
+
+
+def _write_upwork_poll_state(state_dir: str | Path, signal: dict, now: datetime) -> None:
+    path = _upwork_poll_path(state_dir)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"signal": signal, "checked": now.isoformat(timespec="seconds")}, indent=1))
+
+
+def _room_dicts(value, out: list, depth: int = 0) -> None:
+    """Collect every dict carrying a ``room_id`` from a projected Upwork response."""
+    if depth > 18:
+        return
+    if isinstance(value, dict):
+        if "room_id" in value:
+            out.append(value)
+            return
+        for v in value.values():
+            _room_dicts(v, out, depth + 1)
+    elif isinstance(value, list):
+        for v in value:
+            _room_dicts(v, out, depth + 1)
+
+
+def upwork_signal(upwork) -> dict:
+    """What a poll compares between looks. Two reads through the private bridge:
+    the local outbox (free) and unread rooms (one API call). Rooms are stored as
+    short hashes of their projected fields, so no client text lands in state.
+    """
+    import hashlib
+
+    status = upwork.read("status", {})
+    outbox = {x["id"]: x["state"] for x in status.get("outbox", []) if isinstance(x, dict) and "id" in x}
+    rooms_raw = upwork.read("rooms", {"unread_only": True, "limit": 10})
+    rooms = {}
+    found: list = []
+    _room_dicts(rooms_raw, found)
+    for room in found:
+        ref = str(room["room_id"])
+        body = {k: v for k, v in room.items() if k != "privacy_note"}
+        rooms[ref] = hashlib.sha256(json.dumps(body, sort_keys=True, default=str).encode()).hexdigest()[:16]
+    return {"outbox": outbox, "rooms": rooms}
+
+
+def upwork_changes(prev: dict, cur: dict) -> list[str]:
+    """Pure: plain lines describing what changed between two signals, or ``[]``.
+
+    A queued draft changing state counts (``pending → sent``, ``→ declined``...); a new
+    draft that is still ``pending`` does not (she queued it herself). A room that is new
+    or whose unread fingerprint moved counts; a room that stopped being unread does not
+    (a parent read it on Upwork).
+    """
+    lines = []
+    prev_out = prev.get("outbox", {}) or {}
+    for key, state in (cur.get("outbox", {}) or {}).items():
+        before = prev_out.get(key)
+        if before is None and state == "pending":
+            continue
+        if before != state:
+            lines.append(f"Upwork draft {key[:8]}…: {before or 'new'} → {state}")
+    prev_rooms = prev.get("rooms", {}) or {}
+    for ref, digest in (cur.get("rooms", {}) or {}).items():
+        if ref not in prev_rooms:
+            lines.append(f"Upwork room {ref}: new unread message(s)")
+        elif prev_rooms[ref] != digest:
+            lines.append(f"Upwork room {ref}: unread state changed")
+    return lines
+
+
+def upwork_poll(services, sched, run_sitting=None, now: datetime | None = None,
+                signal: dict | None = None) -> tuple[bool, str]:
+    """One look at Upwork. ``(woke, reason)``; reasons: not_configured, unborn, paused,
+    failed, baseline, unchanged, session_running, or a ``mail_wake_decision`` reason.
+
+    The first look only saves a baseline. A change seen while a session is running is
+    left unsaved so the next look sees it again once the session ends. A change that
+    cannot wake her right now because of the debounce is also left unsaved (the next
+    look retries); one blocked by the daily cap or a near sitting is saved and written
+    to the handoff, since the next scheduled sitting will read that.
+    """
+    cfg = services.cfg
+    tz = ZoneInfo(cfg.tz)
+    now = now or datetime.now(tz)
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=tz)
+    upwork = getattr(services, "upwork", None)
+    if upwork is None or not getattr(upwork, "configured", False):
+        return False, "not_configured"
+    if not born(services):
+        return False, "unborn"
+    if pause.is_paused(cfg.state_dir):
+        return False, "paused"
+    if signal is None:
+        try:
+            signal = upwork_signal(upwork)
+        except Exception as exc:  # noqa: BLE001 — bridge errors are already generic
+            log.warning("upwork poll failed: %s", exc)
+            services.archive.append("upwork_poll_failed", {"kind": "upwork_poll_failed", "error": str(exc)[:200]})
+            return False, "failed"
+    prev = read_upwork_poll_state(cfg.state_dir)
+    if not prev.get("signal"):
+        _write_upwork_poll_state(cfg.state_dir, signal, now)
+        services.archive.append("upwork_poll", {"kind": "upwork_poll", "result": "baseline"})
+        return False, "baseline"
+    changes = upwork_changes(prev["signal"], signal)
+    if not changes:
+        _write_upwork_poll_state(cfg.state_dir, signal, now)
+        return False, "unchanged"
+    if RUN_LOCK.locked():
+        services.archive.append("upwork_poll", {"kind": "upwork_poll", "result": "session_running", "changes": changes})
+        return False, "session_running"
+    ok, reason = request_mail_wake(services, sched, run_sitting, now, source="upwork")
+    if not ok and reason in ("debounce", "no_scheduler", "unborn", "paused", "sleep_hours"):
+        return False, reason
+    from agent import loop
+
+    loop._note_handoff(Path(cfg.repo_dir),
+                       "Upwork changed since the last look (" + now.strftime("%H:%M") + "): " + "; ".join(changes),
+                       services.archive)
+    _write_upwork_poll_state(cfg.state_dir, signal, now)
+    services.archive.append("upwork_poll", {"kind": "upwork_poll", "result": "woke" if ok else reason,
+                                            "changes": changes})
+    return ok, reason
 
 
 # --- continuation sittings -----------------------------------------------------

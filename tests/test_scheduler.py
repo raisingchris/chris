@@ -43,14 +43,14 @@ def sched(services, calls):
 def test_weekday_jobs(sched):
     # 2026-09-07 is a Monday
     assert due_on(sched, date(2026, 9, 7)) == [
-        "git-pull", "wake", "unseal", "sitting-09:00", "sitting-12:00", "sitting-15:00", "sitting-18:00",
-        "sleep", "backup",
+        "git-pull", "wake", "unseal", "upwork-poll", "sitting-09:00", "sitting-12:00", "sitting-15:00",
+        "sitting-18:00", "sleep", "backup",
     ]
 
 
 def test_sunday_jobs(sched):
     # 2026-09-06 is a Sunday: no wake, no ordinary sittings — one letter home and sleep.
-    assert due_on(sched, date(2026, 9, 6)) == ["git-pull", "unseal", "sunday", "sleep", "backup"]
+    assert due_on(sched, date(2026, 9, 6)) == ["git-pull", "unseal", "upwork-poll", "sunday", "sleep", "backup"]
 
 
 async def test_backup_job_runs_unguarded_and_notes_last_run(sched, services, monkeypatch):
@@ -347,3 +347,152 @@ def test_rearm_after_restart_when_session_was_killed(services):
     assert sched.jobs == ["continuation"]
     assert "sitting_killed" in services.archive.kinds()
     assert "cut short by a restart" in (Path(services.cfg.repo_dir) / "memory" / "handoff.md").read_text()
+
+
+# --- wake on Upwork changes -----------------------------------------------------------
+
+
+class FakeUpwork:
+    """Only what the poll touches: ``configured`` and ``read``."""
+
+    def __init__(self, outbox=None, rooms=None, fail=False):
+        self.configured = True
+        self.outbox = outbox or []
+        self.rooms = rooms or []
+        self.fail = fail
+        self.calls = []
+
+    def read(self, action, params):
+        self.calls.append((action, params))
+        if self.fail:
+            raise RuntimeError("Upwork request failed.")
+        if action == "status":
+            return {"connected": True, "outbox": list(self.outbox), "note": "x"}
+        assert action == "rooms" and params == {"unread_only": True, "limit": 10}
+        return {"rooms": list(self.rooms), "privacy_note": "y"}
+
+
+def test_upwork_changes_is_pure_and_ignores_the_right_things():
+    from agent.scheduler import upwork_changes
+
+    a = {"outbox": {"abcdef0123": "pending"}, "rooms": {"work_1": "h1"}}
+    assert upwork_changes(a, a) == []
+    # a draft I queued myself is not news; a draft moving is
+    assert upwork_changes(a, {"outbox": {**a["outbox"], "ffff0000": "pending"}, "rooms": a["rooms"]}) == []
+    assert upwork_changes(a, {"outbox": {"abcdef0123": "sent"}, "rooms": a["rooms"]}) == [
+        "Upwork draft abcdef01…: pending → sent"]
+    assert upwork_changes(a, {"outbox": {"abcdef0123": "pending", "ffff0000": "sent"}, "rooms": a["rooms"]}) == [
+        "Upwork draft ffff0000…: new → sent"]
+    # a room a parent read (no longer unread) is not news; a new or changed unread room is
+    assert upwork_changes(a, {"outbox": a["outbox"], "rooms": {}}) == []
+    assert upwork_changes(a, {"outbox": a["outbox"], "rooms": {"work_1": "h2"}}) == [
+        "Upwork room work_1: unread state changed"]
+    assert upwork_changes(a, {"outbox": a["outbox"], "rooms": {"work_1": "h1", "work_2": "h9"}}) == [
+        "Upwork room work_2: new unread message(s)"]
+    assert upwork_changes({}, {"outbox": {"x": "pending"}, "rooms": {}}) == []
+
+
+def test_upwork_signal_hashes_rooms_and_keeps_no_text():
+    from agent.scheduler import upwork_signal
+
+    up = FakeUpwork(outbox=[{"id": "abc", "kind": "proposal", "state": "pending"}],
+                    rooms=[{"room_id": "work_r1", "unread_count": 1, "last_message": {"text": "secret client words"}}])
+    sig = upwork_signal(up)
+    assert sig["outbox"] == {"abc": "pending"}
+    assert list(sig["rooms"]) == ["work_r1"] and len(sig["rooms"]["work_r1"]) == 16
+    assert "secret" not in __import__("json").dumps(sig)
+    up.rooms[0]["last_message"]["text"] = "a second message"
+    assert upwork_signal(up)["rooms"]["work_r1"] != sig["rooms"]["work_r1"]
+
+
+def test_upwork_poll_not_configured_is_silent(services):
+    from agent.scheduler import upwork_poll
+
+    assert upwork_poll(services, FakeSched(), now=_mon(10, 15)) == (False, "not_configured")
+    services.upwork = FakeUpwork()
+    services.upwork.configured = False
+    assert upwork_poll(services, FakeSched(), now=_mon(10, 15)) == (False, "not_configured")
+    assert services.archive.entries == []
+
+
+async def test_upwork_poll_baseline_then_unchanged_then_wake(services, calls):
+    from agent.scheduler import read_mail_wake_state, read_upwork_poll_state, upwork_poll
+
+    up = FakeUpwork(outbox=[{"id": "abc", "kind": "proposal", "state": "pending"}])
+    services.upwork = up
+    fs = FakeSched()
+    # first look: baseline only, no wake
+    assert upwork_poll(services, fs, run_sitting=calls.run_sitting, now=_mon(10, 15)) == (False, "baseline")
+    assert fs.jobs == [] and read_upwork_poll_state(services.cfg.state_dir)["signal"]["outbox"] == {"abc": "pending"}
+    # nothing moved: no wake, no archive noise
+    n = len(services.archive.entries)
+    assert upwork_poll(services, fs, run_sitting=calls.run_sitting, now=_mon(10, 45)) == (False, "unchanged")
+    assert fs.jobs == [] and len(services.archive.entries) == n
+    # a parent pressed send: wake, as an "upwork" sitting, and the handoff says why
+    up.outbox[0]["state"] = "sent"
+    assert upwork_poll(services, fs, run_sitting=calls.run_sitting, now=_mon(11, 15)) == (True, "ok")
+    fn, trigger, kw = fs.jobs[-1]
+    assert kw["id"] == "mail-wake" and trigger.run_date == _mon(11, 16)
+    await fn()
+    assert calls.sittings == ["upwork"]
+    handoff = (Path(services.cfg.repo_dir) / "memory" / "handoff.md").read_text()
+    assert "Upwork changed since the last look (11:15): Upwork draft abc…: pending → sent" in handoff
+    assert read_mail_wake_state(services.cfg.state_dir)["count"] == 1  # shares the mail cap
+    kinds = [e[1] for e in services.archive.entries]
+    assert {"kind": "mail_wake", "source": "upwork"}.items() <= kinds[-2].items()
+    assert kinds[-1]["kind"] == "upwork_poll" and kinds[-1]["result"] == "woke"
+    # the same state again is not a second change
+    assert upwork_poll(services, fs, run_sitting=calls.run_sitting, now=_mon(11, 45)) == (False, "unchanged")
+
+
+def test_upwork_poll_change_during_a_session_is_kept_for_the_next_look(services, calls):
+    from agent import scheduler
+    from agent.scheduler import read_upwork_poll_state, upwork_poll
+
+    up = FakeUpwork(rooms=[])
+    services.upwork = up
+    fs = FakeSched()
+    assert upwork_poll(services, fs, run_sitting=calls.run_sitting, now=_mon(10, 15)) == (False, "baseline")
+    up.rooms.append({"room_id": "work_r1", "unread_count": 1})
+
+    async def locked():
+        async with scheduler.RUN_LOCK:
+            return upwork_poll(services, fs, run_sitting=calls.run_sitting, now=_mon(10, 45))
+
+    import asyncio
+
+    assert asyncio.run(locked()) == (False, "session_running")
+    assert fs.jobs == [] and read_upwork_poll_state(services.cfg.state_dir)["signal"]["rooms"] == {}
+    # session over: the same change is still news
+    assert upwork_poll(services, fs, run_sitting=calls.run_sitting, now=_mon(11, 15)) == (True, "ok")
+    assert (Path(services.cfg.repo_dir) / "memory" / "handoff.md").read_text().count("work_r1: new unread") == 1
+
+
+def test_upwork_poll_debounced_change_is_retried_but_capped_change_is_noted(services, calls):
+    from agent.scheduler import read_upwork_poll_state, request_mail_wake, upwork_poll
+
+    up = FakeUpwork(outbox=[{"id": "abc", "kind": "proposal", "state": "pending"}])
+    services.upwork = up
+    fs = FakeSched()
+    upwork_poll(services, fs, run_sitting=calls.run_sitting, now=_mon(10, 15))
+    # a mail wake ten minutes ago → debounce: leave unsaved so the next look retries
+    request_mail_wake(services, fs, run_sitting=calls.run_sitting, now=_mon(10, 35))
+    up.outbox[0]["state"] = "declined"
+    assert upwork_poll(services, fs, run_sitting=calls.run_sitting, now=_mon(10, 45)) == (False, "debounce")
+    assert read_upwork_poll_state(services.cfg.state_dir)["signal"]["outbox"] == {"abc": "pending"}
+    # daily cap reached → saved and written to the handoff for the next scheduled sitting
+    from agent.scheduler import _mail_wake_path
+    _mail_wake_path(services.cfg.state_dir).write_text(
+        __import__("json").dumps({"last": _mon(8, 0).isoformat(), "day": "2026-09-07", "count": 6}))
+    assert upwork_poll(services, fs, run_sitting=calls.run_sitting, now=_mon(11, 15)) == (False, "daily_cap")
+    assert read_upwork_poll_state(services.cfg.state_dir)["signal"]["outbox"] == {"abc": "declined"}
+    assert "pending → declined" in (Path(services.cfg.repo_dir) / "memory" / "handoff.md").read_text()
+
+
+def test_upwork_poll_bridge_failure_is_archived_not_raised(services):
+    from agent.scheduler import upwork_poll
+
+    services.upwork = FakeUpwork(fail=True)
+    assert upwork_poll(services, FakeSched(), now=_mon(10, 15)) == (False, "failed")
+    assert services.archive.entries[-1][1]["kind"] == "upwork_poll_failed"
+    assert "secret" not in services.archive.entries[-1][1]["error"]
