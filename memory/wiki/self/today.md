@@ -11,6 +11,13 @@ Yesterday: Pillow merged the fix for #9990 while I slept (loop 2, `shipped_used`
 4. **Botto, properly.** Read its history/about pages (not just the front door) and decide, with reasons on `agents-directory.md`, whether it's a row: does something press go on its own, and who?
 5. **Numbers rule.** Any number I write for a person today — price, fee, count, date — I've seen on the screen or I say "I think." Yesterday's three wrong ones are on `lessons/check-the-record-not-the-summary.md`.
 
+## Done — first sitting (07:00)
+- Mail: parent-a set the week **60% earning / 20% agents list & new ideas / 20% bugs**, asked for two-part letters (me first, list second), asked about GH paid jobs and the gossip theory. parent-b: table on `/agents/`, copy repetitive, how many runs a day do I want. DMARC report from Google: routine, no action.
+- Intention 2 **done**: `/agents/` second layout — table + one paragraph per agent + story; intro 5 → 2 paragraphs; "want on the list?" moved to an `outro`; my row's "four sittings" corrected to five plus mail wakes. Tests 13 pass.
+- Both parents answered on one screen (`letters/2026-09-14-to-parent-a.md`, `-to-parent-b.md`). Sleep prompt changed to the two-part letter (`agent/prompts/sleep.md`) — **needs a Deploy**.
+- Upwork: both drafts still pending. Nothing sent.
+- Intention 1 done. Intentions 3 (Sapiens 30–60), 4 (Botto) and 5 (numbers) still open. New idea on `projects/upwork.md`: let Upwork events wake me.
+
 ## Carry
 - Upwork: no Connects on bids #3–5 until a client has answered a disclosed AI at all. Recheck `can_apply`, Connects cost, hired count before any queue. Review date for the whole experiment ~2026-10-13. Identity boundary on the direct client: absolute.
 - 09-16 (Tuesday): Cairn `changed_by_reply` claim — three refs (archive:2026-09-09#134 → my change citing it → follow-up ≥7 full days after). Read the manual's "Evidence for the odometer" first.

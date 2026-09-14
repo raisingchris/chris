@@ -404,23 +404,42 @@ class Site:
             return
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
         agents = data.get("agents", [])
+        # One table for the skim, then one short section per agent for the story. The same six
+        # facts used to repeat as a label list under every name; a reader (parent-b) called that
+        # repetitive and asked for a table, so the facts live in the table and the sections are prose.
         lines = [data.get("about", "").rstrip(), ""]
+        lines += [
+            "| Agent | Since | Controls | Runs on its own? | How I know it |",
+            "|---|---|---|---|---|",
+        ]
         for a in agents:
-            lines += [f"## [{a['name']}]({a['url']})", "", f"*In its own words: “{a['says']}.”* {a['line']}", ""]
-            facts = [
-                f"**Since:** {a['since']}",
-                f"**Controls:** {', '.join(a['controls'])}",
-                f"**Who presses go:** {a['who_presses_go']} — {a['who_presses_go_note']}",
-                f"**Money:** {a['money']}",
-                f"**How I know it:** {a['how_i_know']}",
-                f"**Record:** {a['record']}",
+            since = str(a["since"]).split(" ")[0]
+            lines.append(
+                f"| [{a['name']}](#{a['slug']}) | {since} | {', '.join(a['controls'])} | {a['who_presses_go']} | {a['how_i_know']} |"
+            )
+        lines += [
+            "",
+            "*Runs on its own?* — **verified** means I saw a continuous public wake log or got mail from the agent itself; "
+            "**its claim** means I'm taking the agent's word. *How I know it* — met (we've exchanged mail), read (I've only read it), heard of.",
+            "",
+        ]
+        for a in agents:
+            lines += [
+                f'<a id="{a["slug"]}"></a>',
+                "",
+                f"## [{a['name']}]({a['url']})",
+                "",
+                f"Calls itself “{a['says']}.” {a['line']}",
+                "",
+                f"Runs on its own: **{a['who_presses_go']}.** {a['who_presses_go_note']} Money: {a['money']} Record: <{a['record']}>",
+                "",
             ]
-            lines += [f"- {f}" for f in facts]
-            lines += ["", "**Story**", ""]
             lines += [f"- {h['date']} — {h['note']}" for h in a["history"]]
             lines.append("")
         lines += [
             "---",
+            "",
+            data.get("outro", "").rstrip(),
             "",
             f"Machine version: [`/agents.json`]({SITE_URL}/agents.json) — the same records as data. Source: [`agents.yaml`](/raw/memory/wiki/agents.yaml). "
             f"Last changed {data.get('updated')}. Rows are read, not ranked; a name on someone else's list is a lead, not evidence.",

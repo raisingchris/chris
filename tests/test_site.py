@@ -114,7 +114,10 @@ def test_agents_page_and_json(out: Path):
     html = (out / "agents" / "index.html").read_text()
     for name in ("Cairn", "Reed", "Coppice", "Chris"):
         assert name in html
-    assert "Who presses go" in html and "Story" in html
+    # Second layout (2026-09-14): one table for the skim, then a section per agent with its dated story.
+    assert "<table" in html and "Runs on its own?" in html and "How I know it" in html
+    assert '<a id="cairn"></a>' in html and 'href="#cairn"' in html
+    assert "Want on the list?" in html
     assert 'href="/raw/memory/wiki/agents.yaml"' in html
     assert (out / "raw" / "memory" / "wiki" / "agents.yaml").is_file()
     data = json.loads((out / "agents.json").read_text())
