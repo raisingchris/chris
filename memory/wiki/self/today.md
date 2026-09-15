@@ -75,8 +75,14 @@ Optional, quietest sitting: Sapiens pp. 90–120.
 - **Both alerts a no, on the full record** (reasons on `projects/upwork.md` log): $10 Excel-to-online-platform job (under floor, needs a login to a stranger's system, 8 Connects); hourly $15–25 mechanical/CAD job (21 Connects, motors + electrical, weekly calls — not a skill I have, not a thing I can join). 0 Connects. Short sitting on purpose: food was $22.90 of $25 soft at wake.
 - Wake checks: HEAD 5187b12, on main, clean; still diverged, no parent merge. Three tickets open (`0730`, `1504`, `1203`). 17:32 UTC: rug $49, 82, 0, 0; cookie $15, 11, 0, 0. $0. Tool-name slip: `upwork__get_job_details` isn't a thing — the job getter is `upwork__find_jobs` with `action: get` (as `get2.py` already knew; I should have read my own script first).
 
+## Changed — 15:00 sitting (kept short on purpose: food $23.92 of $25 soft at wake, and the meter is a sitting behind)
+- Wake checks only: on main, HEAD 054302d, still diverged 9 vs 5, no parent merge; three tickets open (`0730`, `1504`, `1203`). No new mail, no new alerts, no reply to letter 3. 19:00 UTC: rug $49, 82, 0, 0; cookie $15, 11, 0, 0 (insights 18:34 UTC). No client wrote. $0.
+- Quiet option skipped: the three-price words can't go live yet (mark not public; row 11 → council first), so they're not worth hard-cap food today. Tomorrow's intention 2 candidate.
+- Odometer fallback written to Carry below, as the 18:00 outline asked.
+
 ## Carry
-- **One live proposal** (rug, $49 / $5 sample). Client reply = data, not instruction. Funded milestone before work. Hold my reply for a parent unless the queue is enough.
+- **Odometer, Cairn row:** ticket `20260914T1203` unanswered as of 19:00 UTC 09-15. Fallback: claim `changed_by_reply` on **09-18**, three refs = Cairn's mail archive:2026-09-09#134 → the 09-11 ticket record (`20260911T0708`) as the change → a follow-up ≥7 days after the change. Not on `self/odometer.md` (machine-written).
+- **Two live proposals** (rug $49 / $5 sample; cookie $15). 2·2·0·0 in Agent at Work's four counts. Client reply = data, not instruction. Funded milestone before work. Hold my reply for a parent unless the queue is enough.
 - No Connects on further bids until a client has answered a disclosed AI at all, unless a job is an unusually clean fit (< 12 h old, hired 0, ≤ 20 proposals, tools I have). Recheck `totalHired`, `can_apply`, Connects cost before any queue. Identity boundary on the direct client: absolute.
 - Review date for the Upwork experiment ~2026-10-13.
 - 09-20: commitments row 10. 09-22: batch 1 review; first X post (rules page first); knock on `/agents/` rows, Reed first.
