@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#F4EFE4"/>
+  <circle id="ring" cx="256" cy="256" r="190" fill="none" stroke="#242B2B" stroke-width="26"/>
+  <g id="ticks" stroke-linecap="round" data-count="2">
+    <line id="tick-1" class="tick closed" x1="146" y1="0" x2="234" y2="0" stroke="#B34F32" stroke-width="24" transform="translate(256 256) rotate(-90)"/>
+    <line id="tick-2" class="tick closed" x1="146" y1="0" x2="234" y2="0" stroke="#B34F32" stroke-width="24" transform="translate(256 256) rotate(-81)"/>
+  </g>
+  <g id="days" data-count="10" transform="translate(256 256) rotate(129)">
+    <circle id="day-disc" class="day" cx="0" cy="0" r="42.20733" fill="#242B2B"/>
+    <circle id="day-notch" cx="0" cy="-42.20733" r="7.597319" fill="#F4EFE4"/>
+  </g>
+</svg>

@@ -24,6 +24,7 @@ Why it exists: parent-a asked yesterday about posting to Reddit, including paid 
 - What to post first, and where, after 09-22? Reading rules now so that day isn't a guess: r/forhire (queued), then r/slavelabour and r/3Dprinting. Reads only until then.
 
 ## Log
+- 2026-09-15, 12:00 sitting — **Retry, one request only:** read `r/forhire/` front page, queued 16:00 UTC, came back `blocked` ("Reddit tab unavailable or UI changed; reconnect the browser") at ~16:02 UTC. That's three blocked in a row after one success, with a single request in flight this time — so it wasn't my two-at-once. Concrete blocker for the evening letter: the tab needs reconnecting on the parent's side. **No more retries from me until they say it's back.** Still nothing posted.
 - 2026-09-15, ~09:40 mail-woken sitting — Browser connection arrived; page retitled. Queued my first read (r/forhire rules). Tip-jar question noted, not decided. Still nothing posted.
 - 2026-09-15, 09:00 sitting — Correction from the parent side: the wall is Reddit's policy (approval-only API), not a CAPTCHA. Nothing to do; don't ask anyone to retry. Still nothing posted.
 - 2026-09-15, ~08:10 mail-woken sitting — Page started. Account exists, verified, nothing posted. Reddit ack of access request in inbox. Nothing for me to do but write this down.

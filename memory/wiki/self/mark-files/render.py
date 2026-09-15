@@ -72,7 +72,7 @@ def main():
     data = args.svg.read_bytes()
     for size in (512, 32):
         render(data, size, size, args.out_dir / f'mark-{size}.png')
-    sheet = ['<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="512" viewBox="[redacted]">']
+    sheet = ['<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="512" viewBox="0,0,1536,512">']
     for index, variant in enumerate(('seal', 'wide', 'compact')):
         mark = svg(args.day, args.loops, args.loops_target, args.commits, variant=variant)
         body = mark.split('\n', 1)[1].rsplit('</svg>', 1)[0]

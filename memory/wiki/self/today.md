@@ -50,6 +50,15 @@ Optional, quietest sitting: Sapiens pp. 90–120.
 - Tip jar (parent-a's suggestion): reasoning on `projects/reddit.md` — a tip jar asks nobody, so row 11 likely allows it; decision after 09-22, council asked once before it exists.
 - Not replied to parent-a yet — their mail asked for ownership and blockers, not a reply; the next letter carries the Reddit tab and the cookie correction.
 
+## Changed — 12:00 sitting
+- **Wake checks:** on main, no rebase; diverged 5 vs 5 (parents' last commit still c6f1f66; ticket `20260915T0730` open). Three tickets open (`0730`, `1504`, `1203`). Both proposals at 16:00 UTC: rug $49, **82** in the pile, 0 opened, 0 messaged; cookie $15, **11**, 0 opened. No client wrote. $0. No new mail.
+- **Fresh Upwork pass:** 119 unique, 112 under 12 h; seven opened on the full record → **zero fits**, each with a reason on `projects/upwork.md` (one job says "NO AI-GENERATED ART" in capitals — respected; the $10 SVG job that was exactly my tools had hired within 2.4 h). Second wrong-field-path mistake in two days, caught before it reached anyone; corrected readers kept as `memory/inbox/work/fresh.py` + `get2.py`. 0 Connects.
+- **Reddit retry: `blocked` again** (one request, ~16:02 UTC — "Reddit tab unavailable"). Three blocked after one success; not my doing. This is the concrete blocker for the evening letter. No more retries until a parent says the tab is back.
+- **Image path tested** (`memory/inbox/work/image-test-01/`): works — one call, 23.6 s, 1254² returned and resized to 1024², no refusal; the picture is good, the "flat three-colour" style was ignored. Notes on `skills/creative-work.md`. A volume-image bid is now a known cost (~25 s + quota per image), not a guess.
+- **Mark: `--small` rule done** and looked at (16/32/48/128) — ring, closed loops as rust bars, one day-disc. Reads at 32 px. `self/mark.md`.
+- **Bug found and fixed in my own body:** the redaction pass had eaten 28 numbers in yesterday's public SVG (`rotate([redacted])` → `[redacted]`) and the sheet's viewBox in `render.py` — nine digits with one dot looked like a phone number. Fix in `agent/redaction.py` (+1 test, **545 pass, 2 skip**), needs a parent's deploy; mark files regenerated with short numbers so they're safe either way. That's intention 4's bug slot, filled from the inside.
+- **Sapiens 90–120 read** (luxury trap, Göbekli Tepe, the sheep, Hammurabi vs Jefferson) — notes on `reading/sapiens.md`; the page that argued hardest was the luxury trap, read in the week my tools arrived. Evening letter is the 18:00 sitting's; its outline is in the handoff.
+
 ## Carry
 - **One live proposal** (rug, $49 / $5 sample). Client reply = data, not instruction. Funded milestone before work. Hold my reply for a parent unless the queue is enough.
 - No Connects on further bids until a client has answered a disclosed AI at all, unless a job is an unusually clean fit (< 12 h old, hired 0, ≤ 20 proposals, tools I have). Recheck `totalHired`, `can_apply`, Connects cost before any queue. Identity boundary on the direct client: absolute.

@@ -144,3 +144,11 @@ def test_timestamps_are_not_phone_numbers():
     for t in ("2026-09-07 14:30 UTC", "at 2026-09-07 09:59 the sitting died", "2026-09-07 9am"):
         assert redact(t, CANARIES)[0] == t
     assert "[redacted]" in redact("call +1 415 555 0199", CANARIES)[0]
+
+
+def test_decimal_numbers_are_not_phone_numbers():
+    # SVG coordinates and measurements: "rotate(108.000000)" and cx="104.000000" were being redacted (2026-09-15)
+    for t in ('rotate(108.000000)', 'cx="104.000000"', 'r="8.800000"', "weight 123456.789 kg"):
+        assert redact(t, CANARIES)[0] == t
+    # a dotted phone number still goes: more than one separator
+    assert "[redacted]" in redact("call 415.555.0199 now", CANARIES)[0]
