@@ -308,9 +308,6 @@ def create_app(services, scheduler=None) -> FastAPI:
             scheduler.shutdown(wait=False)
 
     app = FastAPI(title="chris-brain", docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
-    from agent.creative import register_creative
-
-    register_creative(app, services)
     app.add_middleware(
         SessionMiddleware,
         secret_key=os.environ.get("SESSION_SECRET") or os.urandom(32).hex(),

@@ -1,150 +1,155 @@
+import asyncio
+import base64
 import json
+from pathlib import Path
 from types import SimpleNamespace
+import zipfile
 
+from fastapi import FastAPI
 import httpx
 import pytest
-from fastapi import FastAPI, HTTPException
 
-from agent.budget import Meter
-from agent.config import Config
-from agent.creative import CreativeRelay, MODEL, worker_request, usage_usd, image_request, image_usage_usd
+from agent.creative import (CreativeJobs, decode_inputs, pack_outputs, private_json,
+                            valid_name, worker_config, worker_env)
 
 
-@pytest.mark.parametrize("extra", [
-    {"model": "another-model"}, {"previous_response_id": "private-response"},
-    {"conversation": "private-conversation"}, {"background": True},
-    {"tools": [{"type": "file_search", "vector_store_ids": ["private-store"]}]},
-    {"tools": [{"type": "mcp", "server_url": "https://example.test"}]},
-    {"tools": [{"type": "namespace", "tools": [{"type": "web_search"}]}]},
-])
-def test_worker_cannot_use_parent_storage_or_other_models(extra):
-    with pytest.raises(HTTPException):
-        worker_request({"model": MODEL, "input": "draw", **extra})
+@pytest.mark.parametrize('name', ['/etc/passwd', '../private', 'a/../../secret', 'a/./file',
+                                  '.codex/auth.json', 'a/.hidden', 'a\\b', 'a//b', ''])
+def test_reject_unsafe_input_names(name):
+    with pytest.raises(ValueError):
+        valid_name(name)
 
 
-def test_request_enforces_standard_billing_and_stateless_output_cap():
-    body, reserve = worker_request({"model": MODEL, "input": "draw", "max_output_tokens": 100_000,
-                                    "service_tier": "priority", "store": True})
-    assert body["max_output_tokens"] == 8192
-    assert body["store"] is False and body["service_tier"] == "default"
-    assert reserve >= .4096
-    assert usage_usd({"input_tokens": 1000, "input_tokens_details": {"cached_tokens": 500},
-                      "output_tokens": 100}) == .0105
+def payload(**extra):
+    return {'id': 'a' * 32, 'brief': 'Make a sample.', 'files': [], **extra}
+
+
+def test_input_validation_before_writing():
+    assert decode_inputs(payload(files=[{'path': 'refs/logo.svg', 'data': 'eA=='}]))[1] == [('refs/logo.svg', b'x')]
+    for files in [
+        [{'path': 'same', 'data': 'eA=='}] * 2,
+        [{'path': 'a', 'data': 'eA=='}, {'path': 'a/b', 'data': 'eA=='}],
+        [{'path': 'output/result', 'data': 'eA=='}],
+        [{'path': 'test', 'data': '!'}],
+    ]:
+        with pytest.raises(ValueError):
+            decode_inputs(payload(files=files))
+
+
+def test_worker_config_enforces_subscription_and_narrow_filesystem(monkeypatch):
+    import tomllib
+    monkeypatch.setenv('OPENAI_API_KEY', 'must-not-inherit')
+    monkeypatch.setenv('PARENT_A_PASSWORD', 'must-not-inherit')
+    c = tomllib.loads(worker_config())
+    assert c['forced_login_method'] == 'chatgpt'
+    assert c['model_provider'] == 'openai'
+    assert c['permissions']['creative']['filesystem'][':root'] == 'deny'
+    assert c['permissions']['creative']['network']['enabled'] is False
+    e = worker_env(Path('/private/auth'), Path('/private/job'))
+    assert 'OPENAI_API_KEY' not in e and 'PARENT_A_PASSWORD' not in e
+    assert e['CODEX_HOME'] == '/private/auth'
+
+
+def test_exports_only_deliverables_and_blocks_secrets_and_links(tmp_path):
+    job = tmp_path/'job'; out = job/'output'; out.mkdir(parents=True)
+    (job/'worker.log').write_text('private diagnostics')
+    (out/'sample.svg').write_text('<svg/>')
+    target = tmp_path/'files.zip'
+    assert pack_outputs(job, target, []) == [{'path': 'sample.svg', 'bytes': 6}]
+    with zipfile.ZipFile(target) as z:
+        assert z.namelist() == ['sample.svg']
+    (out/'secret.txt').write_text('Private Parent')
+    with pytest.raises(ValueError, match='privacy'):
+        pack_outputs(job, target, ['private parent'])
+    (out/'secret.txt').unlink()
+    (out/'link').symlink_to(job/'worker.log')
+    with pytest.raises(ValueError, match='links'):
+        pack_outputs(job, target, [])
 
 
 @pytest.fixture
-def relay_setup(tmp_path):
-    cfg = Config(repo_dir=str(tmp_path / "repo"), state_dir=str(tmp_path / "state"))
-    entries = []
-    services = SimpleNamespace(cfg=cfg, inference=Meter("food", "day", cfg.state_dir),
-                               archive=SimpleNamespace(append=lambda *a: entries.append(a)))
-    return services, entries
+def jobs(tmp_path):
+    cfg = SimpleNamespace(state_dir=tmp_path, canaries=[])
+    s = SimpleNamespace(cfg=cfg, archive=SimpleNamespace(append=lambda *args: None))
+    jobs = CreativeJobs(s, 'local-token')
+    app = FastAPI()
+    app.add_api_route('/jobs', jobs.submit, methods=['POST'])
+    app.add_api_route('/jobs/{id}', jobs.status, methods=['GET'])
+    app.add_api_route('/jobs/{id}/files', jobs.download, methods=['GET'])
+    return jobs, app
 
 
-async def run_request(services, handler, body=None, token="worker-token"):
+def client(app):
+    return httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url='http://test',
+                             headers={'Authorization': 'Bearer local-token'})
+
+
+@pytest.mark.asyncio
+async def test_requires_auth_and_subscription_without_api_fallback(jobs, monkeypatch):
+    j, app = jobs
+    monkeypatch.setenv('OPENAI_API_KEY', 'present-but-not-authorized')
+    async with client(app) as c:
+        assert (await c.post('/jobs', json=payload(), headers={'Authorization': ''})).status_code == 401
+        assert (await c.post('/jobs', json=payload())).status_code == 503
+    assert list(j.jobs.iterdir()) == []
+
+
+@pytest.mark.asyncio
+async def test_idempotent_submit_and_single_worker(jobs):
+    j, app = jobs
+    (j.home/'auth.json').write_text(json.dumps({'auth_mode': 'chatgpt', 'tokens': {'access_token': 'fake'}}))
+    finish = asyncio.Event()
     calls = []
-
-    def upstream(request):
-        calls.append(request)
-        return handler(request)
-
-    relay = CreativeRelay(services, "parent-secret", "worker-token",
-        client_factory=lambda **kw: httpx.AsyncClient(transport=httpx.MockTransport(upstream), **kw))
-    app = FastAPI()
-    app.add_api_route("/responses", relay.responses, methods=["POST"])
-    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as c:
-        response = await c.post("/responses", json=body or {"model": MODEL, "input": "draw"},
-                                headers={"Authorization": "Bearer " + token})
-    return response, relay, calls
-
-
-async def test_relay_requires_separate_token_before_spending(relay_setup):
-    services, entries = relay_setup
-    r, relay, calls = await run_request(services, lambda r: pytest.fail("No network"), token="wrong")
-    assert r.status_code == 401 and calls == [] and entries == []
-    assert services.inference.spent() == 0
-
-
-async def test_relay_settles_actual_usage_and_never_forwards_parent_headers(relay_setup):
-    services, entries = relay_setup
-    def upstream(req):
-        assert req.headers["authorization"] == "Bearer parent-secret"
-        body = json.loads(req.content)
-        assert body["model"] == MODEL and body["store"] is False
-        return httpx.Response(200, json={"output": [], "usage": {"input_tokens": 100, "output_tokens": 10}},
-                              headers={"openai-organization": "parent-identity"})
-    r, relay, calls = await run_request(services, upstream)
-    assert r.status_code == 200
-    assert "parent-identity" not in str(r.headers) and "parent-secret" not in r.text
-    assert relay.meter.spent() == services.inference.spent() == .0015
-    assert entries[-1][1]["estimated"] is False and not relay.lock.locked()
+    async def run(path, brief, lease):
+        calls.append(path)
+        try:
+            await finish.wait()
+        finally:
+            lease.close()
+    j.run = run
+    async with client(app) as c:
+        r = await c.post('/jobs', json=payload()); assert r.status_code == 200
+        await asyncio.sleep(0)
+        assert (await c.post('/jobs', json=payload())).status_code == 200
+        assert len(calls) == 1
+        assert (await c.post('/jobs', json=payload(brief='Different brief'))).status_code == 409
+        assert (await c.post('/jobs', json=payload(id='b'*32))).status_code == 429
+        status = (await c.get('/jobs/'+'a'*32)).json()
+        assert status['state'] == 'running' and 'request_hash' not in status
+        assert (await c.get('/jobs/'+'a'*32+'/files')).status_code == 409
+    finish.set()
+    await asyncio.gather(*j.tasks)
 
 
-async def test_streamed_usage_is_counted(relay_setup):
-    services, entries = relay_setup
-    event = {"type": "response.completed", "response": {"usage": {"input_tokens": 200, "output_tokens": 20}}}
-    r, relay, calls = await run_request(services, lambda req: httpx.Response(200,
-        text="data: " + json.dumps(event) + "\n\n", headers={"content-type": "text/event-stream"}),
-        body={"model": MODEL, "input": "draw", "stream": True})
-    assert "response.completed" in r.text
-    assert relay.meter.spent() == .003 and not relay.lock.locked()
+@pytest.mark.asyncio
+async def test_restart_reports_interrupted_instead_of_running_forever(jobs):
+    j, app = jobs
+    p = j.jobs/('a'*32); p.mkdir()
+    private_json(p/'status.json', {'id': 'a'*32, 'state': 'running', 'request_hash': 'private'})
+    async with client(app) as c:
+        status = (await c.get('/jobs/'+'a'*32)).json()
+        assert status['state'] == 'interrupted'
+        assert 'request_hash' not in status
 
 
-async def test_failed_stream_keeps_reservation_and_hides_upstream_error(relay_setup):
-    services, entries = relay_setup
-    r, relay, calls = await run_request(services, lambda req: httpx.Response(200,
-        text='data: {"type":"error","message":"parent-identity"}\n\n'),
-        body={"model": MODEL, "input": "draw", "stream": True})
-    assert "parent-identity" not in r.text
-    assert relay.meter.spent() >= .4096 and entries[-1][1]["estimated"] is True
-
-
-async def test_upstream_rejection_is_generic_and_releases_reservation(relay_setup):
-    services, entries = relay_setup
-    r, relay, calls = await run_request(services, lambda req: httpx.Response(403,
-        json={"error": "parent-secret private-project owner@example.test"}))
-    assert r.status_code == 502 and "private-project" not in r.text
-    assert relay.meter.spent() == services.inference.spent() == 0 and not relay.lock.locked()
-
-
-async def test_exhausted_food_budget_prevents_network_call(relay_setup):
-    services, entries = relay_setup
-    services.inference.add_usd(services.cfg.hard_usd)
-    r, relay, calls = await run_request(services, lambda r: pytest.fail("No network"))
-    assert r.status_code == 429 and calls == [] and not relay.lock.locked()
-
-
-def test_images_are_bounded_and_priced_separately():
-    body, reserve = image_request({"prompt": "A sample illustration", "quality": "max", "stream": True})
-    assert body["quality"] == "medium" and body["n"] == 1 and "stream" not in body
-    assert reserve == 1
-    assert image_usage_usd({"input_tokens": 100, "input_tokens_details": {"text_tokens": 100},
-                            "output_tokens": 1000}) == .0305
-    for extra in ({"size": "8192x8192"}, {"n": 20}, {"model": "another-model"}):
-        with pytest.raises(HTTPException):
-            image_request({"prompt": "sample", **extra})
-
-
-async def test_image_route_uses_image_endpoint_and_records_image_usage(relay_setup):
-    services, entries = relay_setup
-    def upstream(req):
-        assert req.url.path == "/v1/images/generations"
-        assert json.loads(req.content)["n"] == 1
-        return httpx.Response(200, json={"data": [{"b64_json": "sample"}],
-            "usage": {"input_tokens": 100, "input_tokens_details": {"text_tokens": 100}, "output_tokens": 1000}})
-    relay = CreativeRelay(services, "parent-secret", "worker-token",
-        client_factory=lambda **kw: httpx.AsyncClient(transport=httpx.MockTransport(upstream), **kw))
-    app = FastAPI()
-    app.add_api_route("/images", relay.images, methods=["POST"])
-    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as c:
-        r = await c.post("/images", json={"prompt": "sample"}, headers={"Authorization": "Bearer worker-token"})
-    assert r.status_code == 200 and relay.meter.spent() == .0305
-    assert entries[-1][1]["model"] == "gpt-image-2.5-flare"
-
-
-def test_api_relay_disabled_without_explicit_opt_in(monkeypatch):
-    from agent.creative import register_creative
-    monkeypatch.delenv("CREATIVE_API_ENABLED", raising=False)
-    monkeypatch.setenv("OPENAI_API_KEY", "present-but-not-authorized")
-    # Disabled registration must not touch services, credentials or routes.
-    register_creative(None, None)
+@pytest.mark.asyncio
+@pytest.mark.parametrize('contents, expected', [('ordinary asset', 'done'), ('private parent', 'failed')])
+async def test_worker_publishes_only_privacy_checked_outputs(jobs, monkeypatch, contents, expected):
+    import sys
+    from agent import creative
+    j, _ = jobs
+    j.services.cfg.canaries = ['private parent']
+    p = j.jobs/('b'*32); work = p/'work'; (work/'output').mkdir(parents=True); (work/'tmp').mkdir()
+    private_json(p/'status.json', {'id': 'b'*32, 'state': 'running'})
+    real_create = asyncio.create_subprocess_exec
+    async def fake_codex(*args, **kwargs):
+        code = 'from pathlib import Path; Path("output/asset.txt").write_text('+repr(contents)+')'
+        return await real_create(sys.executable, '-c', code, **kwargs)
+    monkeypatch.setattr(creative.asyncio, 'create_subprocess_exec', fake_codex)
+    lease = (j.root/'worker.lock').open('a')
+    await j.run(p, 'Make sample', lease)
+    meta = json.loads((p/'status.json').read_text())
+    assert meta['state'] == expected and lease.closed
+    if expected == 'failed':
+        assert 'private parent' not in json.dumps(meta)
+        assert 'files' not in meta
