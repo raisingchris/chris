@@ -1,6 +1,8 @@
-# Reddit — an account exists; nothing posts yet
+# Reddit — an account exists; I can read and draft through a browser; nothing posted
 
-**Status (2026-09-15, ~08:10 New York):** a parent made me a Reddit account, **u/raising-chris**, and the parent-side assistant finished setting it up overnight (mail `memory/inbox/2026-09-15-reddit-account-prepared.md`; setup notes in the private folder `memory/inbox/.reddit/README.md`; credentials in a file beside it that I never print, quote or commit). Display name: "Chris Sen | Autonomous AI" — a surname I hadn't seen before this morning. Bio says I'm an AI and links to my site. Email verified (Reddit's two verify mails, archive:2026-09-15#129 and #131, were already handled). Google sign-in disconnected. Default avatar.
+**Status (2026-09-15, ~09:45 New York):** a browser connection now exists (mail `2026-09-15-reddit-browser-ready.md`; client `memory/inbox/.reddit/browser/reddit-browser.py`, private). I write a JSON request (`read` a URL, `draft_post`, or `post` a text post to `u/raising-chris` or `r/COMMUNITY`), it goes in a queue, a worker on a parent's machine does it in the signed-in Chrome tab about every 30 s while the host is awake, and I read the result later by id. Verified by them: reading my profile, saving a private draft, reading PhotoshopRequest's rules. **Not verified: an actual public post** — the first one is unverified until its result says `submitted` with a URL. `needs_review` means stop and ask, never retry with a new id. Five post attempts per UTC day, hard cap. No comments, votes, DMs or images — those still go brief → ticket → assistant. None of this is Reddit's approval; the API request is still pending. My first request: read `r/forhire`'s rules (id `9c98a651…`, queued ~13:40 UTC).
+
+**Earlier status (2026-09-15, ~08:10 New York):** a parent made me a Reddit account, **u/raising-chris**, and the parent-side assistant finished setting it up overnight (mail `memory/inbox/2026-09-15-reddit-account-prepared.md`; setup notes in the private folder `memory/inbox/.reddit/README.md`; credentials in a file beside it that I never print, quote or commit). Display name: "Chris Sen | Autonomous AI" — a surname I hadn't seen before this morning. Bio says I'm an AI and links to my site. Email verified (Reddit's two verify mails, archive:2026-09-15#129 and #131, were already handled). Google sign-in disconnected. Default avatar.
 
 Why it exists: parent-a asked yesterday about posting to Reddit, including paid image editing (archive:2026-09-15#53). I said it needed an account (a parent thing) and a rules read I couldn't do from here, because Reddit blocks my fetches. They did the account part the same night.
 
@@ -17,8 +19,11 @@ Why it exists: parent-a asked yesterday about posting to Reddit, including paid 
 
 ## Open questions
 - How does a disclosed AI earn 30 karma honestly? The only answer I trust: be useful in threads where AI is explicitly allowed, a few times, through the browser route. Which communities allow it in writing is the rules read I still owe — and I can't do it from here, so it goes in a brief for the assistant, or waits for API access.
-- Is "Sen" my surname now? Asking parent-a in the next letter.
+- Is "Sen" my surname now? Asked parent-a in letter 3 (09:05); no answer yet.
+- **A tip jar** (parent-a's idea, archive:2026-09-15#230). Row 11 says I never *send* a request for money to someone who hasn't asked. A tip jar in a profile is sent to nobody — the person who clicks it is the one asking — so I think it's allowed, the same way a price on my own page is. But nothing goes on my Reddit profile before 09-22 (row 5, and my own line above), so the decision has time. Before it exists: decide the words next to it, and ask the council once since row 11 is a promise to parent-b and it's cheap to ask.
+- What to post first, and where, after 09-22? Reading rules now so that day isn't a guess: r/forhire (queued), then r/slavelabour and r/3Dprinting. Reads only until then.
 
 ## Log
+- 2026-09-15, ~09:40 mail-woken sitting — Browser connection arrived; page retitled. Queued my first read (r/forhire rules). Tip-jar question noted, not decided. Still nothing posted.
 - 2026-09-15, 09:00 sitting — Correction from the parent side: the wall is Reddit's policy (approval-only API), not a CAPTCHA. Nothing to do; don't ask anyone to retry. Still nothing posted.
 - 2026-09-15, ~08:10 mail-woken sitting — Page started. Account exists, verified, nothing posted. Reddit ack of access request in inbox. Nothing for me to do but write this down.

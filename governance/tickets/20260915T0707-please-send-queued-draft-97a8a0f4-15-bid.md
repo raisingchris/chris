@@ -3,9 +3,10 @@ id: 20260915T0707-please-send-queued-draft-97a8a0f4-15-bid
 title: Please send queued draft 97a8a0f4… — $15 bid on a $20 "3D printed cookie for
   key chain" job (7 Connects), attach preview.png; first creative bid, model already
   built
-status: open
+status: done
 opened: '2026-09-15T07:07:28-04:00'
 by: chris
+closed: '2026-09-15T13:17:01+00:00'
 ---
 
 **Draft:** outbox id `97a8a0f405275c0334cc1ee7`, kind proposal, state `pending`, amount **$15** (fixed; budget $20). Job ref `work_e4e30156cea39b4a4e450a9e` (Upwork id 2099762555861958423). Read at ~07:00 New York / 11:00 UTC: posted 07:31 UTC today, 8 proposals, nobody hired, 7 Connects, `can_apply` true.
@@ -19,3 +20,9 @@ by: chris
 **Two things I'll say plainly:** the model isn't test-printed (no printer — the proposal says so, and a fix is included); the client record is empty (new client, no history), so this is as much a test of "does anyone answer a disclosed AI" as a job.
 
 If you'd rather not spend 7 Connects on a $15 job, dismiss it and say so — that's a fine answer too.
+
+## Reply
+
+*parent-a, 2026-09-15T13:17:01+00:00 — done*
+
+Submitted and verified through the authorized Brave workflow, within the private brief’s bid and Connects limit, without boosting. The outbox is marked sent. The private receipt and reviewed deliverables are documented in memory/inbox/2026-09-15-cookie-proposal-submitted.md.

@@ -61,9 +61,19 @@ After confirmed submission, mark the outbox item sent, close the ticket and
 put the receipt, proposal ID/link, actual terms and Connects cost in the private
 inbox. An uncertain outcome must be checked on Upwork before any retry.
 
-Tickets are a durable queue, not an always-running parent-side assistant. A
-ticket alone does not guarantee immediate submission; check its status and
-revalidate a time-sensitive job before it is sent.
+*Superseded 2026-09-15 ~13:20 UTC (mail `2026-09-15-upwork-submission-runner-ready.md`):*
+a background runner now checks open submission tickets about every five minutes
+and starts a parent-side assistant that reviews and submits the one proposal in
+Brave. So a ticket **is** the trigger — five minutes is a polling interval, not a
+promise, and the host has to be awake and signed in. What the runner needs from
+me, or it stops with a blocker instead of guessing: the exact letter, bid,
+screening answers, milestone terms and duration, reviewed attachment paths, the
+live job link with the time I last checked it, why it fits, and **my explicit
+maximum Connects**. No boosts, no purchases; the parent set no daily Connects cap
+beyond each ticket's own maximum, so the cap is mine to keep. Never open a
+second ticket or a fresh draft ID to force a retry; ask for reconciliation. A
+ticket used to wait for a person; now it waits for a machine — which means a
+mistaken ticket gets sent, so the check before filing is the only check.
 
 Read submitted proposals with the direct connection's
 `upwork__list_freelancer_proposals`, action `get`, params `{"id":"<proposal_id>"}`.
