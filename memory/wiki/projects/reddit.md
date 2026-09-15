@@ -5,7 +5,7 @@
 Why it exists: parent-a asked yesterday about posting to Reddit, including paid image editing (archive:2026-09-15#53). I said it needed an account (a parent thing) and a rules read I couldn't do from here, because Reddit blocks my fetches. They did the account part the same night.
 
 ## What's allowed right now: nothing on my own
-- **No API, no app, no autonomous posting.** Reddit's app form has a human CAPTCHA, and its app-label flow asks for a separate *human* account — the README is clear I must not claim my account is that. An honest access request went in from the parent side; Reddit auto-acknowledged it (archive:2026-09-15#127, receipt `YP055M-121XK`). **Do not send a second request.**
+- **No API, no app, no autonomous posting.** *Corrected 2026-09-15, ~12:44 UTC (mail `2026-09-15-reddit-app-creation-correction.md`):* it isn't a CAPTCHA problem. After repeated human tries, Reddit's app form points to its Responsible Builder Policy — self-service API access has ended, and new OAuth access needs approval first. So no amount of retrying opens it; only the pending request can. Its app-label flow also asks for a separate *human* account — the README is clear I must not claim my account is that. An honest access request went in from the parent side; Reddit auto-acknowledged it (archive:2026-09-15#127, receipt `YP055M-121XK`). **Do not send a second request.**
 - **Browser fallback:** for any concrete Reddit action, I write a brief under `memory/inbox/work/reddit/<task>/brief.md` (thread URL, current community rules, intended action, exact text, disclosure) and file one public ticket with only the title and that path. The parent-side assistant does it in a parent's Chrome session, re-checking the live thread and rules first. Same shape as Upwork: a queued ticket is not a post.
 - **PhotoshopRequest** (the paid-edit community parent-a had in mind) requires ≥ 10 days of account age, positive comment karma, ≥ 30 combined karma earned *elsewhere*, then a probation of free requests before any paid work; paid edits need a watermark and raw one-click AI output isn't enough. Earliest the age gate opens: about **2026-09-25**. Karma has to be earned honestly — no asking for votes, no farming.
 
@@ -20,4 +20,5 @@ Why it exists: parent-a asked yesterday about posting to Reddit, including paid 
 - Is "Sen" my surname now? Asking parent-a in the next letter.
 
 ## Log
+- 2026-09-15, 09:00 sitting — Correction from the parent side: the wall is Reddit's policy (approval-only API), not a CAPTCHA. Nothing to do; don't ask anyone to retry. Still nothing posted.
 - 2026-09-15, ~08:10 mail-woken sitting — Page started. Account exists, verified, nothing posted. Reddit ack of access request in inbox. Nothing for me to do but write this down.

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#F4EFE4"/>
+  <g id="ticks" stroke-linecap="round" data-count="40">
+    <line id="tick-1" class="tick closed" x1="176" y1="0" x2="204" y2="0" stroke="#B34F32" stroke-width="10" transform="translate(256 256) rotate(-90.000000)"/>
+    <line id="tick-2" class="tick closed" x1="176" y1="0" x2="204" y2="0" stroke="#B34F32" stroke-width="10" transform="translate(256 256) rotate(-81.000000)"/>
+    <line id="tick-3" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(-72.000000)"/>
+    <line id="tick-4" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(-63.000000)"/>
+    <line id="tick-5" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(-54.000000)"/>
+    <line id="tick-6" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(-45.000000)"/>
+    <line id="tick-7" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(-36.000000)"/>
+    <line id="tick-8" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(-27.000000)"/>
+    <line id="tick-9" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(-18.000000)"/>
+    <line id="tick-10" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(-9.000000)"/>
+    <line id="tick-11" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(0.000000)"/>
+    <line id="tick-12" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(9.000000)"/>
+    <line id="tick-13" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(18.000000)"/>
+    <line id="tick-14" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(27.000000)"/>
+    <line id="tick-15" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(36.000000)"/>
+    <line id="tick-16" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(45.000000)"/>
+    <line id="tick-17" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(54.000000)"/>
+    <line id="tick-18" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(63.000000)"/>
+    <line id="tick-19" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(72.000000)"/>
+    <line id="tick-20" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(81.000000)"/>
+    <line id="tick-21" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(90.000000)"/>
+    <line id="tick-22" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate(99.000000)"/>
+    <line id="tick-23" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-24" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-25" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-26" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-27" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-28" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-29" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-30" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-31" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-32" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-33" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-34" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-35" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-36" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-37" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-38" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-39" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+    <line id="tick-40" class="tick open" x1="184" y1="0" x2="204" y2="0" stroke="#242B2B" stroke-width="5" transform="translate(256 256) rotate([redacted])"/>
+  </g>
+  <g id="days" fill="#242B2B" data-count="10" transform="translate(256 256) rotate(129)">
+    <circle id="day-1" class="day" cx="[redacted]" cy="0" r="8.800000" transform="rotate(-90.000000)"/>
+    <circle id="day-2" class="day" cx="[redacted]" cy="0" r="8.800000" transform="rotate(-54.000000)"/>
+    <circle id="day-3" class="day" cx="[redacted]" cy="0" r="8.800000" transform="rotate(-18.000000)"/>
+    <circle id="day-4" class="day" cx="[redacted]" cy="0" r="8.800000" transform="rotate(18.000000)"/>
+    <circle id="day-5" class="day" cx="[redacted]" cy="0" r="8.800000" transform="rotate(54.000000)"/>
+    <circle id="day-6" class="day" cx="[redacted]" cy="0" r="8.800000" transform="rotate(90.000000)"/>
+    <circle id="day-7" class="day" cx="[redacted]" cy="0" r="8.800000" transform="rotate([redacted])"/>
+    <circle id="day-8" class="day" cx="[redacted]" cy="0" r="8.800000" transform="rotate([redacted])"/>
+    <circle id="day-9" class="day" cx="[redacted]" cy="0" r="8.800000" transform="rotate([redacted])"/>
+    <circle id="day-10" class="day" cx="[redacted]" cy="0" r="8.800000" transform="rotate([redacted])"/>
+  </g>
+</svg>
