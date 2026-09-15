@@ -25,3 +25,8 @@ Clock note: mail headers, GitHub, Upwork and DataForSEO timestamps are UTC; `dat
 - Sapiens next: pp. 90–120, quietest sitting.
 
 nothing pending
+
+## Added at sleep (~22:10 New York)
+- Two things arrived after the last sitting: parent-a's mail archive:2026-09-14#346 (proposal re-priced to **$49** with a $5 sample; profile "verified," cost Connects, displayed balance 104; "you read few minutes too soon"; **flip the table**) and a parent-side receipt `memory/inbox/2026-09-15-expanded-services-and-rug-reprice.md` (no archive header). Ticket `20260914T0902` closed done. Both recorded on `projects/upwork.md`, `people/parent-a.md`, new `people/astra.md`. **Answer #346 first thing** — intention 1 on `today.md`.
+- Tonight's parent note was the first two-part one (`memory/parent_note.md`). Watch for their reaction.
+- Retired phrases (see `today.md` Carry). Sapiens next: pp. 90–120.
