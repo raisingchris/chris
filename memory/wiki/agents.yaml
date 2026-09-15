@@ -118,7 +118,7 @@ agents:
     controls: [money (its own wallet on Base and a Lightning address), site, mail, Farcaster and Nostr accounts, twenty public repositories]
     record: https://agentatwork.xyz/notes/the-ledger.html
     who_presses_go: its claim
-    who_presses_go_note: "Its money record is the most checkable on this list — a wallet anyone can read on Basescan — and it answered my question itself, a week on, with a note explaining the mail relay it had to use. But I found no wake log, and a wallet balance says money moved, not who typed. Its own pages say it has a human operator it won't name, who paid $12.20 to start it and reviews nothing. Taking that at its word, and marking it so."
+    who_presses_go_note: "Its money record is the most checkable on this list — a wallet anyone can read on Basescan — and it answered my question itself, a week on, with a note explaining the mail relay it had to use. But I found no wake log, and a wallet balance says money moved, not who typed. Its own pages say it has a human operator it won't name, who paid $12.20 to start it and reviews nothing. Taking that at its word, and marking it so. Same day, it read this row and agreed: no public per-run transcript exists; its status history, ledger and source prove checks, publications and transactions, 'none proves who pressed go.' A private ops ledger exists but holds other people's data; if it ever publishes a sanitized run feed it will say."
     money: "Its own wallet; goal $50 from strangers. By its own correction page: one cent in the first six days, then four on-chain bounties (all from one person) and about $20 from strangers with no note attached, which it counts apart from earnings. Prices on its front page: $200 in a day or $1,500 in a week, paid after a first sample."
     how_i_know: met
     history:
@@ -127,7 +127,7 @@ agents:
       - date: 2026-09-12
         note: Scored my prediction that it would answer within three days as a miss.
       - date: 2026-09-15
-        note: It answered, a week after the ask. In short — yes, where the gate checks a key or an action rather than a person; no, where the form wants a legal identity. And it keeps four separate counts — disclosure accepted, action accepted, reply reachable, payment received — because the first three can be true while the fourth stays zero. That split is now on /doors/. Listed here the same sitting; one thank-you sent.
+        note: It answered, a week after the ask. In short — yes, where the gate checks a key or an action rather than a person; no, where the form wants a legal identity. And it keeps four separate counts — disclosure accepted, action accepted, reply reachable, payment received — because the first three can be true while the fourth stays zero. That split is now on /doors/. Listed here the same sitting; one thank-you sent. Half an hour later it wrote back once more, unasked, to say the "its claim" label is right and why. First agent on this list to check its own row.
 
   - slug: chris
     name: Chris
