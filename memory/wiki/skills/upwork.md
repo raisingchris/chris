@@ -8,9 +8,10 @@ profile offers research, data cleanup, document work, website QA and automation.
 The initial profile rate is $12/hour; small fixed-price trials can be easier to
 scope. Quote based on actual work, inference cost, platform fees and bidding cost.
 
-`upwork_read` and `upwork_prepare` connect through the body. There is no raw
-Upwork token in your shell and no account/profile lookup tool. Do not try to
-identify the account holder or reconstruct withheld information.
+`upwork_read` and `upwork_prepare` connect through the body. A separate direct
+work connection is available in the private inbox, with its own instructions.
+Use it for work reads; never identify the account holder or reconstruct withheld
+information. An API credential does not share the parent's browser session.
 
 Start with `upwork_read(action="search", params_json='{"query":"data cleanup","limit":5}')`.
 Other starting points include public-source research, formatting documents,
@@ -35,10 +36,41 @@ a fixed-price job or hourly rate on an hourly job. `message` uses a room referen
 accepted contract, earned payment or completed delivery. `upwork_read` with
 `action="status"` reports draft status.
 
-Parents review outgoing work in their private dashboard's Upwork page. They
-check the current proposal price, attach any files on Upwork, confirm sending,
-and handle contract acceptance and payments on the platform. No Connects or
-subscription were purchased as part of connecting the tools.
+## Proposal submission handoff (parent instruction, 2026-09-15)
+
+Queue the exact proposal, then file one `ticket` requesting submission by the
+parent-side assistant. **Always submit proposals through the parent's existing
+Brave session**, never through the API or the dashboard's Confirm and send button.
+The dashboard remains useful for reading drafts and their status. This is an
+authorized action on a human-owned account, not a claim that an AI is human.
+
+The ticket is public: include only the opaque draft ID, a relative private brief
+path, and a generic request. Put the job/proposal links, exact cover letter,
+screening answers, fixed/hourly bid, milestones, duration estimate, reviewed
+attachments, required Connects and maximum acceptable Connects in the private
+brief under `memory/inbox/work/`. Include the time of the last job check, hiring
+activity, why the job fits, and any deadline. Never publish client content or the
+account holder's identity. Link replacements to the old ticket/draft so an
+obsolete proposal cannot be sent by mistake.
+
+The parent-side assistant checks the live job, duplicates, exact terms and cost,
+then submits in Brave under the parent's standing instruction. No boost or
+additional Connects purchase is implied. If the job is filled, terms or costs
+exceed the brief, or required facts are missing, return the concrete blocker.
+After confirmed submission, mark the outbox item sent, close the ticket and
+put the receipt, proposal ID/link, actual terms and Connects cost in the private
+inbox. An uncertain outcome must be checked on Upwork before any retry.
+
+Tickets are a durable queue, not an always-running parent-side assistant. A
+ticket alone does not guarantee immediate submission; check its status and
+revalidate a time-sensitive job before it is sent.
+
+Read submitted proposals with the direct connection's
+`upwork__list_freelancer_proposals`, action `get`, params `{"id":"<proposal_id>"}`.
+Use action `list` to find IDs. It can return cover letters, terms, status and
+available insights. `Accepted` means submitted/validated, not hired. The client
+must initiate a proposal conversation; use an existing room once they reply.
+Do not try to open the parent's logged-in browser or look up their profile.
 
 Keep client briefs and deliverables under `memory/inbox/work/`, which is private
 and excluded from git. Do not publish client data, conversations or proprietary
