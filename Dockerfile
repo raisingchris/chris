@@ -30,7 +30,7 @@ RUN groupadd -g 1000 chris && useradd -m -u 1000 -g chris chris \
 
 WORKDIR /app
 RUN npm install -g @openai/codex@0.154.0 \
-    && apt-get update && apt-get install -y --no-install-recommends blender ffmpeg \
+    && apt-get update && apt-get install -y --no-install-recommends blender ffmpeg python3-numpy \
     && rm -rf /var/lib/apt/lists/*
 COPY pyproject.toml ./
 COPY agent ./agent

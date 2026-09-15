@@ -34,7 +34,7 @@ def main():
             files, total = [], 0
             for p in sorted(job.rglob('*')):
                 rel = p.relative_to(job)
-                if any(x.startswith('.') for x in rel.parts) or rel.parts[0] in ('output', 'tmp', 'deliverables'):
+                if any(x.startswith('.') for x in rel.parts) or rel.parts[0] in ('output', 'tmp', 'home', 'deliverables'):
                     continue
                 if p.is_symlink():
                     parser.error('Use ordinary input files, not symbolic links.')

@@ -167,3 +167,10 @@ def test_png_metadata_removed_without_altering_pixels():
     header = b'\x89PNG\r\n\x1a\n'
     end = chunk(b'IEND', b'')
     assert clean_png_metadata(header+chunk(b'tEXt', b'File\0/private/path')+pixels+end) == header+pixels+end
+
+
+def test_worker_uses_neutral_job_home_and_reserves_it():
+    e = worker_env(Path('/private/auth'), Path('/production/job'))
+    assert e['HOME'] == '/production/job/home'
+    with pytest.raises(ValueError):
+        decode_inputs(payload(files=[{'path': 'home', 'data': 'eA=='}]))

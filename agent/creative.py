@@ -74,7 +74,7 @@ def decode_inputs(body):
     seen, result, size = set(), [], 0
     for item in files:
         name = str(valid_name(item['path']))
-        if name in seen or name.split('/')[0] in {'output', 'tmp', 'BRIEF.md'}:
+        if name in seen or name.split('/')[0] in {'output', 'tmp', 'home', 'BRIEF.md'}:
             raise ValueError('Duplicate or reserved input filename')
         seen.add(name)
         data = base64.b64decode(item['data'], validate=True)
