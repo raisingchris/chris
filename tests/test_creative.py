@@ -69,7 +69,9 @@ def test_exports_only_deliverables_and_blocks_secrets_and_links(tmp_path):
 
 @pytest.fixture
 def jobs(tmp_path):
-    cfg = SimpleNamespace(state_dir=tmp_path, canaries=[])
+    state = tmp_path / 'state'
+    state.mkdir()
+    cfg = SimpleNamespace(state_dir=state, canaries=[])
     s = SimpleNamespace(cfg=cfg, archive=SimpleNamespace(append=lambda *args: None))
     jobs = CreativeJobs(s, 'local-token')
     app = FastAPI()
@@ -153,3 +155,15 @@ async def test_worker_publishes_only_privacy_checked_outputs(jobs, monkeypatch, 
     if expected == 'failed':
         assert 'private parent' not in json.dumps(meta)
         assert 'files' not in meta
+
+
+def test_png_metadata_removed_without_altering_pixels():
+    import struct
+    import zlib
+    from agent.creative import clean_png_metadata
+    def chunk(kind, value):
+        return struct.pack('>I', len(value))+kind+value+struct.pack('>I', zlib.crc32(kind+value))
+    pixels = chunk(b'IDAT', b'unchanged pixel stream')
+    header = b'\x89PNG\r\n\x1a\n'
+    end = chunk(b'IEND', b'')
+    assert clean_png_metadata(header+chunk(b'tEXt', b'File\0/private/path')+pixels+end) == header+pixels+end

@@ -13,6 +13,7 @@ import re
 import secrets
 import signal
 import stat
+import struct
 import shutil
 import time
 import zipfile
@@ -114,10 +115,31 @@ enabled = false
 def worker_env(home: Path, job: Path):
     # Construct from scratch: no API keys, parent secrets, marketplace tokens,
     # local machine paths, or inherited Codex provider configuration.
-    return {'PATH': '/usr/local/bin:/usr/bin:/bin', 'HOME': '/home/brain',
+    return {'PATH': '/usr/local/bin:/usr/bin:/bin', 'HOME': str(job / 'home'),
             'CODEX_HOME': str(home), 'LANG': 'C.UTF-8', 'TZ': 'UTC',
             'TMPDIR': str(job / 'tmp'), 'OMP_NUM_THREADS': '2',
             'OPENBLAS_NUM_THREADS': '2', 'PLAYWRIGHT_BROWSERS_PATH': '/opt/pw-browsers'}
+
+
+def clean_png_metadata(data: bytes) -> bytes:
+    """Drop identifying PNG metadata without decoding or changing image pixels."""
+    if not data.startswith(b'\x89PNG\r\n\x1a\n'):
+        return data
+    result, pos = bytearray(data[:8]), 8
+    while pos < len(data):
+        if pos + 12 > len(data):
+            raise ValueError('Truncated PNG')
+        size = struct.unpack('>I', data[pos:pos + 4])[0]
+        end = pos + 12 + size
+        if end > len(data):
+            raise ValueError('Truncated PNG chunk')
+        kind = data[pos + 4:pos + 8]
+        if kind not in {b'tEXt', b'zTXt', b'iTXt', b'eXIf', b'tIME'}:
+            result.extend(data[pos:end])
+        pos = end
+        if kind == b'IEND':
+            break
+    return bytes(result)
 
 
 def pack_outputs(job: Path, target: Path, canaries):
@@ -140,7 +162,7 @@ def pack_outputs(job: Path, target: Path, canaries):
             total += info.st_size
             if total > MAX_OUTPUT or len(names) >= MAX_FILES:
                 raise ValueError('Outputs exceed the download limit')
-            data = p.read_bytes()
+            data = clean_png_metadata(p.read_bytes())
             if any(term in data.lower() or term in name.encode().lower() for term in private_terms):
                 raise ValueError('Output withheld by the privacy check')
             z.writestr(name, data)
@@ -159,6 +181,11 @@ class CreativeJobs:
         self.home.mkdir(mode=0o700, exist_ok=True)
         self.jobs = self.root / 'jobs'
         self.jobs.mkdir(mode=0o700, exist_ok=True)
+        # Neutral private workspace paths keep parent-storage names out of native
+        # project formats (Blender embeds its current filename in saved scenes).
+        self.work_root = Path(services.cfg.state_dir).parent / 'production'
+        self.work_root.mkdir(mode=0o700, exist_ok=True)
+        self.work_root.chmod(0o700)
         self.token = token
         self.tasks = set()
         self.lock = asyncio.Lock()
@@ -223,9 +250,11 @@ class CreativeJobs:
                 raise HTTPException(429, 'A creative job is running; retry when it finishes') from None
             try:
                 existing.mkdir(mode=0o700)
-                work = existing / 'work'
-                work.mkdir()
+                work = self.work_root / id
+                work.mkdir(mode=0o700)
+                (existing / 'work').symlink_to(work, target_is_directory=True)
                 (work / 'tmp').mkdir()
+                (work / 'home').mkdir()
                 (work / 'output').mkdir()
                 for name, data in files:
                     p = work / name
@@ -271,7 +300,8 @@ class CreativeJobs:
         try:
             # Config and auth remain outside the tool sandbox and Chris's user.
             (self.home / 'config.toml').write_text(worker_config())
-            work = p / 'work'
+            work = (p / 'work').resolve()
+            (work / 'home').mkdir(exist_ok=True)
             env = worker_env(self.home, work)
             command = ['codex', 'exec', '--strict-config', '--ephemeral', '--ignore-rules',
                        '--skip-git-repo-check', '--model', MODEL, '--cd', str(work), '--json', '-']
