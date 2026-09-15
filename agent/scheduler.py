@@ -112,17 +112,39 @@ def guarded(services, fn: Callable[..., Awaitable], *args, name: str = "") -> Ca
     return run
 
 
-def git_pull(repo_dir: str | Path, run=gitops.git) -> bool:
+def git_pull(repo_dir: str | Path, run=gitops.git, on_conflict: Callable[[str], None] | None = None) -> bool:
+    """``git pull --rebase`` before she wakes. Never leaves the repo half-rebased.
+
+    If a rebase is already half-done (not ours), do nothing: aborting it could drop a
+    commit someone made on the detached HEAD. If *our* pull conflicts, abort the rebase
+    we started so the day's sittings commit on the branch, and tell her via
+    ``on_conflict(reason)`` — the parents' commits did not land and a parent has to merge.
+    """
     repo = Path(repo_dir)
     if not (repo / ".git").exists():
         return False
     try:
+        if gitops.rebase_in_progress(repo, run):
+            log.warning("git pull skipped: a rebase is already half-done; leaving it alone")
+            return False
         r = run(repo, "pull", "--rebase", "--quiet", check=False)
     except Exception as exc:  # noqa: BLE001 — git missing, timeout
         log.warning("git pull failed: %s", exc)
         return False
     if getattr(r, "returncode", 0) != 0:
-        log.warning("git pull failed: %s", str(getattr(r, "stderr", "") or "").strip())
+        err = str(getattr(r, "stderr", "") or "").strip()
+        log.warning("git pull failed: %s", err)
+        try:
+            if gitops.rebase_in_progress(repo, run):
+                run(repo, "rebase", "--abort", check=False)
+                reason = ("git pull --rebase at 06:55 conflicted with the parents' commits and was aborted; "
+                          "the repo is back on its branch, their commits have NOT landed, and pushes will be "
+                          "skipped until a parent merges by hand. " + err[:300]).strip()
+                log.warning(reason)
+                if on_conflict is not None:
+                    on_conflict(reason)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("rebase abort after failed pull: %s", exc)
         return False
     return True
 
@@ -158,7 +180,13 @@ def make_scheduler(services, run_sitting, run_sleep) -> AsyncIOScheduler:
     add(guarded(services, run_sleep, services, name="sleep"), cron(cfg.sleep), "sleep", "sleep")
 
     async def pull() -> None:
-        await asyncio.to_thread(git_pull, cfg.repo_dir)
+        def on_conflict(reason: str) -> None:
+            from agent import loop
+
+            services.archive.append("git_pull_conflict", {"kind": "git_pull_conflict", "reason": reason[:500]})
+            loop._note_handoff(Path(cfg.repo_dir), "Note from the clock: " + reason, services.archive)
+
+        await asyncio.to_thread(git_pull, cfg.repo_dir, gitops.git, on_conflict)
 
     async def unseal() -> None:
         copied = await asyncio.to_thread(services.council.unseal_due)

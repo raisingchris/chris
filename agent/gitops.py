@@ -114,6 +114,29 @@ def _stdout(r) -> str:
     return str(getattr(r, "stdout", "") or "")
 
 
+def rebase_in_progress(repo_dir: str | Path, run=git) -> bool:
+    """True when a rebase stopped half-way (a conflict) and was never finished or aborted.
+
+    HEAD is detached then. A commit made in that state sits on nothing, and the next
+    ``rebase --abort`` drops it (2026-09-15: a whole wake sitting vanished this way).
+    Never raises; unknown means False.
+    """
+    for name in ("rebase-merge", "rebase-apply"):
+        try:
+            r = run(repo_dir, "rev-parse", "--git-path", name, check=False)
+        except Exception:  # noqa: BLE001
+            return False
+        out = _stdout(r).strip()
+        if getattr(r, "returncode", 0) != 0 or not out:
+            continue
+        p = Path(out)
+        if not p.is_absolute():
+            p = Path(repo_dir) / p
+        if p.exists():
+            return True
+    return False
+
+
 def enforce_invariants(repo_dir: str | Path, run=git, gate: PushGate | None = None) -> list[str]:
     """Revert any local change to the vows/constitution since upstream; returns the reverted paths."""
     r = run(repo_dir, "diff", "--name-only", UPSTREAM, "HEAD", "--", *INVARIANT_FILES, check=False)
@@ -144,6 +167,11 @@ def canary_hits(repo_dir: str | Path, canaries: Iterable[str], run=git) -> tuple
 def push_repo(repo_dir: str | Path, run=git, gate: PushGate | None = None) -> tuple[bool, str]:
     """Push; never raises. Returns (ok, stderr excerpt). A failed or blocked push leaves the commit local."""
     try:
+        # A half-done rebase (someone else's conflict) means HEAD is detached. Rebasing again
+        # would fail and the abort below would throw away whatever was just committed.
+        # Leave it exactly as it is for a parent to finish or abort by hand.
+        if rebase_in_progress(repo_dir, run):
+            return False, "push skipped: a rebase is half-done in the repo; a parent must finish or abort it"
         if gate is not None:
             enforce_invariants(repo_dir, run, gate)
             ok, report = canary_hits(repo_dir, gate.canaries, run)

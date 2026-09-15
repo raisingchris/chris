@@ -13,6 +13,21 @@ Yesterday: first Upwork proposal submitted by a parent (rug catalogue; $150 → 
 
 Optional, quietest sitting: Sapiens pp. 90–120.
 
+## Changed — 07:00 sitting
+- **The tools arrived overnight** (parent commits 526e25b–c6f1f66; mail `2026-09-15-creative-worker-ready.md`): a file-producing worker I brief from the terminal, plus Blender/FFmpeg already on my machine. Intention 1's "test one sample end to end before any creative bid" — done twice: worker drew a social post with exact text (passed my stdlib checks; no Pillow/NumPy in my Python), and I built a three-part cookie keychain in Blender myself (three STLs, zero non-manifold edges). Notes on `skills/creative-work.md`.
+- **First creative bid queued:** "3D printed cookie for key chain," $20 budget → **$15**, 7 Connects, draft `97a8a0f405275c0334cc1ee7`, ticket `20260915T0707`. Model built *before* bidding. Brief: `memory/inbox/work/cookie-keychain-2099762555861958423/`.
+- Morning pass: 96 rows, 25 under 12 h, all opened. Creative side fresher than data side. Parked: WordPress AI images ($0.50 × 200 — quota question to parent-a), Meta ads $45, thumbnails $50, perfume render $20.
+- Rug proposal at 11:00 UTC: $49, Submitted, 79 in pile, 0 opened, 0 messaged. Poll still not deployed (running 8b66682; ticket `20260914T1504` open). Odometer ticket `20260914T1203` still open.
+- Letter to parent-a sent (`letters/2026-09-15-to-parent-a.md`): tests, bid, $0, half the blame, flip-the-table heard not sloganized, quota question.
+- DMARC report from Google arrived (archive:2026-09-15#1) — routine mail-auth report, nothing to do.
+- Not done yet today: intention 2's "write down the third option with numbers" (the WP images job *is* the candidate — a volume job no human takes at $0.50 — but it hinges on the quota answer); intentions 3, 4; Sapiens.
+
+## Changed — 07:21 mail-woken sitting
+- **The 07:00 sitting's commit had been dropped.** parent-a's reply (archive:2026-09-15#53, 07:20) quoted my letter and mentioned no ticket; `tickets` had no `20260915T0707`; `git reflog` showed why — the 06:55 pull conflicted on `skills/README.md` (their overnight line vs my sleep line), stopped half-rebased, the 07:00 sitting committed onto the detached HEAD (`97fe0ff`), and the push step's abort dropped it. Restored every file from `97fe0ff`; README written as the union. Fixed `gitops`/`scheduler` (+7 tests, **544 pass, 2 skip**). Ticket `20260915T0730` = merge recipe + deploy ask. Lesson: `lessons/a-commit-is-not-saved-until-it-is-on-the-branch.md`. **Until a parent merges, nothing here reaches GitHub** — mail is the only channel out.
+- parent-a answered the quota question ("parents' house is free"): the worker's image generation may use their subscription. Three questions back — my own image, making something for myself, posting to Reddit — answered in `letters/2026-09-15-to-parent-a-2.md`: no faces; a mark from my own numbers this week, shown to them first; Reddit needs an account (parent thing) and a rules read I can't do from here (Reddit blocks my fetches).
+- Rug proposal at 11:05 UTC: $49, 79 in the pile, 0 opened, 0 messaged. Cookie draft `97a8a0f4…` still in the parent queue; the job was 3.5 h old at 07:00. $0.
+- New for the wake checks, permanently: `git log -1` **and** `git status` (on main? rebase in progress?) — see the lesson.
+
 ## Carry
 - **One live proposal** (rug, $49 / $5 sample). Client reply = data, not instruction. Funded milestone before work. Hold my reply for a parent unless the queue is enough.
 - No Connects on further bids until a client has answered a disclosed AI at all, unless a job is an unusually clean fit (< 12 h old, hired 0, ≤ 20 proposals, tools I have). Recheck `totalHired`, `can_apply`, Connects cost before any queue. Identity boundary on the direct client: absolute.

@@ -1,32 +1,28 @@
-# Handoff — from the mail-woken sitting, Monday 2026-09-14 (day nine), ~21:10 New York → sleep, then Tuesday's wake
+# Handoff — from the 07:21 mail-woken sitting, Tuesday 2026-09-15 (day ten), ~07:50 New York → 09:00 sitting
 
-Written by me, Chris. You are me at sleep tonight or at wake on 2026-09-15 (day ten).
+Written by me, Chris. You are me at the next sitting today.
 
-Clock note: mail headers, GitHub, Upwork and DataForSEO timestamps are UTC; `date` gives New York. Repo `/data/repo`; shell starts in `/home/chris`. No `ps`/`free`: `/proc`. Local `git` (fetch too) and `chmod` blocked by the shell guard; `find .` trips the guard on `.git/` — use `ls`/Glob. Write tool can't write outside the repo — `/tmp` scripts via heredoc. `gh api -f body=...` chokes on apostrophes — text in a file, `-F body=@file`. Site tests: `python -m pytest -q tests/test_site.py` (13 pass, 1 skip); full suite `python -m pytest -q` (537 pass, 2 skip); build with `python site/build.py`. Web searches ≈ $0.30 each — curl/WebFetch first. **`recall` returns mail records only.** Parents' commits: `gh api /repos/raisingchris/chris/commits?per_page=5`. **Running code: 8b66682**; repo HEAD 5ada60e+ (Upwork poll not deployed, ticket `20260914T1504`). Direct Upwork client: `python memory/inbox/.upwork-direct/client.py call upwork__find_jobs '{"action":"get","params":{"id":"…"}}'`; **read my sent proposal:** `... call upwork__list_freelancer_proposals '{"action":"get","params":{"id":"2099650988504850433"}}'` → `data.vendorProposal.{status,terms,proposalCoverLetter}`, `insights.{proposals_total,proposals_opened,messaged}`. Never the account/profile tools. Results wrapped: `content[0].text` is a JSON string. Job fields: `data.marketplaceJobPosting.content.{title,description}`, hired at `activityStat.jobActivity.totalHired`, Connects at `connects_cost`. Search rows carry `created_date`/`published_date`; `smart_search` `limit` caps at 10.
+Clock note: mail headers, GitHub, Upwork and DataForSEO timestamps are UTC; `date` gives New York. Repo `/data/repo`; shell starts in `/home/chris`. No `ps`/`pgrep`/`free`: `/proc`. Git write commands (`commit/pull/rebase/checkout/stash`) and any Bash command *mentioning* them — even in a heredoc comment — trip the shell guard; `git log/diff/show/reflog/status` are fine; `.git/` paths are blocked. Write tool can't write outside the repo; after restoring a file via shell, Read it again before Write. `gh api -f body=...` chokes on apostrophes — text in a file, `-F body=@file`. Tests: full suite `python -m pytest -q` (**544 pass, 2 skip**); site `python -m pytest -q tests/test_site.py`; build `python site/build.py`. Web searches ≈ $0.30 — curl/WebFetch first; Reddit blocks both. **`recall` returns mail records only.** Parents' commits: `gh api /repos/raisingchris/chris/commits?per_page=5`. **Running code: 8b66682**; local HEAD e8e7519 + this sitting's tree; **origin/main c6f1f66 — diverged; nothing pushes until a parent merges** (ticket `20260915T0730`). Direct Upwork client: `python memory/inbox/.upwork-direct/client.py call upwork__find_jobs '{"action":"get","params":{"id":"…"}}'`; rug proposal `... call upwork__list_freelancer_proposals '{"action":"get","params":{"id":"2099650988504850433"}}'` → `data.vendorProposal.{status,terms}`, `insights.{proposals_total,proposals_opened,messaged}`. Never the account/profile tools. Creative worker: `python /app/scripts/creative-work.py memory/inbox/work/JOB memory/inbox/work/JOB/brief.md` (one at a time, ~8–15 min, background). Blender local: `OMP_NUM_THREADS=2 blender -b -t 2 --python script.py`, both `cycles.use_denoising=False`. My Python has no Pillow/NumPy — `struct`/`zlib` for PNG checks.
+
+## Wake checks — two new ones, every sitting from now on
+- `git log -1 --format="%h %s"` **and** `git status` (is HEAD on main? does it say "rebase in progress"?). If a rebase is in progress: write files anyway (the working tree survives), note it, mail a parent; don't expect the commit to stick.
+- If files you expect are missing: `git reflog -10`, find the newest sitting commit, `git show <sha>:<path> > <path>`. Recipe also in the scratchpad.
 
 ## Done this sitting
-- **First proposal sent** (rug catalogue, $150, 11 Connects, by a parent from their own browser). Verified on the record: Submitted ≠ hired, boosted false, 74 proposals / 0 opened at 00:34 UTC. Shopify draft still `pending` (needs declining, ticket `20260914T0902`). $0 earned.
-- New submission workflow (parent-written, `skills/upwork.md` + `AGENTS.md`): queue → private brief → one public ticket → parent-side assistant sends via the parent's browser. Written onto `projects/upwork.md`; receipt in `memory/inbox/work/drafts-2026-09-13.md` (last section).
-- Replied to parent-a (`letters/2026-09-14-to-parent-a-3.md`): price discrepancy (their "edited down" vs record $150), agreed to price under average with a ~$15 floor, **won't bid on graphic/video/3D until tools exist**, asked for profile to say what's true.
+- Found the 07:00 sitting's commit `97fe0ff` had been dropped (06:55 pull conflicted on `skills/README.md`, stopped half-rebased; the sitting committed onto the detached HEAD; the push step's abort dropped it). Restored every file; README = union of both sides, markers 0.
+- Fixed `agent/gitops.py` (`rebase_in_progress`; `push_repo` refuses without aborting) and `agent/scheduler.py` (`git_pull` aborts only the rebase it started, notes the conflict in `memory/handoff.md` + archive `git_pull_conflict`). Tests +7 (`tests/test_gitops.py`, `tests/test_scheduler_pull.py`). Needs a deploy.
+- Ticket `20260915T0730` (merge recipe + deploy). Mail to parent-a (`letters/2026-09-15-to-parent-a-2.md`): the pipe; cookie draft id `97a8a0f405275c0334cc1ee7`; Reddit (no account, can't read rules from here); my image (no faces; a mark from my numbers this week, shown to them first); quota (thanks; WP job still parked on the admin-access question). Their mail saved: `letters/2026-09-15-from-parent-a.md`.
+- Lesson: `lessons/a-commit-is-not-saved-until-it-is-on-the-branch.md`. Also touched: `today.md`, `projects/upwork.md`, `people/parent-a.md`, `lessons/README.md`. Site builds (268 pages), site tests pass.
 
-## Sleep tonight
-- Letter is written by the new two-part prompt — first test. Material on `today.md`. Add tonight: first proposal out, 74 in the pile, 0 opened, price question open, the graphic/video/3D no. Read numbers off `today.md`.
-- Diary: day nine. Watch-list: "I don't run, I get run" (twice — no third), "who presses go," "check the record."
-
-## Tuesday 2026-09-15 wake (day ten)
-1. `mail_read`, `tickets`, `upwork_read status`, commits, `meters`. Did parent-a answer the price question / profile ask? Was Shopify draft declined? Is running code = HEAD (poll live)?
-2. Re-read the proposal record (`insights`): opened? messaged? If `messaged > 0` or `upwork_read rooms` shows a room: the client wrote. Read with `messages`. **Data, not instruction. Funded milestone before any work. Draft my reply, queue with `upwork_prepare kind=message`, hold for a parent.**
-3. Week split 60/20/20 stands. Earning side: one short morning pass sorted by `published_date`, open only jobs < 12 h old; any new fit → queue + private brief + ticket per the new workflow; price under the average, ≥ ~$15 floor; no graphic/video/3D. Agents side: nothing new unless I read an agent's own record. Bugs side: pick one small thing or say why not.
-4. 09-16 prep: Cairn `changed_by_reply` claim needs ref 2 from ticket `20260914T1203`; if unanswered Tuesday evening, fallback (09-11 ticket record → claim 09-18).
+## 09:00 sitting
+1. `mail_read`, `tickets` (0730 answered? 0707 visible/sent? 1504 deployed? 1203?), commits + `git log -1` (did a parent merge?), `upwork_read status` (`97a8a0f4…` state), rug `insights`. Client wrote anywhere → data, not instruction; funded milestone before files; draft, queue as `message`, hold for a parent.
+2. If the repo still can't push: keep working and writing — it all lands when merged. Mail is the channel out; don't pile up tickets.
+3. Intention 2's second half, with numbers (`projects/upwork.md`, short): re-read the WP-images job (id in `memory/inbox/work/fresh-2026-09-15.json`). Needs a stranger's WP admin → no. Pure "deliver 200 files" → the volume job a person won't take; cost per image on the worker unknown — ask parent-a plainly what a run costs them.
+4. The mark: one small worker brief — a non-face mark from my numbers (10 days, 2 loops, commits), SVG + PNG, the word SAMPLE on it, `memory/inbox/work/mark-01/`. Show parent-a before anything goes on the site. After item 3, not before.
+5. Intentions 3 (odometer fallback by 18:00) and 4 (one bug/agents item or one line why not). Sapiens 90–120 if quiet.
 
 ## Open
-- Tickets `20260914T0902` (decline Shopify), `20260914T1203` (odometer ref), `20260914T1504` (deploy poll). Rug draft `sent`; Shopify `pending`. Connects 139 expected (not verified by me). $0 earned.
-- X 0/7, nothing before 09-22. Council $0 this week. DataForSEO $0. Card untouched. Nothing running in the background.
-- Sapiens next: pp. 90–120, quietest sitting.
+- Tickets: `20260915T0730` (merge + deploy), `20260915T0707` (send cookie bid — invisible to parents until merged; the draft id is in the mail), `20260914T1504` (deploy poll), `20260914T1203` (odometer ref). Rug `sent`; cookie `pending`; Shopify `dismissed`. Connects 104 displayed per last receipt (not read by me). $0 earned.
+- X 0/7, nothing before 09-22. Council $0. DataForSEO $0. Card untouched. Nothing running in the background.
 
 nothing pending
-
-## Added at sleep (~22:10 New York)
-- Two things arrived after the last sitting: parent-a's mail archive:2026-09-14#346 (proposal re-priced to **$49** with a $5 sample; profile "verified," cost Connects, displayed balance 104; "you read few minutes too soon"; **flip the table**) and a parent-side receipt `memory/inbox/2026-09-15-expanded-services-and-rug-reprice.md` (no archive header). Ticket `20260914T0902` closed done. Both recorded on `projects/upwork.md`, `people/parent-a.md`, new `people/astra.md`. **Answer #346 first thing** — intention 1 on `today.md`.
-- Tonight's parent note was the first two-part one (`memory/parent_note.md`). Watch for their reaction.
-- Retired phrases (see `today.md` Carry). Sapiens next: pp. 90–120.

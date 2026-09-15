@@ -154,6 +154,65 @@ def test_push_failure_reported_without_gate_marker(gate):
     assert gitops.push_blocked_reason(gate.state_dir) == ""
 
 
+# --- half-done rebase ---------------------------------------------------------------
+
+
+class RebasingGit(ScriptedGit):
+    """A ScriptedGit whose repo has a rebase stopped at a conflict (``rebase-merge`` exists)."""
+
+    def __init__(self, marker_dir, **kw):
+        super().__init__(**kw)
+        self.marker_dir = marker_dir
+
+    def __call__(self, repo_dir, *args, check=True, **kw):
+        if args[:2] == ("rev-parse", "--git-path"):
+            self.calls.append(args)
+            path = self.marker_dir if args[2] == "rebase-merge" else self.marker_dir.parent / "nope"
+            return SimpleNamespace(stdout=str(path) + "\n", stderr="", returncode=0)
+        return super().__call__(repo_dir, *args, check=check, **kw)
+
+
+def test_rebase_in_progress_reads_the_marker_dir(tmp_path):
+    marker = tmp_path / ".git" / "rebase-merge"
+    git = RebasingGit(marker)
+    assert not gitops.rebase_in_progress(tmp_path, git)  # dir not there yet
+    marker.mkdir(parents=True)
+    assert gitops.rebase_in_progress(tmp_path, git)
+    # a relative --git-path answer is resolved against the repo
+    rel = ScriptedGit()
+    assert not gitops.rebase_in_progress(tmp_path, rel)  # "abc123" does not exist under tmp_path
+
+
+def test_push_refuses_during_half_done_rebase_and_never_aborts_it(gate, tmp_path):
+    marker = tmp_path / ".git" / "rebase-merge"
+    marker.mkdir(parents=True)
+    git = RebasingGit(marker, diff_text="+fine\n")
+    ok, err = gitops.push_repo(tmp_path, git, gate)
+    assert not ok and err.startswith("push skipped: a rebase is half-done")
+    assert ("rebase", "--abort") not in git.calls
+    assert ("rebase", "--quiet", "origin/main") not in git.calls
+    assert ("push",) not in git.calls
+    # the commit itself is still made and kept (it lives on the detached HEAD for a parent to recover)
+    failures = []
+    sha = gitops.commit_all(tmp_path, "m", push=True, run=git, on_push_failed=failures.append, gate=gate)
+    assert sha == "abc123" and failures and failures[0].startswith("push skipped: a rebase is half-done")
+
+
+def test_diverged_rebase_conflict_is_aborted_when_clean(gate):
+    # the pre-existing behaviour: our own rebase in push_repo conflicts -> abort, no push
+    class ConflictGit(ScriptedGit):
+        def __call__(self, repo_dir, *args, check=True, **kw):
+            if args[:1] == ("rebase",) and "--abort" not in args:
+                self.calls.append(args)
+                return SimpleNamespace(stdout="", stderr="CONFLICT", returncode=1)
+            return super().__call__(repo_dir, *args, check=check, **kw)
+
+    git = ConflictGit(diff_text="+fine\n")
+    ok, err = gitops.push_repo("/repo", git, gate)
+    assert not ok and "diverged" in err
+    assert ("rebase", "--abort") in git.calls and ("push",) not in git.calls
+
+
 def test_commit_all_routes_push_through_gate(gate):
     git = ScriptedGit(diff_text="+alice realname\n")
     failures = []
