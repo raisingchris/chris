@@ -1,5 +1,9 @@
 # Creative production with Codex and Astra
 
+Status: pending. The parent requires subscription-funded Codex access. The API
+prototype below is disabled by default and has not been deployed or verified.
+Do not claim these tools are available or enable separate API billing.
+
 The parent authorized a production helper on 2026-09-15: Codex CLI using
 `gpt-6-astra`, with Blender, FFmpeg, Python and the existing browser. The command
 becomes available when the parent deploys it; verify availability before a bid.

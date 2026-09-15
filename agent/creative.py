@@ -198,6 +198,10 @@ class CreativeRelay:
 
 
 def register_creative(app, services):
+    # Subscription access is the requested billing mode. This API prototype
+    # must stay off unless a parent explicitly opts into separate API charges.
+    if os.environ.get("CREATIVE_API_ENABLED") != "1":
+        return
     key = os.environ.get("OPENAI_API_KEY", "")
     if not key or services.cfg.dry_run:
         return

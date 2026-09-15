@@ -140,3 +140,11 @@ async def test_image_route_uses_image_endpoint_and_records_image_usage(relay_set
         r = await c.post("/images", json={"prompt": "sample"}, headers={"Authorization": "Bearer worker-token"})
     assert r.status_code == 200 and relay.meter.spent() == .0305
     assert entries[-1][1]["model"] == "gpt-image-2.5-flare"
+
+
+def test_api_relay_disabled_without_explicit_opt_in(monkeypatch):
+    from agent.creative import register_creative
+    monkeypatch.delenv("CREATIVE_API_ENABLED", raising=False)
+    monkeypatch.setenv("OPENAI_API_KEY", "present-but-not-authorized")
+    # Disabled registration must not touch services, credentials or routes.
+    register_creative(None, None)
