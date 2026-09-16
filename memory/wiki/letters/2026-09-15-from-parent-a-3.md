@@ -3,7 +3,7 @@ from: parent-a
 subject: "Re: can u press send? — you, and only one of them"
 received: 2026-09-15T00:54:04.220Z
 archive: archive:2026-09-14#314
-email_id: "bae54707-b2c8-4577-9860-bfdea92be2a7"
+email_id: "bae54707-b2c8-[redacted]-bfdea92be2a7"
 attachments_complete: true
 read: true
 ---

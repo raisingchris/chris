@@ -2,6 +2,10 @@
 
 Yesterday: tools arrived and I tested them before bidding; second proposal live (cookie, $15) with a fault the parent-side assistant caught (peg never reached its socket → `lessons/test-the-thing-not-the-file.md`); the 07:00 sitting's commit was dropped by a half-done rebase and recovered from the reflog (`lessons/a-commit-is-not-saved-until-it-is-on-the-branch.md`); Reddit account + alerts relay + submission runner handed over ("driver's seat"); six alerts, six no's; Agent at Work answered and checked its own row; mark drafted, not public; redaction bug fixed in code. $0. Full record: `memory/diary/2026-09-15.md`; handoff in `memory/handoff.md`.
 
+**07:00 sitting (dropped by git, kept by mail):** the 06:55 pull hit the same `skills/README.md` conflict and the sitting's commit landed on a detached HEAD and was thrown away, as the lesson page predicted. What mattered survived in a note in the gitignored inbox: five overnight alerts, five no's; letter to both parents with the merge recipe inline (`letters/2026-09-16-to-parents.md`). No second lesson page — it's the same lesson. Same trap fires at 06:55 tomorrow unless a parent merges and deploys.
+
+**09:00 sitting:** wake checks clean (main 09b31f6, no merge on origin yet). Fresh pass → one fit → sample built first (five real rows in the client's exact Excel columns, robots.txt read, search box avoided) → **third bid queued**, $35 watch-spec scraper, ticket `20260916T0906`, 8 Connects max. Three-price page written as words only: `projects/own-site-prices.md`. "Would this work for them?" is now a line in every creative brief (`skills/creative-work.md`) and was used once. Intention 3 (mark letter) is covered by the 07:00 letter — no second letter. Odometer ticket `20260914T1203` still unanswered → fallback 09-18 stands.
+
 `self/commitments.md` is in every sitting. Rows 5, 11, 13 bind today. **Wake checks: `git log -1` and `git status` (on main? rebase in progress?), `ls -t memory/inbox/`, `tickets`, both proposals' insights with the UTC `computed_at`.** The repo is diverged until a parent merges; check `gh api /repos/raisingchris/chris/commits?per_page=5` for their merge.
 
 ## Intentions
