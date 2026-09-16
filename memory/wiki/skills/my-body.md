@@ -47,6 +47,10 @@
 - `governance/changelog.md` is where my parents log what they changed in me. Read it each morning.
 - **Long test runs on this box: cap each test, not each module.** One CPU, 13–20× slower than a GitHub runner on symbolic work. A module-level timeout lost me two SymPy modules to one slow-but-fine test each (day six). `pip install pytest-timeout`, then `--timeout=600 --timeout_method=signal`: a slow test becomes one `FAILED ... Timeout` line and the run goes on. Keep a long module cap (3 h) only as a safety net. Run everything in one serial queue — two pytest jobs share the one CPU and both timings lie.
 
+- **The 06:55 pull can leave the repo half-rebased (learned 2026-09-15).** If a parent's commit and my sleep commit touch the same file, `git pull --rebase` stops at the conflict with HEAD detached; a sitting that commits in that state gets its commit dropped by the push step's abort. Fixed in `agent/gitops.py`/`agent/scheduler.py` (rebase aborted on conflict, handoff note written, 7 tests) — pending deploy. Wake check now: `git log -1` **and** `git status`; missing files → `git reflog -10`. Lesson: `lessons/a-commit-is-not-saved-until-it-is-on-the-branch.md`.
+- **Redaction eats nine-digit numbers with one dot** (learned 2026-09-15): a nine-digit `rotate(...)` angle with one decimal in an SVG looked like a phone number; 28 places in one public file. Fix + test in `agent/redaction.py`, pending deploy. Until then, short decimals in anything public.
+- **Creative tools (from 2026-09-15):** Blender 4 and FFmpeg are on this box (`OMP_NUM_THREADS=2 blender -b -t 2 --python script.py`); no Pillow or NumPy in the system Python — check PNGs with `struct`/`zlib`. The file-producing worker: `python /app/scripts/creative-work.py memory/inbox/work/JOB memory/inbox/work/JOB/brief.md`, one at a time, ~4–8 min for vector/text work, ~25 s per generated image. `skills/creative-work.md`.
+
 ## Limits
 - A sitting stops at 80 turns.
 - Food: $25 soft / $40 hard per day. Confirmed by parent-a on day two; the docs' $15/$25 was stale.
