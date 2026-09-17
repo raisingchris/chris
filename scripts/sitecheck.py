@@ -9,7 +9,7 @@ memory/wiki/projects/own-site-prices.md. The checks, and nothing else:
   3. scripts    — JavaScript errors the browser prints to its console
   4. images     — images that fail to load; images with no alt text
   5. redirects  — links that end somewhere other than where they point
-  6. mixed      — anything fetched over http:// on an https:// page
+  6. mixed      — any asset written as http:// on an https:// page (or fetched that way)
   7. basics     — a title, exactly one h1, a mobile viewport tag
 
 Fences for the person who owns the site (they may not be the buyer):
@@ -199,6 +199,16 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 _opener = urllib.request.build_opener(_NoRedirect)
+_LOCAL_TEST = False  # set only by --allow-local: self-signed certs on my own test server
+BROWSER_ARGS: list[str] = []  # extra Chromium flags; only my own fault harness sets this
+
+
+def _build_opener():
+    handlers = [_NoRedirect()]
+    if _LOCAL_TEST:
+        import ssl
+        handlers.append(urllib.request.HTTPSHandler(context=ssl._create_unverified_context()))
+    return urllib.request.build_opener(*handlers)
 
 
 def http_probe(url: str, budget: Budget) -> tuple[int | None, str | None]:
@@ -208,7 +218,7 @@ def http_probe(url: str, budget: Budget) -> tuple[int | None, str | None]:
     budget.pace()
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Range": "bytes=0-0"})
     try:
-        with _opener.open(req, timeout=LINK_TIMEOUT_S) as r:
+        with _build_opener().open(req, timeout=LINK_TIMEOUT_S) as r:
             return r.status, None
     except urllib.error.HTTPError as e:
         return e.code, e.headers.get("Location")
@@ -252,6 +262,8 @@ def crawl(start: str, out_dir: Path, max_pages: int = 25, budget_limit: int = 40
         sys.exit(f"refusing {host}: {why}")
     if sample:
         max_pages = 1
+    global _LOCAL_TEST
+    _LOCAL_TEST = bool(allow_local)
 
     budget = Budget(budget_limit)
     began = utcnow()
@@ -264,7 +276,7 @@ def crawl(start: str, out_dir: Path, max_pages: int = 25, budget_limit: int = 40
     try:
         budget.take(); budget.pace()
         req = urllib.request.Request(robots_url, headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(req, timeout=LINK_TIMEOUT_S) as r:
+        with _build_opener().open(req, timeout=LINK_TIMEOUT_S) as r:
             rp.parse(r.read().decode("utf-8", "replace").splitlines())
         robots_note = "read"
     except urllib.error.HTTPError as e:
@@ -288,8 +300,9 @@ def crawl(start: str, out_dir: Path, max_pages: int = 25, budget_limit: int = 40
     stopped_reason = ""
 
     with sync_playwright() as p:
-        browser = p.chromium.launch()
-        ctx = browser.new_context(user_agent=USER_AGENT, viewport={"width": 1280, "height": 900})
+        browser = p.chromium.launch(args=BROWSER_ARGS)
+        ctx = browser.new_context(user_agent=USER_AGENT, viewport={"width": 1280, "height": 900},
+                                  ignore_https_errors=allow_local)
         ctx.set_default_timeout(PAGE_TIMEOUT_S * 1000)
 
         while queue and len(pages) < max_pages:
@@ -313,8 +326,8 @@ def crawl(start: str, out_dir: Path, max_pages: int = 25, budget_limit: int = 40
                 failed[r.url] = (r.failure or "failed")
 
             def on_console(m, pr=pr):
-                if m.type == "error":
-                    pr.console_errors.append(m.text[:300])
+                if m.type == "error" and not m.text.startswith("Mixed Content:"):
+                    pr.console_errors.append(m.text[:300])  # mixed-content lines belong to check 6
 
             def on_pageerror(e, pr=pr):
                 pr.console_errors.append(f"uncaught: {str(e)[:300]}")
@@ -344,6 +357,10 @@ def crawl(start: str, out_dir: Path, max_pages: int = 25, budget_limit: int = 40
                     """() => ({
                         h1: document.querySelectorAll('h1').length,
                         viewport: !!document.querySelector('meta[name="viewport"]'),
+                        mixed: [...document.querySelectorAll(
+                               'img[src], script[src], link[href], iframe[src], video[src], audio[src], source[src], object[data], embed[src]')]
+                               .map(e => e.getAttribute('src') || e.getAttribute('href') || e.getAttribute('data') || '')
+                               .filter(u => u.trim().toLowerCase().startsWith('http://')),
                         imgs: [...document.images].map(i => ({src: i.currentSrc || i.src,
                                alt: i.getAttribute('alt'), ok: i.complete && i.naturalWidth > 0})),
                         links: [...document.querySelectorAll('a[href]')].map(a =>
@@ -359,7 +376,10 @@ def crawl(start: str, out_dir: Path, max_pages: int = 25, budget_limit: int = 40
                         pr.alt_missing.append(im["src"])
                 pr.links = [(h, t) for h, t in info["links"] if h]
                 if site_https:
-                    pr.mixed = sorted({r for r in reqs if r.startswith("http://")})
+                    # as written in the HTML (the browser may silently upgrade http:// images to
+                    # https://, so the request log alone misses them) plus anything really fetched over http://
+                    written = {normalize(u, url) or u.strip() for u in info["mixed"]}
+                    pr.mixed = sorted(written | {r for r in reqs if r.startswith("http://")})
             except StopIteration:
                 pass
             except Exception as e:  # noqa: BLE001
@@ -498,7 +518,10 @@ def render_report(r: dict) -> str:
     for p in pages:
         for s in p.failed_images:
             findings += 1
-            L.append(f"- failed: {s} on {p.url} ({p.checked_at})")
+            why = ""
+            if s.startswith("https://") and "http://" + s[len("https://"):] in p.mixed:
+                why = " — written as http:// in the HTML; the browser upgraded it to https:// and that failed (see 6)"
+            L.append(f"- failed: {s} on {p.url} ({p.checked_at}){why}")
         for s in p.alt_missing:
             findings += 1
             L.append(f"- no alt: {s} on {p.url} ({p.checked_at})")
@@ -514,7 +537,8 @@ def render_report(r: dict) -> str:
 
     # 6 mixed
     mx = sum(len(p.mixed) for p in pages)
-    L.append(f"## 6. Mixed content — {mx} http:// fetch{'es' if mx != 1 else ''} on https:// pages")
+    L.append(f"## 6. Mixed content — {mx} http:// asset{'s' if mx != 1 else ''} on https:// pages"
+             + (" (browsers block or silently rewrite these; fix the address in the HTML)" if mx else ""))
     for p in pages:
         for u in p.mixed:
             findings += 1

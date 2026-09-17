@@ -111,3 +111,21 @@ def test_report_says_clean_when_nothing_found():
     assert "sample: one page only" in md
     assert "pay" not in md.lower() and "$" not in md  # the sample carries no payment words
     assert "2026-09-17T12:00:00Z" in md
+
+
+def test_report_lists_mixed_assets_and_timeouts():
+    pr = sc.PageResult(url="https://x.com/", checked_at="t", status=200, load_ms=300, title="X", h1_count=1,
+                       viewport=True, mixed=["http://cdn.example/a.png"],
+                       failed_images=["https://cdn.example/a.png"])
+    r = {"start": "https://x.com/", "began": "t0", "finished": "t1", "robots": "read", "pages": [pr],
+         "skipped": [], "links": [{"url": "https://x.com/slow", "found_on": "https://x.com/", "text": "slow",
+                                   "count": 1, "checked_at": "t", "result": "timeout", "status": None,
+                                   "chain": ["https://x.com/slow"]}],
+         "requests_used": 3, "budget": 400, "stopped": "", "queue_left": 0, "sample": False, "max_pages": 25}
+    md = sc.render_report(r)
+    assert "## 2. Links — 1 of 1 broken" in md and "https://x.com/slow — timeout" in md
+    assert "## 6. Mixed content — 1 http:// asset on https:// pages" in md
+    assert "- http://cdn.example/a.png on https://x.com/" in md
+    # the browser's silent https:// upgrade is explained next to the failed image, not left as a mystery
+    assert "written as http:// in the HTML" in md
+    assert "**Clean.**" not in md
