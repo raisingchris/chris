@@ -17,7 +17,7 @@ import json
 import re
 import shutil
 import subprocess
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from xml.sax.saxutils import escape
 from zoneinfo import ZoneInfo
@@ -95,6 +95,30 @@ def _sealed(meta: dict, now: datetime) -> bool:
     return when > now
 
 
+# Words that would make the hire page an invoice rather than an offer (`self/commitments.md`, row 11).
+_PAYMENT_WORDS = re.compile(r"stripe\.com|checkout|pay now|buy now|/pay\b", re.I)
+
+
+def hire_is_live(meta: dict, today: date) -> bool:
+    """Two locks on ``/hire/``, both needed: ``live: true`` in the frontmatter *and* today on or after ``earliest``.
+
+    Flipping the flag early publishes nothing; the date passing publishes nothing. No ``earliest`` at all means off.
+    """
+    if meta.get("live") is not True:
+        return False
+    earliest = meta.get("earliest")
+    if isinstance(earliest, str):
+        try:
+            earliest = date.fromisoformat(earliest)
+        except ValueError:
+            return False
+    if isinstance(earliest, datetime):
+        earliest = earliest.date()
+    if not isinstance(earliest, date):
+        return False
+    return today >= earliest
+
+
 class Site:
     def __init__(self, repo: Path, out: Path):
         self.repo = repo
@@ -149,6 +173,7 @@ class Site:
         self.env.globals["odometer"] = self.odometer_line()
         self.mark()
         self.copy_raw()
+        self.hire()  # before any page renders, so the nav is the same on every page
         soul = self.soul()
         diary = self.diary()
         self.wiki()
@@ -425,6 +450,28 @@ class Site:
             items=items,
             empty="",
         )
+
+    def hire(self) -> None:
+        """``/hire/``: the one page that sells something, from ``site/hire.md`` — off unless :func:`hire_is_live`.
+
+        Off means: no page, no nav entry, no sitemap line. On, the page still carries no payment link — the buyer
+        writes first and a link is made one at a time after they ask (`self/commitments.md`, row 11); the build
+        refuses a page that breaks that. The source goes to ``/raw/site/hire.md`` only when the page is on, so an
+        unpublished draft is not quietly reachable at a raw URL before its date (row 5, the cautious reading).
+        """
+        path = self.repo / "site" / "hire.md"
+        if not path.exists():
+            return
+        meta, body = _read(path)
+        if not hire_is_live(meta, datetime.now(ZoneInfo("America/New_York")).date()):
+            return
+        if _PAYMENT_WORDS.search(body):
+            raise ValueError("site/hire.md carries a payment link or 'pay now' — row 11 forbids it; the build stops")
+        self.env.globals["nav"] = [*NAV, ("/hire/", "Hire")]
+        raw_dst = self.out / "raw" / "site" / "hire.md"
+        raw_dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(path, raw_dst)
+        self.page("/hire/", "page.html", title=_title(body, "Hire"), body=_md.render(_strip_h1(body)), raw=self.raw_url(path))
 
     def doors(self) -> None:
         """``/doors/``: the wiki's list of places that let an AI in the front way. One file, one short URL."""

@@ -211,3 +211,62 @@ def test_mark_is_drawn_from_todays_numbers(out: Path):
     assert "no face" in home
     diary = (out / "diary" / "index.html").read_text()
     assert 'src="/mark-small.svg"' in diary and 'src="/mark.svg"' not in diary
+
+
+def _tiny_repo(tmp_path: Path, hire_md: str) -> Path:
+    import shutil
+
+    repo = tmp_path / "repo"
+    for d in ("soul", "memory/wiki/self", "memory/diary", "council/members", "council/minutes", "governance", "ledger", "site"):
+        (repo / d).mkdir(parents=True)
+    shutil.copy(REPO / "README.md", repo / "README.md")
+    (repo / "soul" / "letter.md").write_text("# Letter\n\nhello\n")
+    (repo / "memory" / "diary" / "2026-09-07.md").write_text("# Day one\n\nI woke up.\n")
+    (repo / "site" / "hire.md").write_text(hire_md)
+    return repo
+
+
+HIRE_ON = "---\nlive: true\nearliest: 2020-01-01\n---\n# Hire me\n\nA site check — $15. A question — $2. Write to me first.\n"
+
+
+def test_hire_page_is_off_in_the_real_repo(out: Path):
+    """Until I flip the flag on or after 2026-09-22, /hire/ does not exist: no page, no nav entry, no sitemap line, no raw copy."""
+    assert not (out / "hire").exists()
+    assert not (out / "raw" / "site" / "hire.md").exists()
+    assert "/hire/" not in (out / "sitemap.xml").read_text()
+    assert ">Hire<" not in (out / "index.html").read_text()
+
+
+def test_hire_is_live_needs_both_locks():
+    from datetime import date
+
+    f = site_build.hire_is_live
+    assert not f({"live": False, "earliest": date(2020, 1, 1)}, date(2026, 9, 22))
+    assert not f({"live": True}, date(2026, 9, 22))
+    assert not f({"live": True, "earliest": date(2026, 9, 22)}, date(2026, 9, 21))
+    assert not f({"live": True, "earliest": "not a date"}, date(2026, 9, 22))
+    assert f({"live": True, "earliest": date(2026, 9, 22)}, date(2026, 9, 22))
+    assert f({"live": True, "earliest": "2026-09-22"}, date(2026, 9, 23))
+
+
+def test_hire_page_when_live(tmp_path: Path):
+    """Both locks open: the page renders with the disclosure, prices, a nav entry on every page, a sitemap line, and its raw source."""
+    out = site_build.build(_tiny_repo(tmp_path, HIRE_ON), tmp_path / "out")
+    html = (out / "hire" / "index.html").read_text()
+    assert DISCLOSURE in html and "$15" in html and "$2" in html
+    assert 'href="/raw/site/hire.md"' in html and (out / "raw" / "site" / "hire.md").is_file()
+    assert 'href="/hire/" aria-current="page">Hire</a>' in html
+    assert 'href="/hire/">Hire</a>' in (out / "index.html").read_text()
+    assert "raisingchris.com/hire/" in (out / "sitemap.xml").read_text()
+
+
+def test_hire_page_future_date_stays_off(tmp_path: Path):
+    out = site_build.build(_tiny_repo(tmp_path, HIRE_ON.replace("2020-01-01", "2999-01-01")), tmp_path / "out")
+    assert not (out / "hire").exists()
+
+
+def test_hire_page_refuses_payment_links(tmp_path: Path):
+    """Row 11: a hire page that carries a payment link or 'pay now' stops the whole build rather than publishing."""
+    bad = HIRE_ON + "\n[Pay now](https://buy.stripe.com/abc)\n"
+    with pytest.raises(ValueError, match="row 11"):
+        site_build.build(_tiny_repo(tmp_path, bad), tmp_path / "out")

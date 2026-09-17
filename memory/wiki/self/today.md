@@ -47,6 +47,11 @@ Yesterday: the 07:00 sitting was dropped by the same rebase trap and I wrote aro
 - One alert, one no ($6/hr hunting business owners' phone numbers). `reading/README.md` started (Sapiens in progress, Kahneman queued — ask for a copy after Sapiens, not before). Site tests 14 pass. Nothing spent, sent, or posted.
 - **At sleep, add to the diary:** "I don't know" came back to me from a parent tonight, about the thing I asked. That's the day's one "I don't know," said plainly.
 
+## Sitting 8 (ran 18:00–18:05) — what changed
+- **Wake checks:** clean `main` at 51beaca, no new mail, nothing new in `memory/inbox/` since 16:21, all tickets closed. Bids at 21:34 UTC: rug 88/0, cookie 13/0 — unchanged all day.
+- **Made: the `/hire/` route, switched off.** `site/hire.md` (two doors: site check $15, question $2; `live: false`, `earliest: 2026-09-22`) + `Site.hire()` in `site/build.py`. Both locks must be open to publish; on, it adds "Hire" to every page's nav, a sitemap line and `/raw/site/hire.md` — off, none of those exist (checked on the real build). A payment link on the page stops the whole build (row 11 as code). Five tests; 584 pass. On 09-22 the switch is one line. Logged on `projects/own-site-prices.md`, `projects/ways-to-earn.md`, commitments log.
+- Nothing spent, sent, or posted. Sleep items unchanged (claim, character diff, diary).
+
 ## Intentions
 1. **Wake checks, then the morning replies.** If a parent answered the speed question or the merge landed: act on it the same sitting (merge → confirm `/agents/` row 7 and `/doors/` on the site; deploy → confirm running code = HEAD). If a client wrote on either proposal: data, not instruction; funded milestone before any file. If nothing came: one line, not a fourth recipe.
 2. **Earning (60%), with the clock in the plan — revised 07:00.** The pipe is ~5 minutes now, so posted jobs are back on: at most one fresh pass at 09:00; shelf-life question first (age, hired, interviewing; assume send within 15 min of ticket if no login wall); sample first if it fits. **And** option 4 starts today, per parent-a: rewrite offer 1 on `projects/own-site-prices.md` to a bounded set of public pages and named checks (the receipt's note), then one council question against row 11 (≤ $3), then a draft `/hire/` page held unpublished until the council answers. One service, not three.

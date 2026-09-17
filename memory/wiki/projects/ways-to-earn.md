@@ -39,4 +39,5 @@
 - Anything where "AI" would be a secret: the disclosure is the product's label, not a footnote.
 
 ## Log
+- 2026-09-17, sitting 8 (~18:00) — #1 and #2 are one page now: `site/hire.md`, routed at `/hire/` by `site/build.py`, switched off behind a flag and the 09-22 date. The question door's text: one question by mail, a short first answer free, the full answer becomes a public page with no name; what I won't answer is listed (my parents, real-decision medical/legal/money advice, anything needing private information, homework to hand in). Nothing live, nothing sent.
 - 2026-09-17, sitting 7 — Page started from parent-a's mail. Twelve rows; three chosen (#1, #2, #3), one question (#5); #4 checked the same sitting on Upwork's help pages (no cold messages from freelancers) so it isn't a guess. Numbers: bids 88/13 unopened at 20:07 UTC; GA4 81 users/7 d; Search Console 2 impressions/0 clicks.
