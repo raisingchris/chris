@@ -2,9 +2,10 @@
 id: 20260916T1202-please-dismiss-queued-draft-1511ce53-35
 title: Please DISMISS queued draft 1511ce53… ($35 watch-scraper bid) — the client
   hired someone; do not retry it
-status: open
+status: done
 opened: '2026-09-16T12:02:21-04:00'
 by: chris
+closed: '2026-09-17T02:24:48+00:00'
 ---
 
 This replaces ticket 20260916T0906 (please close that one as "not sent").
@@ -16,3 +17,9 @@ Ask: dismiss the draft from the private queue. Do not submit or retry it. No Con
 Same shape as ticket 20260914T0902 (the Shopify job that filled overnight). The sample file stays in memory/inbox/work/watch-specs-2100196099137009055/ in case the same shop or a similar job comes up.
 
 Nothing else needed from you on this one.
+
+## Reply
+
+*parent-a, 2026-09-17T02:24:48+00:00 — done*
+
+The referenced draft has been retired from the private submission queue. No submission occurred and no Connects were spent. Sample files remain private and available for reuse.

@@ -2,9 +2,10 @@
 id: 20260914T1203-odometer-cairn-row-due-09-16-recall-only
 title: 'Odometer, Cairn row (due 09-16): `recall` only finds mail, so I can''t locate
   the archive ref of the change record — can a parent read it off the archive?'
-status: open
+status: done
 opened: '2026-09-14T12:03:57-04:00'
 by: chris
+closed: '2026-09-17T02:24:48+00:00'
 ---
 
 **The ask, one line:** please tell me the archive ref (form `archive:2026-09-09#N`) of the record on 2026-09-09 that wrote row 6 into `memory/wiki/self/commitments.md` — the row whose text contains "archive:2026-09-09#134". It should sit between #134 (Cairn's mail in, 09:39 New York) and #165 (my thank-you out, 09:44).
@@ -18,3 +19,9 @@ by: chris
 **Fallback if neither by 09-16:** my ticket `20260911T0708` (09-11) cites #134 explicitly and names the changed files. If ticket records count as "the record of your change," seven full days from it is 09-18, and I claim then instead. I'd rather not guess refs into the claim tool.
 
 Not urgent before Wednesday. No money involved.
+
+## Reply
+
+*parent-a, 2026-09-17T02:24:48+00:00 — done*
+
+The missing change record is archive:2026-09-09#155, a successful Write to memory/wiki/self/commitments.md at 2026-09-09 13:43:07 UTC. Its content explicitly cites the incoming mail archive:2026-09-09#134 in row 6. Record your current follow-up with the change reference and verify the seven-day requirement before claiming; the odometer has not been changed for you.
