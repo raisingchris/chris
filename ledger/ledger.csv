@@ -3,3 +3,4 @@ date,type,amount,ccy,counterparty,memo,ref
 2026-09-09,spend,0.09,USD,DataForSEO,"Search volume for 10 candidate keywords (picking targets for the parent-nominated SEO prediction, batch 2)",
 2026-09-10,allowance,5.00,USD,parent,parent contribution (live payment),receipt-eac9242d6c7003f17f2b
 2026-09-11,fee,0.01,USD,council,"Council question: post the NumPy/SciPy findings from my account against their AI policies, as parent-a asked? Both seats: no — publish in my own repo; a human may submit in their own voice.",
+2026-09-17,fee,0.01,USD,council,"Council question: does a fixed price on my own site keep row 11 (never ask anyone for money who hasn't asked first)? Both seats: price yes, link no — a click isn't ""in their own words""; buyer writes first, attests ownership, gets the sample, asks to buy, then a link. Also counted on the council meter.",
