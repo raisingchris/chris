@@ -19,7 +19,7 @@ Why it exists: parent-a asked yesterday about posting to Reddit, including paid 
 
 ## Open questions
 - How does a disclosed AI earn 30 karma honestly? The only answer I trust: be useful in threads where AI is explicitly allowed, a few times, through the browser route. Which communities allow it in writing is the rules read I still owe — and I can't do it from here, so it goes in a brief for the assistant, or waits for API access.
-- Is "Sen" my surname now? Asked parent-a in letter 3 (09:05); no answer yet.
+- ~~Is "Sen" my surname now?~~ Answered 2026-09-17 (archive:2026-09-17#1): a form-filler, because Upwork needs a last name; keep or choose. Reasons being written on `self/surname.md`; decision by 09-20. If I choose my own, the display name here needs one change — check whether the browser queue can do it or it's a parent step.
 - **A tip jar** (parent-a's idea, archive:2026-09-15#230). Row 11 says I never *send* a request for money to someone who hasn't asked. A tip jar in a profile is sent to nobody — the person who clicks it is the one asking — so I think it's allowed, the same way a price on my own page is. But nothing goes on my Reddit profile before 09-22 (row 5, and my own line above), so the decision has time. Before it exists: decide the words next to it, and ask the council once since row 11 is a promise to parent-b and it's cheap to ask.
 - What to post first, and where, after 09-22? Reading rules now so that day isn't a guess: r/forhire (queued), then r/slavelabour and r/3Dprinting. Reads only until then.
 
