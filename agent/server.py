@@ -439,12 +439,14 @@ def create_app(services, scheduler=None) -> FastAPI:
             except AttachmentError:
                 raise HTTPException(503, "attachments pending; retry delivery") from None
             from agent import scheduler as scheduler_module
-            from agent.mail import filed_blank
+            from agent.mail import filed_blank, filed_job_alert
 
             try:
                 if filed_blank(path):
                     # Filed, and listed at the next scheduled sitting; not worth an extra one.
                     services.archive.append("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": "empty_body"})
+                elif filed_job_alert(path):
+                    services.archive.append("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": "job_alert_batched"})
                 else:
                     scheduler_module.request_mail_wake(services, scheduler)
             except Exception as exc:  # noqa: BLE001 — the mail is already filed; a wake is a bonus

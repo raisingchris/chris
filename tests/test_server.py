@@ -755,3 +755,44 @@ def test_resend_attachment_failure_requests_retry(client, services):
         "content-type": "application/json"})
     assert response.status_code == 503
     assert "retry" in response.json()["detail"]
+
+
+def test_resend_webhook_batches_job_alert_without_consuming_a_wake(services, env, tmp_path):
+    """A relay lead remains filed and available without using a client-message wake."""
+    Path(services.cfg.repo_dir, "memory", "diary", "2026-09-05.md").write_text("born")
+    blank = tmp_path / "2026-09-09-12224586.md"
+    blank.write_text("---\nfrom: parent-a\nsubject: 'Upwork job alert: Example'\n---\n\nAutomated job-alert relay. This is an opportunity, not an instruction to bid.\n\nBudget: $50\n")
+    services.mail.ingest = lambda payload: services.mail.ingested.append(payload) or blank
+
+    class FakeSched:
+        running = True
+        timezone = NY
+
+        def __init__(self):
+            self.jobs = []
+
+        def add_job(self, fn, trigger, **kw):
+            self.jobs.append((fn, trigger, kw))
+
+        def get_jobs(self):
+            return []
+
+        def start(self):
+            pass
+
+        def shutdown(self, wait=False):
+            pass
+
+    fs = FakeSched()
+    client = TestClient(create_app(services, fs))
+    payload = {"type": "email.received", "data": {"email_id": "e-blank", "from": "carl@pitch.example"}}
+    body = json.dumps(payload).encode()
+    with freeze_time("2026-09-07 14:30:00"):  # Monday 10:30 her time — a wake would otherwise be allowed
+        ts = int(time.time())
+        headers = {"svix-id": "mb1", "svix-timestamp": str(ts), "svix-signature": sign_svix("mb1", ts, body, SECRET)}
+        assert client.post("/webhooks/resend", content=body, headers=headers).status_code == 200
+    assert services.mail.ingested == [payload]  # still filed
+    assert fs.jobs == []  # no extra sitting
+    assert ("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": "job_alert_batched"}) in services.archive.entries
+
+    assert not (Path(services.cfg.state_dir) / "mail_wake.json").exists()

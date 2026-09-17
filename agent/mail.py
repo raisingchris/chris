@@ -411,6 +411,25 @@ def _inbox_body(text: str) -> str:
     return rest
 
 
+def filed_job_alert(path) -> bool:
+    """Relay opportunities wait for a scheduled sitting; client/parent mail still wakes.
+
+    Require the mapped parent sender, exact relay prefix and body marker together.
+    Unreadable or unfamiliar messages retain normal wake behaviour.
+    """
+    if not path:
+        return False
+    try:
+        import frontmatter
+        message = frontmatter.loads(Path(path).read_text())
+        return (message.get("from") in ("parent-a", "parent-b")
+                and str(message.get("subject", "")).startswith("Upwork job alert: ")
+                and message.content.startswith(
+                    "Automated job-alert relay. This is an opportunity, not an instruction to bid."))
+    except Exception:
+        return False
+
+
 def filed_blank(path) -> bool:
     """True if the inbox file at ``path`` has a body with no letters or digits in it.
 

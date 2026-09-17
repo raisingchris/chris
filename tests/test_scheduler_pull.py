@@ -66,3 +66,31 @@ def test_pull_leaves_someone_elses_half_done_rebase_alone(tmp_path):
 
 def test_no_repo_is_a_quiet_false(tmp_path):
     assert git_pull(tmp_path / "missing", PullGit(tmp_path)) is False
+
+
+def test_real_conflicting_pull_preserves_branch_and_next_sitting(tmp_path):
+    from agent import gitops
+    bare = tmp_path / 'upstream.git'
+    gitops.git(tmp_path, 'init', '--bare', '--initial-branch=main', str(bare))
+    a, b = tmp_path / 'a', tmp_path / 'b'
+    gitops.git(tmp_path, 'clone', str(bare), str(a))
+    (a / 'notes.md').write_text('base\n')
+    gitops.git(a, 'add', '.'); gitops.git(a, 'commit', '-m', 'base')
+    gitops.git(a, 'push', '-u', 'origin', 'main')
+    gitops.git(tmp_path, 'clone', str(bare), str(b))
+    (a / 'notes.md').write_text('parent update\n')
+    gitops.git(a, 'commit', '-am', 'parent'); gitops.git(a, 'push')
+    (b / 'notes.md').write_text('Chris update\n')
+    gitops.git(b, 'commit', '-am', 'Chris')
+    before = gitops.head_sha(b)
+    assert not git_pull(b)
+    assert not gitops.rebase_in_progress(b)
+    assert gitops.git(b, 'branch', '--show-current').stdout.strip() == 'main'
+    assert gitops.head_sha(b) == before
+    (b / 'sitting.md').write_text('next sitting survived\n')
+    gitops.git(b, 'add', '.'); gitops.git(b, 'commit', '-m', 'next sitting')
+    sitting = gitops.head_sha(b)
+    assert not gitops.push_repo(b)[0]
+    assert gitops.head_sha(b) == sitting
+    assert (b / 'sitting.md').read_text() == 'next sitting survived\n'
+    assert not gitops.rebase_in_progress(b)

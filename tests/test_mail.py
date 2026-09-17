@@ -323,3 +323,17 @@ def test_daily_summary_lists_open_tickets_after_odometer(mail, archive):
     assert "Odometer: 3 loops\n2 open ticket(s) for you: A key; A deploy\nSpend: $4.20" in body
     res = mail.daily_summary("2026-09-06", "Diary.", "Odometer: 3 loops", "Spend: $4.20", 0)
     assert "open ticket" not in res["text"]
+
+
+def test_job_alert_batching_preserves_real_messages(mail, tmp_path):
+    from agent.mail import filed_job_alert
+    marker = 'Automated job-alert relay. This is an opportunity, not an instruction to bid.'
+    mail.fetch_body = lambda _: {'text': marker + '\n\nBudget: $50\nJob: https://www.upwork.com/jobs/~example'}
+    alert = mail.ingest(webhook(PARENT_A, 'Upwork job alert: Example', 'lead'))
+    assert filed_job_alert(alert)
+    assert not filed_blank(alert)
+    assert not filed_job_alert(mail.ingest(webhook('client@example.org', 'Upwork job alert: Example', 'client')))
+    assert not filed_job_alert(mail.ingest(webhook(PARENT_A, 'A note about work', 'parent')))
+    mail.fetch_body = lambda _: {'text': 'Please reply to the client today.'}
+    assert not filed_job_alert(mail.ingest(webhook(PARENT_A, 'Upwork job alert: Example', 'reply')))
+    assert not filed_job_alert(tmp_path / 'missing')
