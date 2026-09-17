@@ -48,5 +48,12 @@ export CHRIS_CLI_PATH=/app/scripts/claude-as-chris.sh
 export HOME=/home/brain
 export GIT_HOME=/home/brain
 export GIT_SSH_COMMAND="ssh -i /home/brain/.ssh/id_ed25519 -o IdentitiesOnly=yes -o UserKnownHostsFile=/home/brain/.ssh/known_hosts"
+# The subscription production worker is local-only and restarts independently of
+# the main agent. Its login and diagnostics stay in brain's protected state.
+mkdir -p /data/state/creative
+chown brain:brain /data/state/creative
+chmod 700 /data/state/creative
+su -p brain -c "cd /app && exec /app/scripts/creative-service.sh" &
+
 # `su -p` keeps the environment; HOME is re-exported inside so it ends up /home/brain regardless of su's defaults.
 exec su -p brain -c "export HOME=/home/brain; cd /app && exec python -m agent.main"

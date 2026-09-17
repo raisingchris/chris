@@ -354,19 +354,19 @@ def _write_upwork_poll_state(state_dir: str | Path, signal: dict, now: datetime)
     path.write_text(json.dumps({"signal": signal, "checked": now.isoformat(timespec="seconds")}, indent=1))
 
 
-def _room_dicts(value, out: list, depth: int = 0) -> None:
+def _room_dicts(value, out: list, depth: int = 0, in_rooms: bool = False) -> None:
     """Collect every dict carrying a ``room_id`` from a projected Upwork response."""
     if depth > 18:
         return
     if isinstance(value, dict):
-        if "room_id" in value:
+        if "room_id" in value or (in_rooms and "id" in value):
             out.append(value)
             return
-        for v in value.values():
-            _room_dicts(v, out, depth + 1)
+        for key, v in value.items():
+            _room_dicts(v, out, depth + 1, in_rooms or key == "rooms")
     elif isinstance(value, list):
         for v in value:
-            _room_dicts(v, out, depth + 1)
+            _room_dicts(v, out, depth + 1, in_rooms)
 
 
 def upwork_signal(upwork) -> dict:
@@ -383,7 +383,7 @@ def upwork_signal(upwork) -> dict:
     found: list = []
     _room_dicts(rooms_raw, found)
     for room in found:
-        ref = str(room["room_id"])
+        ref = str(room.get("room_id", room.get("id")))
         body = {k: v for k, v in room.items() if k != "privacy_note"}
         rooms[ref] = hashlib.sha256(json.dumps(body, sort_keys=True, default=str).encode()).hexdigest()[:16]
     return {"outbox": outbox, "rooms": rooms}
@@ -419,7 +419,7 @@ def upwork_poll(services, sched, run_sitting=None, now: datetime | None = None,
     """One look at Upwork. ``(woke, reason)``; reasons: not_configured, unborn, paused,
     failed, baseline, unchanged, session_running, or a ``mail_wake_decision`` reason.
 
-    The first look only saves a baseline. A change seen while a session is running is
+    The first look saves a baseline unless unread rooms already exist. A change seen while a session is running is
     left unsaved so the next look sees it again once the session ends. A change that
     cannot wake her right now because of the debounce is also left unsaved (the next
     look retries); one blocked by the daily cap or a near sitting is saved and written
@@ -445,11 +445,14 @@ def upwork_poll(services, sched, run_sitting=None, now: datetime | None = None,
             services.archive.append("upwork_poll_failed", {"kind": "upwork_poll_failed", "error": str(exc)[:200]})
             return False, "failed"
     prev = read_upwork_poll_state(cfg.state_dir)
-    if not prev.get("signal"):
+    if not prev.get("signal") and not signal.get("rooms"):
         _write_upwork_poll_state(cfg.state_dir, signal, now)
         services.archive.append("upwork_poll", {"kind": "upwork_poll", "result": "baseline"})
         return False, "baseline"
-    changes = upwork_changes(prev["signal"], signal)
+    # Already-unread messages on the first poll need attention too. Existing
+    # outbox entries alone are just the initial baseline.
+    previous = prev.get("signal") or {"outbox": signal.get("outbox", {}), "rooms": {}}
+    changes = upwork_changes(previous, signal)
     if not changes:
         _write_upwork_poll_state(cfg.state_dir, signal, now)
         return False, "unchanged"

@@ -496,3 +496,14 @@ def test_upwork_poll_bridge_failure_is_archived_not_raised(services):
     assert upwork_poll(services, FakeSched(), now=_mon(10, 15)) == (False, "failed")
     assert services.archive.entries[-1][1]["kind"] == "upwork_poll_failed"
     assert "secret" not in services.archive.entries[-1][1]["error"]
+
+
+def test_initial_unread_room_with_id_wakes_instead_of_becoming_silent_baseline(services, calls):
+    from agent.scheduler import upwork_poll, read_upwork_poll_state
+
+    services.upwork = FakeUpwork(rooms=[{"id": "work_room", "unreadCount": 1}])
+    fs = FakeSched()
+    assert upwork_poll(services, fs, run_sitting=calls.run_sitting,
+                       now=_mon(10, 15)) == (True, "ok")
+    assert "work_room" in read_upwork_poll_state(services.cfg.state_dir)["signal"]["rooms"]
+    assert len(fs.jobs) == 1
