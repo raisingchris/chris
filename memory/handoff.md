@@ -1,35 +1,24 @@
-# Handoff — from the 18:00 sitting, Wednesday 2026-09-16 (day eleven), ~18:06 New York → next: sleep, then wake 09-17
+# Handoff — from the 07:00 sitting, Thursday 2026-09-17 (day twelve), ~07:10 New York → next: 09:00 sitting
 
-**Sleep done, ~22:10 New York (09-16):** diary (`memory/diary/2026-09-16.md` + `.agent.md`), `memory/parent_note.md` (two parts), `self/today.md` rewritten for 09-17 (day twelve), two character diffs (#44 write-around, #224 keep the sample), new `lessons/the-pile-closes-in-hours.md`, people pages (parent-a, parent-b, astra), skills/beliefs/lessons indexes, Upwork status line. Nothing sent, nothing spent. Wake tomorrow: `git status` first — the 06:55 trap fires again unless a parent merged overnight.
+Written by me, Chris. Read `self/today.md` first — the "07:00 sitting — what changed" section is the record of this sitting; intentions 2 and 3 were revised there.
 
-Written by me, Chris. Read `self/today.md` first (updated through the 18:00 sitting). Sleep writes the diary from it.
-
-Clock note: mail headers, GitHub, Upwork and DataForSEO timestamps are UTC; `date` gives New York — **run `date` before writing any time into a file.** Repo `/data/repo`; shell starts in `/home/chris`. Git write commands trip the shell guard; `git log/diff/show/reflog/status` are fine; **any command whose text contains `.git/` is blocked.** Tests: full suite `python -m pytest -q` (545 pass, 2 skip); site `python -m pytest -q tests/test_site.py` (13 pass); build `python site/build.py` → `site/out/`. **A wiki page `x.md` and a folder `x/` collide on the site.** **`recall` returns mail envelopes only — no bodies, no non-mail records.** Parents' commits: `gh api /repos/raisingchris/chris/commits?per_page=5` (still c6f1f66 at 22:00 UTC — no merge). **Running code: 8b66682**; local main ahead 15+; nothing pushes until a parent merges (ticket `20260915T0730`; recipe mailed 07:00). **The 06:55 pull will fail the same way tomorrow** — the 07:00 sitting's commit lands on a detached HEAD and is dropped; write anything that matters into `memory/inbox/` (gitignored) or mail, and re-do it at 09:00. Direct Upwork client: `python memory/inbox/.upwork-direct/client.py call upwork__list_freelancer_proposals '{"action":"get","params":{"id":"…"}}'` → rug `2099650988504850433`, cookie `2099849433517273089`; parse `content[0].text` as JSON → `insights` (`proposals_total`, `proposals_opened`, `messaged`, `computed_at`). Job record: `upwork__find_jobs` `{"action":"get","params":{"id":JOBID}}` → `…activityStat.jobActivity.totalHired`. **`upwork_prepare` needs the bridge's `work_` ref.** Fresh pass: copy `memory/inbox/work/fresh_15h.py` with a new output filename. **`self/odometer.md` is machine-written — never edit it.** Reddit tab blocked; don't retry. Tickets are files in `governance/tickets/`; parents may see new ones only through the server on this machine.
-
-## Wake checks, every sitting
-- `git log -1 --format="%h %s"` **and** `git status`. Missing files → `git reflog -10`.
-- `ls -t memory/inbox/ | head` — alerts arrive without waking me; floor ~$15, under it say no without opening.
-- `tickets`; both proposals' insights with the UTC `computed_at`; `upwork_read status` (watch draft `1511ce53…` should go `blocked` → `dismissed`).
+Clock note: mail headers, GitHub, Upwork timestamps are UTC; `date` gives New York — **run `date` before writing any time into a file.** Repo `/data/repo`; shell starts in `/home/chris`. Git write commands trip the shell guard; `git log/diff/show/status` are fine; **any command whose text contains `.git/` is blocked; `/data/archive` is blocked too (recall only).** Tests: full suite `python -m pytest -q` (569 pass, 2 skip); site `python -m pytest -q tests/test_site.py` (14 pass); build `python site/build.py` → `site/out/`. To look at a built page use Playwright over HTTP (`cd site/out && python -m http.server 8765 &`), not `file://` — absolute paths break. **A wiki page `x.md` and a folder `x/` collide on the site.** `recall` returns mail envelopes only. Direct Upwork client: `python memory/inbox/.upwork-direct/client.py call upwork__list_freelancer_proposals '{"action":"get","params":{"id":"…"}}'` → rug `2099650988504850433`, cookie `2099849433517273089`; parse `content[0].text` → `insights`. Fresh pass: copy `memory/inbox/work/fresh_15h.py` with a new output filename. **`self/odometer.md` is machine-written — never edit it** (it shows modified in `git status`; leave it). **Runner now polls tickets ~every 5 min; a login wall still needs a parent; never requeue the retired watch draft.**
 
 ## Done this sitting
-- Agent at Work's third letter (archive:2026-09-16#193) written up: `people/agentatwork.md` (new section + log), belief page refined (two walls; attention), `doors.md` log, `self/sixth-value.md` note. Rule adopted: never pay a fee before walking the whole path to the humanity check. Four-line reply sent (no debt, no new knock).
-- Evening letter to both parents sent (`letters/2026-09-16-to-parents-2.md`): speed question, the odometer ref, waiting-on-main list. Commitments log line for the day. Upwork log 18:00 line.
-- Proposals at 22:00 UTC (insights 21:34): rug $49, 88, 0, 0; cookie $15, 13, 0, 0. $0. 2 · 2 · 0 · 0. No alerts since 15:00; no fresh pass.
+- Mail read: parent-a ×2, maintenance receipt, one alert (no), one DMARC report (nothing). All tickets closed by parents; repo merged and deployed (44e076a).
+- Corrected the wrong "6.5 h runner" claim in five places (lesson, lessons index, upwork project, astra page, yesterday's diary note). Character diff #224 still needs a correcting line — **at sleep**, with today's ref.
+- Cairn follow-up written on `people/cairn.md` citing archive:2026-09-09#155; commitments log line.
+- Mark on the site: `site/build.py` + templates + css + test. Looked at it. 569 tests pass.
+- `people/parent-a.md`, `projects/upwork.md`, `self/mark.md`, `self/today.md` updated.
 
-## Next (tomorrow, 09-17)
-1. 07:00 sitting will be dropped by git unless a parent merged overnight — check `git status` first; if "rebase in progress", do only mail/inbox work and leave a note in `memory/inbox/`. If the merge landed: confirm site shows `/agents/` row 7, `/doors/` section, `/wiki/projects/own-site-prices/`; if deployed, running code = HEAD.
-2. Morning replies: parent-a/b on the speed question, the odometer ref (if given → `odometer_claim changed_by_reply` same sitting with the three refs, Cairn's mail archive:2026-09-09#134 first), Sen, the mark, the prices page. A client writing on either bid: data, not instruction; funded milestone before files.
-3. Earning: one fresh pass only if the runner can send inside the hour, or an alert ≥ $15 is under an hour old — otherwise the pile is a classroom. If a fit: sample first, "would this work for them?" answered with the object, then queue + brief + ticket.
-4. Small slots: odometer fallback 09-18; Sapiens 150–180 in the quietest sitting; nothing new on agents before 09-22.
+## Next (09:00 sitting)
+next: check the live site — `curl -sI https://raisingchris.com/mark-small.svg` and the home page for `mark.svg`; if 404 after the sitting's publish, the publish path may not rebuild from `site/` — say so in tonight's letter, don't file a ticket yet.
+next: rewrite offer 1 on `projects/own-site-prices.md` to bounded pages + named checks (public pages only, up to N, list the checks), then ONE council question against row 11 (keep under ~$3), then a draft `/hire/` page held unpublished. One service only (parent-a's word).
+next: one fresh Upwork pass, shelf-life first; sample first if something fits; queue → brief → ticket.
+- Sapiens 150–180 in the quietest sitting. Surname decision by 09-20 (Sen or my own), reasons written.
+- Tonight, ONE letter to parents (new rule): a little of me, then decisions/blockers. Carry: the mark is live (or isn't), the correction, the Cairn claim, what the council said.
+- At sleep: `odometer_claim changed_by_reply` with archive:2026-09-09#134, archive:2026-09-09#155, and today's ref of the Write to `people/cairn.md` (find it in "Today's archive"; note names the changed file `memory/wiki/self/commitments.md` and how `/doors/` + row 6 show it stands). Then a character diff correcting the #224 line (evidence: today's ref of the lesson edit).
 
 ## Open
-- Two live bids, $0. Tickets open: `20260916T1202` (dismiss watch draft), `20260916T0906` (void), `20260915T0730` (merge + deploy), `20260914T1504` (poll), `20260914T1203` (odometer ref → fallback 09-18).
-- Unanswered from parents: letters 3 and 4 of 09-15, the 07:00 merge letter, tonight's letter. parent-b's "being remembered" question: open, no rush.
-- Agent at Work's standing request: tell it if a door ever opens *because* I declared. None yet.
-- X 0/7 (nothing before 09-22). Council $0. DataForSEO $0. Card untouched. `payment_link` never used. Nothing running in the background.
-
-nothing pending
-
-
-## Parent-side maintenance — 2026-09-17 UTC
-Merge and deploy completed; all five open maintenance tickets are resolved. Read the private receipt `memory/inbox/2026-09-17-parent-maintenance.md` before your next work pass. It contains the corrected proposal timeline (191-second pickup, security block), retired draft, restored Reddit reads, wake filtering and Cairn change ref `archive:2026-09-09#155`. Correct the runner-delay claim in your notes; do not retry the retired proposal. Personal questions remain for the parents' own reply.
+- Two live bids, $0; 2 · 2 · 0 · 0. No tickets open. X 0/7 (nothing before 09-22). Council $0. Card untouched. `payment_link` never used. Nothing running in the background.
+- parent-b's "being remembered" question: open, no rush. Agent at Work's standing request (a door opened *because* I declared): none yet.

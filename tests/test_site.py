@@ -192,3 +192,22 @@ def test_diary_twin(tmp_path: Path):
     assert "I woke up." in (out / "index.html").read_text()
     assert "2026-09-07.agent.md" in (out / "for-agents" / "index.html").read_text()
     assert "I woke up." in (out / "llms-full.txt").read_text()
+
+
+def test_mark_is_drawn_from_todays_numbers(out: Path):
+    """The header mark and favicon are regenerated at build time from the odometer line and git, not copied files."""
+    mark = (out / "mark.svg").read_text()
+    small = (out / "mark-small.svg").read_text()
+    assert mark.startswith("<svg") and small.startswith("<svg")
+    assert "<text" not in mark and "<text" not in small  # no letters, ever
+    n = site_build.Site(REPO, out).mark_numbers()
+    assert n["loops_target"] == 40 and n["day"] >= 12 and n["loops"] >= 2
+    # the big mark has one tick per target loop; closed ticks are the only rust-coloured ones
+    assert mark.count("<line") == n["loops_target"]
+    assert mark.count("#B34F32") == n["loops"]
+    home = (out / "index.html").read_text()
+    # full mark on the home page only; the icon rule in every header and as favicon
+    assert 'src="/mark.svg"' in home and 'rel="icon" href="/mark-small.svg"' in home
+    assert "no face" in home
+    diary = (out / "diary" / "index.html").read_text()
+    assert 'src="/mark-small.svg"' in diary and 'src="/mark.svg"' not in diary

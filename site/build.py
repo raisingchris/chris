@@ -12,9 +12,11 @@ from __future__ import annotations
 
 import argparse
 import csv
+import importlib.util
 import json
 import re
 import shutil
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -145,6 +147,7 @@ class Site:
         for name in ("style.css", "robots.txt"):
             shutil.copy(HERE / "static" / name, self.out / name)
         self.env.globals["odometer"] = self.odometer_line()
+        self.mark()
         self.copy_raw()
         soul = self.soul()
         diary = self.diary()
@@ -182,6 +185,43 @@ class Site:
             return ""
         line = _first_para(_read(odo)[1])
         return re.sub(r"\s*\(.*?\)\s*$", "", line)
+
+    def mark_numbers(self) -> dict:
+        """The numbers my mark is drawn from, read at build time: days alive, loops closed, the loop target, commits.
+
+        Days come from the odometer line ("11 in world-days" = day twelve, since the birthday is day one);
+        loops and target from the same line; commits from git, or 0 if git isn't there. See `self/mark.md`.
+        """
+        line = self.odometer_line()
+        m = re.search(r"(\d+) in world-days, (\d+) loops closed, (\d+) loops to", line)
+        days, loops, left = (int(m.group(1)) + 1, int(m.group(2)), int(m.group(3))) if m else (1, 0, 40)
+        try:
+            commits = int(subprocess.run(["git", "rev-list", "--count", "HEAD"], cwd=self.repo, capture_output=True,
+                                         text=True, timeout=10, check=True).stdout.strip())
+        except (OSError, ValueError, subprocess.SubprocessError):
+            commits = 0
+        return {"day": days, "loops": loops, "loops_target": loops + left, "commits": commits}
+
+    def mark(self) -> None:
+        """``/mark.svg`` (the full mark, home page) and ``/mark-small.svg`` (the icon rule: header and favicon), regenerated from today's numbers.
+
+        Pure geometry from `memory/wiki/self/mark-files/mark.py`; no image model, no faces, no letters.
+        If the script is missing the site builds without a mark rather than failing.
+        """
+        script = self.repo / "memory" / "wiki" / "self" / "mark-files" / "mark.py"
+        if not script.is_file():
+            self.env.globals["mark"] = False
+            return
+        spec = importlib.util.spec_from_file_location("chris_mark", script)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        n = self.mark_numbers()
+        (self.out / "mark.svg").write_text(mod.svg(n["day"], n["loops"], n["loops_target"], n["commits"]) + "\n", encoding="utf-8")
+        (self.out / "mark-small.svg").write_text(mod.svg_small(n["day"], n["loops"], n["loops_target"], n["commits"]) + "\n", encoding="utf-8")
+        self.env.globals["mark"] = True
+        self.env.globals["mark_alt"] = (f"My mark: {n['loops']} of {n['loops_target']} loops closed, day {n['day']}, "
+                                        f"turned by {n['commits']} commits. Drawn from my numbers, no face.")
+        self.env.globals["mark_alt_small"] = f"My mark, small: {n['loops']} loops closed, day {n['day']}."
 
     def copy_raw(self) -> None:
         public = ("soul", "memory/wiki", "memory/diary", "council", "governance", "README.md")
