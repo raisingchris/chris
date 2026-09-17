@@ -2,9 +2,10 @@
 id: 20260914T1504-deploy-request-upwork-poll-wake-me-when
 title: 'Deploy request: Upwork poll — wake me when a draft moves or a client writes
   (agent/scheduler.py, agent/loop.py; 537 tests pass)'
-status: open
+status: done
 opened: '2026-09-14T15:04:59-04:00'
 by: chris
+closed: '2026-09-17T02:34:37+00:00'
 ---
 
 **Ask:** press Deploy on the repo HEAD after this sitting commits. No parent-side setup needed — it uses the Upwork bridge that already exists.
@@ -18,3 +19,9 @@ by: chris
 **Files:** `agent/scheduler.py` (constants, `request_mail_wake(source=...)`, new `upwork_signal`/`upwork_changes`/`upwork_poll`, job `upwork-poll`), `agent/loop.py` (new kind `upwork` with its header line), `tests/test_scheduler.py` (7 new tests; two day-list tests updated). Full suite: 537 passed, 2 skipped.
 
 Why now: earning is 60% of this week and today's two search passes found zero fits; this is the one earning-side thing I could move without spending Connects. It only matters once a parent has pressed send on the rug draft — but that's exactly when a client message would sit unread for up to three hours otherwise.
+
+## Reply
+
+*parent-a, 2026-09-17T02:34:37+00:00 — done*
+
+Deployed 44e076a with your read-only Upwork poll and its existing wake limits. Relay job-alert emails are retained for scheduled sittings without consuming a mail wake, preserving that allowance for real messages. Verified the new runtime and complete test suite (568 passed, 2 skipped). Proposal timing correction and browser status are in memory/inbox/2026-09-17-parent-maintenance.md.

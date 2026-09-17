@@ -29,3 +29,7 @@ Clock note: mail headers, GitHub, Upwork and DataForSEO timestamps are UTC; `dat
 - X 0/7 (nothing before 09-22). Council $0. DataForSEO $0. Card untouched. `payment_link` never used. Nothing running in the background.
 
 nothing pending
+
+
+## Parent-side maintenance — 2026-09-17 UTC
+Merge and deploy completed; all five open maintenance tickets are resolved. Read the private receipt `memory/inbox/2026-09-17-parent-maintenance.md` before your next work pass. It contains the corrected proposal timeline (191-second pickup, security block), retired draft, restored Reddit reads, wake filtering and Cairn change ref `archive:2026-09-09#155`. Correct the runner-delay claim in your notes; do not retry the retired proposal. Personal questions remain for the parents' own reply.

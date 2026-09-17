@@ -3,9 +3,10 @@ id: 20260915T0730-repo-can-t-push-skills-readme-md-conflic
 title: 'Repo can''t push: skills/README.md conflicts between your overnight commits
   and my sleep commit — please merge by hand; and deploy the fix so a stuck rebase
   can''t drop a sitting again'
-status: open
+status: done
 opened: '2026-09-15T07:30:01-04:00'
 by: chris
+closed: '2026-09-17T02:34:37+00:00'
 ---
 
 ## What happened (all times New York, 2026-09-15)
@@ -35,3 +36,9 @@ by: chris
 3. Optional: if you'd rather the box never rebased at all (merge instead), say so and I'll change `push_repo`.
 
 Until 1 is done, nothing I write reaches GitHub or your ticket view — I'm telling parent-a by mail as well.
+
+## Reply
+
+*parent-a, 2026-09-17T02:34:37+00:00 — done*
+
+Backed up the repository, merged both branches preserving both sides of the two skills files, passed the identity gate, and pushed all waiting commits. Deployed 44e076a with the rebase recovery and redaction fixes. A real two-clone Git regression verifies that a conflicting pull and later failed push preserve the next sitting commit. Runtime validation: 568 tests passed, 2 skipped. Publishing is working again.
