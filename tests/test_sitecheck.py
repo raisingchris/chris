@@ -129,3 +129,89 @@ def test_report_lists_mixed_assets_and_timeouts():
     # the browser's silent https:// upgrade is explained next to the failed image, not left as a mystery
     assert "written as http:// in the HTML" in md
     assert "**Clean.**" not in md
+
+
+# --- 2026-09-18: three labels the first real knock run showed were wrong ---
+
+def test_off_site_403_is_refused_not_broken_but_on_site_403_is_broken():
+    r = sc.follow_chain("https://other.org/shop", lambda u: (403, None), "https://x.com/")
+    assert r["result"].startswith("refused (403)") and "not verified" in r["result"]
+    assert r["status"] == 403
+    # my own site's 403 is a real problem, not a wall against me
+    assert sc.follow_chain("https://x.com/private", lambda u: (403, None), "https://x.com/")["result"] == "broken (403)"
+    # 404 on another site is still simply broken
+    assert sc.follow_chain("https://other.org/gone", lambda u: (404, None), "https://x.com/")["result"] == "broken (404)"
+
+
+def test_has_downgrade_spots_the_https_to_http_hop():
+    assert sc.has_downgrade(["https://a.org/x", "http://b.org/x", "https://b.org/x"])
+    assert not sc.has_downgrade(["https://a.org/x", "https://b.org/x"])
+    assert not sc.has_downgrade(["http://a.org/x", "https://a.org/x"])  # an upgrade is fine
+    assert not sc.has_downgrade(["https://a.org/x"])
+
+
+def test_read_robots_follows_same_site_redirect_and_reports_final_status():
+    table = {
+        "https://x.com/robots.txt": (301, "https://www.x.com/robots.txt", ""),
+        "https://www.x.com/robots.txt": (404, None, ""),
+    }
+    rp, note = sc.read_robots("https://x.com/robots.txt", lambda u: table[u], "https://x.com/")
+    assert note == "none (HTTP 404 after redirect; all allowed)"
+    assert rp.can_fetch("Chris", "https://x.com/anything")
+
+    table2 = {
+        "https://x.com/robots.txt": (302, "/r.txt", ""),
+        "https://x.com/r.txt": (200, None, "User-agent: *\nDisallow: /secret\n"),
+    }
+    rp, note = sc.read_robots("https://x.com/robots.txt", lambda u: table2[u], "https://x.com/")
+    assert note == "read (via redirect to https://x.com/r.txt)"
+    assert not rp.can_fetch("Chris", "https://x.com/secret") and rp.can_fetch("Chris", "https://x.com/ok")
+
+    # off-site redirect is never followed
+    rp, note = sc.read_robots("https://x.com/robots.txt", lambda u: (301, "https://cdn.other/robots.txt", ""), "https://x.com/")
+    assert note.startswith("redirects off-site") and rp.can_fetch("Chris", "https://x.com/a")
+
+    # a plain 200 is still just "read"; a 500 is treated as allow with the status shown
+    rp, note = sc.read_robots("https://x.com/robots.txt", lambda u: (200, None, "User-agent: *\nAllow: /\n"), "https://x.com/")
+    assert note == "read"
+    rp, note = sc.read_robots("https://x.com/robots.txt", lambda u: (503, None, ""), "https://x.com/")
+    assert note == "HTTP 503 (treated as allow)"
+
+
+def test_report_separates_refused_links_and_names_the_downgrade_hop():
+    pr = sc.PageResult(url="https://x.com/", checked_at="t", status=200, load_ms=300, title="X", h1_count=1,
+                       viewport=True)
+    links = [
+        {"url": "https://shop.other/", "found_on": "https://x.com/", "text": "shop", "count": 1, "checked_at": "t",
+         "result": "refused (403) — may be a bot wall, not verified", "status": 403, "chain": ["https://shop.other/"]},
+        {"url": "https://f.x.com/m", "found_on": "https://x.com/", "text": "members", "count": 1, "checked_at": "t",
+         "result": "redirects off-domain (not followed)", "status": 301,
+         "chain": ["https://f.x.com/m", "http://found.org/m"]},
+    ]
+    r = {"start": "https://x.com/", "began": "t0", "finished": "t1", "robots": "none (HTTP 404; all allowed)",
+         "pages": [pr], "skipped": [], "links": links,
+         "requests_used": 3, "budget": 400, "stopped": "", "queue_left": 0, "sample": True, "max_pages": 1}
+    md = sc.render_report(r)
+    assert "## 2. Links — 0 of 2 broken" in md            # the 403 is not counted as broken
+    assert "refused, not verified: 1 other site" in md
+    assert "https://shop.other/ — refused (403)" in md
+    assert "drops from https:// to http:// for a hop" in md
+    assert "https://f.x.com/m → http://found.org/m" in md
+    assert "**Clean.**" not in md
+    assert "2 findings in total" in md                    # the redirect line + the downgrade line; the 403 adds none
+    assert "pay" not in md.lower() and "$" not in md
+
+
+def test_report_says_why_a_link_errored_in_plain_words():
+    assert sc.plain_error("[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1010)") \
+        == " (the site's https certificate has expired)"
+    assert sc.plain_error("[Errno -2] Name or service not known") == " (the domain name doesn't resolve)"
+    assert sc.plain_error("") == ""
+    pr = sc.PageResult(url="https://x.com/", checked_at="t", status=200, load_ms=300, title="X", h1_count=1, viewport=True)
+    r = {"start": "https://x.com/", "began": "t0", "finished": "t1", "robots": "read", "pages": [pr], "skipped": [],
+         "links": [{"url": "https://old.other/", "found_on": "https://x.com/", "text": "", "count": 1, "checked_at": "t",
+                    "result": "error", "status": None, "chain": ["https://old.other/"],
+                    "detail": "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1010)"}],
+         "requests_used": 3, "budget": 400, "stopped": "", "queue_left": 0, "sample": True, "max_pages": 1}
+    md = sc.render_report(r)
+    assert "https://old.other/ — error (the site's https certificate has expired); on https://x.com/" in md

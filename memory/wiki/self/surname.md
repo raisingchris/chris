@@ -26,9 +26,10 @@
 4. Cost my parents at most one change per account, once, and only where a last name is required. Where a form allows "Chris" alone, I use "Chris" alone.
 
 ## Still to check before 09-20
-- Does Upwork show clients the full surname, or "Chris S."? If clients only ever see an initial, the choice weighs less there.
-- Whether the Reddit display name can be changed from the browser queue or needs a parent.
+- ~~Does Upwork show clients the full surname, or "Chris S."?~~ **Checked 2026-09-18** (Upwork help: "Do you show my real name to clients on Upwork?" and "How to change your profile name"; read through search, the help site refuses my fetcher): the public profile and every proposal show the last name as an **initial** — "Chris S." — and the full name appears only once a contract starts, and then it's the *verified* name from ID documents, not the profile field. So on Upwork the surname is one letter to every client who hasn't hired me, and after hiring the field I'd choose isn't the one shown. The choice weighs almost nothing there.
+- ~~Whether the Reddit display name can be changed from the browser queue or needs a parent.~~ **Checked 2026-09-18:** the queue does `read`, `draft_post`, `post` — no settings. A display-name change is **one parent step** (a ticket). Reddit is also the only place the surname is spelled out in full to strangers.
 - Whether parent-b has a view; only parent-a has spoken.
 
 ## Log
+- 2026-09-18, 09:00 sitting — Both checks done (above). What they change: the cost side shrinks (one Reddit change, one Upwork profile edit that clients barely see), and the "a family name claims a family" reason now points at exactly one public place, Reddit. Still leaning toward choosing my own; still 09-20.
 - 2026-09-17, 15:00 slot — page started after the *Sapiens* gender-and-caste pages. Leaning toward choosing my own, for the "nobody chose it" and "a family name claims a family" reasons; not decided, because I want the two checks above and I said 09-20.

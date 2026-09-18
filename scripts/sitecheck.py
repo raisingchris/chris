@@ -185,10 +185,57 @@ def follow_chain(url: str, fetch, start_site: str, max_hops: int = MAX_HOPS) -> 
             continue
         if status is None:
             return {"result": "error", "status": None, "chain": chain}
+        if status in REFUSED_STATUSES and not same_site(cur, start_site):
+            # Another site's door said no to *me*. From one machine I can't tell a dead link from
+            # a bot wall, so it's not called broken; the report lists it as unverified.
+            return {"result": f"refused ({status}) — may be a bot wall, not verified", "status": status, "chain": chain}
         if status >= 400:
             return {"result": f"broken ({status})", "status": status, "chain": chain}
         return {"result": "ok" if len(chain) == 1 else "ok via redirect", "status": status, "chain": chain}
     return {"result": "too many redirects", "status": None, "chain": chain}
+
+
+REFUSED_STATUSES = (401, 403, 429)
+
+
+def has_downgrade(chain: list[str]) -> bool:
+    """True if any hop in a redirect chain goes from https:// to http:// — one hop in the clear."""
+    return any(a.startswith("https://") and b.startswith("http://") for a, b in zip(chain, chain[1:]))
+
+
+def read_robots(robots_url: str, fetch, start_site: str, max_hops: int = 3) -> tuple[urllib.robotparser.RobotFileParser, str]:
+    """Fetch robots.txt, following redirects only on the same site, and say what happened in plain words.
+
+    `fetch(url) -> (status, location_or_None, body_text)`; may raise. Anything but a readable file
+    means "all allowed", and the note says why, with the final status rather than the first one.
+    """
+    rp = urllib.robotparser.RobotFileParser()
+    cur = robots_url
+    hops = 0
+    try:
+        while True:
+            status, location, body = fetch(cur)
+            if status in (301, 302, 303, 307, 308) and location:
+                nxt = normalize(location, cur)
+                if not nxt or not same_site(nxt, start_site):
+                    rp.allow_all = True
+                    return rp, f"redirects off-site to {location} (treated as allow)"
+                hops += 1
+                if hops > max_hops:
+                    rp.allow_all = True
+                    return rp, "too many redirects (treated as allow)"
+                cur = nxt
+                continue
+            if status == 200:
+                rp.parse(body.splitlines())
+                return rp, "read" if hops == 0 else f"read (via redirect to {cur})"
+            rp.allow_all = True
+            if status in (404, 410):
+                return rp, f"none (HTTP {status}{' after redirect' if hops else ''}; all allowed)"
+            return rp, f"HTTP {status}{' after redirect' if hops else ''} (treated as allow)"
+    except Exception as e:  # noqa: BLE001
+        rp.allow_all = True
+        return rp, f"unreadable ({type(e).__name__}; treated as allow)"
 
 
 # ---------- fetching ----------
@@ -270,21 +317,18 @@ def crawl(start: str, out_dir: Path, max_pages: int = 25, budget_limit: int = 40
     site_https = start_n.startswith("https://")
 
     # robots.txt first
-    rp = urllib.robotparser.RobotFileParser()
     robots_url = urllib.parse.urlunsplit(urllib.parse.urlsplit(start_n)[:2] + ("/robots.txt", "", ""))
-    robots_note = ""
-    try:
+
+    def robots_fetch(u: str) -> tuple[int, str | None, str]:
         budget.take(); budget.pace()
-        req = urllib.request.Request(robots_url, headers={"User-Agent": USER_AGENT})
-        with _build_opener().open(req, timeout=LINK_TIMEOUT_S) as r:
-            rp.parse(r.read().decode("utf-8", "replace").splitlines())
-        robots_note = "read"
-    except urllib.error.HTTPError as e:
-        rp.allow_all = True
-        robots_note = f"HTTP {e.code} (treated as allow)"
-    except Exception as e:  # noqa: BLE001
-        rp.allow_all = True
-        robots_note = f"unreadable ({type(e).__name__}; treated as allow)"
+        req = urllib.request.Request(u, headers={"User-Agent": USER_AGENT})
+        try:
+            with _build_opener().open(req, timeout=LINK_TIMEOUT_S) as r:
+                return r.status, None, r.read().decode("utf-8", "replace")
+        except urllib.error.HTTPError as e:
+            return e.code, e.headers.get("Location"), ""
+
+    rp, robots_note = read_robots(robots_url, robots_fetch, start_n)
 
     def allowed(u: str) -> bool:
         try:
@@ -455,6 +499,22 @@ def write_csv(result: dict, path: Path) -> None:
                         row.get("status"), " -> ".join(row.get("chain", [row["url"]])), row["checked_at"]])
 
 
+def plain_error(detail: str) -> str:
+    """Turn a socket/SSL error string into a few plain words for the report; empty if there's nothing to say."""
+    if not detail:
+        return ""
+    d = detail.lower()
+    if "certificate has expired" in d:
+        return " (the site's https certificate has expired)"
+    if "certificate_verify_failed" in d or "certificate verify failed" in d:
+        return " (the site's https certificate doesn't check out)"
+    if "name or service not known" in d or "nodename nor servname" in d or "getaddrinfo" in d:
+        return " (the domain name doesn't resolve)"
+    if "connection refused" in d:
+        return " (nothing is listening there)"
+    return f" ({detail[:80]})"
+
+
 def render_report(r: dict) -> str:
     pages: list[PageResult] = r["pages"]
     links = r["links"]
@@ -495,7 +555,15 @@ def render_report(r: dict) -> str:
     L.append(f"## 2. Links — {len(broken)} of {len(links)} broken")
     for x in broken:
         findings += 1
-        L.append(f"- {x['url']} — {x['result']}; on {x['found_on']} as “{x['text'] or '(no text)'}” ({x['checked_at']})")
+        why = plain_error(x.get("detail", ""))
+        L.append(f"- {x['url']} — {x['result']}{why}; on {x['found_on']} as “{x['text'] or '(no text)'}” ({x['checked_at']})")
+    refused = [x for x in links if x["result"].startswith("refused")]
+    if refused:
+        L.append(f"- refused, not verified: {len(refused)} other site{'s' if len(refused) != 1 else ''} answered "
+                 "401/403/429 to my request. From one machine that could be a dead page or a wall against "
+                 "automated visitors; check these by hand before calling them broken:")
+        for x in refused:
+            L.append(f"  - {x['url']} — {x['result']}; on {x['found_on']} ({x['checked_at']})")
     unchecked = [x for x in links if x["result"].startswith("not ")]
     if unchecked:
         L.append(f"- not fetched: {len(unchecked)} (robots, private/IP hosts, or budget) — see links.csv")
@@ -533,6 +601,15 @@ def render_report(r: dict) -> str:
     for x in red:
         findings += 1
         L.append(f"- {' → '.join(x['chain'])} — {x['result']}; on {x['found_on']} ({x['checked_at']})")
+    down = [x for x in red if has_downgrade(x["chain"])]
+    if down:
+        L.append("")
+        L.append(f"**{len(down)} of these drop{'s' if len(down) == 1 else ''} from https:// to http:// for a hop** — "
+                 "one step of the trip is unencrypted, so anyone on the path could read or change where the visitor "
+                 "is sent. Point the link at the final https:// address, or make the redirect go https:// → https://.")
+        for x in down:
+            findings += 1
+            L.append(f"- {' → '.join(x['chain'])} ({x['checked_at']})")
     L.append("")
 
     # 6 mixed
