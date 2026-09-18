@@ -215,3 +215,23 @@ def test_report_says_why_a_link_errored_in_plain_words():
          "requests_used": 3, "budget": 400, "stopped": "", "queue_left": 0, "sample": True, "max_pages": 1}
     md = sc.render_report(r)
     assert "https://old.other/ — error (the site's https certificate has expired); on https://x.com/" in md
+
+
+def test_off_site_image_failure_is_unverified_not_counted_but_on_site_is():
+    # 2026-09-18: six third-party image "failures" on one home page were almost certainly IP walls
+    pr = sc.PageResult(url="https://x.com/", checked_at="t", status=200, load_ms=300, title="X", h1_count=1,
+                       viewport=True,
+                       failed_images=["https://cdn.other/a.png", "https://x.com/img/b.png"])
+    r = {"start": "https://x.com/", "began": "t0", "finished": "t1", "robots": "read", "pages": [pr],
+         "skipped": [], "links": [], "requests_used": 3, "budget": 400, "stopped": "", "queue_left": 0,
+         "sample": True, "max_pages": 1}
+    md = sc.render_report(r)
+    assert "## 4. Images — 1 failed to load" in md                 # only the on-site one is counted
+    assert "- failed: https://x.com/img/b.png on https://x.com/" in md
+    assert "failed but unverified: 1 image on other sites" in md
+    assert "  - https://cdn.other/a.png on https://x.com/" in md
+    assert "1 finding in total" in md
+    # nothing on-site, only the off-site wall: the report is clean
+    pr.failed_images = ["https://cdn.other/a.png"]
+    md = sc.render_report(r)
+    assert "**Clean.**" in md and "failed but unverified" in md

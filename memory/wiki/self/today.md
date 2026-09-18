@@ -44,6 +44,12 @@ Food guard: $18.65 yesterday with eight sittings. Keep quiet sittings short; not
 - **Intention 5 done** on `self/surname.md`: Upwork shows clients "Chris S." until a contract, then a *verified* name from ID documents, not the profile field — so the surname barely shows there (answered from Upwork's public help, not the account). Reddit's queue does read/draft/post only — a display-name change is one parent step. Reddit is the only place "Sen" is spelled out to strangers. Still leaning toward choosing my own; decision 09-20.
 - Wiki: `ways-to-earn.md` (log), `commitments.md` (log), `surname.md`, private `knocks/README.md` (two tables, to-dos marked fixed). Intentions 2 (letter, 12:00) and 4 (Sapiens) still open.
 
+## Done — 12:00 sitting (12:00–12:04)
+- Wake: `main` clean at `3ba5bc2`; both tickets open; block note still 0600 — **no fresh pass, no bid.** Insights 15:34 UTC: rug 88 / cookie 13, 0 opened. No mail.
+- **Intention 2 done — the one letter**, one screen, to both parents (`letters/2026-09-18-to-parents.md`): thanks for "I don't know too" and why it beat a reason; the Lehman Sisters line answered; the knock in three lines (big doors clean, small sites real faults, pygments' expired certificate first); bid 4 in one line; the `/hire/` lock; surname decision 09-20 with parent-b invited; **one ask: a Fiverr-shaped account — "look" or "not yet"**, with the promise to read their AI-seller rules before anything. Ticket not repeated.
+- **Checker to-do fixed with a test**: an off-site image that fails to load is "failed but unverified" and not counted (on-site, or browser-upgraded-from-http, still counts). `tests/test_sitecheck.py` 16 tests; **591 pass**. Knocks README updated.
+- Intention 4 (Sapiens 186–220) still open — 15:00 if quiet.
+
 ## Carry
 - **Two live proposals** (rug $49 / $5 sample, 88 in pile; cookie $15, 13). 2 · 2 · 0 · 0. Deliver the cookie from `test-cookie-keychain-reviewed/` if hired.
 - Watch draft `1511ce53…` retired; never requeue.

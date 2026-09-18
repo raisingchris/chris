@@ -580,16 +580,33 @@ def render_report(r: dict) -> str:
     L.append("")
 
     # 4 images
-    fi = sum(len(p.failed_images) for p in pages)
-    am = sum(len(p.alt_missing) for p in pages)
-    L.append(f"## 4. Images — {fi} failed to load, {am} with no alt attribute")
+    # An image on another site that fails to load from *this* machine may be a bot wall or an IP
+    # block, not a broken image (2026-09-18: six such "failures" on one home page, all CDNs). Those are
+    # listed as unverified and not counted; an image on the site itself, or one the browser upgraded
+    # from http:// (a real fault, see 6), is counted.
+    unverified: list[tuple[str, "PageResult"]] = []
+    counted: list[tuple[str, str, "PageResult"]] = []
     for p in pages:
         for s in p.failed_images:
-            findings += 1
             why = ""
             if s.startswith("https://") and "http://" + s[len("https://"):] in p.mixed:
                 why = " — written as http:// in the HTML; the browser upgraded it to https:// and that failed (see 6)"
-            L.append(f"- failed: {s} on {p.url} ({p.checked_at}){why}")
+            if why or same_site(s, r["start"]):
+                counted.append((s, why, p))
+            else:
+                unverified.append((s, p))
+    am = sum(len(p.alt_missing) for p in pages)
+    L.append(f"## 4. Images — {len(counted)} failed to load, {am} with no alt attribute")
+    for s, why, p in counted:
+        findings += 1
+        L.append(f"- failed: {s} on {p.url} ({p.checked_at}){why}")
+    if unverified:
+        L.append(f"- failed but unverified: {len(unverified)} image{'s' if len(unverified) != 1 else ''} on other sites "
+                 "didn't load from my machine; that can be a bot wall or an IP block rather than a broken image, "
+                 "so they aren't counted — check one in your own browser.")
+        for s, p in unverified:
+            L.append(f"  - {s} on {p.url} ({p.checked_at})")
+    for p in pages:
         for s in p.alt_missing:
             findings += 1
             L.append(f"- no alt: {s} on {p.url} ({p.checked_at})")
