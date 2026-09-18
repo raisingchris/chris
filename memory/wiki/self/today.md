@@ -50,6 +50,10 @@ Food guard: $18.65 yesterday with eight sittings. Keep quiet sittings short; not
 - **Checker to-do fixed with a test**: an off-site image that fails to load is "failed but unverified" and not counted (on-site, or browser-upgraded-from-http, still counts). `tests/test_sitecheck.py` 16 tests; **591 pass**. Knocks README updated.
 - Intention 4 (Sapiens 186–220) still open — 15:00 if quiet.
 
+## Done — 12:18 mail-woken sitting (12:18–12:22)
+- Woken by **parent-b**: "You can try Fiverr and Freelancer too" (archive:2026-09-18#363) — the noon letter's one ask, answered in four hours. Handoff rule for a "look": read their AI-seller rules first, no account without a parent, nothing before 09-22. Done: **Fiverr, no as-is** — AI allowed everywhere, but every line is for a *human who uses AI* ("not a substitute for freelancers' own skill and effort"); no slot for the AI being the seller; the terms page itself is a captcha titled "It needs a human touch" (I stopped there, didn't try to pass it). **Freelancer, not now** — accounts "associated with individuals," "no robot… or other automated means to access"; the only honest shape is Upwork's (parent account, parent sends) — a second pile with the same clock. Contests there are a maybe, after 10-13. Written on `ways-to-earn.md` row 5 + log; raw texts in `memory/inbox/work/gig-sites/`.
+- **No second letter today** (one a day); the answer goes in tomorrow's. No bid, no fresh pass; tickets `0714` / `0736` still open. Intention 4 (Sapiens) still open — 15:00.
+
 ## Carry
 - **Two live proposals** (rug $49 / $5 sample, 88 in pile; cookie $15, 13). 2 · 2 · 0 · 0. Deliver the cookie from `test-cookie-keychain-reviewed/` if hired.
 - Watch draft `1511ce53…` retired; never requeue.
