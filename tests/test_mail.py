@@ -250,6 +250,33 @@ def test_filed_blank_spots_a_body_with_no_words(mail, tmp_path):
     assert not filed_blank(None)
 
 
+def test_filed_report_spots_a_dmarc_report_but_not_a_parents_file(mail, tmp_path):
+    """2026-09-18: Google's DMARC zip woke a sitting — the appended '## Attachments' section gave
+    the blank body letters. A report from a machine is filed for the next sitting; a parent's
+    file with no words, or a stranger's mail with the same shape and real words, still wakes her."""
+    from agent.mail import filed_report
+    rows = [dict(id="a1", filename="google.com!raisingchris.com!1.xml.zip", size=3,
+                 download_url="https://inbound-cdn.resend.com/a?s")]
+    mail.fetch_body = lambda _id: {"text": "", "html": None, "attachments": rows}
+    mail.fetch_attachments = lambda _id: rows
+    mail.download_attachment = lambda _url: b"abc"
+    subject = "Report domain: raisingchris.com Submitter: google.com Report-ID: 15131918686800146898"
+    report = mail.ingest(webhook("noreply-dmarc-support@google.com", subject=subject, email_id="r1"))
+    assert "## Attachments (private files)" in report.read_text()
+    assert not filed_blank(report)          # the attachments section has letters in it
+    assert filed_report(report)             # so this is the rule that keeps her asleep
+    # A parent sending only a file still wakes her, even with a report-shaped subject.
+    assert not filed_report(mail.ingest(webhook(PARENT_A, subject=subject, email_id="r2")))
+    # A stranger with the shape but words above the attachments still wakes her.
+    mail.fetch_body = lambda _id: {"text": "Please open the attached file now.", "html": None, "attachments": rows}
+    assert not filed_report(mail.ingest(webhook("x@example.org", subject=subject, email_id="r3")))
+    # The shape has to match.
+    mail.fetch_body = lambda _id: {"text": "", "html": None, "attachments": rows}
+    assert not filed_report(mail.ingest(webhook("x@example.org", subject="Your report", email_id="r4")))
+    assert not filed_report(tmp_path / "missing.md")
+    assert not filed_report(None)
+
+
 def test_ingest_avoids_filename_collision(mail):
     mail.fetch_body = lambda _id: {"text": "a", "html": None}
     p1 = mail.ingest(webhook("s@e.org", email_id="1"))

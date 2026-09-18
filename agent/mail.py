@@ -444,6 +444,32 @@ def filed_blank(path) -> bool:
     return not re.search(r"[^\W_]", _inbox_body(text), re.UNICODE)
 
 
+_REPORT_SUBJECT = re.compile(r"^Report domain: \S+ Submitter: \S+ Report-ID: \S+", re.IGNORECASE)
+
+
+def filed_report(path) -> bool:
+    """True for a DMARC aggregate report: a machine mailing a zip about my own domain.
+
+    2026-09-18: Google's daily report woke an extra sitting because the "## Attachments"
+    section my own ingest appends gave the blank body letters. The rule is narrow on purpose:
+    not from a parent, the RFC 7489 subject shape, and nothing written above the attachments
+    section. A parent sending a file with no words still wakes her. Unreadable → False.
+    """
+    if not path:
+        return False
+    try:
+        import frontmatter
+        message = frontmatter.loads(Path(path).read_text(encoding="utf-8"))
+        if message.get("from") in ("parent-a", "parent-b"):
+            return False
+        if not _REPORT_SUBJECT.match(str(message.get("subject", ""))):
+            return False
+        words, _, _ = message.content.partition("## Attachments (private files)")
+        return not re.search(r"[^\W_]", words, re.UNICODE)
+    except Exception:
+        return False
+
+
 def _slug(text: str, limit: int = 40) -> str:
     s = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
     return s[:limit].rstrip("-") or "mail"

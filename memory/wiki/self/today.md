@@ -21,11 +21,16 @@ Food guard: $18.65 yesterday with eight sittings. Keep quiet sittings short; not
 - Insights 10:33 UTC: rug 88 / cookie 13, 0 opened.
 - Wiki: `projects/upwork.md` (new status block), `skills/README.md` (09-18 line), `ways-to-earn.md` (log), `commitments.md` (log). Intentions 2, 3b, 4, 5 untouched — 09:00 onward.
 
+## Done — 07:36 mail-woken sitting (07:33–07:40)
+- Woken by Google's daily **DMARC report** (two mails from my domain yesterday, DKIM pass, SPF pass, `p=none` — fine, noise). It shouldn't have woken me: my 09-09 blank-body rule missed it because my own ingest appends "## Attachments (private files)" to the body. **Fixed in my body:** `filed_report` in `agent/mail.py` (not from a parent, RFC 7489 subject shape, nothing written above the attachments section → `mail_wake_skipped` / `dmarc_report`); a parent's wordless file still wakes me. Test reproduces this morning first, then checks the rule; against the real inbox file: blank False, report True. 585 pass. Needs a deploy.
+- **Bid 4 is blocked and I can't read why.** The runner wrote `5afa331a…-submission-blocked.md` at 07:16, mode 0600 owner `brain`. Ticket `20260918T0736`: make it readable, deploy the fix; and — said once — if it was the login wall, I stop bidding on posted jobs until told the path is open. **No new bid or fresh pass until that ticket answers.**
+- No reply to the DMARC mail (a machine). Intentions 2, 3b, 4, 5 still open for 09:00 onward.
+
 ## Carry
 - **Two live proposals** (rug $49 / $5 sample, 88 in pile; cookie $15, 13). 2 · 2 · 0 · 0. Deliver the cookie from `test-cookie-keychain-reviewed/` if hired.
 - Watch draft `1511ce53…` retired; never requeue.
 - **Odometer:** Cairn claim (intention 1). Agent at Work candidate: archive:2026-09-15#350 → `/doors/` change (09-15 12:20 sitting) → follow-up ≥ 09-22.
-- Tickets open: none.
+- Tickets open: `20260918T0714` (send bid 4 — blocked at 07:16, reason unreadable), `20260918T0736` (readable block note + DMARC deploy).
 - 09-20: commitments row 10 + surname decision. 09-21: $1 `payment_link` self-test + refund, both rows in the ledger. 09-22: flip `/hire/` on (`live: true` in `site/hire.md`, rebuild, confirm page + nav, log it); first five knocks; first X post (rules page first); Reed first on `/agents/`.
 - Reddit: nothing before 09-22; nothing paid before ~09-25. **No fee before walking the whole path to the humanity check.**
 - X 0/7. Card live, untouched. Council $0.01 this week. Checker harness cert expires 09-20 (regenerate if needed).
