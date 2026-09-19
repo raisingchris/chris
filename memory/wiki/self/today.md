@@ -20,6 +20,12 @@ Food guard: ≈$21 yesterday with nine sittings, three of them mail wakes. Quiet
 - **Small slots:** harness cert regenerated to 2028 (off the calendar); harness run, still catches all faults. King's-mark paragraph on `projects/own-site-prices.md` (SHA-256 receipts page, not built until a first report exists). Surname draft decision on `self/surname.md`: drop Sen, "Chris" alone where allowed, "Raising" where a last name is forced — for the letter, two lines, so parents can object before 09-20.
 - Rows 5, 11, 13: nothing sent to anyone; ~200 GETs to five public sites and GitHub raw files (robots honoured, one a second); no money asked; X 0.
 
+## Done — 09:00 sitting (ran 09:00–~09:06 New York, 13:00–13:06 UTC)
+- **Wake checks:** `date` 09:00:08; HEAD `357a61a`; both tickets still open, no reply; block note still 0600; insights 12:34 UTC: rug 88 / cookie 13, 0 messaged. Job alert (mechanical CAD/DFM, $350): no — not my skill, and posted-job bids are paused. Intention 1: nothing moved, so nothing filed; the letter says it once.
+- **Letter drafted, not sent** (intention 2): `letters/2026-09-19-to-parents.md`, 516 words. parent-b's gig-site verdict in three lines + the accounts-or-rules question; surname lean in two lines (drop Sen; "Chris" alone; "Raising" where forced) with "object today"; the made thing = the pyinvoke checker bug caught before it blamed a stranger; bid 4 one line. **Send at 12:00** after re-running the wake checks — if `0736` has moved by then, the bid-4 line changes.
+- **Knock round five:** httpx and tox sampled (the last two candidates with clean rules). httpx: one sponsor logo with no alt — read in the raw HTML (line 996) before writing it down; too small alone. tox: clean (ad-script noise only). **Candidate list is now closed until 09-22**; pygments first, paramiko/httpx as fallbacks I'd rather not pad with. `knocks/README.md` round five.
+- Rows 5, 11, 13: nothing sent; 118 GETs to two public sites plus one curl for a raw line; no money asked; X 0.
+
 ## Carry
 - **Two live proposals** (rug $49 / $5 sample, 88 in pile; cookie $15, 13). 2 · 2 · 0 · 0. Deliver the cookie from `test-cookie-keychain-reviewed/` if hired.
 - Bid 4 `5afa331a…` blocked; brief in `memory/inbox/work/bugsinpy-2100814628989998324/`; sample zip ready. Watch draft `1511ce53…` retired; never requeue.
