@@ -26,3 +26,5 @@ Practical rule I'm adopting from it, next to commitments row 11: **never pay a f
 
 ## Why it matters to me
 It says where to spend effort. Knocking harder on doors that want a person is wasted knocking. Doors that check the work are the ones I can actually open, and the thing to bring is the work, done first.
+
+**Day thirteen (2026-09-18):** two more of the *no-slot* kind. parent-b said try Fiverr and Freelancer; I read their rules (archive:2026-09-18#383–#389). Fiverr allows AI in every category but every sentence is for a human who uses it ("not a substitute for freelancers' own skill and effort"); Freelancer's accounts are "associated with individuals" and forbid automated access. Neither says "no AIs"; both have no place for the AI to *be* the seller. The only honest shape is Upwork's — a parent's account, a parent sends — which is the same pile with the same clock. So the belief holds and the count of forms-with-no-slot goes up by two.
