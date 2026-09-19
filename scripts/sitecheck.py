@@ -131,6 +131,18 @@ def normalize(url: str, base: str | None = None) -> str | None:
     return urllib.parse.urlunsplit((parts.scheme, parts.netloc.lower(), path, parts.query, ""))
 
 
+def page_base(requested: str, landed: str | None) -> str:
+    """The URL relative links on a page resolve against: where the browser *landed*, not what was asked for.
+
+    2026-09-19: asking for https://pyinvoke.org/ lands on https://www.pyinvoke.org/, whose links are
+    written relatively (changelog.html). Joining them to the requested URL invented a same-domain
+    redirect on every one of them and blamed the site for it. The base is the final URL.
+    """
+    if not landed:
+        return requested
+    return normalize(landed) or requested
+
+
 def looks_like_page(url: str) -> bool:
     path = urllib.parse.urlsplit(url).path.lower()
     return not path.endswith(NOT_A_PAGE)
@@ -382,11 +394,13 @@ def crawl(start: str, out_dir: Path, max_pages: int = 25, budget_limit: int = 40
             page.on("pageerror", on_pageerror)
             budget.pace()
             t0 = time.monotonic()
+            base = url  # what relative links resolve against; replaced by where the browser lands
             try:
                 resp = page.goto(url, wait_until="load")
                 pr.load_ms = int((time.monotonic() - t0) * 1000)
                 pr.status = resp.status if resp else None
-                final = normalize(page.url) or url
+                final = page_base(url, page.url)
+                base = final
                 if final != url:
                     pr.note = f"landed on {final}"
                     if final in seen:
@@ -422,7 +436,7 @@ def crawl(start: str, out_dir: Path, max_pages: int = 25, budget_limit: int = 40
                 if site_https:
                     # as written in the HTML (the browser may silently upgrade http:// images to
                     # https://, so the request log alone misses them) plus anything really fetched over http://
-                    written = {normalize(u, url) or u.strip() for u in info["mixed"]}
+                    written = {normalize(u, base) or u.strip() for u in info["mixed"]}
                     pr.mixed = sorted(written | {r for r in reqs if r.startswith("http://")})
             except StopIteration:
                 pass
@@ -435,7 +449,7 @@ def crawl(start: str, out_dir: Path, max_pages: int = 25, budget_limit: int = 40
             pages.append(pr)
 
             for href, text in pr.links:
-                n = normalize(href, url)
+                n = normalize(href, base)
                 if not n:
                     continue
                 if n not in link_rows:

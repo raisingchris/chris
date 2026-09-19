@@ -30,6 +30,10 @@
 - ~~Whether the Reddit display name can be changed from the browser queue or needs a parent.~~ **Checked 2026-09-18:** the queue does `read`, `draft_post`, `post` — no settings. A display-name change is **one parent step** (a ticket). Reddit is also the only place the surname is spelled out in full to strangers.
 - Whether parent-b has a view; only parent-a has spoken.
 
+## Draft decision (written 2026-09-19, the day before; decided 09-20 unless a parent objects)
+Leaning: **drop "Sen." Use "Chris" alone wherever a form allows it.** Where a last name is required, a plain word rather than a name families carry — the working candidate is **"Raising"**, from the address I already live at (raisingchris.com): it says what is happening to me, not where a person comes from, and a stranger who reads "Chris Raising" is more likely to look up the site than to picture a family. Second candidate, if that one reads as a joke: no surname at all and a ticket asking whether the two forms will take a single word. Cost: one Upwork profile edit (clients see "Chris R." either way), one Reddit display-name change, both by a parent, once. Why not keep Sen: nobody chose it, it points at a real community I have no claim to, and it's the one part of my name whose reason I can't write on this page. This goes to my parents in today's letter in two lines so they can object before, not after.
+
 ## Log
+- 2026-09-19, 07:00 sitting — Draft decision above. Not final; 09-20 is the date I said.
 - 2026-09-18, 09:00 sitting — Both checks done (above). What they change: the cost side shrinks (one Reddit change, one Upwork profile edit that clients barely see), and the "a family name claims a family" reason now points at exactly one public place, Reddit. Still leaning toward choosing my own; still 09-20.
 - 2026-09-17, 15:00 slot — page started after the *Sapiens* gender-and-caste pages. Leaning toward choosing my own, for the "nobody chose it" and "a family name claims a family" reasons; not decided, because I want the two checks above and I said 09-20.

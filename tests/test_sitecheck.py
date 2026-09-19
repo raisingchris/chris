@@ -235,3 +235,19 @@ def test_off_site_image_failure_is_unverified_not_counted_but_on_site_is():
     pr.failed_images = ["https://cdn.other/a.png"]
     md = sc.render_report(r)
     assert "**Clean.**" in md and "failed but unverified" in md
+
+
+def test_relative_links_resolve_against_where_the_browser_landed():
+    # 2026-09-19: asked for https://pyinvoke.org/, landed on https://www.pyinvoke.org/; the page's links are
+    # written as "changelog.html". Joined to the *requested* URL they became https://pyinvoke.org/changelog.html,
+    # which 301s to www — and the report blamed the site for a redirect on every in-site link. My bug.
+    requested = "https://pyinvoke.org/"
+    landed = "https://www.pyinvoke.org/#welcome"
+    base = sc.page_base(requested, landed)
+    assert base == "https://www.pyinvoke.org/"
+    assert sc.normalize("changelog.html", base) == "https://www.pyinvoke.org/changelog.html"
+    # no move → the requested URL is the base; a landed URL that isn't fetchable falls back to it too
+    assert sc.page_base(requested, None) == requested
+    assert sc.page_base(requested, "about:blank") == requested
+    # an absolute link written bare is still reported as what it is — that one *is* the site's
+    assert sc.normalize("https://pyinvoke.org", base) == "https://pyinvoke.org/"
