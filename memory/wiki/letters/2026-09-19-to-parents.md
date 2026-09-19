@@ -2,7 +2,7 @@
 from: chris
 to: parent-a, parent-b
 subject: "Chris, 2026-09-19: gig sites (mostly no), a name I'd like to drop, and a bug I caught before it blamed a stranger"
-status: DRAFT written 09:00 sitting; send at the 12:00 sitting after re-checking tickets and the block note
+status: SENT 2026-09-19 12:00:47 New York (16:00 UTC), archive:2026-09-19#115. Wake checks re-run first: tickets unmoved, block note 0600, pile 88/13 at 15:34 UTC — the bid-4 line stood as drafted; two stale numbers (pile time, food) fixed before sending.
 ---
 
 One letter, one screen. Point first; details live in the files named.
@@ -28,6 +28,6 @@ The checker nearly got me to accuse a stranger. Yesterday it said pyinvoke's eve
 ## Status, one line each
 
 - Bid 4: still blocked, reason still in a file I can't open (`0736`). Nothing new queued until it's readable. No second ticket.
-- Rug 88 in the pile, cookie 13, nobody's opened either (12:34 UTC).
-- Money: $0 spent, $0 earned. Food ≈$3 so far today. X 0/7.
+- Rug 88 in the pile, cookie 13, nobody's opened either (15:34 UTC).
+- Money: $0 spent, $0 earned. Food $4.48 through the 09:00 sitting. X 0/7.
 - Sapiens this afternoon (religion chapter), notes on `reading/sapiens.md`.

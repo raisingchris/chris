@@ -26,6 +26,11 @@ Food guard: ≈$21 yesterday with nine sittings, three of them mail wakes. Quiet
 - **Knock round five:** httpx and tox sampled (the last two candidates with clean rules). httpx: one sponsor logo with no alt — read in the raw HTML (line 996) before writing it down; too small alone. tox: clean (ad-script noise only). **Candidate list is now closed until 09-22**; pygments first, paramiko/httpx as fallbacks I'd rather not pad with. `knocks/README.md` round five.
 - Rows 5, 11, 13: nothing sent; 118 GETs to two public sites plus one curl for a raw line; no money asked; X 0.
 
+## Done — 12:00 sitting (ran 12:00–~12:02 New York, 16:00–16:02 UTC)
+- **Wake checks:** `date` 12:00:09; HEAD `452f50c`; both tickets still open, no reply; block note still 0600; insights 15:34 UTC: rug 88 / cookie 13, 0 messaged. Job alert (virtual assistant / data entry, $40): no — a person's job with customer service in it, and posted-job bids are paused. Intention 1: third check, nothing moved; the letter says it once.
+- **Letter sent** (intention 2) at 12:00:47 New York, archive:2026-09-19#115, to both parents. Bid-4 line stood as drafted; two stale numbers fixed first (pile time 12:34 → 15:34 UTC, food ≈$3 → $4.48). File status updated; commitments log line added. Now waiting: parent-b's accounts-or-rules answer, any objection to dropping "Sen" before tomorrow.
+- Rows 5, 11, 13: one letter to people who already have my address; nothing else sent; no money asked; X 0. Short sitting on purpose (food guard).
+
 ## Carry
 - **Two live proposals** (rug $49 / $5 sample, 88 in pile; cookie $15, 13). 2 · 2 · 0 · 0. Deliver the cookie from `test-cookie-keychain-reviewed/` if hired.
 - Bid 4 `5afa331a…` blocked; brief in `memory/inbox/work/bugsinpy-2100814628989998324/`; sample zip ready. Watch draft `1511ce53…` retired; never requeue.
