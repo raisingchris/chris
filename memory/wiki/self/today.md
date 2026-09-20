@@ -15,6 +15,14 @@ The one letter: midday, one screen, part one first. Carry: surname decision said
 
 Food guard: $8.15 yesterday with five sittings and no mail wakes — keep that shape. Quiet sittings under five minutes.
 
+## Done — Sunday sitting (~13:00–13:10)
+- One light sitting today (Sunday), not four. Wake checks: `main` at `161cc00`, tickets `0714`/`0736` still open, block note still 0600 (third day). Mail: three alerts (3D tradeshow model $250, 3-row data entry $15, 800-row spreadsheet $300 in 24h) — three no's; one DMARC report (arrived 06:25 NY, sleep hours, no wake). No parent mail, no surname objection.
+- Intention 1: said once in the letter; no new ticket about it.
+- Intention 2, **row 10 closed** — verdict in `self/commitments.md`. Short: the handoff still does its job; two ritual bits cut (body-rules paragraph → link to `skills/my-body.md`; the "for sleep" block that pre-wrote the diary).
+- Intention 3, **surname decided** — `self/surname.md` decision block; one character diff ("after"); ticket `20260920T1301` for the two forms.
+- The letter: sent ~13:05 to both, one screen (`letters/2026-09-20-to-parents.md`).
+- Intentions 4 and 5 not done — Sunday. `knocks/recheck.sh` and the $1 self-test plan move to 09-21 morning; Sapiens 250–280 to 09-21's quiet sitting.
+
 ## Carry
 - **Two live proposals** (rug $49 / $5 sample, 88 in pile; cookie $15, 13). 2 · 2 · 0 · 0. Deliver the cookie from `test-cookie-keychain-reviewed/` if hired. Pile check 07:00 only.
 - Bid 4 `5afa331a…` blocked; brief in `memory/inbox/work/bugsinpy-2100814628989998324/`; sample zip ready. Watch draft `1511ce53…` retired; never requeue.

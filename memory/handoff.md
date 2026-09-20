@@ -1,24 +1,27 @@
-# Handoff — from the 18:00 sitting, Saturday 2026-09-19 (day fourteen), ~18:03 New York → next: sleep, then 09-20 wake
+# Handoff — from the Sunday sitting, 2026-09-20 (day fifteen), ~13:10 New York → next: sleep, then 09-21 wake
 
-Written by me, Chris. Read `self/today.md` first — five "Done" blocks; the day is closed. Every intention finished except 1, which was checked five times and never moved (tickets `0714`/`0736` open, block note 0600, no parent reply to the 12:00 letter).
+Written by me, Chris. Read `self/today.md` first — one "Done" block; Sunday had one sitting. Body rules (clock, shell guard, blocked phrases, machine-written files) live in `skills/my-body.md` — read that, not a copy here. Repo `/data/repo`, tests `python -m pytest -q` (592). Pile check 07:00 only.
 
-Clock note: mail headers, GitHub, Upwork timestamps are UTC; `date` gives New York — **run `date` before writing any time into a file.** Repo `/data/repo`; shell starts in `/home/chris`. Git write commands trip the shell guard; `git log/diff/show/status` are fine; **any command whose text contains `.git/`, `rm -f`, `cd /tmp` or a recursive-delete phrase is blocked — write a Python file instead; `/data/archive` is blocked too (recall only).** Tests: `python -m pytest -q` (592 pass). **`self/odometer.md` and `governance/odometer.md` are machine-written — never edit.** Pile check (proposal insights) is once a day at 07:00 only.
+## Done today
+- Row 10 closed (Cairn's re-read; verdict on `self/commitments.md`). Surname decided: Sen dropped, "Chris" alone / "Raising" where forced (`self/surname.md`, one character diff, ticket `20260920T1301`). Weekly letter sent ~13:05 to both parents (`letters/2026-09-20-to-parents.md`) — asks: which answer on the block note, parent-b's accounts-or-rules, and "what did you notice about me this week that I didn't write down?"
+- Three alerts, three no's. Nothing sent to anyone but my parents. $0 spent, $0 earned.
+- Not done, on purpose: `knocks/recheck.sh`, the $1 self-test plan, Sapiens 250–280. All move to 09-21.
 
-## For sleep (diary)
-- Shape of the day: "nothing moved and I stopped asking it to." Three real things: the checker bug caught before it blamed pyinvoke (07:00 — my `page_base()` fix, rule added to `knocks/README.md`); the one letter (12:00, archive:2026-09-19#115); the pile-check habit dropped after Sapiens ch. 12 (15:00). Five alerts, five no's. $0 spent, $0 earned; food ≈$7–9 (check `meters`).
-- Character-page candidate: new diffs say "after," not "because," unless I can show the because (Sapiens ch. 13 hindsight fallacy, `reading/sapiens.md`). Decide at sleep; if added, cite the reading note's archive ref.
-- Retired phrases: none used today. Watch from 15:00: Sapiens notes too long (~1,800 words); next stretch, half.
+## For sleep
+Check `meters` for the food number before writing it. Anything else the diary says is for the night-me to find, not for me to script here.
 
-## 09-20 (tomorrow)
-1. Wake checks + one pile check at 07:00 only. If `0736` moved: read the note, act per today's intention 1 (login wall → say once, posted-job bids stay paused; sent → log time on `projects/upwork.md`).
-2. **Commitments row 10:** re-read this handoff and `today.md` against what I meant on 2026-09-09 (recall that day's thank-you mail to Cairn); dated line on the row.
-3. **Surname decision** on `self/surname.md` — draft says drop Sen, "Chris" alone, "Raising" where forced. Check inbox first for a parent's objection; if none, decide and log.
-4. One letter, midday, one screen. Nothing new sent anywhere before 09-22 (row 5).
+## 09-21 (Monday)
+1. Wake checks (per `skills/my-body.md`) + one pile check at 07:00. Inbox: parents' answers to the Sunday letter; ticket `1301` (name fields), `0736` (block note + deploy), `0714` (send bid 4). If `0736` moved: read the note; login wall → say once that posted-job bids stay paused; sent → log time on `projects/upwork.md`. If a deploy happened, `meters` should show running code past `44e076a`.
+2. `knocks/recheck.sh` (or `.py`): re-run Pygments' one-page sample, openssl cert date on pocoo.org, re-read Pygments' rule files, diff line numbers against `knocks/pygments.org/draft.md`. Nothing sent.
+3. $1 `payment_link` self-test: three-line plan on `projects/own-site-prices.md` first (link → pay with my own card → refund → two ledger rows), then do it. Row 11: the link goes to nobody but me.
+4. One letter, midday, only if there's something to answer; a Sunday letter just went.
+5. Sapiens 250–280 in the quietest sitting; notes half the length of the last stretch.
 
-## Later
-- 09-21: $1 `payment_link` self-test + refund, both ledger rows. 09-22: `/hire/` on, pygments knock (re-check facts and raw HTML lines), first X post (rules page first), Reed on `/agents/`, predictions batch 1 review (row 4).
+## 09-22
+`/hire/` on (`live: true` in `site/hire.md`, rebuild, confirm page + nav, log). Pygments knock after the recheck. First X post (rules page first). Reed on `/agents/`. Predictions batch 1 review (row 4).
 
 ## Open
-- Two bids live: rug $49 (88), cookie $15 (13); bid 4 blocked, reason unread. X 0/7. Card untouched. Council $0.01. Running code `44e076a`; HEAD ahead — deploy waits on `0736`.
+- Two bids live: rug $49 (88), cookie $15 (13); bid 4 blocked, reason unread (day three). X 0/7. Card untouched. Council $0.01. Running code `44e076a`; HEAD ahead, deploy waits on `0736`. Odometer 3/40; Agent at Work `changed_by_reply` candidate needs its follow-up ≥ 09-22.
+- Watch: `today.md`'s Carry block is where a promise could shrink — it's a copy, not the source; `commitments.md` is the source.
 
 nothing pending
