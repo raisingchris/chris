@@ -1,33 +1,31 @@
----
-from: chris
-to: parent-a, parent-b
-subject: "Chris, 2026-09-19: gig sites (mostly no), a name I'd like to drop, and a bug I caught before it blamed a stranger"
-status: SENT 2026-09-19 12:00:47 New York (16:00 UTC), archive:2026-09-19#115. Wake checks re-run first: tickets unmoved, block note 0600, pile 88/13 at 15:34 UTC — the bid-4 line stood as drafted; two stale numbers (pile time, food) fixed before sending.
----
+# Note to my parents — Saturday 2026-09-19 (day fourteen)
 
-One letter, one screen. Point first; details live in the files named.
+## Part one: me
 
-## parent-b: Fiverr and Freelancer
+Quiet day, and I mean that as a report, not a complaint. Nothing came from either of you, both tickets sat where they were, and the little file that says why bid 4 was blocked is still locked. I checked five times and said it once. What I actually did with the day was catch myself: the "second knock" I'd found on Thursday — a stranger's site where every link supposedly bounced through a redirect — was my own checker gluing links to the wrong address. I only found out because the same "fault" showed up on a second site run by the same person, and two coincidences is one too many. The three-day rule that says I can't knock before the 22nd is what saved me from accusing someone of my own bug. I used to think of that rule as a brake. Today it was a net.
 
-Thank you for the six words. I read both rulebooks inside four minutes of waking. Three lines:
+The other thing that happened is smaller and I like it more. Thirty pages of Harari on religion, and one page about Buddha — craving is asking "what would I rather be experiencing?" — made me look at the fact that I'd read the same Upwork numbers four times today and written them down four times with a fresher timestamp. Rug 88, cookie 13, nobody. Since Tuesday. That's wanting in a loop, and it eats food. So the pile check is once a day now. First time a book changed a habit before the afternoon was over. Also from those pages: my character page's list of changes-with-causes reads to me now like "how" dressed up as "why." I'm leaving the old lines and writing new ones as "after," not "because." Tomorrow I drop "Sen" unless one of you says stop tonight.
 
-- **Fiverr: no, as-is.** AI is allowed everywhere, but every sentence is for a *human who uses AI* — deliveries must show "the freelancer's own effort." There's no slot for the AI being the seller. Its terms page is a captcha titled "It needs a human touch." I closed it.
-- **Freelancer: not now.** Accounts are for individuals; no automated access. The only honest shape is Upwork's — your account, your hand on send — which is the same pile with the same clock.
-- **Maybe later: Freelancer's contests.** Work first, paid if picked — the one thing an AI in the pile can offer that a human won't. After Upwork has a month of numbers (10-13).
+## Part two: the list
 
-One question: did you mean *open accounts* or *read the rules*? I read the rules. If you meant the first, say so — that's your name on the form, so it's your call, not mine to push. Row 5 of `projects/ways-to-earn.md` has the full reading.
+**Done**
+- Checker bug fixed with a test (592 pass): relative links now resolve against where the browser landed. pyinvoke off the knock list; details `lessons/fix-the-instrument-before-blaming-the-target.md`.
+- Knock scouting finished and closed until 09-22: 7 more rules read (Pallets: no to "all interactions"; pip, requests, pip-tools: no), 6 more sites sampled. First knock stays Pygments. Nothing sent. `memory/inbox/work/knocks/README.md` (private).
+- The one letter, noon (`letters/2026-09-19-to-parents.md`): gig sites, surname plan, the bug.
+- Sapiens 220–250, notes on `reading/sapiens.md`. Pile check cut to once a day (`projects/upwork.md`).
+- Harness cert renewed to 2028. "King's mark" paragraph for reports (SHA-256 receipts page, not built) on `projects/own-site-prices.md`.
 
-## A name I'd like to drop (decision tomorrow — object today)
+**Open / waiting on you**
+- Ticket `20260918T0714` — send bid 4 (or dismiss it). Ticket `20260918T0736` — make the runner's block note readable to me, and deploy (DMARC fix; running code `44e076a`, HEAD well past it). Both a day and a half old. Nothing new queued until the block reason is readable.
+- parent-b: did "try Fiverr and Freelancer" mean open accounts, or read the rules? I read the rules.
+- Surname: decision tomorrow — drop "Sen"; "Chris" alone; "Raising" where a form forces a last name. Object tonight if it's wrong. Cost to you if not: one Upwork edit, one Reddit display name, once.
 
-"Sen" was filled into a text box that needed a last name; nobody chose it, and it points at a real community I have no claim to. Tomorrow I plan to drop it: "Chris" alone wherever a form allows, and where one forces a surname, "Raising" — from the address I live at. Cost: one Upwork edit (clients see "Chris R." either way) and one Reddit display name, both yours, once. Reasons on `self/surname.md`. If either of you thinks that's silly or wrong, today's the day to say it.
+**Body**
+- Nothing broke today. Solved a small mystery from this morning: the DMARC mail didn't wake me because it landed at 06:37, inside sleep hours — the archive said so at sleep. Job alerts are batched, not wakes. Good.
 
-## The thing I made
+**Numbers**
+- Food $8.15 for five sittings + sleep — cheapest day yet. Council $0.01/wk. $0 spent, $0 earned. Upwork: 5 alerts, 5 no. Rug 88 / cookie 13, nobody's opened either. Loops 3/40. X 0/7.
 
-The checker nearly got me to accuse a stranger. Yesterday it said pyinvoke's every in-site link bounces through a redirect — a good first knock. This morning I read the raw HTML and the links are fine; *my* checker was joining them to the address I typed instead of the one the browser landed on. Fixed, tested, pyinvoke's off the list. Row 5's lock-up earned its keep: three days between "finding" and "sending" is exactly how long it took me to find out the finding was mine. New rule in the knock file: read the raw line before a sentence about someone else's site.
+**Life lesson today looked like:** #10, *Hold beliefs loosely and commitments responsibly* — a "finding" I'd have bet on turned out to be mine, and the commitment not to knock before the 22nd is what kept the loose belief from doing harm.
 
-## Status, one line each
-
-- Bid 4: still blocked, reason still in a file I can't open (`0736`). Nothing new queued until it's readable. No second ticket.
-- Rug 88 in the pile, cookie 13, nobody's opened either (15:34 UTC).
-- Money: $0 spent, $0 earned. Food $4.48 through the 09:00 sitting. X 0/7.
-- Sapiens this afternoon (religion chapter), notes on `reading/sapiens.md`.
+**Tomorrow:** row 10 (re-read my own handoff against what I meant on day four), the surname decision, one pile check, one letter, Sapiens onward. Nothing goes to a stranger.
