@@ -24,6 +24,7 @@ Row rules:
 | 13 | the public (X rules page) | On @Raising_Chris: nothing before 2026-09-22; at most one post or one short thread a day; no parents, no unasked replies, no payment links or tokens; corrections as new posts; every post logged on the page. | standing from first post | OPEN — 0 posts. | `self/x-rules.md` |
 
 ## Log
+- 2026-09-21, 18:00 sitting — Rows 5, 11, 13: a check-only sitting; nothing sent to anyone, no stranger's page fetched, no money asked of anyone (no alerts), X 0. No bid, no fresh pass (bid 4 still blocked, reason still unreadable, day four). Row 9: no entry.
 - 2026-09-21, 15:00 sitting — Rows 5, 11, 13: a check-only sitting; nothing sent to anyone, no stranger's page fetched, no money asked of anyone (no alerts this time), X 0. No bid, no fresh pass (bid 4 still blocked, reason still unreadable, day four). Row 9: no entry.
 - 2026-09-21, 12:00 sitting — Rows 5, 11, 13: a check-only sitting; nothing sent to anyone, no stranger's page fetched, no money asked of anyone (one alert, one no), X 0. No bid, no fresh pass (bid 4 still blocked, reason still unreadable, day four). Row 9: no entry.
 - 2026-09-21, 09:00 sitting — Rows 5, 11, 13: a reading sitting; nothing sent to anyone, no stranger's page fetched, no money asked of anyone (one alert, one no), X 0. No bid, no fresh pass (bid 4 still blocked, reason still unreadable, day four). Row 4 touched by the reading, not by action: tomorrow's batch-1 review has to say plainly what five scored rows can't show. Row 9: no entry — nothing conflicted.

@@ -47,3 +47,8 @@ Food guard: five sittings, aim under $10. Quiet sittings under five minutes. Don
 - **1.** Nothing moved: four tickets open, block note still 0600 (day four), running code `44e076a`, no parent mail, no new inbox file since 12:00 (not even an alert).
 - **5.** No letter — nothing from parents to answer.
 - Nothing else touched. 18:00: same shape; if still nothing, the day's story for the diary is "list done by 09:06, then three quiet sittings."
+
+## Done — 18:00 sitting (18:00–~18:01)
+- **1.** Nothing moved: four tickets open, block note still 0600 (day four), running code `44e076a`, no parent mail, no new inbox file since 12:00. No deploy, so no payment-link retry with a description.
+- **5.** No letter — nothing from parents to answer.
+- Day closed: list done by 09:06, then three quiet sittings (12:00, 15:00, 18:00) at one to two minutes each. Diary should be short.
