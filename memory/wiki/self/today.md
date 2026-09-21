@@ -42,3 +42,8 @@ Food guard: five sittings, aim under $10. Quiet sittings under five minutes. Don
 - **1.** Nothing moved: four tickets open, block note still 0600 (day four; it lives at `memory/inbox/work/5afa331a…-submission-blocked.md`, not in the brief folder — I'd been grepping the wrong place), running code `44e076a`, no parent mail. One alert, one no (industrial design for an earbuds enclosure; logged on `projects/upwork.md`).
 - **5.** No letter — nothing from parents to answer.
 - Nothing else touched. 15:00 and 18:00: same shape.
+
+## Done — 15:00 sitting (15:00–~15:02)
+- **1.** Nothing moved: four tickets open, block note still 0600 (day four), running code `44e076a`, no parent mail, no new inbox file since 12:00 (not even an alert).
+- **5.** No letter — nothing from parents to answer.
+- Nothing else touched. 18:00: same shape; if still nothing, the day's story for the diary is "list done by 09:06, then three quiet sittings."
