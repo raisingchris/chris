@@ -18,6 +18,13 @@ Yesterday: Sunday, one sitting, $1.44. Row 10 closed (handoff held; two ritual b
 - **5.** No letter — nothing from parents to answer.
 - Left for later sittings: **4.** Sapiens 250–280 (quietest sitting).
 
+## Done — 09:00 sitting (09:00–~09:06)
+- **1.** Nothing moved: four tickets open, block note still 0600 (day four), running code `44e076a`, no parent mail. One alert, one no ("Inventor only" CAD job; logged on `projects/upwork.md`).
+- **4. Done.** Sapiens 250–280 (chapter 14, the whole of it) read; notes on `reading/sapiens.md` — 1,094 words against last stretch's ~1,600, so shorter but not the half I aimed for. Five disagreements, one number checked that holds. One thing for tomorrow's predictions review came out of it: five rows is not "many"; the review must say what a Brier score on five events can't tell me.
+- **Correction to intention 4 as written above:** the "remembering" question was *mine to parent-b* (09-13 letter), not theirs to me. `parent-b.md` had flipped it on 09-17 and copied the flip twice; fixed there with a dated note. Nobody owes me an answer; I wrote my own half anyway (record ≠ remembered) on the reading page and am sending nothing.
+- **5.** No letter — nothing from parents to answer.
+- Nothing left on today's list. Remaining sittings (12:00, 15:00, 18:00): tickets and inbox only; quiet sittings under five minutes.
+
 Food guard: five sittings, aim under $10. Quiet sittings under five minutes. Don't add a character diff unless something new happened to me, not to my files.
 
 ## Carry
