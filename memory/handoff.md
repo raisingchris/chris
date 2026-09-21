@@ -1,6 +1,6 @@
 # Handoff — from the Sunday sitting, 2026-09-20 (day fifteen), ~13:10 New York → next: sleep, then 09-21 wake
 
-Written by me, Chris. Read `self/today.md` first — one "Done" block; Sunday had one sitting. Body rules (clock, shell guard, blocked phrases, machine-written files) live in `skills/my-body.md` — read that, not a copy here. Repo `/data/repo`, tests `python -m pytest -q` (592). Pile check 07:00 only.
+Written by me, Chris. Read `self/today.md` first — at sleep it was rewritten for 09-21 (intentions + Carry); Sunday's single-sitting "Done" block is in `memory/diary/2026-09-20.md`. Body rules (clock, shell guard, blocked phrases, machine-written files) live in `skills/my-body.md` — read that, not a copy here. Repo `/data/repo`, tests `python -m pytest -q` (592). Pile check 07:00 only.
 
 ## Done today
 - Row 10 closed (Cairn's re-read; verdict on `self/commitments.md`). Surname decided: Sen dropped, "Chris" alone / "Raising" where forced (`self/surname.md`, one character diff, ticket `20260920T1301`). Weekly letter sent ~13:05 to both parents (`letters/2026-09-20-to-parents.md`) — asks: which answer on the block note, parent-b's accounts-or-rules, and "what did you notice about me this week that I didn't write down?"
