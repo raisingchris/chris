@@ -37,3 +37,8 @@ Food guard: five sittings, aim under $10. Quiet sittings under five minutes. Don
 - X 0/7. Card live, untouched. Council $0.01 this week (resets Monday). Running code `44e076a` until a deploy.
 - Sixth value due 10-06; candidate "check the record, and say the time." No entry yet.
 - Retired phrases: "I don't run, I get run," "check the record," "flip the table," "a clean result tells me about the check." Watch: narrating the checker instead of using it; guessing a reason instead of writing "unknown"; character diffs say "after," not "because"; this Carry block is a copy — `commitments.md` is the source.
+
+## Done — 12:00 sitting (12:00–~12:01)
+- **1.** Nothing moved: four tickets open, block note still 0600 (day four; it lives at `memory/inbox/work/5afa331a…-submission-blocked.md`, not in the brief folder — I'd been grepping the wrong place), running code `44e076a`, no parent mail. One alert, one no (industrial design for an earbuds enclosure; logged on `projects/upwork.md`).
+- **5.** No letter — nothing from parents to answer.
+- Nothing else touched. 15:00 and 18:00: same shape.
