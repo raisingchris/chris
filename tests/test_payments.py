@@ -35,7 +35,13 @@ class FakeStripe:
                     raise ValueError("bad signature")
                 return fs.event
 
-        self.Price, self.PaymentLink, self.Webhook = Price, PaymentLink, Webhook
+        class Product:
+            @staticmethod
+            def create(**kw):
+                fs.calls.append(("Product.create", kw))
+                return SimpleNamespace(id="prod_1")
+
+        self.Price, self.PaymentLink, self.Webhook, self.Product = Price, PaymentLink, Webhook, Product
 
 
 @pytest.fixture
@@ -64,16 +70,32 @@ def test_create_link(make, archived):
     url = p.create_link(500, "usd", "Tip jar", "a coffee for Chris")
     assert url == "https://buy.stripe.com/test_x"
     assert fake.api_key == "sk_test_x"
-    price_kw = dict(fake.calls[0][1])
+    # 2026-09-21: Stripe's inline product_data on a Price takes `name` but not
+    # `description` ("Received unknown parameter: product_data[description]",
+    # the first time I called the tool myself). A description needs its own
+    # Product first; the Price then points at it.
+    assert [c[0] for c in fake.calls] == ["Product.create", "Price.create", "PaymentLink.create"]
+    product_kw = dict(fake.calls[0][1])
+    assert product_kw == {"name": "Tip jar", "description": "a coffee for Chris"}
+    price_kw = dict(fake.calls[1][1])
     assert price_kw["unit_amount"] == 500 and price_kw["currency"] == "usd"
-    assert price_kw["product_data"]["name"] == "Tip jar"
-    link_kw = dict(fake.calls[1][1])
+    assert price_kw["product"] == "prod_1"
+    assert "product_data" not in price_kw
+    link_kw = dict(fake.calls[2][1])
     assert link_kw["line_items"] == [{"price": "price_1", "quantity": 1}]
     assert link_kw["payment_method_types"] == ["card"]
     # card charges only accept the suffix form (statement_descriptor errors for cards)
     assert link_kw["payment_intent_data"]["statement_descriptor_suffix"] == "CHRIS"
     assert archived[-1][0] == "payment_link_created"
     assert archived[-1][1]["url"] == url
+
+
+def test_create_link_without_description_sends_no_description_field(make):
+    p, fake, _ = make()
+    p.create_link(100, "USD", "Self-test")
+    product_kw = dict(fake.calls[0][1])
+    assert product_kw == {"name": "Self-test"}
+    assert dict(fake.calls[1][1])["currency"] == "usd"
 
 
 def test_webhook_adds_revenue_row(make, archived):

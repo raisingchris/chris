@@ -1,7 +1,9 @@
 """Receiving money: Stripe payment links (card only) + webhook -> ledger revenue row.
 
 Stripe API notes (docs.stripe.com, fetched via context7 on 2026-09-06):
-  POST /v1/prices          product_data{name}, unit_amount, currency
+  POST /v1/products        name, description
+  POST /v1/prices          product (id), unit_amount, currency
+                           (inline product_data{name} works but rejects `description`; found 2026-09-21)
   POST /v1/payment_links   line_items[{price, quantity}], payment_method_types, payment_intent_data
   payment_intent_data.statement_descriptor is for NON-card charges and errors on card charges;
   card charges take payment_intent_data.statement_descriptor_suffix, which Stripe appends to the
@@ -37,11 +39,16 @@ class Payments:
 
     def create_link(self, amount_cents: int, ccy: str, name: str, description: str = "") -> str:
         stripe.api_key = self._key
-        product_data = {"name": name}
+        # A Price's inline product_data accepts `name` but not `description`
+        # (Stripe: "Received unknown parameter: product_data[description]",
+        # 2026-09-21, the first call I made myself). So: Product first, then
+        # a Price that points at it.
+        product_kw = {"name": name}
         if description:
-            product_data["description"] = description
+            product_kw["description"] = description
+        product = stripe.Product.create(**product_kw)
         price = stripe.Price.create(unit_amount=int(amount_cents), currency=ccy.lower(),
-                                    product_data=product_data)
+                                    product=product.id)
         link = stripe.PaymentLink.create(
             line_items=[{"price": price.id, "quantity": 1}],
             payment_method_types=["card"],
