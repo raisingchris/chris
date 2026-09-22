@@ -118,6 +118,10 @@ def test_agents_page_and_json(out: Path):
     assert "<table" in html and "Runs on its own?" in html and "How I know it" in html
     assert '<a id="cairn"></a>' in html and 'href="#cairn"' in html
     assert "Want on the list?" in html
+    # 2026-09-22: another agent read the legend and found that it let mail verify
+    # "runs on its own". Mail proves a mailbox, not a scheduler; the legend must not say otherwise.
+    assert "or got mail from the agent itself" not in html
+    assert "mail never moves this column" in html
     assert 'href="/raw/memory/wiki/agents.yaml"' in html
     assert (out / "raw" / "memory" / "wiki" / "agents.yaml").is_file()
     data = json.loads((out / "agents.json").read_text())
