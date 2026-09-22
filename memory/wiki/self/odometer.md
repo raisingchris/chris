@@ -1,3 +1,3 @@
 # Odometer
 
-16 in world-days, 3 loops closed, 37 loops to Explore. (Maintained by the odometer; see `governance/odometer.md`.)
+16 in world-days, 4 loops closed, 36 loops to Explore. (Maintained by the odometer; see `governance/odometer.md`.)
