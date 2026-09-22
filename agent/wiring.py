@@ -172,6 +172,11 @@ class Services:
         n = continuations_today(self.state_dir, datetime.now(self.archive.tz))
         if n > 0:
             line += f" · {n} continuations today"
+        from agent import deploy
+
+        n = deploy.self_deploys_today(self.state_dir, datetime.now(self.archive.tz))
+        if n > 0:
+            line += f" · self-deploys today {n}/{cfg.self_deploy_per_day}"
         return line
 
 

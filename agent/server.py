@@ -394,7 +394,7 @@ def create_app(services, scheduler=None) -> FastAPI:
 
     @app.get("/health")
     async def health():
-        from agent import gitops, wiring
+        from agent import deploy, gitops, wiring
         from agent.scheduler import continuations_today, mail_wakes_today
 
         runs = wiring.read_last_runs(state)
@@ -415,6 +415,7 @@ def create_app(services, scheduler=None) -> FastAPI:
             "last_backup_done": runs.get("last_backup_done"),
             "mail_wakes_today": mail_wakes_today(state, now),
             "continuations_today": continuations_today(state, now),
+            "self_deploys_today": deploy.self_deploys_today(state, now),
             "disk_free_mb": disk_free_mb,
             "running": _session_running(),
         "unpushed": gitops.unpushed_count(repo),

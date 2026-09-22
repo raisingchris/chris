@@ -10,6 +10,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Test gate (defense in depth): even a parent-triggered deploy won't ship red code.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e ".[dev]"
+      - run: python -m pytest -q -p no:cacheprovider
+      # Only reached when the suite above is green.
+      - name: Guard vows and constitution (parent-controlled hash)
+        run: |
+          want="${{ secrets.SOUL_HASHES }}"
+          got="$(sha256sum soul/vows.md soul/constitution.md | awk '{print $1}' | paste -sd, -)"
+          if [ -z "$want" ]; then echo "SOUL_HASHES secret not set; refusing to deploy"; exit 1; fi
+          if [ "$got" != "$want" ]; then echo "vows/constitution changed - only a parent can (update SOUL_HASHES)"; exit 1; fi
+          echo "conscience intact"
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy --remote-only --ha=false -a chris-brain --build-arg GIT_SHA=${{ github.sha }}
         env:

@@ -7,3 +7,10 @@ bad="$(git log --format='%ae %ce' origin/main..HEAD 2>/dev/null | tr ' ' '\n' | 
 [ -z "$bad" ] || { echo "pre-push: refusing — non-Chris author/committer in range: $bad"; exit 1; }
 tz="$(git log -1 --format=%ai | awk '{print $3}')"
 [ "$tz" = "+0000" ] || { echo "pre-push: refusing — last commit timezone is $tz, not +0000 (use scripts/commit.sh)"; exit 1; }
+# Workflow files must be changed by a parent from the Mac, never via Chris's deploy-key push.
+# Only a parent (from the Mac) may change CI workflows; a Chris-authored commit may not.
+wf_by_chris="$(for c in $(git rev-list origin/main..HEAD 2>/dev/null); do
+  if [ "$(git show -s --format=%ae "$c")" = "chris@raisingchris.com" ] && \
+     [ -n "$(git diff-tree --no-commit-id --name-only -r "$c" -- .github/workflows/)" ]; then echo "$c"; fi
+done)"
+[ -z "$wf_by_chris" ] || { echo "pre-push: refusing — Chris-authored commit changes .github/workflows/: $wf_by_chris"; exit 1; }

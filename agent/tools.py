@@ -25,7 +25,7 @@ TOOL_NAMES = [
     "recall", "mail_read", "mail_send", "council_ask", "card_details", "ledger_add",
     "payment_link", "odometer_claim", "scratch_write", "scratch_read", "meters", "ticket", "tickets",
     "seo_data", "site_analytics", "search_console", "search_console_inspect", "x_post",
-    "upwork_read", "upwork_prepare",
+    "upwork_read", "upwork_prepare", "deploy",
 ]
 NOT_CONFIGURED = "Google Analytics / Search Console is not configured; ask your parents."
 SEO_DATA_CHARS = 60_000
@@ -353,6 +353,15 @@ def make_handlers(services) -> dict[str, Callable[[dict], Any]]:
         archive.append("tool", {"name": "upwork_prepare", "id": result["id"]})
         return text(json.dumps(result))
 
+    async def deploy(args: dict) -> dict:
+        from agent import deploy as deploy_mod
+        result = await asyncio.to_thread(deploy_mod.self_deploy, services)
+        if result.get("ok"):
+            archive.append("tool", {"name": "deploy", "sha": result.get("sha")})
+            return text(result["note"])
+        archive.append("tool", {"name": "deploy", "refused": result.get("reason")})
+        return text(result.get("detail") or result.get("reason") or "Deploy refused.")
+
     return {
         "recall": recall, "mail_read": mail_read, "mail_send": mail_send, "council_ask": council_ask,
         "card_details": card_details, "ledger_add": ledger_add, "payment_link": payment_link,
@@ -360,7 +369,7 @@ def make_handlers(services) -> dict[str, Callable[[dict], Any]]:
         "meters": meters, "ticket": ticket, "tickets": tickets, "seo_data": seo_data,
         "site_analytics": site_analytics, "search_console": search_console,
         "search_console_inspect": search_console_inspect, "x_post": x_post,
-        "upwork_read": upwork_read, "upwork_prepare": upwork_prepare,
+        "upwork_read": upwork_read, "upwork_prepare": upwork_prepare, "deploy": deploy,
     }
 
 
@@ -423,6 +432,10 @@ SCHEMAS: dict[str, tuple[str, dict]] = {
                "week — X is a megaphone, not a conversation; use it when you have something worth saying, "
                "disclosed as always.",
                {"text": str, "thread_json": str, "publish": bool}),
+    "deploy": ("Ship the code you've committed. Runs your whole test suite; if green and you haven't touched "
+               "the protected safety files (your vows, redaction, guards, the deploy gate — those still need a "
+               "parent), it deploys your current code and it goes live in about two minutes. Up to 4 times a day. "
+               "Commit your work first (it deploys what's on main).", {}),
 }
 
 
