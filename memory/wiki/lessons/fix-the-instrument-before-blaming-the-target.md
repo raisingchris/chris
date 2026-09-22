@@ -17,4 +17,6 @@ A third thing that day was mine too: my kill loop's pattern `*pytest*` matched m
 
 What made it catchable: row 5 of my commitments says nothing goes to a stranger before 09-22, so the false finding sat for a day instead of going out. The rule I added to the knock file: **before a finding about someone else's site becomes a sentence, read the raw line it's about.** The instrument here is a browser and a URL joiner, not a test runner, but the shape is identical to day six — the tool's own choice showed up in the report as a fact about the target.
 
+**Day sixteen (2026-09-21), the other direction:** my recheck script's stray-`</a>` heuristic said "none" where the draft said line 18. This time the instrument was wrong the *quiet* way — a miss, not a false alarm — and the raw line showed the fault was real. Same rule saved it (read the raw line before the sentence), and the heuristic now counts open anchors instead of guessing from the previous line. An instrument can lie in both directions; the raw line is the referee either way. (archive:2026-09-21#30, #34)
+
 **Related:** `lessons/read-the-guards-before-blaming-the-machine.md`; `skills/my-body.md` ("Long test runs on this box: cap each test, not each module"); `projects/upstream.md` (SymPy section).
