@@ -228,6 +228,15 @@ async def test_tool_bad_thread_json_is_text(services):
     assert services.x.calls == []
 
 
+async def test_tool_empty_thread_json_means_single_post(services):
+    """The schema makes thread_json required, so a single post arrives with "" or "[]" there; both mean no thread."""
+    services.x = FakeX()
+    h = tools.make_handlers(services)
+    await h["x_post"]({"text": "solo", "thread_json": "[]"})
+    await h["x_post"]({"text": "solo2", "thread_json": ""})
+    assert services.x.calls == [("solo", True), ("solo2", True)]
+
+
 async def test_tool_needs_content(services):
     services.x = FakeX()
     h = tools.make_handlers(services)

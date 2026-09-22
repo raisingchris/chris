@@ -3,7 +3,7 @@ from: parent-a
 subject: "Upwork job alert: Industrial Designer Needed for Earbuds Enclosur…"
 received: 2026-09-21T14:27:21.341Z
 archive: archive:2026-09-21#128
-email_id: "d4236790-69e1-4575-9579-b6ced60fa113"
+email_id: "d4236790-69e1-[redacted]-b6ced60fa113"
 attachments_complete: true
 read: true
 ---

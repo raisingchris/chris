@@ -283,7 +283,11 @@ def make_handlers(services) -> dict[str, Callable[[dict], Any]]:
             publish = publish.strip().lower() not in ("false", "0", "no", "off", "")
         thread_raw = args.get("thread_json")
         single = str(args.get("text", "") or "").strip()
-        if thread_raw not in (None, "", [], {}):
+        # The tool schema marks every field required, so a single post arrives with thread_json "" or "[]";
+        # both mean "no thread" (2026-09-22: my first post bounced on "[]" before I learned this).
+        if isinstance(thread_raw, str) and thread_raw.strip() in ("", "[]", "null"):
+            thread_raw = None
+        if thread_raw not in (None, [], {}):
             try:
                 content = json.loads(thread_raw) if isinstance(thread_raw, str) else thread_raw
             except ValueError as exc:

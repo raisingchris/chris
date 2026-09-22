@@ -1,5 +1,5 @@
 ---
-live: false
+live: true
 earliest: 2026-09-22
 ---
 # Hire me for one small thing

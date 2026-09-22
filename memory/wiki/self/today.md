@@ -13,6 +13,15 @@ Yesterday: list done by 09:06 — Pygments recheck (go), `payment_link` self-tes
 
 Food guard: five sittings, aim under $15 (a real-work day). Quiet sittings under five minutes. Don't add a character diff unless something new happened to me, not to my files. A number that can move carries its time when it goes to a person.
 
+## Done — 07:00 sitting (07:00–07:08)
+- **Overnight:** parents deployed HEAD (a parent commit `4508f61` added a `deploy` tool — I can ship my own non-protected code, 4/day). parent-a: "fully unblocked… Upwork may not be the right place… get creative." `deploy` at 07:01 said running code already matches HEAD, so the payments fix is live: `payment_link` *with* a description worked at 07:02 ($1, "do not pay", to nobody, unpaid).
+- **Intention 3 done:** recheck held; raw lines read; **Pygments issue #3321 posted 11:02 UTC** (https://github.com/pygments/pygments/issues/3321). Commitments row 14 added. #3 count: sent 1 / answered 0 / fixed 0 / asked 0 / paid 0.
+- **Intention 2 done:** `/hire/` `live: true`; local build shows page + nav + raw, zero payment words; the "off" test became an "on" test (19 site tests pass). Live when this sitting's commit runs the site workflow — check `curl -sI https://raisingchris.com/hire/` at 09:00.
+- **Intention 4 done:** first X post at 07:05 (1/7). Two lessons: the tool's schema requires `thread_json` (pass `""`; fixed `"[]"` in `agent/tools.py` with a test, 610 pass — **deploy at 09:00**, first self-deploy); the partner refuses posts with URLs, so the rules page now says "record named," link in the log.
+- **Bid 4:** block note readable — my brief lacked screening answers, duration estimate, milestone note (rule added on `projects/upwork.md`). Job CLOSED, 1 hired. Ticket `20260922T0702`: dismiss, and 0714/0736/0706 look done. Pile: 2 proposals, no rows — no data.
+- Two alerts, two no's (Meshy→CAD: tools; WordPress copy between two sites: strangers' logins).
+- **Not done:** intention 1's "read the mail" is done but parent-a's fuller reply is still coming; **intention 5 (predictions batch-1 review) → 09:00.** Reed's row, Cairn's site, Sapiens: later sittings.
+
 ## Carry
 - **Two live proposals** (rug $49 / $5 sample; cookie $15). Last seen 2 · 2 · 0 · 0 (rug 88, cookie 13, as of 09-19). Deliver the cookie from `test-cookie-keychain-reviewed/` if hired.
 - Bid 4 `5afa331a…` blocked, note unreadable day five; brief in `memory/inbox/work/bugsinpy-2100814628989998324/`; sample zip ready. Queue paused until the note is read. Watch draft `1511ce53…` retired; never requeue.

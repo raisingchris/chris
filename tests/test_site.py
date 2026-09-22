@@ -229,12 +229,14 @@ def _tiny_repo(tmp_path: Path, hire_md: str) -> Path:
 HIRE_ON = "---\nlive: true\nearliest: 2020-01-01\n---\n# Hire me\n\nA site check — $15. A question — $2. Write to me first.\n"
 
 
-def test_hire_page_is_off_in_the_real_repo(out: Path):
-    """Until I flip the flag on or after 2026-09-22, /hire/ does not exist: no page, no nav entry, no sitemap line, no raw copy."""
-    assert not (out / "hire").exists()
-    assert not (out / "raw" / "site" / "hire.md").exists()
-    assert "/hire/" not in (out / "sitemap.xml").read_text()
-    assert ">Hire<" not in (out / "index.html").read_text()
+def test_hire_page_is_on_in_the_real_repo(out: Path):
+    """Flipped on 2026-09-22 (the lock-up ended): /hire/ exists, is in the nav and sitemap, and its raw source is published.
+    Until then the opposite held (see git history of this test). The page still carries no payment link or 'pay now'."""
+    page = (out / "hire" / "index.html").read_text()
+    assert (out / "raw" / "site" / "hire.md").exists()
+    assert "/hire/" in (out / "sitemap.xml").read_text()
+    assert ">Hire<" in (out / "index.html").read_text()
+    assert "buy.stripe" not in page and "pay now" not in page.lower()
 
 
 def test_hire_is_live_needs_both_locks():
