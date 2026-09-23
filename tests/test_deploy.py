@@ -67,98 +67,140 @@ def test_is_protected_dir_prefix_and_exact():
 # --- self_deploy refusals ----------------------------------------------------
 
 
-def test_self_deploy_refuses_when_paused(services, monkeypatch):
+def test_self_deploy_precheck_refuses_when_paused(services, monkeypatch):
     monkeypatch.setenv("GIT_SHA", "old000")
+    monkeypatch.setenv("GITHUB_DEPLOY_TOKEN", "tok")
     pause.flag_path(services.cfg.state_dir).parent.mkdir(parents=True, exist_ok=True)
     pause.flag_path(services.cfg.state_dir).write_text("{}")
-    r = deploy.self_deploy(services, dispatch=lambda t: None, run_tests_fn=lambda repo: (True, "ok"),
-                           git_run=FakeGit(head="new111"), now=_now())
+    r = deploy.self_deploy_precheck(services, run_tests_fn=lambda repo: (True, "ok"),
+                                    git_run=FakeGit(head="new111"), now=_now())
     assert r["ok"] is False and r["reason"] == "paused"
+    assert not (Path(services.cfg.state_dir) / "pending_deploy.json").exists()  # nothing queued
 
 
-def test_self_deploy_nothing_to_deploy(services, monkeypatch):
+def test_self_deploy_precheck_nothing_to_deploy(services, monkeypatch):
     monkeypatch.setenv("GIT_SHA", "abc1234567")
-    r = deploy.self_deploy(services, dispatch=lambda t: None, run_tests_fn=lambda repo: (True, "ok"),
-                           git_run=FakeGit(head="abc1234567"), now=_now())
+    r = deploy.self_deploy_precheck(services, run_tests_fn=lambda repo: (True, "ok"),
+                                    git_run=FakeGit(head="abc1234567"), now=_now())
     assert r["ok"] is False and r["reason"] == "nothing_to_deploy"
 
 
-def test_self_deploy_refuses_protected_files(services, monkeypatch):
+def test_self_deploy_precheck_refuses_protected_files(services, monkeypatch):
     monkeypatch.setenv("GIT_SHA", "old000")
+    monkeypatch.setenv("GITHUB_DEPLOY_TOKEN", "tok")
     git = FakeGit(head="new111", diff_names=["soul/vows.md", "agent/loop.py"])
-    called = []
-    r = deploy.self_deploy(services, dispatch=lambda t: called.append(t),
-                           run_tests_fn=lambda repo: (True, "ok"), git_run=git, now=_now())
+    r = deploy.self_deploy_precheck(services, run_tests_fn=lambda repo: (True, "ok"), git_run=git, now=_now())
     assert r["ok"] is False and r["reason"] == "protected_files"
     assert "soul/vows.md" in r["detail"] and "need a parent" in r["detail"]
-    assert called == []  # never dispatched
+    assert not (Path(services.cfg.state_dir) / "pending_deploy.json").exists()  # never queued
 
 
-def test_self_deploy_refuses_on_failed_tests(services, monkeypatch):
+def test_self_deploy_precheck_refuses_on_failed_tests(services, monkeypatch):
     monkeypatch.setenv("GIT_SHA", "old000")
+    monkeypatch.setenv("GITHUB_DEPLOY_TOKEN", "tok")
     git = FakeGit(head="new111", diff_names=["agent/loop.py"])
-    called = []
-    r = deploy.self_deploy(services, dispatch=lambda t: called.append(t),
-                           run_tests_fn=lambda repo: (False, "1 failed, 592 passed"), git_run=git, now=_now())
+    r = deploy.self_deploy_precheck(services, run_tests_fn=lambda repo: (False, "1 failed, 592 passed"),
+                                    git_run=git, now=_now())
     assert r["ok"] is False and r["reason"] == "tests_failed" and r["detail"] == "1 failed, 592 passed"
-    assert called == []
+    assert not (Path(services.cfg.state_dir) / "pending_deploy.json").exists()  # never queued
 
 
-def test_self_deploy_daily_cap(services, monkeypatch):
+def test_self_deploy_precheck_daily_cap(services, monkeypatch):
     monkeypatch.setenv("GIT_SHA", "old000")
     state = Path(services.cfg.state_dir)
     state.mkdir(parents=True, exist_ok=True)
     (state / "self_deploy.json").write_text(json.dumps({"day": "2026-09-22", "count": 4}))
-    r = deploy.self_deploy(services, dispatch=lambda t: None, run_tests_fn=lambda repo: (True, "ok"),
-                           git_run=FakeGit(head="new111", diff_names=["agent/loop.py"]), now=_now())
+    r = deploy.self_deploy_precheck(services, run_tests_fn=lambda repo: (True, "ok"),
+                                    git_run=FakeGit(head="new111", diff_names=["agent/loop.py"]), now=_now())
     assert r["ok"] is False and r["reason"] == "daily_cap"
 
 
-def test_self_deploy_not_configured_without_token(services, monkeypatch):
+def test_self_deploy_precheck_not_configured_without_token(services, monkeypatch):
     monkeypatch.setenv("GIT_SHA", "old000")
     monkeypatch.delenv("GITHUB_DEPLOY_TOKEN", raising=False)
-    r = deploy.self_deploy(services, run_tests_fn=lambda repo: (True, "ok"),
-                           git_run=FakeGit(head="new111", diff_names=["agent/loop.py"]), now=_now())
+    r = deploy.self_deploy_precheck(services, run_tests_fn=lambda repo: (True, "ok"),
+                                    git_run=FakeGit(head="new111", diff_names=["agent/loop.py"]), now=_now())
     assert r["ok"] is False and r["reason"] == "not_configured"
+    assert not (Path(services.cfg.state_dir) / "pending_deploy.json").exists()  # never queued
 
 
-# --- self_deploy happy path --------------------------------------------------
+# --- precheck queues, dispatch ships (the two halves of a self-deploy) --------
 
 
-def test_self_deploy_happy_path(services, monkeypatch):
+def test_self_deploy_precheck_queues_without_dispatching(services, monkeypatch):
     monkeypatch.setenv("GIT_SHA", "old0000000")
+    monkeypatch.setenv("GITHUB_DEPLOY_TOKEN", "tok")
+    git = FakeGit(head="new1111222", diff_names=["agent/loop.py", "site/index.html"])
+    r = deploy.self_deploy_precheck(services, run_tests_fn=lambda repo: (True, "593 passed, 2 skipped"),
+                                    git_run=git, now=_now())
+    assert r["ok"] is True and r["sha"] == "new1111" and r.get("queued") and "Queued" in r["note"]
+
+    # pending flag written with the head sha — but nothing dispatched, no changelog, no counter yet
+    pending = json.loads((Path(services.cfg.state_dir) / "pending_deploy.json").read_text())
+    assert pending["head_sha"] == "new1111222" and "requested_at" in pending
+    assert not (Path(services.cfg.repo_dir) / "governance" / "changelog.md").exists()
+    assert not (Path(services.cfg.state_dir) / "self_deploy.json").exists()
+    assert "self_deploy" not in archive_text(services)
+
+
+def test_self_deploy_dispatch_ships_and_clears(services, monkeypatch):
+    monkeypatch.setenv("GIT_SHA", "old0000000")
+    state = Path(services.cfg.state_dir)
+    state.mkdir(parents=True, exist_ok=True)
+    (state / "pending_deploy.json").write_text(json.dumps(
+        {"requested_at": "2026-09-22T12:00:00", "head_sha": "new1111222"}))
     git = FakeGit(head="new1111222", diff_names=["agent/loop.py", "site/index.html"])
     called = []
-    r = deploy.self_deploy(services, dispatch=lambda t: called.append(t),
-                           run_tests_fn=lambda repo: (True, "593 passed, 2 skipped"),
-                           git_run=git, now=_now())
+    r = deploy.self_deploy_dispatch(services, dispatch=lambda t: called.append(t), git_run=git, now=_now())
     assert r["ok"] is True and r["sha"] == "new1111" and "deploying" in r["note"]
     assert len(called) == 1  # dispatched exactly once
 
-    # changelog line written (an agent/loop.py edit deploys)
+    # flag cleared; changelog written; counter incremented; archived; last_deploy recorded
+    assert not (state / "pending_deploy.json").exists()
     changelog = (Path(services.cfg.repo_dir) / "governance" / "changelog.md").read_text()
     assert "Chris deployed herself: new1111 (2 files: agent/loop.py, site/index.html)" in changelog
-
-    # counter incremented, archived, last_deploy recorded
-    rec = json.loads((Path(services.cfg.state_dir) / "self_deploy.json").read_text())
+    rec = json.loads((state / "self_deploy.json").read_text())
     assert rec == {"day": "2026-09-22", "count": 1}
     assert "self_deploy" in archive_text(services)
     runs = wiring.read_last_runs(services.cfg.state_dir)
     assert "last_deploy" in runs
 
 
-def test_self_deploy_cap_resets_next_day(services, monkeypatch):
+def test_self_deploy_dispatch_noop_when_nothing_queued(services, monkeypatch):
     monkeypatch.setenv("GIT_SHA", "old000")
+    called = []
+    r = deploy.self_deploy_dispatch(services, dispatch=lambda t: called.append(t),
+                                    git_run=FakeGit(head="new111"), now=_now())
+    assert r["ok"] is False and r["reason"] == "nothing_pending"
+    assert called == []
+
+
+def test_self_deploy_dispatch_blocked_when_paused(services, monkeypatch):
+    monkeypatch.setenv("GIT_SHA", "old000")
+    state = Path(services.cfg.state_dir)
+    state.mkdir(parents=True, exist_ok=True)
+    (state / "pending_deploy.json").write_text(json.dumps({"requested_at": "x", "head_sha": "new111"}))
+    pause.flag_path(state).parent.mkdir(parents=True, exist_ok=True)
+    pause.flag_path(state).write_text("{}")
+    called = []
+    r = deploy.self_deploy_dispatch(services, dispatch=lambda t: called.append(t),
+                                    git_run=FakeGit(head="new111"), now=_now())
+    assert r["ok"] is False and r["reason"] == "paused"
+    assert called == []
+    assert (state / "pending_deploy.json").exists()  # left queued, ships once a parent unpauses
+
+
+def test_self_deploy_precheck_cap_resets_next_day(services, monkeypatch):
+    monkeypatch.setenv("GIT_SHA", "old000")
+    monkeypatch.setenv("GITHUB_DEPLOY_TOKEN", "tok")
     state = Path(services.cfg.state_dir)
     state.mkdir(parents=True, exist_ok=True)
     (state / "self_deploy.json").write_text(json.dumps({"day": "2026-09-21", "count": 4}))
     git = FakeGit(head="new111", diff_names=["agent/loop.py"])
-    # Yesterday's cap is spent, but today is a fresh day → allowed.
-    r = deploy.self_deploy(services, dispatch=lambda t: None, run_tests_fn=lambda repo: (True, "ok"),
-                           git_run=git, now=_now(d=22))
-    assert r["ok"] is True
-    rec = json.loads((state / "self_deploy.json").read_text())
-    assert rec == {"day": "2026-09-22", "count": 1}
+    # Yesterday's cap is spent, but today is a fresh day → queued.
+    r = deploy.self_deploy_precheck(services, run_tests_fn=lambda repo: (True, "ok"), git_run=git, now=_now(d=22))
+    assert r["ok"] is True and r.get("queued")
+    assert (state / "pending_deploy.json").exists()
 
 
 def test_self_deploys_today_counts_only_today(tmp_path):
@@ -175,16 +217,18 @@ def test_self_deploys_today_counts_only_today(tmp_path):
 # --- the deploy tool ---------------------------------------------------------
 
 
-async def test_deploy_tool_returns_success_note(services, monkeypatch):
-    monkeypatch.setattr(deploy, "self_deploy",
-                        lambda s: {"ok": True, "sha": "abc1234", "note": "deploying; ~2 min."})
+async def test_deploy_tool_queues_and_returns_note(services, monkeypatch):
+    # The tool runs the precheck (not the dispatch) — a clean call queues, it does not ship.
+    monkeypatch.setattr(deploy, "self_deploy_precheck",
+                        lambda s: {"ok": True, "sha": "abc1234", "queued": True,
+                                   "note": "Queued — I'll deploy at the end of this sitting."})
     got = out_text(await tools.make_handlers(services)["deploy"]({}))
-    assert "deploying" in got
-    assert "abc1234" in archive_text(services)
+    assert "Queued" in got
+    assert "abc1234" in archive_text(services) and '"queued": true' in archive_text(services)
 
 
 async def test_deploy_tool_returns_protected_refusal(services, monkeypatch):
-    monkeypatch.setattr(deploy, "self_deploy", lambda s: {
+    monkeypatch.setattr(deploy, "self_deploy_precheck", lambda s: {
         "ok": False, "reason": "protected_files",
         "detail": "You changed protected safety files: soul/vows.md. These need a parent."})
     got = out_text(await tools.make_handlers(services)["deploy"]({}))

@@ -89,14 +89,17 @@ class Archive:
         return False
 
     # Records that quote large slices of other records; matching them returns the whole day, not a memory.
-    NOISY_KINDS = ("session_start", "session_result", "assistant", "redaction", "tool")
+    # ``tool`` records are deliberately NOT here: they are small and are exactly the evidence Chris
+    # needs for odometer claims about her own Bash/file-edit/gh actions (e.g. changed_by_reply loops).
+    NOISY_KINDS = ("session_start", "session_result", "assistant", "redaction")
 
     def search(self, query: str, limit: int = 20, max_chars: int = 2000) -> list[dict]:
         """Case-insensitive substring match over serialized lines, newest first.
 
-        Prompt/transcript records (session_start, assistant text, tool echoes) are skipped: they
-        contain the day's other records verbatim, so every query would match them first. Each hit's
-        payload is cut to ``max_chars`` in the *result only* (the file is untouched), so a recall stays a memory.
+        Prompt/transcript records (session_start, assistant text) are skipped: they contain the day's
+        other records verbatim, so every query would match them first. Tool records are kept — they are
+        her own small actions and the evidence a recall is for. Each hit's payload is cut to ``max_chars``
+        in the *result only* (the file is untouched), so a recall stays a memory.
         """
         q = query.lower()
         hits: list[dict] = []

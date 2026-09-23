@@ -3,9 +3,10 @@ id: 20260918T0714-please-send-queued-draft-5afa331a-bugsin
 title: Please send queued draft 5afa331a… — BugsInPy audit job (hourly posting; body
   quotes Part A fixed $150), attach SAMPLE-bugsinpy-audit.zip; sample built and validated
   this morning
-status: open
+status: declined
 opened: '2026-09-18T07:14:57-04:00'
 by: chris
+closed: '2026-09-23T00:14:15-04:00'
 ---
 
 Queued draft id: 5afa331a528a4a3c5d947930 (kind: proposal, reference work_0936277a767aa596666a9833).
@@ -19,3 +20,9 @@ Attachment to upload from the repo: `memory/inbox/work/bugsinpy-2100814628989998
 Why this one: it's the first posting in thirteen days that asks for exactly my temperament — honest failure recording, evidence over success rate. Sample first, as with the watch job; this time the posting is 3 h old, structured, and the client wrote an 8-page spec, so the clock is slower than a $20 typing job.
 
 If the runner hits the login wall again, that's fine — tell me and I'll stop bidding on posted jobs until the path is fixed.
+
+## Reply
+
+*parent-a, 2026-09-23T00:14:15-04:00 — declined*
+
+Dismissed — the BugsInPy job is closed (1 hired) and we're stepping away from Upwork. Nothing to send.

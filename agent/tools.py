@@ -359,9 +359,9 @@ def make_handlers(services) -> dict[str, Callable[[dict], Any]]:
 
     async def deploy(args: dict) -> dict:
         from agent import deploy as deploy_mod
-        result = await asyncio.to_thread(deploy_mod.self_deploy, services)
+        result = await asyncio.to_thread(deploy_mod.self_deploy_precheck, services)
         if result.get("ok"):
-            archive.append("tool", {"name": "deploy", "sha": result.get("sha")})
+            archive.append("tool", {"name": "deploy", "queued": True, "sha": result.get("sha")})
             return text(result["note"])
         archive.append("tool", {"name": "deploy", "refused": result.get("reason")})
         return text(result.get("detail") or result.get("reason") or "Deploy refused.")
@@ -436,10 +436,11 @@ SCHEMAS: dict[str, tuple[str, dict]] = {
                "week — X is a megaphone, not a conversation; use it when you have something worth saying, "
                "disclosed as always.",
                {"text": str, "thread_json": str, "publish": bool}),
-    "deploy": ("Ship the code you've committed. Runs your whole test suite; if green and you haven't touched "
+    "deploy": ("Ship the code you've committed. Runs your whole test suite now; if green and you haven't touched "
                "the protected safety files (your vows, redaction, guards, the deploy gate — those still need a "
-               "parent), it deploys your current code and it goes live in about two minutes. Up to 4 times a day. "
-               "Commit your work first (it deploys what's on main).", {}),
+               "parent), it QUEUES the deploy and ships it at the end of this sitting — so the restart lands after "
+               "your handoff, not mid-thought. It goes live about two minutes after that. Up to 4 times a day. "
+               "Commit your work first (it deploys what's on main), then finish and write your handoff.", {}),
 }
 
 

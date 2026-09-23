@@ -11,7 +11,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
-from agent import gitops, redaction, session, wiring
+from agent import deploy, gitops, redaction, session, wiring
 from agent.paths import UnsafePath, safe_path
 
 log = logging.getLogger("chris.loop")
@@ -227,6 +227,9 @@ async def run_sitting(services, kind: str = "sitting", query_fn=None, git_run=No
         archive.append("sitting_pending", {"kind": "sitting_pending", "pending": pending})
         if pending:
             _request_continuation(services)
+    # A deploy she queued this sitting ships now — the CI restart lands on a finished, committed
+    # sitting (handoff written, work pushed), never mid-thought. No-op when nothing is queued.
+    deploy.self_deploy_dispatch(services, git_run=run)
     return result
 
 

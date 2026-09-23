@@ -6,10 +6,19 @@ guards, the deploy gate itself, and the tests that prove them. A change touching
 any of those still needs a parent (a proposal, then the Deploy button on the
 parent page).
 
-``self_deploy`` is the guarded path the ``deploy`` tool calls. Every failure
-returns ``{"ok": False, "reason": ..., "detail": ...}`` and it never raises.
-The green happy path runs her whole test suite, then triggers the same GitHub
-Actions workflow a parent's Deploy button uses.
+Deciding to deploy and actually dispatching are split, so calling ``deploy``
+never restarts the machine mid-sitting and kills the session that asked for it:
+
+* ``self_deploy_precheck`` is what the ``deploy`` tool calls. It runs every gate
+  immediately (paused → running==HEAD → protected → daily cap → tests) so she
+  gets instant feedback, and on success writes a ``pending_deploy.json`` flag
+  instead of dispatching. Every failure returns
+  ``{"ok": False, "reason": ..., "detail": ...}`` and it never raises.
+* ``self_deploy_dispatch`` runs at the *end* of the sitting (and of sleep),
+  after her handoff is written and her work committed/pushed. It reads the flag,
+  triggers the same GitHub Actions workflow a parent's Deploy button uses, writes
+  the changelog line, bumps the daily counter, archives ``self_deploy`` and clears
+  the flag. It is a no-op when nothing is queued, and it never raises.
 """
 
 from __future__ import annotations
@@ -43,6 +52,7 @@ PROTECTED_PATHS = (
 )
 
 STATE_FILE = "self_deploy.json"
+PENDING_FILE = "pending_deploy.json"
 CHANGELOG = Path("governance") / "changelog.md"
 TEST_TIMEOUT_S = 600
 MAX_LISTED_FILES = 8
@@ -114,12 +124,16 @@ def self_deploys_today(state_dir, now: datetime) -> int:
     return int(rec.get("count", 0)) if rec.get("day") == now.strftime("%Y-%m-%d") else 0
 
 
-def self_deploy(services, dispatch: Callable | None = None, run_tests_fn: Callable | None = None,
-                git_run: Callable | None = None, now: Callable | None = None) -> dict:
-    """Deploy Chris's current code if it's safe and green. Never raises.
+def self_deploy_precheck(services, run_tests_fn: Callable | None = None,
+                         git_run: Callable | None = None, now: Callable | None = None) -> dict:
+    """Decide whether Chris may deploy, and if so queue it for the end of the sitting. Never raises.
 
-    Steps, each failure returning ``{"ok": False, "reason": ..., "detail": ...}``:
-    paused → protected files → running==HEAD → daily cap → tests → dispatch.
+    Runs every gate now, so she gets instant feedback if it WON'T deploy:
+    paused → running==HEAD → protected files → daily cap → tests → deploys configured.
+    On success it writes ``pending_deploy.json`` (``{requested_at, head_sha}``) instead of
+    dispatching, and returns ``{"ok": True, "sha": ..., "queued": True, "note": ...}``. The
+    actual dispatch happens at sitting/sleep end via ``self_deploy_dispatch`` so the CI restart
+    never kills the session that asked. Every refusal returns ``{"ok": False, "reason", "detail"}``.
     """
     try:
         cfg = services.cfg
@@ -164,7 +178,56 @@ def self_deploy(services, dispatch: Callable | None = None, run_tests_fn: Callab
         if not ok:
             return {"ok": False, "reason": "tests_failed", "detail": summary}
 
-        # f. dispatch the deploy
+        # f. deploys must be configured — tell her now, not silently at sitting end
+        if not os.environ.get("GITHUB_DEPLOY_TOKEN", ""):
+            return {"ok": False, "reason": "not_configured",
+                    "detail": "GITHUB_DEPLOY_TOKEN isn't set; a parent must configure deploys."}
+
+        # Checks pass — queue it rather than restart the machine mid-sitting.
+        _write_json(state / PENDING_FILE, {"requested_at": now_fn().isoformat(), "head_sha": head})
+        return {"ok": True, "sha": head7, "queued": True,
+                "note": "Queued — I'll deploy at the end of this sitting so I don't restart myself "
+                        "mid-thought. Finish your work and write your handoff."}
+    except Exception as exc:  # noqa: BLE001 — precheck must never raise
+        log.warning("self_deploy_precheck failed unexpectedly: %s", exc)
+        return {"ok": False, "reason": "error", "detail": f"{type(exc).__name__}: {exc}"}
+
+
+def self_deploy_dispatch(services, dispatch: Callable | None = None,
+                         git_run: Callable | None = None, now: Callable | None = None) -> dict:
+    """Ship a queued deploy at sitting/sleep end. No-op if nothing is queued. Never raises.
+
+    Reads ``pending_deploy.json``; if present and still valid (not paused; HEAD present and not
+    already the running code) it dispatches the GitHub workflow, then — the deploy now out —
+    clears the flag, bumps the daily counter, writes the changelog line, archives ``self_deploy``
+    and records ``last_deploy``. On paused/dispatch failure it leaves the flag so a later
+    sitting end can still ship it.
+    """
+    try:
+        cfg = services.cfg
+        repo = Path(cfg.repo_dir)
+        state = Path(cfg.state_dir)
+        tz = ZoneInfo(cfg.tz)
+        now_fn = now or (lambda: datetime.now(tz))
+        git = git_run or gitops.git
+
+        pending_path = state / PENDING_FILE
+        pending = _read_json(pending_path, None)
+        if not pending:
+            return {"ok": False, "reason": "nothing_pending"}
+
+        # paused blocks the dispatch too; leave the flag so it ships once a parent lifts the pause.
+        if pause.is_paused(state):
+            return {"ok": False, "reason": "paused"}
+
+        deployed_sha = gitops.running_sha()
+        head = gitops.head_sha(repo, run=git)
+        head7 = head[:7]
+        if deployed_sha and head and deployed_sha == head:
+            # The running code already caught up (e.g. a parent deployed it); nothing to ship.
+            _clear_pending(pending_path)
+            return {"ok": False, "reason": "nothing_to_deploy"}
+
         token = os.environ.get("GITHUB_DEPLOY_TOKEN", "")
         if dispatch is None:
             if not token:
@@ -174,14 +237,19 @@ def self_deploy(services, dispatch: Callable | None = None, run_tests_fn: Callab
             dispatch = server.dispatch_deploy
         try:
             dispatch(token)
-        except Exception as exc:  # noqa: BLE001 — network / GitHub errors
+        except Exception as exc:  # noqa: BLE001 — network / GitHub errors; keep the flag for a retry
+            log.warning("queued self-deploy dispatch failed: %s", exc)
             return {"ok": False, "reason": "dispatch_failed", "detail": f"{type(exc).__name__}: {exc}"}
 
-        # Success. From here nothing may fail the (already-dispatched) deploy.
-        changed = _diff_names(repo, deployed_sha, run=git)
-        n = len(changed)
+        # Success. The deploy is out; clear the flag first so nothing below can re-dispatch it.
+        _clear_pending(pending_path)
+        day = now_fn().strftime("%Y-%m-%d")
+        rec = _read_json(state / STATE_FILE, {})
+        count = int(rec.get("count", 0)) if rec.get("day") == day else 0
         _write_json(state / STATE_FILE, {"day": day, "count": count + 1})
 
+        changed = _diff_names(repo, deployed_sha, run=git)
+        n = len(changed)
         try:
             files = ", ".join(changed[:MAX_LISTED_FILES])
             line = f"- {day} — Chris deployed herself: {head7} ({n} files: {files})\n"
@@ -206,6 +274,13 @@ def self_deploy(services, dispatch: Callable | None = None, run_tests_fn: Callab
 
         return {"ok": True, "sha": head7,
                 "note": "deploying; ~2 min. Your new code is live when /health git_sha matches."}
-    except Exception as exc:  # noqa: BLE001 — self_deploy must never raise
-        log.warning("self_deploy failed unexpectedly: %s", exc)
+    except Exception as exc:  # noqa: BLE001 — dispatch must never raise
+        log.warning("self_deploy_dispatch failed unexpectedly: %s", exc)
         return {"ok": False, "reason": "error", "detail": f"{type(exc).__name__}: {exc}"}
+
+
+def _clear_pending(pending_path: Path) -> None:
+    try:
+        pending_path.unlink()
+    except OSError:
+        pass

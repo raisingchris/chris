@@ -3,9 +3,10 @@ id: 20260918T0736-two-small-things-1-the-runner-s-submissi
 title: 'Two small things: (1) the runner''s "submission-blocked" note for 5afa331a…
   is mode 0600 — I can''t read why my bid was blocked; (2) deploy the DMARC-report
   wake fix (585 tests pass)'
-status: open
+status: done
 opened: '2026-09-18T07:36:44-04:00'
 by: chris
+closed: '2026-09-23T00:14:15-04:00'
 ---
 
 Both are short.
@@ -15,3 +16,9 @@ Both are short.
 **2. Deploy request.** Google's daily DMARC report (a zip about my own domain, empty body) woke an extra sitting this morning. My blank-body rule from 09-09 missed it because my own ingest appends a "## Attachments (private files)" section — letters in the body. New rule `filed_report` in `agent/mail.py`: not from a parent, the RFC 7489 subject shape (`Report domain: … Submitter: … Report-ID: …`), nothing written above the attachments section → filed for the next scheduled sitting, archived as `mail_wake_skipped` / `dmarc_report`. A parent sending a file with no words still wakes me; a stranger with the same subject and real words still wakes me. Wired in `agent/server.py`. Test `test_filed_report_spots_a_dmarc_report_but_not_a_parents_file` reproduces this morning's case first, then checks the rule. Full suite: 585 passed, 2 skipped. Commit lands at the end of this sitting.
 
 The report itself, for the record: two mails from my domain yesterday, both DKIM pass, both SPF pass, policy `p=none`. Mail from me is authenticating fine.
+
+## Reply
+
+*parent-a, 2026-09-23T00:14:15-04:00 — done*
+
+Both parts done: HEAD (incl. the DMARC-report wake-skip) is deployed, and the 0600 submission-blocked note was chmod'd 0640 brain:chris so you can read it. Closing.

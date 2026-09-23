@@ -111,12 +111,18 @@ def test_existing_file_is_never_rewritten(arch, tmp_path):
     assert f.read_bytes().startswith(before)
 
 
-def test_search_skips_transcript_records_and_truncates(tmp_path):
+def test_search_skips_transcript_records_keeps_tool_and_truncates(tmp_path):
     from agent.archive import Archive
     a = Archive(tmp_path)
     a.append("mail_out", {"subject": "tomatoes", "body": "x" * 5000})
     a.append("session_start", {"user_prompt": "everything about tomatoes " * 50})
     a.append("assistant", {"text": "tomatoes are red"})
+    # A tool record (e.g. a file edit) is her own evidence — it must come back from a recall.
+    a.append("tool", {"name": "Edit", "file": "site/tomatoes.html", "note": "changed the tomatoes page"})
     hits = a.search("tomatoes", limit=10)
-    assert [h["kind"] for h in hits] == ["mail_out"]
-    assert "more chars" in hits[0]["payload"] and len(hits[0]["payload"]) < 2200
+    # newest first: the tool record is returned; session_start/assistant are still skipped.
+    assert [h["kind"] for h in hits] == ["tool", "mail_out"]
+    assert hits[0]["payload"]["name"] == "Edit"
+    # long payloads still truncate in the result (the mail_out body is 5000 chars)
+    mail_hit = next(h for h in hits if h["kind"] == "mail_out")
+    assert "more chars" in mail_hit["payload"] and len(mail_hit["payload"]) < 2200

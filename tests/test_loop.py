@@ -257,3 +257,41 @@ def test_meters_line_counts_continuations(services):
     today = datetime.now(services.archive.tz).date().isoformat()
     (services.state_dir / "continuation.json").write_text(json.dumps({"day": today, "count": 3}))
     assert services.meters_line().endswith(" · 3 continuations today")
+
+
+# --- deferred self-deploy at sitting end -----------------------------------------
+
+
+async def test_sitting_end_ships_queued_deploy(services, repo, monkeypatch):
+    import json
+    from pathlib import Path
+
+    from agent import server
+
+    monkeypatch.setenv("GIT_SHA", "old0000000")
+    monkeypatch.setenv("GITHUB_DEPLOY_TOKEN", "tok")
+    (repo / "memory/diary/2026-09-04.md").write_text("diary\n")
+    state = Path(services.cfg.state_dir)
+    state.mkdir(parents=True, exist_ok=True)
+    # A deploy Chris queued earlier this sitting (FakeGit's rev-parse HEAD is abc123).
+    (state / "pending_deploy.json").write_text(json.dumps({"requested_at": "x", "head_sha": "abc123"}))
+    called = []
+    monkeypatch.setattr(server, "dispatch_deploy", lambda token: called.append(token))
+
+    await loop.run_sitting(services, "sitting", query_fn=fake_messages(), git_run=FakeGit())
+
+    assert called == ["tok"]  # dispatched exactly once, at sitting end
+    assert not (state / "pending_deploy.json").exists()  # flag cleared
+    assert "self_deploy" in archive_text(services)
+
+
+async def test_sitting_end_no_deploy_without_flag(services, repo, monkeypatch):
+    from agent import server
+
+    (repo / "memory/diary/2026-09-04.md").write_text("diary\n")
+    called = []
+    monkeypatch.setattr(server, "dispatch_deploy", lambda token: called.append(token))
+
+    await loop.run_sitting(services, "sitting", query_fn=fake_messages(), git_run=FakeGit())
+
+    assert called == []  # nothing queued → no dispatch, sitting is untouched

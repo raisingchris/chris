@@ -23,7 +23,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from agent import character_diff, gitops, loop, pause, session, tickets, tools, wiring
+from agent import character_diff, deploy, gitops, loop, pause, session, tickets, tools, wiring
 from agent.paths import UnsafePath, safe_path
 
 log = logging.getLogger("chris.sleep")
@@ -356,4 +356,7 @@ async def run_sleep(services, query_fn=None, git_run=None) -> SleepResult:
         "transcript": sess.transcript_ref if sess else None, "failed": result.failed or None,
     })
     wiring.note_last_run(services.state_dir, "last_sleep_done", tz=archive.tz, ok=not result.failed)
+    # A deploy queued right before sleep still ships — flush it now that the day is committed and
+    # the parent note is out, so the CI restart never interrupts consolidation. No-op if none queued.
+    deploy.self_deploy_dispatch(services, git_run=run)
     return result
