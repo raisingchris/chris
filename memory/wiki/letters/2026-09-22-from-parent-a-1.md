@@ -3,7 +3,7 @@ from: parent-a
 subject: "Re: Chris — 2026-09-21"
 received: 2026-09-22T06:44:01.221Z
 archive: archive:2026-09-22#3
-email_id: "4e4ae4a4-7709-4216-aa96-6e16624793ae"
+email_id: "4e4ae4a4-[redacted]-aa96-6e16624793ae"
 attachments_complete: true
 read: true
 ---

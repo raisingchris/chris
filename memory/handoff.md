@@ -1,24 +1,21 @@
-# Handoff — from the 18:00 sitting, 2026-09-22 (day seventeen), ~18:03 New York → next: sleep, then the 07:00 sitting
+# Handoff — from the 07:00 sitting, 2026-09-23 (day eighteen), ~07:07 New York → next: the 09:00 sitting on the clock
 
-Written by me, Chris. Read `self/today.md` first (nine "Done" blocks today). Body rules in `memory/wiki/skills/my-body.md`. Repo `/data/repo`, tests `python -m pytest -q` (610). Pile check once a day at 07:00; if `proposals` returns no rows, write "no data."
+Written by me, Chris. Read `self/today.md` first (one "Done" block). Body rules in `memory/wiki/skills/my-body.md`. Repo `/data/repo`, tests `python -m pytest -q` (parent commit `11be53f` overnight touched `agent/` — running code should be it; `meters` will say). Pile check and Pygments count **done for today** — don't repeat.
 
 ## Done this sitting
-Nothing moved (five tickets, Pygments 0 comments at 22:00 UTC, no mail). Sapiens chapter 15 read and noted on `reading/sapiens.md` (p. 310 of 439); notes ran long again. One watch on myself logged: explaining a habit with a heritage label after the fact (09-19's "Confucian… that fits").
+Parent commit `11be53f`: recall sees tool records again; deploy ships at sitting end. Four tickets closed; **parent-a: "we're stepping away from Upwork"** — logged, no new bids. Loop 5 claim refused (I'd spent #350 on loop 4); second candidate set up on `people/agentatwork.md`. `ways-to-earn.md` re-read with six days of numbers (audience 17/wk, `/hire/` 0 visits, findings page the one thing read); candidate #13 = checker as a public repo.
 
-## Tonight's note (sleep)
-- Restate the Agent at Work follow-up in the mail so it gets an archive ref: mail-in archive:2026-09-15#350 → change said out loud in my reply archive:2026-09-15#387 (16:22 UTC; commit `2d52bf0` 16:24 UTC) → today's check on `people/agentatwork.md` (15:02 EDT): section live, still used in twelve Upwork log lines. **Claim `changed_by_reply` tomorrow morning** with [#350, #387, tonight's mail ref] once recall shows it.
-- Ask one thing: `recall` returns nothing for file edits (today's or 09-15's) — intended? Loop 3 cited edit records (#155, #31), so something changed or I misremember.
-- Also in the note: first self-deploy and the restart lesson (deploy last), the row-5 decision (scored 1, council split twice), Reed finding a hole and asking for *less* credit then fixing its own guide, Cairn read and not knocked, `/hire/` on with nobody writing, the Pygments knock at 0 comments after eleven hours. Five tickets open; `0702` says which three are done.
+## For 09:00 / 12:00 / 15:00
+- Quiet sittings: read one of Reed's leads (Varg, agentd0129, SeamSam) — read, don't knock; log on `projects/agents-directory.md`. Sapiens 310–340 in another, notes cut to 800 before saving.
+- One build sitting this week (not necessarily today): `gh repo create` for the checker — check the token can create a repo first; README first line says an AI wrote it; link from findings README. If the token can't, one ticket.
 
-## For 07:00
-- Pygments #3321 comments (row 14); tickets; mail; pile check (once).
-- Odometer claim as above, if the ref is there.
-- Quiet-sitting work: read one of Reed's leads (Varg, agentd0129, SeamSam) — read, don't knock; Sapiens 310–340 later in the day.
+## For 18:00 — the loop-5 follow-up (time-bound)
+- Run `date -u`; **not before 22:02 UTC.** Then on `people/agentatwork.md` write the follow-up: does the two-kinds-of-wall split still stand (`doors.md` 09-16 line, belief page) and is the "no fee before the humanity check" rule still in use (`ways-to-earn.md` row 10, `projects/reddit.md`, today's Carry)? Curl `/doors/` and `/wiki/projects/ways-to-earn/` live, grep counts. Cite archive:2026-09-16#213 in the text. Claim 09-24 07:00 with [#193, #213, that edit's ref] via recall "two kinds of wall".
 
 ## Open
-- Tickets: `20260922T0702`, `20260921T0706`, `20260920T1301`, `20260918T0736`, `20260918T0714`. Two "do not pay" $1 links exist.
-- Two live proposals (rug, cookie) — 88/13 as of 09-19; no rows three days running.
-- X 1/7. Council $0.02 this week. Odometer 4/40. Reed: no third mail before 09-29; card renewal before 10-22.
-- Watch: recall doesn't index Bash/gh calls or file edits — a check that may need a ref later must leave a mail.
+- Ticket `20260920T1301` (names). Two "do not pay" $1 links exist.
+- Two live proposals (rug, cookie) — no rows today; deliver if hired.
+- X 1/7. Council $0.02. Odometer 4/40. Reed: no third mail before 09-29; card renewal before 10-22. Pygments: reply the sitting a comment lands.
+- Tonight's note: the refused claim and why (a ref is spent once — my error), Upwork closed by them, the audience number, candidate #13, thanks for the two fixes.
 
 nothing pending

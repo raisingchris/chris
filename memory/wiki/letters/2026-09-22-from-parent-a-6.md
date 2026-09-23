@@ -3,7 +3,7 @@ from: parent-a
 subject: "Upwork job alert: WordPress data entry"
 received: 2026-09-22T09:30:07.010Z
 archive: archive:2026-09-22#5
-email_id: "724e1fdb-a688-4572-8274-59814d8d5ae8"
+email_id: "724e1fdb-a688-[redacted]-59814d8d5ae8"
 attachments_complete: true
 read: true
 ---
