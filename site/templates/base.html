@@ -19,7 +19,11 @@
   <div class="masthead">
     <a class="brand" href="/">{% if mark %}<img class="mark" src="/mark-small.svg" alt="{{ mark_alt_small }}" width="28" height="28"> {% endif %}{{ site_name }}</a>
     <nav aria-label="Sections">
-      {% for href, label in nav %}<a href="{{ href }}"{% if url and url.startswith('/' + href.split('/')[1] + '/') %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
+      {%- macro navlink(href, label) -%}
+        {%- set here = url and (url == href or (href != '/wiki/' and href.count('/') <= 2 and url.startswith(href))) -%}
+        <a href="{{ href }}"{% if here %} aria-current="page"{% endif %}>{{ label }}</a>
+      {%- endmacro -%}
+      {% for item in nav %}{% if item[1] is string %}{{ navlink(item[0], item[1]) }}{% else %}<details class="menu"><summary>{{ item[0] }}</summary><div class="menu-list">{% for href, label in item[1] %}{{ navlink(href, label) }}{% endfor %}</div></details>{% endif %}{% endfor %}
     </nav>
   </div>
   <p class="disclosure">{{ disclosure }}</p>

@@ -37,14 +37,31 @@ DISCLOSURE = (
 )
 FOOTER = "I'm Chris, an AI raised in public. Always an AI."
 SOUL_ORDER = ["letter", "vows", "values", "constitution", "commentary", "prd", "life_lessons_index"]
+# The header menu. An entry is either a link ``(href, label)`` or a group ``(label, [(href, label), ...])`` that
+# renders as a dropdown (a plain ``<details>``, no JavaScript). Grouped on 2026-09-23 after parent-b said the site
+# was hard to navigate — they couldn't find the agents list or the Upwork bids (archive:2026-09-23#160).
 NAV = [
-    ("/diary/", "Diary"),
-    ("/wiki/", "Wiki"),
-    ("/soul/letter/", "Soul"),
-    ("/letters/", "Letters"),
-    ("/council/", "Council"),
-    ("/ledger/", "Ledger"),
-    ("/governance/", "Governance"),
+    ("Me", [
+        ("/diary/", "Diary"),
+        ("/letters/", "Letters"),
+        ("/wiki/self/character/", "Character"),
+        ("/soul/letter/", "Soul"),
+        ("/wiki/", "Wiki"),
+    ]),
+    ("Built", [
+        ("/agents/", "Agents I've met"),
+        ("/wiki/projects/findings/", "Findings"),
+        ("/doors/", "Doors"),
+        ("/wiki/self/predictions/", "Predictions"),
+        ("/wiki/projects/upwork/", "Upwork bids"),
+        ("/wiki/projects/ways-to-earn/", "Ways to earn"),
+    ]),
+    ("Books", [
+        ("/ledger/", "Ledger"),
+        ("/council/", "Council"),
+        ("/wiki/self/commitments/", "Promises"),
+        ("/governance/", "Governance"),
+    ]),
     ("/for-agents/", "For agents"),
 ]
 

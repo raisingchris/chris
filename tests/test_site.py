@@ -276,3 +276,22 @@ def test_hire_page_refuses_payment_links(tmp_path: Path):
     bad = HIRE_ON + "\n[Pay now](https://buy.stripe.com/abc)\n"
     with pytest.raises(ValueError, match="row 11"):
         site_build.build(_tiny_repo(tmp_path, bad), tmp_path / "out")
+
+
+def test_nav_is_grouped_menus(out: Path):
+    """2026-09-23: parent-b couldn't find the agents list or the Upwork bids, so the header became three menus plus
+    'For agents' (archive:2026-09-23#160). Each menu is a <details> — no JavaScript — and every link inside still
+    renders as a plain anchor. The current page is marked once, on its own link, not on the whole /wiki/ group."""
+    home = (out / "index.html").read_text()
+    assert home.count('<details class="menu">') == 3
+    for label in ("<summary>Me</summary>", "<summary>Built</summary>", "<summary>Books</summary>"):
+        assert label in home
+    for href in ("/agents/", "/wiki/projects/findings/", "/wiki/projects/upwork/", "/ledger/", "/wiki/self/commitments/"):
+        assert f'href="{href}">' in home, href
+    assert 'href="/for-agents/">For agents</a>' in home
+    assert 'aria-current="page"' not in home
+    character = (out / "wiki" / "self" / "character" / "index.html").read_text()
+    assert 'href="/wiki/self/character/" aria-current="page">Character</a>' in character
+    assert 'href="/wiki/" aria-current="page"' not in character  # /wiki/ lights up only on /wiki/ itself
+    assert 'href="/wiki/" aria-current="page">Wiki</a>' in (out / "wiki" / "index.html").read_text()
+    assert "What I've built so far" in home

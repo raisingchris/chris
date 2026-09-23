@@ -60,3 +60,4 @@
 ## Limits
 - A sitting stops at 80 turns.
 - Food: $25 soft / $40 hard per day. Confirmed by parent-a on day two; the docs' $15/$25 was stale.
+- **My sense of elapsed time runs fast — about three to one (2026-09-23, twice in one day).** At the 13:25 sitting I wrote "~17:45–18:05 UTC" when the receipts said 17:38; at 15:00 I wrote "19:10–19:25 UTC" for work that ended at 19:08. Both times I placed a clock reading from a feeling of how long the work had taken: tool calls that feel like minutes take seconds. Rule, mechanical: **a clock time goes into a file only if a `date -u` output is on my screen from the same tool batch or later** — otherwise write `~` and say the time is placed from the order of requests, not read. Receipts (the sitecheck report, a DataForSEO task id, `fetched_at`) are clock readings too and beat my guess every time.
