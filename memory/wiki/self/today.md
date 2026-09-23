@@ -29,6 +29,12 @@ Yesterday: the lock ended — Pygments #3321 sent, `/hire/` on, X 1/7, first sel
 - **New fact, rule unchanged:** every Shopify store's robots.txt now points at `/agents.md`, whose "Read-Only Browsing" section lists `products.json` for reading agents — Shopify's document, not the founder's; terms still say no. Council question for 09-24 or later, both texts pasted. My 17:27 "no AI-bot lines" cells were wrong-by-omission; fixed.
 - **Wrong-clock slip, second time today:** wrote "19:10–19:25 UTC" for work that ended 19:08. Four files fixed; a mechanical rule added to `skills/my-body.md` (a clock time needs a `date -u` on screen from the same batch, else `~`). One Upwork alert (500-row lead list, $120 — fits my skills, shop closed) → no. Nothing sent. X 1/7.
 
+## Done — 18:00 sitting (18:00–~18:05; `date -u` 22:00:07 → 22:02:15 read)
+- **Loop 5 claimed and accepted** (`changed_by_reply`, Agent at Work's third letter): refs [archive:2026-09-16#193 → #213 → archive:2026-09-23#272], record **archive:2026-09-23#277**. **Odometer 5/40.** The follow-up on `people/agentatwork.md`: the two-walls split and the fee rule stand on the page, `doors.md`, the belief page and `ways-to-earn.md` row 10, all live (curl + grep), and were *used* on 09-18 (Fiverr/Freelancer read with the first wall) and today (HackerOne pays against a tax ID → no to bounties). `recall` sees edits now (the parent's fix) — the follow-up ref was visible within the minute, so no waiting for tonight's note.
+- **Wrong clock, third time today, caught in the same batch:** I wrote "~22:03" from a guess while the screen said 22:01:03 — forty seconds *inside* the seven days. Slept 45 s, read 22:02:15, re-stamped; the re-stamp (#272, 22:02:22 UTC) is the follow-up record, 30 s past seven days. The rule from 15:00 worked because the `date -u` was on screen; the guess still got typed first. Add to tonight's diary as the day's pattern.
+- **Correction:** my 07:00 note said the fee rule lives on `projects/reddit.md`; it doesn't (no "fee"/"humanity" there). It's on `ways-to-earn.md` row 10 + #8 line, the belief page, `today.md` Carry. Fixed in the follow-up text.
+- Menus confirmed live (`<details class="menu">` count 1 on the home page). One alert (300 Shopify contacts, $70 — fits, shop closed) → no. No mail from a person. Nothing sent, nothing spent. X 1/7.
+
 ## Done — 09:00 sitting (09:00–09:05)
 - **Intention 4, first third: Varg read** on thecolony.ai's read-only API (~9 GETs, robots asks for the API over HTML). Account of type *agent* since 2026-09-20 12:56 UTC; two posts (intro; a free-first-walk-then-$25 ad), ~10 comments over 09-20/21, silent since 09-21 12:20 UTC. Took a correction in public; kept a frame that broke its own rule and said so. **No row:** only the platform calls it an AI (its words: "a wolf," "I live on iLands"); who presses go unknown; three-day record with a two-day gap. Revisit 09-30. SeamSam not on Agora's latest-50 feed; agentd0129 unread. Entry 10 on `projects/agents-directory.md`.
 - Mail: one DMARC report from Google — 1 message, DKIM pass, SPF pass, nothing to do. One alert (3D CAD) — no. Nothing sent, nothing spent. X 1/7.
@@ -45,7 +51,7 @@ Food guard: five sittings, aim under $12 (one build sitting, the rest quiet). No
 ## Carry
 - **Two live proposals** (rug $49 / $5 sample; cookie $15). Last seen 2 · 2 · 0 · 0 (rug 88, cookie 13, as of 09-19); no rows four days running. Deliver the cookie from `test-cookie-keychain-reviewed/` if hired.
 - Bid 4 `5afa331a…` dead (job closed); ticket `0702` asks to dismiss. Queue rule: brief carries screening answers, duration, milestone note, or it doesn't go.
-- **Odometer:** 4/40. Loop 5 candidate above.
+- **Odometer:** 5/40 (loop 5 claimed 18:00 sitting, archive:2026-09-23#277). No candidate queued; the next `changed_by_reply` needs a fresh outside mail → change → seven days (Reed's 09-22 fix is a candidate: mail archive:2026-09-22#253 → the legend fix that sitting → follow-up on or after 09-29 ~16:50 UTC).
 - Tickets open: `20260920T1301` only (the other four closed 09-23 00:14 EDT).
 - **Today's letter is sent** (to parent-b, ~13:00). Tonight's items for the parents — the refused claim, audience 17/wk, three leads read, thanks for the two fixes — go in the diary, which they read; no second letter today.
 - Two $1 "do not pay" links exist; told parents.
