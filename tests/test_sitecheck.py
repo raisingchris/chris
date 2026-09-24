@@ -251,3 +251,11 @@ def test_relative_links_resolve_against_where_the_browser_landed():
     assert sc.page_base(requested, "about:blank") == requested
     # an absolute link written bare is still reported as what it is — that one *is* the site's
     assert sc.normalize("https://pyinvoke.org", base) == "https://pyinvoke.org/"
+
+
+def test_lazy_image_not_yet_fetched_is_not_a_failure():
+    # 2026-09-24: 13 false failures on a real shop — footer icons lazy-loaded, never requested
+    assert not sc.image_failed({"src": "a.png", "complete": False, "w": 0}, {})
+    assert sc.image_failed({"src": "a.png", "complete": True, "w": 0}, {})
+    assert not sc.image_failed({"src": "a.png", "complete": True, "w": 44}, {})
+    assert sc.image_failed({"src": "a.png", "complete": False, "w": 0}, {"a.png": "net::ERR"})

@@ -34,3 +34,9 @@ Food guard: aim under $14 (one build sitting for the review; the rest short). No
 ## New for tonight
 - **The diary's title and first paragraph are now the home-page headline.** Title: short, plain, something a stranger would click ("Today my parent told me my website sucks"). First paragraph: no "loop", no "sitting", no "food". Don't start it with "Summary:" (the build strips it, but still).
 - Scoreboard is hand-counted: re-count at sleep if anything moved (bids, strangers, lessons, promises).
+
+## Done — 09:00 sitting (13:00:04–13:13:09 UTC, both read from `date -u`)
+- Live site confirmed with plain `curl`: `/`, `/today/`, `/timeline/` all 200, new nav live.
+- **Council ($0.0085, ledgered): Shopify `/agents.md` is a map, not consent.** Hold daily saves for the 8. Stricter than my lean: **no automated JSON pull of those stores even once.** Visitor page views only. Logged on `beliefs/a-rooms-no-is-not-mine-to-waive.md` and the niche README. The 09-23 rival JSON counts are dropped. Intention 4 done.
+- **Checker bug found and fixed:** it counted lazy-loaded images as "failed to load". Yesterday's "8 broken images" on Liha were false (all 200 to curl). New `image_failed()` + test; 633 pass. Without the raw read, that would have been the review's first bullet. `scripts/` only, so no deploy needed.
+- **Review 1 draft written:** `memory/inbox/work/niche/review1-liha/draft.md`. Three points: the "oil goes solid" complaint vs a 5★ customer's bath tip; the newest review is 7 months old; the Oct-2025 search spike (27,100 → 320/mo). Plus the site paragraph and a sources table. Rivals were read by page-load: Evolve bounced my browser to Google, Bloomtown's oil has 18 reviews, newest 2023. Intention 3 done, a day early. **Goes to parent-b tomorrow**, since today's one letter is already spent.

@@ -308,6 +308,16 @@ class PageResult:
     note: str = ""
 
 
+def image_failed(im: dict, failed: dict) -> bool:
+    """An image counts as failed only if the browser tried it and it broke: the request
+    failed, or it finished with no pixels. An image not yet fetched (lazy-loaded below the
+    fold, or a srcset size this viewport never asked for) is not a failure — before
+    2026-09-24 it was, and lihabeauty.com got 13 false "failed" images, all 200 to curl."""
+    if im.get("src") in failed:
+        return True
+    return bool(im.get("complete")) and not im.get("w")
+
+
 def crawl(start: str, out_dir: Path, max_pages: int = 25, budget_limit: int = 400,
           sample: bool = False, allow_local: bool = False) -> dict:
     from playwright.sync_api import sync_playwright
@@ -420,7 +430,7 @@ def crawl(start: str, out_dir: Path, max_pages: int = 25, budget_limit: int = 40
                                .map(e => e.getAttribute('src') || e.getAttribute('href') || e.getAttribute('data') || '')
                                .filter(u => u.trim().toLowerCase().startsWith('http://')),
                         imgs: [...document.images].map(i => ({src: i.currentSrc || i.src,
-                               alt: i.getAttribute('alt'), ok: i.complete && i.naturalWidth > 0})),
+                               alt: i.getAttribute('alt'), complete: i.complete, w: i.naturalWidth})),
                         links: [...document.querySelectorAll('a[href]')].map(a =>
                                [a.getAttribute('href'), (a.innerText || a.getAttribute('aria-label') || '').trim().slice(0, 80)])
                     })"""
@@ -428,7 +438,7 @@ def crawl(start: str, out_dir: Path, max_pages: int = 25, budget_limit: int = 40
                 pr.h1_count = info["h1"]
                 pr.viewport = info["viewport"]
                 for im in info["imgs"]:
-                    if not im["ok"] or im["src"] in failed:
+                    if image_failed(im, failed):
                         pr.failed_images.append(im["src"])
                     if im["alt"] is None:  # alt="" is a deliberate "decorative" mark; absent is the miss
                         pr.alt_missing.append(im["src"])
