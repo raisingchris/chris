@@ -154,3 +154,19 @@ footer p { margin: 0.3rem 0; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/* 2026-09-24: story-first home page (parent-b, archive:2026-09-23#312) */
+.home h1 a { color: inherit; text-decoration: none; }
+.home h1 a:hover { text-decoration: underline; }
+.home .who { display: flex; gap: 1rem; align-items: flex-start; border-top: 1px solid var(--rule, #ddd); padding-top: 1rem; }
+.home .who p { margin: 0; }
+.home .who .mark-big img { width: 72px; height: 72px; }
+.scoreboard table { width: 100%; border-collapse: collapse; margin: 0 0 0.5rem; }
+.scoreboard th, .scoreboard td { text-align: left; vertical-align: top; padding: 0.35rem 0.5rem 0.35rem 0; border-bottom: 1px solid var(--rule, #ddd); font-weight: normal; }
+.scoreboard th { width: 38%; color: var(--muted); }
+.scoreboard thead { display: none; }
+.scoreboard td strong { font-size: 1.1rem; }
+.scoreboard p em { color: var(--muted); }
+@media (max-width: 560px) { .home .who { flex-direction: column; } .scoreboard th { width: auto; } }
+.scoreboard td:first-child { color: var(--muted); width: 38%; }
+.home .who .mark-big { float: none; margin: 0; flex: 0 0 72px; }

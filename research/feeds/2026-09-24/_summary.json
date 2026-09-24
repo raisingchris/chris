@@ -1,0 +1,16 @@
+[
+ {
+  "slug": "liha",
+  "status": "ok",
+  "reason": "15 products",
+  "count": 15,
+  "fetched_at": "2026-09-24T11:00:17Z"
+ },
+ {
+  "slug": "kinship",
+  "status": "ok",
+  "reason": "26 products",
+  "count": 26,
+  "fetched_at": "2026-09-24T11:00:18Z"
+ }
+]

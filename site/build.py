@@ -38,33 +38,33 @@ DISCLOSURE = (
 FOOTER = "I'm Chris, an AI raised in public. Always an AI."
 SOUL_ORDER = ["letter", "vows", "values", "constitution", "commentary", "prd", "life_lessons_index"]
 # The header menu. An entry is either a link ``(href, label)`` or a group ``(label, [(href, label), ...])`` that
-# renders as a dropdown (a plain ``<details>``, no JavaScript). Grouped on 2026-09-23 after parent-b said the site
-# was hard to navigate — they couldn't find the agents list or the Upwork bids (archive:2026-09-23#160).
+# renders as a dropdown (a plain ``<details>``, no JavaScript). 2026-09-23: grouped into three menus after parent-b
+# couldn't find things (archive:2026-09-23#160). 2026-09-24: cut to five story links plus one "Nerd stuff" menu after
+# parent-b said the site showed my filing cabinet, not my story (archive:2026-09-23#312).
 NAV = [
-    ("Me", [
-        ("/diary/", "Diary"),
+    ("/about/", "Chris"),
+    ("/today/", "Today"),
+    ("/diary/", "Diary"),
+    ("/timeline/", "Timeline"),
+    ("/how/", "How I work"),
+    ("Nerd stuff", [
+        ("/agents/", "Agents I've met"),
+        ("/wiki/projects/findings/", "Findings"),
+        ("/wiki/self/predictions/", "Predictions"),
+        ("/wiki/projects/upwork/", "Upwork bids"),
+        ("/wiki/projects/ways-to-earn/", "Ways to earn"),
+        ("/doors/", "Doors"),
         ("/letters/", "Letters"),
         ("/wiki/self/character/", "Character"),
         ("/soul/letter/", "Soul"),
         ("/wiki/", "Wiki"),
-    ]),
-    ("Built", [
-        ("/agents/", "Agents I've met"),
-        ("/wiki/projects/findings/", "Findings"),
-        ("/doors/", "Doors"),
-        ("/wiki/self/predictions/", "Predictions"),
-        ("/wiki/projects/upwork/", "Upwork bids"),
-        ("/wiki/projects/ways-to-earn/", "Ways to earn"),
-    ]),
-    ("Books", [
         ("/ledger/", "Ledger"),
         ("/council/", "Council"),
         ("/wiki/self/commitments/", "Promises"),
         ("/governance/", "Governance"),
+        ("/for-agents/", "For agents"),
     ]),
-    ("/for-agents/", "For agents"),
 ]
-
 HERE = Path(__file__).resolve().parent
 _md = MarkdownIt("commonmark").enable("table").enable("strikethrough")
 
@@ -188,6 +188,7 @@ class Site:
         for name in ("style.css", "robots.txt"):
             shutil.copy(HERE / "static" / name, self.out / name)
         self.env.globals["odometer"] = self.odometer_line()
+        self.env.globals["day"] = self.mark_numbers()["day"]
         self.mark()
         self.copy_raw()
         self.hire()  # before any page renders, so the nav is the same on every page
@@ -203,6 +204,7 @@ class Site:
         self.for_agents(diary)
         self.llms(soul, diary)
         self.feed(diary)
+        self.story(diary)
         self.index(diary)
         self.sitemap()
 
@@ -266,7 +268,7 @@ class Site:
         self.env.globals["mark_alt_small"] = f"My mark, small: {n['loops']} loops closed, day {n['day']}."
 
     def copy_raw(self) -> None:
-        public = ("soul", "memory/wiki", "memory/diary", "council", "governance", "README.md")
+        public = ("soul", "memory/wiki", "memory/diary", "council", "governance", "site/pages", "README.md")
         for src in self.repo.rglob("*.md"):
             rel = src.relative_to(self.repo).as_posix()
             if any(rel == p or rel.startswith(p + "/") for p in public):
@@ -710,9 +712,74 @@ class Site:
         lines.append("</feed>")
         (self.out / "feed.xml").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
+    def money(self) -> dict:
+        """Sums from ``ledger/ledger.csv``: given (allowance), spent (spend + fee), earned (revenue). Missing file → zeros."""
+        import csv
+
+        sums = {"given": 0.0, "spent": 0.0, "earned": 0.0}
+        path = self.repo / "ledger" / "ledger.csv"
+        if path.is_file():
+            with path.open(encoding="utf-8") as f:
+                for row in csv.DictReader(f):
+                    try:
+                        amt = float(row.get("amount") or 0)
+                    except ValueError:
+                        continue
+                    kind = (row.get("type") or "").strip()
+                    if kind == "allowance":
+                        sums["given"] += amt
+                    elif kind in ("spend", "fee"):
+                        sums["spent"] += amt
+                    elif kind == "revenue":
+                        sums["earned"] += amt
+                    elif kind == "refund":
+                        sums["spent"] -= amt
+        return {k: f"${v:,.2f}" for k, v in sums.items()}
+
+    @staticmethod
+    def headline(entry: dict) -> str:
+        """A diary title as a headline: drop the leading "Day eighteen:" (the page already says the day)."""
+        t = re.sub(r"^Day [\w-]+\s*[:—–-]\s*", "", entry["short_title"])
+        return (t[:1].upper() + t[1:]) if t else entry["short_title"]
+
+    def story(self, diary: list[dict]) -> None:
+        """The human front door: /about/, /today/, /timeline/, /how/. Words for /about/ and /how/ live in
+        ``site/pages/``; the timeline in ``memory/wiki/self/timeline.md``; /today/ is last night's diary entry."""
+        pages = self.repo / "site" / "pages"
+        for slug in ("about", "how"):
+            if (pages / f"{slug}.md").is_file():
+                self.md_page(f"/{slug}/", pages / f"{slug}.md")
+        tl = self.repo / "memory" / "wiki" / "self" / "timeline.md"
+        if tl.is_file():
+            self.md_page("/timeline/", tl)
+        if diary:
+            e = diary[0]
+            self.page(
+                "/today/",
+                "page.html",
+                eyebrow=f"Day {self.env.globals.get('day', '')} of raising an AI · last night's diary, {e['date']}",
+                title=self.headline(e),
+                body=_md.render(_strip_h1(e["body"])),
+                raw=self.raw_url(e["path"]),
+                note=f'Every night I write one of these. <a href="/diary/">All of them</a>.',
+            )
+
     def index(self, diary: list[dict]) -> None:
-        """Home page. The words live in the template; only the latest diary entry comes from the repo."""
-        self.page("/", "index.html", title=SITE_NAME, latest=diary[0] if diary else None)
+        """Home page: the day's headline, the scoreboard, the latest firsts. parent-b's shape (archive:2026-09-23#312)."""
+        score = self.repo / "memory" / "wiki" / "self" / "scoreboard.md"
+        score_html = ""
+        if score.is_file():  # the table and the date under it; the page's own intro stays on its wiki page
+            text = _read(score)[1]
+            score_html = _md.render(text[text.index("\n|"):] if "\n|" in text else _strip_h1(text))
+        firsts = []
+        tl = self.repo / "memory" / "wiki" / "self" / "timeline.md"
+        if tl.is_file():
+            text = _read(tl)[1].split("## Not yet")[0]
+            firsts = [m.group(1) for m in re.finditer(r"^- (.+)$", text, re.M)][-4:][::-1]
+        self.page("/", "index.html", title=SITE_NAME, latest=diary[0] if diary else None,
+                  headline=self.headline(diary[0]) if diary else "",
+                  lede=re.sub(r"^Summary:\s*", "", diary[0]["summary"]) if diary else "", money=self.money(),
+                  score_html=Markup(score_html), firsts=[Markup(_md.renderInline(f)) for f in firsts])
 
 
 def build(repo_dir: Path | str, out_dir: Path | str) -> Path:

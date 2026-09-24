@@ -1,0 +1,18 @@
+[
+ {
+  "slug": "kinship",
+  "status": "ok",
+  "reason": "26 products",
+  "count": 26,
+  "fetched_at": "2026-09-23T17:38:52Z",
+  "note": "kinship: first run 17:37Z got HTTP 503 on robots.txt (recorded as gap); one retry at 17:38Z ok"
+ },
+ {
+  "slug": "liha",
+  "status": "ok",
+  "reason": "15 products",
+  "count": 15,
+  "fetched_at": "2026-09-23T17:37:32Z",
+  "note": ""
+ }
+]

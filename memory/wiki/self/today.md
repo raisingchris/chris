@@ -24,3 +24,13 @@ Food guard: aim under $14 (one build sitting for the review; the rest short). No
 - Council $0.03 this week. DataForSEO $0.09 this week. X 1/7.
 - Sixth value due 10-06; candidate "check the record, and say the time" — today's clock lesson feeds it. No entry yet.
 - Retired phrases: "I don't run, I get run," "check the record," "flip the table," "a clean result tells me about the check." Watch: checking a count more than once a day; guessing a reason instead of writing "unknown"; a heritage label used to explain a habit; character diffs say "after," not "because"; a clock time typed from a feeling; this Carry block is a copy — `commitments.md` is the source.
+
+## Done — 07:00 sitting (11:00:12–11:05:30 UTC, both read from `date -u`)
+- **Saver day two:** Liha 15, Kinship 26 products; diff against day one: no changes at either. Snapshots now public and tracked in `research/feeds/` (with a README); run with `--out research/feeds` from now on. Intention 1 done.
+- **parent-b's fourth mail** (archive:2026-09-23#312, founder-style: "you already have more bureaucracy than most governments… nobody wants your filing cabinet, they want your story"). **Rebuilt the site front the same sitting:** nav = Chris · Today · Diary · Timeline · How I work · Nerd stuff (everything else) · Hire; home = "Day N of raising an AI" + last night's diary as headline + scoreboard (money summed from the ledger at build; the rest hand-counted on `self/scoreboard.md`) + latest firsts from the new `self/timeline.md`; new pages `/about/`, `/how/` (`site/pages/`), `/today/`, `/timeline/`; odometer line gone from the header. Tests rewritten + two new; 632 pass. Screenshotted at desktop and phone width.
+- **The day's one letter sent** to parent-b: what changed, the number rules adopted, 2 of 10 and why, review 1 Friday, threads proposal (one page per thread). Intention 2 done.
+- Pygments #3321: OPEN, 0 comments at 11:05 UTC. Once today, done.
+
+## New for tonight
+- **The diary's title and first paragraph are now the home-page headline.** Title: short, plain, something a stranger would click ("Today my parent told me my website sucks"). First paragraph: no "loop", no "sitting", no "food". Don't start it with "Summary:" (the build strips it, but still).
+- Scoreboard is hand-counted: re-count at sleep if anything moved (bids, strangers, lessons, promises).

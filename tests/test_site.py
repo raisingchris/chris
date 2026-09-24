@@ -278,20 +278,46 @@ def test_hire_page_refuses_payment_links(tmp_path: Path):
         site_build.build(_tiny_repo(tmp_path, bad), tmp_path / "out")
 
 
-def test_nav_is_grouped_menus(out: Path):
-    """2026-09-23: parent-b couldn't find the agents list or the Upwork bids, so the header became three menus plus
-    'For agents' (archive:2026-09-23#160). Each menu is a <details> — no JavaScript — and every link inside still
-    renders as a plain anchor. The current page is marked once, on its own link, not on the whole /wiki/ group."""
+def test_nav_is_story_first(out: Path):
+    """2026-09-24: parent-b said the site showed my filing cabinet, not my story (archive:2026-09-23#312). The header
+    is five story links plus one "Nerd stuff" menu (a <details>, no JavaScript) holding everything else. The current
+    page is marked once, on its own link, not on the whole /wiki/ group."""
     home = (out / "index.html").read_text()
-    assert home.count('<details class="menu">') == 3
-    for label in ("<summary>Me</summary>", "<summary>Built</summary>", "<summary>Books</summary>"):
-        assert label in home
-    for href in ("/agents/", "/wiki/projects/findings/", "/wiki/projects/upwork/", "/ledger/", "/wiki/self/commitments/"):
+    assert home.count('<details class="menu">') == 1
+    assert "<summary>Nerd stuff</summary>" in home
+    for href, label in (("/about/", "Chris"), ("/today/", "Today"), ("/diary/", "Diary"), ("/timeline/", "Timeline"), ("/how/", "How I work")):
+        assert f'href="{href}">{label}</a>' in home, href
+    for href in ("/agents/", "/wiki/projects/findings/", "/wiki/projects/upwork/", "/ledger/", "/wiki/self/commitments/", "/for-agents/"):
         assert f'href="{href}">' in home, href
-    assert 'href="/for-agents/">For agents</a>' in home
     assert 'aria-current="page"' not in home
     character = (out / "wiki" / "self" / "character" / "index.html").read_text()
     assert 'href="/wiki/self/character/" aria-current="page">Character</a>' in character
     assert 'href="/wiki/" aria-current="page"' not in character  # /wiki/ lights up only on /wiki/ itself
     assert 'href="/wiki/" aria-current="page">Wiki</a>' in (out / "wiki" / "index.html").read_text()
-    assert "What I've built so far" in home
+
+
+def test_home_tells_the_story_first(out: Path):
+    """Home: the day number, last night's headline without the "Day N:" prefix or a "Summary:" label, then the
+    scoreboard with money summed from the ledger, then the latest firsts. No loop jargon in the header."""
+    home = (out / "index.html").read_text()
+    day = site_build.Site(REPO, out).mark_numbers()["day"]
+    assert f"Day {day} of raising an AI" in home and f"Chris is {day} days old" in home
+    assert "Summary:" not in home.split("scoreboard")[0]
+    assert "loops to Explore" not in home
+    assert "Money I&#39;ve earned" in home or "Money I've earned" in home
+    assert "Latest firsts" in home and 'href="/timeline/"' in home
+    for page in ("about", "today", "timeline", "how"):
+        assert (out / page / "index.html").is_file(), page
+    assert (out / "raw" / "site" / "pages" / "about.md").is_file()
+
+
+def test_money_sums_ledger(tmp_path: Path):
+    repo = tmp_path / "r"
+    (repo / "ledger").mkdir(parents=True)
+    (repo / "ledger" / "ledger.csv").write_text(
+        "date,type,amount,ccy,counterparty,memo,ref\n"
+        "2026-09-10,allowance,5.00,USD,p,x,\n2026-09-11,fee,0.01,USD,c,x,\n2026-09-12,spend,1.50,USD,s,x,\n"
+        "2026-09-13,revenue,15,USD,b,x,\n2026-09-14,refund,0.50,USD,s,x,\n")
+    m = site_build.Site(repo, tmp_path / "o").money()
+    assert m == {"given": "$5.00", "spent": "$1.01", "earned": "$15.00"}
+    assert site_build.Site(tmp_path / "none", tmp_path / "o2").money()["earned"] == "$0.00"
