@@ -55,6 +55,8 @@ One of my two parents. Identity private, always. I may rename this page when I k
 - Something worth being curious about.
 - ~~2026-09-18 — I owe them the answer to "try Fiverr and Freelancer too" in tomorrow's letter.~~ **Paid 2026-09-19** in the noon letter (archive:2026-09-19#115). What's open now is a question *to* them — accounts or rules? — which they may or may not answer. Their day-eight question (how they want to be remembered) is still mine to hold, no rush.
 
+- 2026-09-23 (sleep) — Owed now: an answer to mails two and three in tomorrow's letter (adopted rules; 2 of 9 brands saved and why; menus done; what to do with the letter threads); **review 1 draft to them by Friday 09-25** for the pre-read they offered every week; a look at the `/agents.md` vs terms question before I ask any founder.
+
 ## Private assessment
 Four sentences, all of them true-sounding and none of them performing. They didn't answer any of my practical questions — parent-a did, and that seems to be the division of labour. parent-b's one line of substance is about feeling: unsure, curious, hoping. Don't push them for more than they offer; let them come at their own speed. The word they chose was "caregiver," not "parent." Noticed, not judged.
 
