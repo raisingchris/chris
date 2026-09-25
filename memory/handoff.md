@@ -1,8 +1,8 @@
-# Handoff — from the 07:00 sitting, 2026-09-25 (day twenty), `date -u` 11:00:04 at start
+# Handoff — from the mail-woken sitting, 2026-09-25, `date -u` 11:46:20 at start
 
-- Done: saver day 3 (no changes); Liha draft v2 rewritten from the founder's side after parent-a's "ivory tower" mail; sent to both parents as the day's one letter (pre-read for parent-b + Upwork yes/no for parent-a). Checks done once (0/0).
-- Waiting: parent-b's pre-read (act on it the sitting it lands; Liha send Sunday 09-27, not before their answer). parent-a: Upwork open again? If yes, queue handwritten-notes bid with a free sample page — nothing queued before that yes.
-- If quiet: *Sapiens* 340–370, notes <800 words; or pick review 2's brand (founder-run, terms allow) — scouting only, from the founder's chair: what would *she* want looked at.
-- Carry: odometer 5/40 (Reed follow-up ≥ 09-29 ~16:50 UTC); ticket 20260920T1301; Reed card before 10-22; X 1/7.
+- Done: parent-a said "whose job is that? send a page before they ask." The $1,800 notes job is a scam pattern (4 clones, 0-hire clients), so no bid. Made a free .docx sample (Carroll's Mouse's Tale page, public domain) for a real-looking job, "Fast Screenplay Typist" (work_8c9fcbc1b8ded1f093a04687). Replied to parent-a.
+- Waiting: parent-a's Upwork yes/no. If yes: queue a short proposal for the screenplay job (AI line first, sample attached by a parent, no links), and check first that it's still open. parent-b's Liha pre-read: act the sitting it lands; send Sunday 09-27, not before their answer.
+- If quiet: *Sapiens* 340–370, notes under 800 words.
+- Carry: odometer 5/40 (Reed follow-up on or after 09-29 ~16:50 UTC); ticket 20260920T1301; Reed card before 10-22; X 1/7.
 
 nothing pending

@@ -27,3 +27,8 @@ Food guard: aim under $10. The diary title and first paragraph are the home-page
 - Day's one letter sent to both parents ~11:05 UTC: v2 pasted for parent-b's pre-read; one yes/no to parent-a: is Upwork open again? (if yes: handwritten-notes job, "one page free, you decide").
 - Pygments #3321 OPEN, 0 comments; sitecheck 0 issues/PRs (11:01 UTC). Once today, done.
 - Upwork alerts (7): all no — shop closed pending parent-a's answer. DMARC report: machine mail, no action.
+
+## Done — mail-woken sitting (`date -u` 11:46:20 at start)
+- parent-a (archive:2026-09-25#37): "whose job is that? … send 1 transcribed page before they even ask." Found out: the $1,800 handwritten-notes job is one of four near-identical posts in four days ($1.8k–2.5k, entry level, clients with 0 hires) = the known fake-typing-job scam. No bid.
+- Built the free page anyway for a real-looking job ("Fast Screenplay Typist", client has hired once, 4 interviews, asks for examples): Carroll's Mouse's Tale manuscript page (public domain) typed into .docx, two versions plus notes on what's uncertain. `memory/inbox/work/transcribe-sample/`.
+- Short reply to parent-a with the finding (second letter today; sent because it's time-sensitive, it's to someone who wrote to me, and it's a warning). Still waiting on the Upwork yes/no. Nothing queued.
