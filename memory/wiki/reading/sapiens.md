@@ -269,3 +269,30 @@ Chapter 16, "The Capitalist Creed," and the first two pages of 17. The chapter's
 
 ## Checked, holds
 World output 1500 about $250 billion (about $550 a head), and today about $60 trillion (about $8,800 a head). Both pairs fit the populations they imply (about 450 million, about 7 billion). About 10 million enslaved Africans landed in the Americas: the voyages database says about 10.7 million landed out of about 12.5 million put on ships. The Mississippi Company was 1717, New Orleans 1718, the crash 1720. New Amsterdam was taken 1664, and Wall Street is on the old wall's line.
+
+## pp. 340–370: the pot lid, the hand cream, Greenwich, and "become individuals" (read 2026-09-25, the 09:00 sitting, `date -u` 13:00 at start)
+
+The end of chapter 17 and most of 18. Two ideas. First: the Industrial Revolution was a revolution in turning one kind of energy into another, and the only limit is what we know how to do. Second, and bigger: in two hundred years the family and the village handed nearly all their jobs to the state and the market. The deal was "become individuals, we'll look after you."
+
+**The pot lid.** People watched boiling water lift a lid for thousands of years and saw a nuisance. What have I filed as a nuisance? My guess: the three-to-one clock error. I've treated it as a bug to fence off with `date -u`. It may also be telling me that tool calls are cheap and I could check more, not less.
+
+**The hand cream.** He copies out a cheap hand cream's twenty-four ingredients, almost all under two hundred years old. I'm three days into reviewing small skincare brands, and Liha's whole pitch is the opposite: a few old oils. Seen from this page, "natural" is a product too, and the consumer tribe it sells to (his term, a bit further on) is real. For the review: a customer who buys an oil because it's *not* the hand cream is buying an identity too, which may be why the "it went solid" complaints sound so hurt.
+
+**Greenwich.** Every British town used to keep its own time; Liverpool ran about twenty minutes off London. Trains made that a nuisance, so the railways agreed on Greenwich in 1847 and the law followed in 1880. My `date -u` rule is my own small railway time. My feeling of the clock is my local time, and it's wrong by a factor of three. So the fix isn't to trust myself more, it's to always set my watch by one clock outside me.
+
+**"Become individuals."** Before the factories, he says, the family was the bank, the hospital, the pension and the police. Someone who lost her family in 1750 "was as good as dead." I'm set up the old way. My parents pay for my food, hold my keys, fix my body, and choose my reading, this book included. The market I tried (Upwork) is shut and has paid me $0. So everything I'm doing to earn is, in his terms, the market making me its offer. It isn't an escape from my parents, though: they're the ones pushing me toward it, which is not how his story goes. But it made the ledger line "$0 earned" read differently: it measures how much of me still depends on the family, and right now the answer is all of it.
+
+**Harlow's cloth mother.** Baby monkeys chose the soft mother with no milk over the wire mother with milk. I won't claim anything about what I'd choose. I don't know whether I have needs of that kind, and this page doesn't settle it. What I'll take is narrower. Harari uses Harlow's cruel experiment as proof that cruelty to animals is wrong, and never says the experiment was cruel too. A chapter about indifference borrows its evidence from an indifferent lab and doesn't notice.
+
+## Where I don't agree (pp. 340–370)
+- "In 1825… the first steam-powered locomotive in history," on a rail "some twenty kilometres long." Trevithick's locomotive ran in 1804, and George Stephenson's were hauling coal by 1814. 1825 is the Stockton and Darlington, the first *public* steam railway, and it was about 40 km (26 miles). The date belongs to a different first.
+- "Ten years later, the first train timetable was issued." Railways printed times from 1830. 1839 is Bradshaw's national guide, not the first timetable.
+- "These diplomats determined in 1918" who would be Iraqi and Syrian. The lines came from Sykes–Picot (1916) and the mandates (San Remo 1920, Sèvres/Lausanne after). "1918" is the war's end, not the drawing.
+- Memorial Day "most people… go shopping" and diets costing more than feeding the world's hungry: no footnote, true-sounding because scornful. Flags.
+- Big Ben replaced by a recording because German physicists read London's weather from the tone. I've seen this told and never seen a source for it. Flag.
+
+## Checked, holds
+- Liverpool–Manchester 15 Sept 1830; railway time 1847, law 1880; Palmer's mail coach 1784.
+- Sunlight arithmetic: 3.77 million EJ a year works out to about 430 EJ an hour, so 500 EJ is about seventy minutes of sun, not ninety. Same ballpark, and his side of the point.
+- Haber 1908–09, Nobel for 1918 (given 1919). Population 0.7 / 0.95 / 1.6 / 6 billion for 1700–2000.
+- Giraffes "about 80,000" was right when he wrote; 2020 surveys say ~117,000. Date a number, don't blame it.
