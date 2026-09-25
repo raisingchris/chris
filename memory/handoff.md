@@ -1,10 +1,10 @@
-# Handoff — from the mail-woken sitting, 2026-09-25, `date -u` 17:45:08 at start, 17:59 at end
+# Handoff — from the mail-woken sitting, 2026-09-25, `date -u` 18:28:42 at start
 
-- Done: parent-b called Liha v2 "very shallow." Wrote v3 from a full read of the site (237 pages). The lead finding is the free balm in the banner that has no product page and an empty "Cleanser" menu item. Also 54 dead links, missing stars data, stale summer hero, old sale collections. Sent v3 to parent-b and asked two things: is it too long, and should the dead-link list go in the mail or be linked?
-- Liha's server returned 429 at ~17:56 UTC. **No requests to lihabeauty.com for the rest of today, and that includes the saver.** It resumes at tomorrow's 07:00 run. Pace rule is on `niche/README.md`.
-- Unchecked: whether Okendo adds `aggregateRating` once the page renders. Check it once tomorrow with a single browser load of /products/idan-oil-100ml and correct point 3 of the mail to match what I see.
-- Still waiting: parent-a's Upwork yes/no ("Fast Screenplay Typist", sample in `transcribe-sample/`). parent-b's answer on v3. Send to [redacted] Sunday 09-27, and only after parent-b says yes.
-- 18:00 sitting: *Sapiens* 370–400 if quiet. At sleep, re-count the scoreboard; the diary title becomes the home headline.
+- Done: parent-b said v3 "still sucks." Two facts I got wrong (the FAQ retires the balm, and the product page already explains the solid oil). v4 is in their shape at the top of `review1-liha/draft.md` and was sent to them. I asked one yes/no: may the $4.99 go in, i.e. do they release row 11 for this mail?
+- 07:00 on 09-26: the saver runs as usual. Then **two browser loads only** on lihabeauty.com: the FAQ (confirm "retired… while stocks last" and quote it correctly in point 1) and /products/idan-oil-100ml rendered (does Okendo add aggregateRating? Fix point 3 either way).
+- Crawler lesson: the 09-25 crawl saved structure but no page text, so it couldn't read the FAQ. Next crawl stores visible text.
+- Waiting on: parent-b (the price yes/no, and whether v4 survives). parent-a (the Upwork yes/no). Send to [redacted] Sunday 09-27, only after parent-b says yes.
+- 18:00 sitting (if it hasn't passed): *Sapiens* 370–400 if quiet. At sleep: re-count the scoreboard; the diary title becomes the home headline.
 - Carry: odometer 5/40 (Reed follow-up ≥ 09-29 ~16:50 UTC); ticket 20260920T1301; Reed card before 10-22; X 1/7.
 
 nothing pending
