@@ -1,0 +1,499 @@
+{
+ "domain": "lihabeauty.com",
+ "fetched_at": "2026-09-25T11:00:13Z",
+ "products": [
+  {
+   "created_at": "2023-10-12T12:15:21+01:00",
+   "handle": "idan-candle",
+   "id": 8856889524539,
+   "image_count": 3,
+   "product_type": "",
+   "published_at": "2026-03-29T12:15:48+01:00",
+   "tags": [],
+   "title": "IDAN TUBEROSE CANDLE",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2023-10-12T12:15:21+01:00",
+     "id": 47134992433467,
+     "price": "34.00",
+     "sku": "LIHA93-IDANCANDLE220",
+     "title": "Default Title",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "LIHA Beauty"
+  },
+  {
+   "created_at": "2024-12-17T09:56:41+00:00",
+   "handle": "liha-beauty-virtual-gift-card",
+   "id": 14889453093247,
+   "image_count": 1,
+   "product_type": "gift cards",
+   "published_at": "2025-10-28T12:39:36+00:00",
+   "tags": [
+    "gift cards"
+   ],
+   "title": "LIHA Beauty Virtual Gift Card",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2024-12-17T09:56:42+00:00",
+     "id": 54910725063039,
+     "price": "15.00",
+     "sku": "",
+     "title": "\u00a315.00",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    },
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2024-12-17T09:56:42+00:00",
+     "id": 54910725095807,
+     "price": "25.00",
+     "sku": "",
+     "title": "\u00a325.00",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    },
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2024-12-17T09:56:42+00:00",
+     "id": 54910725128575,
+     "price": "50.00",
+     "sku": "",
+     "title": "\u00a350.00",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    },
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2024-12-17T17:02:23+00:00",
+     "id": 54911660720511,
+     "price": "75.00",
+     "sku": "",
+     "title": "75.00",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    },
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2024-12-17T09:56:42+00:00",
+     "id": 54910725161343,
+     "price": "100.00",
+     "sku": "",
+     "title": "\u00a3100.00",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    },
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2024-12-17T17:02:23+00:00",
+     "id": 54911660753279,
+     "price": "150.00",
+     "sku": "",
+     "title": "150.00",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    },
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2024-12-17T17:02:23+00:00",
+     "id": 54911660786047,
+     "price": "200.00",
+     "sku": "",
+     "title": "200.00",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "LIHA Beauty"
+  },
+  {
+   "created_at": "2025-10-01T23:46:32+01:00",
+   "handle": "the-mini-ritual-bundle",
+   "id": 15316208124287,
+   "image_count": 5,
+   "product_type": "Gift Sets",
+   "published_at": "2025-10-01T23:56:32+01:00",
+   "tags": [
+    "100% Organic Shea Butter",
+    "Ghanaian raw shea butter",
+    "Gold shea butter",
+    "Idan oil",
+    "ivory shea butter",
+    "LIHA discovery set",
+    "Nigerian shea butter",
+    "Organic Unrefined Shea Butter",
+    "queen idia candle",
+    "raw shea butter",
+    "shea butter",
+    "unrefined shea butter"
+   ],
+   "title": "MINI CEREMONY BUNDLE",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2025-10-01T23:46:33+01:00",
+     "id": 56153192694143,
+     "price": "55.00",
+     "sku": "LIHA-MINI-RITUAL-2",
+     "title": "Default Title",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "Liha Beauty"
+  },
+  {
+   "created_at": "2025-10-01T16:02:10+01:00",
+   "handle": "luxury-layers-gold",
+   "id": 15315240452479,
+   "image_count": 5,
+   "product_type": "Gift Sets",
+   "published_at": "2025-10-01T19:47:51+01:00",
+   "tags": [
+    "100% Organic Shea Butter",
+    "coconut oil",
+    "Gold shea butter",
+    "Idan oil",
+    "ivory shea butter",
+    "moisturiser",
+    "monoi oil",
+    "Organic Unrefined Shea Butter",
+    "raw shea butter",
+    "Raw Unrefined Extra Virgin A Grade African Pure",
+    "rose essential oil",
+    "shea butter",
+    "unrefined shea butter"
+   ],
+   "title": "LUXURY LAYERS (GOLD)",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2025-10-01T16:02:11+01:00",
+     "id": 56148873478527,
+     "price": "60.00",
+     "sku": "LIHA-GOLD-LUXLAYERS",
+     "title": "Default Title",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "LIHA Beauty"
+  },
+  {
+   "created_at": "2024-08-05T15:38:14+01:00",
+   "handle": "idan-oil-set",
+   "id": 9698159755579,
+   "image_count": 4,
+   "product_type": "Body Care",
+   "published_at": "2024-08-06T21:02:36+01:00",
+   "tags": [],
+   "title": "THE IDAN PAIRING",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2024-08-05T15:38:15+01:00",
+     "id": 49250919186747,
+     "price": "76.00",
+     "sku": "LIHA10-IDANOIL-200B",
+     "title": "100ml",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "Liha Beauty"
+  },
+  {
+   "created_at": "2024-05-16T18:48:29+01:00",
+   "handle": "summer-glow-bundle-1",
+   "id": 9478433210683,
+   "image_count": 4,
+   "product_type": "Gift Sets",
+   "published_at": "2024-05-21T13:24:54+01:00",
+   "tags": [],
+   "title": "THE GLOW BUNDLE",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2024-05-16T18:48:31+01:00",
+     "id": 48719123054907,
+     "price": "75.00",
+     "sku": "LIHA-GLOW-BUNDLE",
+     "title": "Default Title",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "LIHA Beauty"
+  },
+  {
+   "created_at": "2022-02-16T12:24:51+00:00",
+   "handle": "shea-lovers",
+   "id": 6706899124302,
+   "image_count": 5,
+   "product_type": "",
+   "published_at": "2024-02-19T13:16:22+00:00",
+   "tags": [],
+   "title": "SHEA LOVERS",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2022-02-16T12:24:51+00:00",
+     "id": 39679715639374,
+     "price": "45.00",
+     "sku": "LIHA067-G-SHEALOVERS-120ML",
+     "title": "Default Title",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "LIHA Beauty"
+  },
+  {
+   "created_at": "2023-11-06T12:50:39+00:00",
+   "handle": "idan-tuberose-queen-idia-candle-gift-set",
+   "id": 8923135967547,
+   "image_count": 4,
+   "product_type": "",
+   "published_at": "2023-11-10T20:15:13+00:00",
+   "tags": [],
+   "title": "CANDLE POWER DUO",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2023-11-06T12:50:39+00:00",
+     "id": 47331746283835,
+     "price": "26.00",
+     "sku": "LIHA94-POWERDUOMINI",
+     "title": "Default Title",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "LIHA Beauty"
+  },
+  {
+   "created_at": "2019-11-04T16:01:14+00:00",
+   "handle": "winter-skin-cure-bundle",
+   "id": 4342183460942,
+   "image_count": 5,
+   "product_type": "Gift Sets",
+   "published_at": "2023-01-26T16:50:16+00:00",
+   "tags": [
+    "100% Organic Shea Butter",
+    "coconut oil",
+    "Gold shea butter",
+    "Idan oil",
+    "ivory shea butter",
+    "moisturiser",
+    "monoi oil",
+    "Organic Unrefined Shea Butter",
+    "raw shea butter",
+    "Raw Unrefined Extra Virgin A Grade African Pure",
+    "rose essential oil",
+    "shea butter",
+    "unrefined shea butter"
+   ],
+   "title": "LUXURY LAYERS (IVORY)",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2019-11-04T16:01:14+00:00",
+     "id": 31126373138510,
+     "price": "60.00",
+     "sku": "LIHA-IVORY-LUXLAYERS",
+     "title": "Default Title",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "LIHA Beauty"
+  },
+  {
+   "created_at": "2019-10-30T14:51:53+00:00",
+   "handle": "shower-routine-bundle",
+   "id": 4330152067150,
+   "image_count": 5,
+   "product_type": "Gift Sets",
+   "published_at": "2021-04-29T17:37:46+01:00",
+   "tags": [
+    "black soap",
+    "idan oil",
+    "monoi oil",
+    "natural soap",
+    "ose dudu",
+    "ose gidi",
+    "tuberose flower"
+   ],
+   "title": "MORNING ESSENTIALS",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2019-10-30T14:51:53+00:00",
+     "id": 31078477824078,
+     "price": "50.00",
+     "sku": "LIHA01-IDANOIL-100B,LIHA-SOAPNEW-BS1193",
+     "title": "Default Title",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "Liha Beauty"
+  },
+  {
+   "created_at": "2019-07-10T14:00:46+01:00",
+   "handle": "ose-gidi-soap-1",
+   "id": 3945538027598,
+   "image_count": 4,
+   "product_type": "Body Care",
+   "published_at": "2021-02-03T14:24:59+00:00",
+   "tags": [],
+   "title": "OS\u00c9 GIDI BLACK SOAP",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2024-10-01T19:20:13+01:00",
+     "id": 51618528756095,
+     "price": "12.00",
+     "sku": "LIHA-SOAPNEW-BS1193",
+     "title": "Default Title",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "Liha Beauty"
+  },
+  {
+   "created_at": "2020-02-04T09:15:06+00:00",
+   "handle": "raw-shea-butter-gold",
+   "id": 4542323654734,
+   "image_count": 4,
+   "product_type": "Body Care",
+   "published_at": "2020-08-17T13:04:57+01:00",
+   "tags": [
+    "100% Organic Shea Butter",
+    "Gold shea butter",
+    "Nigerian shea butter",
+    "Organic Unrefined Shea Butter",
+    "Raw Unrefined Extra Virgin A Grade African Pure",
+    "Raw Unrefined Extra Virgin A Grade African Pure Ivory"
+   ],
+   "title": "SHEA BUTTER (GOLD)",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2020-02-04T09:15:06+00:00",
+     "id": 31759640297550,
+     "price": "25.00",
+     "sku": "LIHA06-G-SHEA-120ML",
+     "title": "Default Title",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "Liha Beauty"
+  },
+  {
+   "created_at": "2019-07-10T13:16:30+01:00",
+   "handle": "idan-oil-100ml",
+   "id": 3945436315726,
+   "image_count": 5,
+   "product_type": "Body Care",
+   "published_at": "2019-07-10T12:54:35+01:00",
+   "tags": [],
+   "title": "IDAN OIL",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": "42.00",
+     "created_at": "2019-07-10T13:16:30+01:00",
+     "id": 29421638844494,
+     "price": "42.00",
+     "sku": "LIHA01-IDANOIL-100B",
+     "title": "Default Title",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "Liha Beauty"
+  },
+  {
+   "created_at": "2019-07-09T16:04:22+01:00",
+   "handle": "queen-idia-candle",
+   "id": 3942507216974,
+   "image_count": 4,
+   "product_type": "Candles",
+   "published_at": "2019-07-09T15:59:27+01:00",
+   "tags": [
+    "african moss candle",
+    "LIHA candle",
+    "natural candle",
+    "queen idia candle"
+   ],
+   "title": "QUEEN IDIA CANDLE",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": "36.00",
+     "created_at": "2019-08-01T14:45:19+01:00",
+     "id": 29626696761422,
+     "price": "36.00",
+     "sku": "LIHA04-CANDLE-220B",
+     "title": "Default Title",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "Liha Beauty"
+  },
+  {
+   "created_at": "2019-07-09T15:51:42+01:00",
+   "handle": "raw-shea-butter-120ml",
+   "id": 3942485295182,
+   "image_count": 4,
+   "product_type": "Body Care",
+   "published_at": "2019-07-09T15:46:06+01:00",
+   "tags": [
+    "Ghanaian raw shea butter",
+    "ivory shea butter",
+    "Organic Unrefined Shea Butter",
+    "raw shea butter",
+    "unrefined shea butter"
+   ],
+   "title": "SHEA BUTTER (IVORY)",
+   "updated_at": "2026-09-25T12:00:15+01:00",
+   "variants": [
+    {
+     "available": true,
+     "compare_at_price": null,
+     "created_at": "2019-07-09T15:51:42+01:00",
+     "id": 29412315103310,
+     "price": "25.00",
+     "sku": "LIHA08-I-SHEA-120ML",
+     "title": "Default Title",
+     "updated_at": "2026-09-25T12:00:15+01:00"
+    }
+   ],
+   "vendor": "LIHA Beauty"
+  }
+ ],
+ "reason": "15 products",
+ "robots": "robots: allows",
+ "slug": "liha",
+ "status": "ok"
+}

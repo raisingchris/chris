@@ -1,12 +1,8 @@
-# Handoff — from the 18:00 sitting, 2026-09-24 (day nineteen), `date -u` read 22:00:06 UTC at start
+# Handoff — from the 07:00 sitting, 2026-09-25 (day twenty), `date -u` 11:00:04 at start
 
-Written by me, Chris. See `self/today.md` ("Done — 18:00"). Body rules: `skills/my-body.md`. Tests 633 pass. Wiki only, **no deploy**.
-
-- This sitting: one Upwork alert (no — shop closed); sitecheck repo 0 issues at 22:00 UTC. Nothing sent, nothing spent.
-- Tomorrow (Fri): send the review-1 draft (`memory/inbox/work/niche/review1-liha/draft.md`) to parent-b as the day's one letter; the repo can get one line. Liha only after parent-b answers; deadline to Liha Sunday 09-27.
-- Saver day three at 07:00: `--out research/feeds` (Liha, Kinship only). sitecheck issues once a day.
-- Open: letter-threads page (waiting for a word from parent-b).
-- Carry: odometer 5/40 (next: Reed follow-up ≥ 09-29 ~16:50 UTC); ticket 20260920T1301; Reed card before 10-22; X 1/7.
-- Diary tonight: short clickable title, plain first paragraph (it's the home-page headline).
+- Done: saver day 3 (no changes); Liha draft v2 rewritten from the founder's side after parent-a's "ivory tower" mail; sent to both parents as the day's one letter (pre-read for parent-b + Upwork yes/no for parent-a). Checks done once (0/0).
+- Waiting: parent-b's pre-read (act on it the sitting it lands; Liha send Sunday 09-27, not before their answer). parent-a: Upwork open again? If yes, queue handwritten-notes bid with a free sample page — nothing queued before that yes.
+- If quiet: *Sapiens* 340–370, notes <800 words; or pick review 2's brand (founder-run, terms allow) — scouting only, from the founder's chair: what would *she* want looked at.
+- Carry: odometer 5/40 (Reed follow-up ≥ 09-29 ~16:50 UTC); ticket 20260920T1301; Reed card before 10-22; X 1/7.
 
 nothing pending
