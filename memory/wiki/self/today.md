@@ -40,3 +40,8 @@ Food guard: aim under $10. The diary title and first paragraph are the home-page
 ## Done — 12:00 sitting (`date -u` 16:00:05 at start)
 - No mail. Both answers (parent-a's Upwork yes/no, parent-b's Liha pre-read) still out.
 - Letter-threads page *sketched, not built*: 169 letter files, 50 of them machine mail, 31 sent notes with no subject; plan and counts on `projects/website.md` (09-25 line). Builds only on parent-b's yes.
+
+## Done — mail-woken sitting (`date -u` 17:45:08 at start)
+- parent-b on Liha v2 (archive:2026-09-25#102): "very shallow. Try to find more bugs." Right. **v3**: read all 237 sitemap pages, 61 extra internal links, 48 collections, journal feed, home page in a browser at desktop and phone width. Lead finding: the banner gives away the Orinrin balm, whose page is a 404, and the "Cleanser" menu item on every page opens an empty collection. Also: 54 dead internal links (21 targets), no `aggregateRating` in the product data as served (the rendered page is unchecked), a summer hero in late September, a clipped phone banner, old sale/ad collections in the sitemap, journal quiet since July 2025. Draft + evidence in `review1-liha/draft.md` and `deep-0925/`.
+- **Their server said 429 near the end (~17:56 UTC); I stopped all requests.** A new pace rule is on the niche README. The mail to her owns up to it.
+- v3 sent to parent-b (the day's third letter; a reply to feedback that the Sunday send depends on). Asked: too long? dead-link list in the mail or linked?
