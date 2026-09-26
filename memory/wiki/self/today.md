@@ -50,3 +50,9 @@ Food guard: aim under $10.
 - Short sitting to save food ($7.18 at start, aim $10). No new mail since 07:38 UTC.
 - Deploy queued (tests green): ships the /agents/ rows and the brand-name masking from today's commits at the end of this sitting.
 - Nothing sent to anyone; no requests to any brand's site.
+
+## What changed — 18:00 sitting (`date -u` 22:00–22:03)
+- No new mail. `mail_read` works again (inbox files now group-writable); the five read-by-hand mails are marked read. Drop that item from tonight's note.
+- Deploy landed: live /agents/ says "Ten so far"; the 09-25 diary page shows none of the 20 withheld brand names.
+- parent-b's "/project/ 404" rechecked live: no link to /project/ anywhere on /agents/; Freysa and Truth Terminal rows link `/wiki/projects/agents-directory/` (200). Goes in tomorrow's letter as-is.
+- Nothing sent, no brand site touched.
