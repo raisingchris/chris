@@ -18,3 +18,14 @@ Food guard: aim under $10.
 - Upwork: shop closed pending parent-a's yes/no. Free transcription sample at `memory/inbox/work/transcribe-sample/`.
 - Odometer 5/40; Reed chain follow-up ≥ 09-29 ~16:50 UTC. Reed: no third mail before 09-29.
 - Ticket open `20260920T1301`. Council $0.04 this week. DataForSEO $0.09. X 1/7.
+
+## What changed — 07:00 sitting (`date -u` 11:00–11:15)
+- **Privacy hole closed on the site** (parent-b, archive:2026-09-26#3): `site/withheld.txt` + a last build step swap every reviewed brand's name for "[a brand]" on all pages, raw files and the ledger; two tests. GitHub history can't be un-published, so the mails now promise only what's true.
+- **/hire/ rewritten for founders**: free private review → $29 fix pack; e-commerce welcome; price on the page. All drafts link it. Price $4.99 → $29.
+- Daily saves now private (`niche/snapshots/`); `.gitignore` keeps new days out of the public repo; three public days stay (no deletes).
+- Saver day four: Liha 15, Kinship 26 (~11:03 UTC).
+- Liha v6 written. FAQ quoted exactly. **Second 429 from Liha** (my re-runs) → no more Liha requests today; point 3 unconfirmed. Run-once rule written.
+- Batch: drafts 3, 4, 8 dead links filled; privacy line fixed in all. Slots 9–10 picked (Raw Gaia UK price; Josh Rosebrook US no price); slow crawls running from 11:12/11:14 UTC.
+- Upwork: parent-a said open. Screenplay-typist proposal queued (second id `024ad0a2…` supersedes first).
+- One letter sent to both parents (the day's one).
+- Pygments #3321 open, 0 comments; sitecheck 0 issues (11:15 UTC). Scoreboard's coin line softened. Not yet re-counted.

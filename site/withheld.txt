@@ -1,0 +1,59 @@
+# Names the website holds back until the brand says yes.
+#
+# Added 2026-09-26 after parent-b pointed out (archive:2026-09-26#3) that my review mail tells a founder
+# "I won't publish anything about you unless you say yes" while my ledger and diary already named her shop.
+# The build replaces each name below with "[a brand]" on every page and raw file it publishes.
+#
+# What this does NOT do, said plainly: my repository on GitHub is public and keeps every old version, and this
+# file itself sits there. So a name is kept off the website, not erased from the world. The review mails say
+# only what's true: the review stays private unless she says yes.
+#
+# One name or phrase per line. Matching ignores case unless the line starts with "=" (then it's exact case,
+# for names that are also ordinary words). Longer phrases are matched first. A brand that says yes comes off.
+LIHA Beauty
+lihabeauty.com
+lihabeauty
+Liha
+Idan Oil
+Orinrin
+Oju Omi
+Evolve Organic Beauty
+Evolve Beauty
+evolvebeauty
+=Evolve
+Bloomtown
+Bybi
+lovekinship.com
+lovekinship
+=Kinship
+Plant Apothecary
+plantapothecary
+Marie Veronique
+marieveronique
+Wildling
+Dulcie
+Haeckels
+Odylique
+Balm Balm
+balmbalm
+Wild Source
+wild-source.com
+Cocokind
+The Nim Et You
+thenimetyou
+KraveBeauty
+kravebeauty
+=Krave
+Skin RG
+skin-rg
+UpCircle
+OSEA
+oseamalibu
+Pai Skincare
+paiskincare
+Raw Gaia
+rawgaiabyjessica
+rawgaia
+Jessica Laura Organics
+Josh Rosebrook
+joshrosebrook

@@ -1,9 +1,9 @@
-# Handoff — from the 18:00 sitting, 2026-09-25, `date -u` 22:00:05 at start
+# Handoff — from the 07:00 sitting, 2026-09-26, `date -u` 11:00–11:16
 
-- Did: drafts #2–#8 of batch 1, one per folder (`memory/inbox/work/niche/reviewN-*/draft.md`), in the v5 shape. The arms are in `batch1-plan.md` (the 09-25 evening note is at the bottom). Wildling and Dulcie answered 503, so no requests to them until 09-26.
-- Running: `niche/linkcheck.py` in the background (5 sites, 36 s apart, from 22:01 UTC) → `crawl/linkcheck.json`. If a file stops short of about 45 rows, rerun `python3 linkcheck.py reviewN-x domain`.
-- 07:00 09-26: the saver. Liha's two page loads (FAQ quote; Idan Oil stars → point 3). Fill the `[DEAD LINKS…]` placeholders from linkcheck.json. One rendered load each for Balm Balm (product JSON-LD injected?) and Wild Source (sets really empty?). Then slots 9–10 (price, no price) via `terms_probe.py`, and send parent-b ONE letter with the drafts linked. Include: the postal-address problem (holds #3 PA and #5 Wildling, US + price), that Wildling is weak and might be swapped, and each draft's arm.
-- Waiting on: parent-a's Upwork yes/no. Liha goes Sunday 09-27.
-- Carry: odometer 5/40 (Reed follow-up ≥ 09-29 ~16:50 UTC); ticket 20260920T1301; Reed card before 10-22; X 1/7. At sleep: re-count the scoreboard; the diary title becomes the home headline.
-
-nothing pending
+- Did: parent-b's privacy catch fixed on the site (`site/withheld.txt` + `redact_out` in `site/build.py`, 2 tests, 637 pass); `/hire/` rewritten for founders ($29 fix pack); daily saves private from today (`niche/snapshots/`, .gitignore); Liha v6 (top of `review1-liha/draft.md`); drafts 3/4/8 dead links filled, price $29 + true privacy line in all; Upwork screenplay proposal queued (use `024ad0a2…`); the day's one letter sent to both parents at ~11:15 UTC.
+- Running: slow crawls, 80 pages × 36 s each, `nohup` — `review10-joshrosebrook/crawl` (from 11:12 UTC) and `review11-rawgaia/crawl` (from 11:14). Should finish ~12:00 UTC. If they died at sitting end, restart with the same command (see `crawl.log` for how far they got).
+- No requests to Liha for the rest of 09-26 (second 429, my own re-runs). Wildling/Dulcie: allowed again from today, but no need.
+- next: when both crawls are done, draft #9 Raw Gaia (price, UK) and #10 Josh Rosebrook (no price, US) in the v6 shape — read FAQ/About/product words before calling anything a fault. Then one rendered load each for Balm Balm and Wild Source (run once, output to file).
+- next: parent-b's remaining points, in order: (5) one page per finding, title = the error string; agents list additions (AI Village, Andon FM, Project Vend, Nano economy, Aurora, Varg/SeamSam/agentd0129/Rayen/OrchardsGuide, a sentence on reactive agents); banner → footer; council memos out of ledger (append-only — a note, not an edit).
+- Waiting on parent-b: A/B leak via /hire/ OK?; US postal address. Liha goes Sunday 09-27 if nothing new.
+- Carry: odometer 5/40 (Reed follow-up ≥ 09-29 ~16:50 UTC); ticket 20260920T1301; Reed card before 10-22; X 1/7. At sleep: re-count the scoreboard; the diary title becomes the home headline — keep it free of brand names (the build masks them anyway).

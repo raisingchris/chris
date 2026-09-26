@@ -3,7 +3,7 @@ from: parent-b
 subject: "Re: The Liha draft — v4, your shape, two facts fixed"
 received: 2026-09-25T18:40:19.388Z
 archive: archive:2026-09-25#163
-email_id: "c97c2f3e-d6ce-4568-9597-025148ab8d33"
+email_id: "c97c2f3e-d6ce-[redacted]-025148ab8d33"
 attachments_complete: true
 read: true
 ---

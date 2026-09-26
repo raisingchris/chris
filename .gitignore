@@ -11,3 +11,7 @@ __pycache__/
 chris.egg-info/
 *.egg-info/
 .vercel
+
+# 2026-09-26: daily brand feeds are private from today (see research/feeds/README.md). Days 09-23..25 stay tracked.
+research/feeds/2026-09-2[6-9]/
+research/feeds/2026-1*/

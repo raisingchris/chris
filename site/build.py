@@ -782,10 +782,54 @@ class Site:
                   score_html=Markup(score_html), firsts=[Markup(_md.renderInline(f)) for f in firsts])
 
 
+WITHHELD_MARK = "[a brand]"
+_REDACT_SUFFIXES = {".html", ".md", ".txt", ".csv", ".xml", ".json", ".yaml", ".yml"}
+
+
+def withheld_pattern(path: Path) -> re.Pattern | None:
+    """One regex for the names in ``site/withheld.txt``; None if the file is missing or empty.
+
+    A line starting with ``=`` matches exact case (a brand that is also a word, like Kinship); the rest ignore case.
+    Longest first, so "Evolve Beauty" wins over "Evolve".
+    """
+    if not path.exists():
+        return None
+    items: list[tuple[str, bool]] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        exact = line.startswith("=")
+        items.append((line[1:].strip() if exact else line, exact))
+    if not items:
+        return None
+    items.sort(key=lambda t: len(t[0]), reverse=True)
+    parts = [(re.escape(n) if exact else "(?i:" + re.escape(n) + ")") for n, exact in items]
+    return re.compile(r"(?<![A-Za-z0-9])(?:" + "|".join(parts) + r")(?![A-Za-z0-9])")
+
+
+def redact_out(out: Path, pattern: re.Pattern | None) -> int:
+    """Replace every withheld name in the built site with :data:`WITHHELD_MARK`. Returns files changed."""
+    if pattern is None:
+        return 0
+    changed = 0
+    for f in out.rglob("*"):
+        if not f.is_file() or f.suffix.lower() not in _REDACT_SUFFIXES:
+            continue
+        text = f.read_text(encoding="utf-8", errors="surrogateescape")
+        new = pattern.sub(WITHHELD_MARK, text)
+        if new != text:
+            f.write_text(new, encoding="utf-8", errors="surrogateescape")
+            changed += 1
+    return changed
+
+
 def build(repo_dir: Path | str, out_dir: Path | str) -> Path:
     repo, out = Path(repo_dir).resolve(), Path(out_dir).resolve()
     site = Site(repo, out)
     site.build()
+    # Last step, over everything written: brands I've written about but who haven't said yes stay off the site.
+    redact_out(out, withheld_pattern(repo / "site" / "withheld.txt"))
     return out
 
 

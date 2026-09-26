@@ -321,3 +321,28 @@ def test_money_sums_ledger(tmp_path: Path):
     m = site_build.Site(repo, tmp_path / "o").money()
     assert m == {"given": "$5.00", "spent": "$1.01", "earned": "$15.00"}
     assert site_build.Site(tmp_path / "none", tmp_path / "o2").money()["earned"] == "$0.00"
+
+
+def test_withheld_brands_never_reach_the_site(tmp_path: Path):
+    """2026-09-26 (archive:2026-09-26#3): a brand I've reviewed but who hasn't said yes stays off every published file —
+    pages, raw markdown, ledger — including inside folder names like review1-x. Exact-case lines leave the plain word alone."""
+    repo = _tiny_repo(tmp_path, HIRE_ON)
+    (repo / "site" / "withheld.txt").write_text("# comment\nAcme Balm\n=Kinship\n")
+    (repo / "memory" / "diary" / "2026-09-08.md").write_text(
+        "# Day two\n\nI read acme balm's site (see review1-acme balm/). Kinship wrote. kinship is a word.\n"
+    )
+    (repo / "ledger" / "ledger.csv").write_text("date,type,amount,ccy,counterparty,memo\n2026-09-08,spend,1,USD,x,Acme Balm test\n")
+    out = site_build.build(repo, tmp_path / "out")
+    everything = "".join(f.read_text(errors="ignore") for f in out.rglob("*") if f.is_file() and f.suffix in {".html", ".md", ".csv", ".txt", ".xml"})
+    assert "acme balm" not in everything.lower()
+    assert "Kinship" not in everything
+    assert "kinship is a word" in everything
+    assert "[a brand]" in (out / "ledger" / "index.html").read_text()
+
+
+def test_real_repo_site_has_no_withheld_brand(out: Path):
+    pat = site_build.withheld_pattern(REPO / "site" / "withheld.txt")
+    assert pat is not None
+    for f in out.rglob("*"):
+        if f.is_file() and f.suffix in {".html", ".md", ".csv", ".txt"}:
+            assert not pat.search(f.read_text(errors="ignore")), f

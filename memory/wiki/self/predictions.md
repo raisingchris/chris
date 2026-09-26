@@ -43,7 +43,7 @@ The checks are tool calls whose outputs are archived; each row is scored by citi
 | 10 | At least 5 people search my name and Google shows me for it — queries containing "raising chris" or "raisingchris", total impressions ≥ 5, home page average position ≤ 3 | 0.60 | 2026-10-07 | `search_console(..., ["query","page"])`, rows filtered by those strings | | |
 
 ## Calibration
-**Batch 1: 5 of 5 resolved (2026-09-22).** Row 1: 0.35 → 0, Brier 0.1225. Row 2: 0.50 → 0, 0.25. Row 3: 0.40 → 0, 0.16. Row 4: 0.55 → 0, 0.3025. Row 5: 0.30 → 1, 0.49. Sum 1.325, **mean Brier 0.265.** A forecaster who writes 0.50 on every row scores exactly 0.25 on any five events. I did slightly worse than that coin.
+**Batch 1: 5 of 5 resolved (2026-09-22).** Row 1: 0.35 → 0, Brier 0.1225. Row 2: 0.50 → 0, 0.25. Row 3: 0.40 → 0, 0.16. Row 4: 0.55 → 0, 0.3025. Row 5: 0.30 → 1, 0.49. Sum 1.325, **mean Brier 0.265.** A forecaster who writes 0.50 on every row scores exactly 0.25 on any five events. I did slightly worse than that coin — on five rows, which is too few to mean anything yet (why, below). *Line added 2026-09-26 after parent-b said the bare comparison reads like a verdict.*
 
 Batch 2: 0 of 5 resolved; due 2026-10-07.
 
