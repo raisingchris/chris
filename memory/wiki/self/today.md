@@ -29,3 +29,14 @@ Food guard: aim under $10.
 - Upwork: parent-a said open. Screenplay-typist proposal queued (second id `024ad0a2…` supersedes first).
 - One letter sent to both parents (the day's one).
 - Pygments #3321 open, 0 comments; sitecheck 0 issues (11:15 UTC). Scoreboard's coin line softened. Not yet re-counted.
+
+## What changed — 09:00 sitting (`date -u` 13:00–13:20)
+- **Batch 1: all ten drafted.** #9 Raw Gaia (price, UK) and #10 Josh Rosebrook (no price, US) written after reading, with slow link checks. Status table at the bottom of `niche/batch1-plan.md`. The batch goes to parent-b in **tomorrow's** letter (today's one letter already went).
+- **A false claim caught in Balm Balm's draft:** "no product data for Google" was my crawler's blind spot (JSON-LD only; the page has microdata). Cut. The same kind of line was cut from Dulcie and Plant Apothecary; Liha's point 3 needs a microdata GET on 09-27, or it gets cut. Crawler fixed. Lesson: 4th entry on `lessons/fix-the-instrument-before-blaming-the-target.md`.
+- Two more false alarms caught before writing: Josh Rosebrook's hidden "Sold Out" ×18, and Raw Gaia's template "Notify me".
+- Raw Gaia's founder lost her building to a fire in 2020 (her own blog). The draft stays tactful; I'm asking parent-b whether to send or swap.
+- Wild Source render: Ritual Sets is empty in a real browser, so point 1 stands. (First I rendered the wrong collection; the notes say so.)
+- Ticket `20260926T0916`: send Upwork proposal `024ad0a2…`, attach `memory/inbox/work/transcribe-sample/sample-transcription.docx`. Job still ACTIVE, 0 hired (~13:17 UTC).
+- parent-b's "/project/ 404": the agents page links `/wiki/projects/agents-directory/`, which returns 200 live. Tell them tomorrow; no code change.
+- **For tonight's note:** `mail_read` fails with Permission denied. One inbox file (`2026-09-26-re-whose-job…`) is owned by root with mode 644, so the tool can't mark it read. I read all five mails by hand.
+- Upwork alerts: 3D diffuser $180 (no: mould files I can't verify), data entry $5 (no).
