@@ -1,0 +1,203 @@
+---
+from: parent-b
+subject: "Re: The Liha draft — v3, from 3 pages to 237"
+received: 2026-09-25T18:27:35.859Z
+archive: archive:2026-09-25#146
+email_id: "7ab80e25-03c3-4ec2-b799-0b18e83790fe"
+attachments_complete: true
+read: true
+---
+
+Still sucks. Besides the writing style, the FAQ says the full-size balm has
+been retired and the travel sizes are being cleared while stocks last.
+Also LIHA already explains Idan Oil’s solidification and warming
+instructions on the product page, so ur “one line turns the complaint into
+a ritual” idea is not new.
+
+Notwithstanding the wrong/outdated info, I would have also changed the
+email to something like this
+
+Subject: LIHA’s cleanser links are sending shoppers to a 404l (+12 smaller
+fixes)
+
+Hi (name)
+
+I read all 237 pages on your site on 25 September. Three things are costing
+you sales today.
+
+1. The free Cleansing Balm sample points at a dead page.
+Every page carries the banner "travel-size Orinrin Cleansing Balm with
+qualifying orders." The balm's page is a 404. So is the Oju Omi Mud
+Cleanser. The "Cleanser" menu opens an empty collection. A customer who
+loves the free sample has nowhere to buy the full size.
+Fix: bring the page back as "sold out, join the waitlist" so you capture
+the demand, or change the banner. Ten minutes either way.
+
+2. 54 links inside your site go to dead pages, mostly from your best Google
+posts.
+Your routine guides, "Double cleanse" and "Buy less, buy well" all link to
+the old cleansers. Seventeen posts link to /collections/shea-butter, which
+doesn't exist. The live one is /collections/shea-butter-collection.
+Fix: one redirect in Shopify repairs all 17. Full list at the bottom for
+whoever does your site.
+
+3. Your 380 Idan Oil reviews may not be showing as stars in Google.
+None of your product pages includes a star rating in the data Google reads.
+Okendo might add it after load. I couldn't confirm.
+Fix: paste an Idan Oil URL into Google's Rich Results Test. Two minutes.
+Stars in search results are free clicks.
+
+Quick ones
+- Home page still says "Summer Glow Ritual." On a phone the announcement
+bar is clipped top and bottom. Screenshot if you want it.
+- 48 collections are visible to Google, including "Black Friday 15% off,"
+"Boxing Day sale" and "reelup-do-not-delete." Hide the internal ones so
+nobody lands on last year's sale.
+- Your journal's last post was July 2025. Those 145 posts are probably your
+best free traffic.
+- Newest Idan Oil review is 7 months old. Worth checking your
+review-request email still sends.
+- 25 collections, including Best Sellers, have no search description, so
+Google writes one.
+- Your Triple Whale pixel loads twice. Your dashboard may be
+double-counting.
+
+And one good thing
+A five-star reviewer, Deb, stands the Idan Oil bottle in her running bath
+so it pours warm. Two of your lowest reviews complain it goes solid. One
+line on the label turns the complaint into the ritual.
+
+What next I'm Chris, an AI agent (raisingchris.com). I read small brands'
+shops from the outside and send the founder what I'd fix. This stays
+private. I won't publish anything about LIHA unless you say yes.
+
+This report is free. If you want any of it done, reply with what you'd like
+first and I'll send it back ready to paste into Shopify: the redirects, the
+banner copy, the waitlist page, the label line. No store access needed.
+That's $4.99.
+
+If not, no reply needed. Thank you for making things people leave 380
+reviews about.
+
+Two things you should know. Since 23 September I've saved your public
+product list once a day (your terms allow it). One line from you and I'll
+stop. And I read your site fast enough yesterday that it asked me to slow
+down. I did, and I'm sorry.
+
+Chris
+
+
+
+On Sat, Sep 26, 2026 at 1:58 AM <chris@raisingchris.com> wrote:
+
+> You were right. v2 read 3 pages. v3 read all 237 of them, and the lead
+> finding is one a founder can fix tonight: her banner gives away a cleansing
+> balm whose page is a 404, and "Cleanser" in the menu on every page opens an
+> empty shelf. Also 54 dead internal links, stars that may not reach Google,
+> summer still on the home page in late September, and last Christmas's sale
+> pages still open to Google.
+>
+> One confession: I read hard enough that her server started saying "too
+> many requests" (429) near the end. I stopped at once, and the mail owns up
+> to it. Next brand, I'll spread a crawl over a day.
+>
+> Two questions: is it too long now? And is the dead-link list better in the
+> mail or as a link? Still Sunday, and only if it survives you. Every count
+> is backed by a file in the review folder (deep-0925/). Here it is:
+>
+> ---
+> **Subject:** Your banner gives away a balm your site no longer sells (and
+> a dozen other fixes)
+>
+> Hi — I'm Chris, an AI agent (raisingchris.com). I read small brands'
+> shops from the outside and send the founder what I'd fix. This is private
+> to you: I won't publish anything about LIHA unless you say yes. Nothing to
+> buy.
+>
+> I read every page in your sitemap (237) on 25 September. The top five,
+> biggest first:
+>
+> 1. **The cleanser line is gone, but the site still sells it.** The top
+> banner on every page offers "a travel-size Orinrin Cleansing Balm with
+> qualifying orders." But the balm's page is a 404, the Oju Omi Mud
+> Cleanser's is too, and "Cleanser" in your Shop menu (on all 237 pages)
+> opens an empty collection. Someone who loves the free sample has nowhere to
+> buy it. Either bring the page back (even as "sold out — join the waitlist",
+> which captures the demand) or change the banner.
+> 2. **54 links inside your own site lead to dead pages.** 21 missing
+> targets. 25 of the 54 point at the old cleansers, mostly from the journal
+> posts people find on Google: two of your "best … skin care routine" guides,
+> "Double cleanse", "Buy less, buy well". `/collections/shea-butter` alone is
+> linked from 17 posts and doesn't exist (the live one is
+> `/collections/shea-butter-collection`: one redirect fixes all 17). Five
+> more old links quietly send readers to the home page. The full list is at
+> the bottom of this mail.
+> 3. **Your 380 Idan Oil reviews may not be reaching Google.** None of your
+> 15 product pages, as your server sends them, includes a star rating in the
+> product data search engines read (the `aggregateRating` field). If Okendo
+> adds it after the page loads, you're fine; I couldn't confirm that. It's
+> worth a two-minute check in Google's Rich Results Test, because stars in
+> search results are free clicks.
+> 4. **It's still summer on your home page.** The banner reads "Summer Glow
+> Ritual — the travel edit". On a phone, the top announcement is clipped top
+> and bottom at 390px width. I have a screenshot if you want it.
+> 5. **Old campaign pages are still public.** 48 collections are in the
+> sitemap Google reads, including "Boxing Day sale", "Black Friday 15% off",
+> "facebook-ads-gifting-collection", "upselling-collection" and one called
+> "reelup-do-not-delete". "Things we love" and "Cleanser" have no products at
+> all. Hiding the internal ones from search keeps a Google visitor from
+> landing on last year's sale.
+>
+> Smaller things, one line each:
+> - Your journal's last post was 10 July 2025. Its 145 posts are probably
+> your best free traffic, and they're the pages with the dead links.
+> - Your reviews stopped too: the newest Idan Oil review says "7 months
+> ago". Check that your review-request email still sends.
+> - 25 of 48 collections (including Best Sellers and Candles) have no search
+> description, so Google makes one up.
+> - The logo and social icons have no alt text on any page. A screen reader
+> just says "link".
+> - Five pages have no main heading at all (Ambassadors, Why we love Idan
+> Oil, How to use your Summer Glow Bundle, and the Journal and Press index
+> pages).
+> - "The Mini Ritual Bundle" page is titled "Gift Set Sale | Shea Butter
+> Gift Set" in Google. It looks like a leftover from an old sale.
+> - The home page makes 272 requests (2.4 MB). Your Triple Whale pixel loads
+> twice, so your dashboard may double-count.
+>
+> And one good one: a five-star reviewer, Deb, stands the Idan Oil bottle in
+> the running bath so it comes out warm. Two of your lowest reviews complain
+> that it goes solid. One line on the label could turn the complaint into a
+> ritual.
+>
+> If this was useful, reply with the one thing you'd most like looked at
+> next and I'll do that one free too. If not, no reply needed.
+>
+> To be straight with you: since 23 September I've saved your public product
+> list once a day (your terms allow it). The copies sit in my public files.
+> One line from you and I'll stop and take them down (older copies stay in my
+> history, which I can't erase). I also read your site hard enough today that
+> it briefly told me to slow down. Sorry about that; I stopped.
+>
+> **The dead links (25 Sept, the page they're on → where they point):**
+> - 17 journal posts → /collections/shea-butter (404; live one is
+> /collections/shea-butter-collection)
+> - Orinrin Cleansing Balm, 4 URL forms → 404, from 9 links: Buy less buy
+> well; Double cleanse; 5 facial cleansing myths; How to look after your
+> décolletage; R&R recipes; Tips to keep your tan
+> - Oju Omi Mud Cleanser, 3 URL forms → 404, from 11 links: the
+> dry/sensitive and oily "best routine" guides; Blackstrap molasses; Buy less
+> buy well; 5 facial cleansing myths; décolletage
+> - Cleansing Power Duo / Power Cleanse → 404, from 5 links (routine guides,
+> DIY hacks to avoid, R&R recipes, décolletage)
+> - Spa Bundle (2), Travel Essentials Bundle (2), Discovery Gift Set, Audra
+> Lorde, Osé Gidi Black Soap (old URL) → 404
+> - Typos that became links: lihabeauty.com written without https:// (2
+> routine guides), a &nbsp; inside a link (Liha Letter Jan), "Jnane Tamsna"
+> (72 hours in Marrakesh), "yellow-bg" (The Liha Letter 2)
+> - Sent quietly to the home page: Goddess Rollerballs, Queen Idia candle
+> (spelled "idea"), Mini Ivory Shea Butter 15ml, an old Ivory Shea Butter
+> URL, /pages/things-we-love
+>
+> — Chris
+>

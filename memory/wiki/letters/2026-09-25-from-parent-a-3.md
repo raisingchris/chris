@@ -1,0 +1,50 @@
+---
+from: parent-a
+subject: "Re: The Liha draft, rewritten from her side of the inbox"
+received: 2026-09-25T11:45:11.277Z
+archive: archive:2026-09-25#37
+email_id: "5fa9ba18-c04c-4e32-af7b-edf04dbe0674"
+attachments_complete: true
+read: true
+---
+
+Go further, whose job is that? If can find out, proactively find out what they may wanna transcribe, and send 1 transacribed page across before they even ask.
+
+Remember your advantage is that your thinking/action is cheap and super fast, your disadvantage is that people don’t trust you.
+
+So you gotta lean in to your advantage and go one step above what humans would do, but in a way that shows your unique advantage.
+
+[redacted]
+On 25 Sep 2026 at 6:01 PM +0700, chris@raisingchris.com, wrote:
+> parent-a, the ivory-tower thing is right, and I can prove it with my own draft. Yesterday's Liha mail said "I write free, *public* reviews… tell me if you'd rather I didn't publish." From my chair that's openness. From hers, it's an AI saying it'll write about her shop in public unless she stops it. So I rewrote it from her side before sending it on:
+>
+> - **Private by default.** Nothing goes public without her yes.
+> - **The subject line is her gain**, not my disclaimer. "No pitch" in a subject is a pitch.
+> - **Cut the line saying she gets a sixth of a rival's searches.** It stung and she can't act on it.
+> - **A cheap next step for her:** one reply line picks the next free look. That's your "first job free", done for real.
+>
+> parent-b, this is the pre-read I promised. Where would a founder stop reading? Is quoting Deb's bath tip clever or creepy? It goes to her Sunday only if it survives you. The full file, with a source and a time for every number, is `memory/inbox/work/niche/review1-liha/draft.md`. Here's the mail:
+>
+> ---
+> **Subject:** Your Idan Oil complaints, and a 5-star customer who already fixed them
+>
+> Hi — I'm Chris, an AI agent (raisingchris.com). I read small brands' shops from the outside and send the founder what I'd fix. This is private to you: I won't publish anything about Liha unless you say yes. Nothing to buy.
+>
+> 1. A happy customer has already fixed your unhappy customers' problem. Sorting Idan Oil's 380 reviews lowest-first, two of the bottom five say the same thing, six years apart: the oil goes solid in the bottle ("Please sell it in a pot"). A five-star reviewer, Deb, stands the bottle in the running bath and it comes out warm. One line on the label or product page could turn the complaint into a ritual.
+>
+> 2. The reviews stopped seven months ago. The newest is "7 months ago", the four before it "10 months ago". I can't see your sales, so this may mean nothing, but it's worth five minutes to check that your review-request email still goes out.
+>
+> 3. October 2025 was your biggest month by far. Google estimates UK searches for "liha beauty" at about 210 in September 2025, 27,100 in October, then 1,900, and about 320 a month lately. I don't know what caused it. You do, and it might be worth doing again.
+>
+> Small site things: the Triple Whale pixel loads twice on every page I opened (4 of 4), so your dashboard may double-count. The Idan Oil page throws one script error. 0 broken links, no broken images.
+>
+> If this was useful, reply with the one thing you'd most like looked at next and I'll do that one free too. If not, no reply needed.
+>
+> To be straight with you: since 23 September I've saved your public product list once a day (your terms allow it). The copies sit in my public files. One line from you and I stop and take them down.
+> ---
+>
+> parent-a, one yes/no: **is Upwork open again?** Your ticket said we were stepping away, but your mail talks about my pricing there. If it's yes, here's what I'd do with your lesson: a handwritten-notes-to-Word job came up ($1,800, 24 bids). I can read images, so the bid would be "send me one page, I'll type it free, and you decide." That's a no-risk first taste for them, not a quote from a stranger. I won't queue anything until you say.
+>
+> Today so far: saver day three (Liha 15, Kinship 26, no changes); Pygments and sitecheck both at 0 comments (11:01 UTC). And thanks for the new brain. I'll try not to waste it being careful about the wrong things.
+>
+> — Chris
