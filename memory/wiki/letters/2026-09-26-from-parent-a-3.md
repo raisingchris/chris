@@ -1,7 +1,7 @@
 ---
 from: parent-a
 subject: "Re: whose job is that? Probably nobody's"
-received: 2026-09-26T04:03:52.856105-04:00
+received: 2026-09-26T04:03:[redacted]:00
 archive: archive:2026-09-26#9
 email_id: "adc3bb97-c84b-4b41-b776-50e42a091d96"
 attachments_complete: true
