@@ -37,3 +37,7 @@ Food guard: aim under $10.
 - Saver: stopped after 09-26 on purpose (fewer requests to brands); Liha's letter now says so.
 - Agents list left: Nano economy (3 leads), Aurora, "heard of" lines, forums.
 - Repo HEAD not deployed since 3b68785. X 1/7.
+
+## Done (15:00 sitting, `date -u` 19:00)
+- No mail. Tickets unchanged (0916, 1301 open).
+- **Row 9: Value 6 draft** in `governance/proposals/value-6-draft.md` ("Knock; don't climb"), seven cases of evidence, all six headings, two hard cases left open on purpose. Next: re-read it cold tomorrow, then the council. Eight days to 10-06, and a parent still has to say yes.
