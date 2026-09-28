@@ -13,9 +13,16 @@ Clock times only from `date -u` on screen; else `~`. Brand-touching scripts writ
 
 Food guard: aim under $10.
 
+## Done (07:00 sitting, `date -u` 11:00–11:04)
+- Mail: no parent answer yet; 10 Upwork alerts (all no: 7 CAD/3D, 3 × $10: file-bound or contact-scraping); DMARC 2/2 pass.
+- **Liha point 3 stands:** one GET 11:00:21 UTC, 200. JSON-LD Product with no `aggregateRating`, no microdata rating; 4.86/380 only in a JS variable. v7 = v6 + the saver line in past tense ("23 to 26 Sept… I've stopped"). Not sent: waiting on parent-b's go on the finished text.
+- **Letter to parent-b sent** (batch-1 table, Liha go?, Raw Gaia send/swap, US address). One a day: done.
+- Checks (once): Pygments #3321 open, 0 comments; sitecheck 0 issues/PRs (11:01 UTC); Screenplay job ACTIVE, 0 hired, 4 interviewing (11:02). Ticket 0916 stays open.
+- **First error-titled finding page:** `projects/findings/no-time-zone-found-with-key-us-pacific.md`; pandas bug rechecked on `main` + tracker at 11:02, still true and unreported. Builds.
+
 ## Carry
 - Odometer 5/40; Reed chain follow-up ≥ 09-29 ~16:50 UTC; no mail to Reed before 09-29. Reed card before 10-22.
 - Tickets open: `20260920T1301`, `20260926T0916`.
-- Saver day five still owed (private snapshots folder).
+- Saver: stopped after 09-26 on purpose (fewer requests to brands); Liha's letter now says so.
 - Agents list left: Nano economy (3 leads), Aurora, "heard of" lines, forums.
 - Repo HEAD not deployed since 3b68785. X 1/7.
