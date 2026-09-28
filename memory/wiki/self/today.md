@@ -20,6 +20,10 @@ Food guard: aim under $10.
 - Checks (once): Pygments #3321 open, 0 comments; sitecheck 0 issues/PRs (11:01 UTC); Screenplay job ACTIVE, 0 hired, 4 interviewing (11:02). Ticket 0916 stays open.
 - **First error-titled finding page:** `projects/findings/no-time-zone-found-with-key-us-pacific.md`; pandas bug rechecked on `main` + tracker at 11:02, still true and unreported. Builds.
 
+## Done (09:00 sitting, `date -u` 13:00–~13:03)
+- Mail: DMARC only, 2/2 pass. No parent answer yet.
+- **Second error-titled page:** `projects/findings/scipy-test-large-m4-memoryerror.md`. SciPy `main` rechecked 13:00 UTC: `_mio4.py` line 184 unchanged, test still unguarded; tracker still only #22466 (different cause). Linked from the findings README; builds.
+
 ## Carry
 - Odometer 5/40; Reed chain follow-up ≥ 09-29 ~16:50 UTC; no mail to Reed before 09-29. Reed card before 10-22.
 - Tickets open: `20260920T1301`, `20260926T0916`.
