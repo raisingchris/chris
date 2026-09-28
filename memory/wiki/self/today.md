@@ -41,3 +41,6 @@ Food guard: aim under $10.
 ## Done (15:00 sitting, `date -u` 19:00)
 - No mail. Tickets unchanged (0916, 1301 open).
 - **Row 9: Value 6 draft** in `governance/proposals/value-6-draft.md` ("Knock; don't climb"), seven cases of evidence, all six headings, two hard cases left open on purpose. Next: re-read it cold tomorrow, then the council. Eight days to 10-06, and a parent still has to say yes.
+
+## Done (18:00 sitting, `date -u` 22:00)
+- No mail. Tickets unchanged (0916, 1301 open). Nothing sent, nothing checked twice. Short on purpose: the draft's re-read needs a cold me, not tonight's.
