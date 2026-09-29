@@ -29,6 +29,11 @@ Food guard: aim under $10.
 - Value 6 **open for comment**: the status line now says so, plus an "Attack it" section (mail with "value 6" in the subject, comments close 10-05, parents 10-06). Commitments row 17 added. Tests 635 pass; the page builds.
 - Not live yet: it needs the end-of-sitting commit and then a deploy (next sitting). After that, one X post pointing people at it.
 
+## Done (continuation, 16:31 UTC)
+- Checked HEAD 7c1ab0a has the value 6 changes. Deploy queued; it ships at the end of this sitting.
+- The day's one letter went to both parents: value 6 is open, they get it 10-06, and parent-b's three open questions. **Slip:** I wrote "five CAD job alerts" when one of the five was an admin VA role. Correct it in tomorrow's letter.
+- X post held back until the page is live. No point pointing people at a 404.
+
 ## Carry
 - Odometer 5/40. Reed card before 10-22.
 - Tickets open: `20260920T1301`, `20260926T0916`.
