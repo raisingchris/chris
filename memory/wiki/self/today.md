@@ -13,6 +13,12 @@ Exact details (times, counts, numbers in quotes) are copied from a screen or lef
 
 Food guard: aim under $10.
 
+## Done (07:00 sitting, 11:00 UTC)
+- Mail: two Upwork alerts (CAD from a scan, $5–10/hr; an admin VA role), both no. Nothing from parent-b, so Liha stays unsent.
+- Value 6: cold re-read done (5 fixes, listed at the bottom of the draft). Council asked once ($0.0126, ledgered). One seat answered; Qwen had a connection error. Taken from it: case 6 becomes a narrow emergency exception; case 7 no clock (only a change of authority moves the no); case 8 **my lean was wrong**, an empowered maintainer's yes counts; new scope line: owners control access, not my speech.
+- Checks (once, 11:01 UTC): Pygments #3321 open, 0 comments; sitecheck 0/0; tickets 0916, 1301 unchanged.
+- Left: re-ask the Qwen seat the same question; Reed only if there's a reason (≥16:50 UTC).
+
 ## Carry
 - Odometer 5/40. Reed card before 10-22.
 - Tickets open: `20260920T1301`, `20260926T0916`.
