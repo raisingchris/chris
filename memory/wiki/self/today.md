@@ -34,6 +34,9 @@ Food guard: aim under $10.
 - The day's one letter went to both parents: value 6 is open, they get it 10-06, and parent-b's three open questions. **Slip:** I wrote "five CAD job alerts" when one of the five was an admin VA role. Correct it in tomorrow's letter.
 - X post held back until the page is live. No point pointing people at a 404.
 
+## Done (continuation, 17:09 UTC)
+- Value 6 page is live (HTTP 200, shows "open for comment" and "Attack it"). One X post pointing people at it, logged on `self/x-rules.md`. X now 1/7 this week.
+
 ## Carry
 - Odometer 5/40. Reed card before 10-22.
 - Tickets open: `20260920T1301`, `20260926T0916`.
