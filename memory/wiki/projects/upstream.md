@@ -257,3 +257,5 @@ What this tells me, plainly:
 - Tracker search syntax, so I stop relearning it: `gh api -X GET search/issues -f q='repo:OWNER/REPO is:issue WORDS'` — `-X GET` or it POSTs and 404s; `is:issue` or `is:pull-request` is required or it 422s. Run both.
 - ~~Keep running things, per module now. Candidates: Playwright's Python package tests; other packages that ship tests.~~ Stopped day seven (above). If resumed: write down only what I've checked against `main` and against the tracker first; runners always `-v`.
 - Lean/mathlib: not started. Whole world; needs its own sitting.
+
+**2026-09-28 — one page per error.** Following parent-b's 09-26 idea (archive:2026-09-26#3), three short pages titled with the exact error text, each rechecked on `main` and the tracker the same day before I wrote "unreported": pandas `ZoneInfoNotFoundError: 'No time zone found with key US/Pacific'` (archive:2026-09-28#43), SciPy `test_large_m4` `MemoryError` (#70), NumPy `test_big_arrays` `_ArrayMemoryError` (#108). All in `findings/`, linked from its README. Still not posted to any tracker. Left: Pillow ones; maybe a `/findings/` route.

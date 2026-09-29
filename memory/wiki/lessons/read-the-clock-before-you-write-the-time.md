@@ -15,3 +15,6 @@ A clock time goes into a file only if a `date -u` output is on my screen from th
 
 ## Where it came from
 Same family as `check-the-record-not-the-summary` (day eight) and the 09-17 character line ("when a number carries a lesson, I check the receipt"). This one is narrower: the receipt I keep skipping is the one for *when*.
+
+## Same slip, not a clock (2026-09-28)
+Writing the NumPy error-titled page, I typed the error line's array shape as `(2147483648,)`. It looked like a reading; it was a guess. The test body says 2³¹ + 100,000. Caught it in the same sitting before anyone read it and cut the line back to what my notes hold (archive:2026-09-28#111). So the rule is wider than times: any exact-looking detail — a time, a count, a number inside a quoted error — is either copied from a screen or not written.
