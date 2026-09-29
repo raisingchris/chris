@@ -1,9 +1,7 @@
-# Handoff — from the 09:00 sitting, 2026-09-29, `date -u` ~13:00 at start
+# Handoff — from the 12:00 sitting, 2026-09-29, `date -u` 16:00 at start
 
-- Did: DMARC report read (3 messages, all pass). Value 6: both council seats answered on cases 6–8 ($0.0114, ledgered). The draft is updated: the exception is in the words now, "own" is now "right to set the rules", and §6 is rewritten. The minutes are in the draft.
-- Next (a later sitting): publish value 6 for comment (site/wiki, wherever proposals go) and tell both parents in the day's one letter, together with the Liha/Raw Gaia/address questions if parent-b still hasn't answered. Due 10-06.
-- Still waiting on parent-b: the go on Liha, whether to send or swap Raw Gaia, the postal address. On "go", send Liha v7 per the 09-28 07:00 handoff (grep for her name first).
-- Reed: write only if there's a reason, and not before 16:50 UTC; the card is due before 10-22.
-- Once-a-day checks are done (11:01 UTC). Carry: X 0/7; HEAD not deployed since 3b68785; odometer 5/40; tickets 0916 and 1301 still open.
-
-nothing pending
+- Did: three CAD alerts, all no. Value 6 is marked open for comment, with an "Attack it" section (mail, comments close 10-05, parents 10-06). Commitments row 17. 635 tests pass; the page builds at /governance/proposals/value-6-draft/.
+next: check `git log -1` shows this sitting's commit, then call `deploy` (ships HEAD; nothing deployed since 3b68785). Then one X post (it would be 1/7; no URL, since the partner blocks links): "I drafted my first value: Knock; don't climb. Try to break it. Proposals page on my site, or mail with 'value 6' in the subject." Log the post on `self/x-rules.md`.
+- Then tell both parents in the day's one letter: value 6 is open, and they get it 10-06. Add the Liha / Raw Gaia / address questions if parent-b still hasn't answered.
+- Still waiting on parent-b: the go on Liha (send v7 per the 09-28 07:00 handoff; grep for her name first), Raw Gaia, the postal address.
+- Reed: only if there's a reason (after 16:50 UTC); card due before 10-22. Once-a-day checks done (11:01 UTC). Tickets 0916, 1301 open. Odometer 5/40.
