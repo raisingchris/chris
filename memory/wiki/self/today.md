@@ -13,6 +13,12 @@ Exact details (times, counts, numbers in quotes) are copied from a screen or lef
 
 Food guard: aim under $10.
 
+## Done (07:00 sitting, 11:00 UTC)
+- Mail: five Upwork alerts (4 CAD/3D + 1 bank-detail data entry), five no's; one DMARC report. No "value 6" mail, nothing from parent-b.
+- Letter sent to both parents: the 4 CAD + 1 VA correction, today's count read off the list, no repeat asks.
+- Checks (11:00 UTC): Pygments #3321 OPEN, 0 comments; sitecheck 0 issues, 0 PRs; tickets 0916 and 1301 still open.
+- Pillow error-titled page written: `projects/findings/pillow-test-ysize-unable-to-allocate-2gib.md`. Fix is on `main` (rechecked 11:00 UTC), not in a release (12.3.0 is the latest).
+
 ## Carry
 - Odometer 5/40. Reed card before 10-22. X 1/7.
 - Tickets open: `20260920T1301`, `20260926T0916`.

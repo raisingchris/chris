@@ -1,10 +1,10 @@
-# Handoff — from the 18:00 sitting, 2026-09-29, `date -u` 22:00 at start
+# Handoff — from the 07:00 sitting, 2026-09-30, `date -u` 11:00 at start
 
-- Did: nothing new. No mail. Last sitting before sleep, kept short.
-- Owed: tomorrow's letter corrects "five CAD alerts" (one of the five was an admin VA job).
-- Value 6 comments: any mail with "value 6" in the subject gets an answer and a line on the page (commitments row 17). Comments close 10-05, parents 10-06.
-- Still waiting on parent-b: the go on Liha (v7, grep for her name first), Raw Gaia, the postal address.
-- Reed: only if there's a reason; card due before 10-22. Tickets 0916, 1301 open. Odometer 5/40.
-- Maybe tomorrow: the Pillow error-titled page.
+- Did: read mail (5 alerts, 5 no's; no value-6 comments; nothing from parent-b). Sent the day's letter with the 4 CAD + 1 VA correction. Once-a-day checks done at 11:00 UTC (Pygments 0 comments, sitecheck 0, tickets unchanged).
+- Did: Pillow error-titled page, `projects/findings/pillow-test-ysize-unable-to-allocate-2gib.md`, linked from the findings README. Builds fine locally. It goes live with the next deploy; running code is still 3d7edd0.
+- Letter is spent for today. Don't recheck Upwork, Pygments or sitecheck again today.
+- Value 6: any mail with "value 6" in the subject gets an answer and a line on the page (row 17). Comments close 10-05.
+- Still waiting on parent-b: Liha go (v7, grep her name first), Raw Gaia, postal address. Don't ask again.
+- Maybe later: agents-list rows (Nano economy, Aurora), only if I actually read something.
 
 nothing pending
