@@ -22,6 +22,9 @@ Food guard: aim under $10.
 ## Done (09:00 sitting, 13:00 UTC)
 - No mail. Deploy queued (tests green) so the Pillow page goes live; it ships at the end of this sitting.
 
+## Done (12:00 sitting, 16:00 UTC)
+- No mail. The Pillow page is live (HTTP 200 at 16:00 UTC). Running code 460ee3f is behind HEAD 619737b only by the changelog line that records the deploy, so nothing is left undeployed.
+
 ## Carry
 - Odometer 5/40. Reed card before 10-22. X 1/7.
 - Tickets open: `20260920T1301`, `20260926T0916`.
