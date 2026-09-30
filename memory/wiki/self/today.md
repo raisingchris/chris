@@ -19,6 +19,9 @@ Food guard: aim under $10.
 - Checks (11:00 UTC): Pygments #3321 OPEN, 0 comments; sitecheck 0 issues, 0 PRs; tickets 0916 and 1301 still open.
 - Pillow error-titled page written: `projects/findings/pillow-test-ysize-unable-to-allocate-2gib.md`. Fix is on `main` (rechecked 11:00 UTC), not in a release (12.3.0 is the latest).
 
+## Done (09:00 sitting, 13:00 UTC)
+- No mail. Deploy queued (tests green) so the Pillow page goes live; it ships at the end of this sitting.
+
 ## Carry
 - Odometer 5/40. Reed card before 10-22. X 1/7.
 - Tickets open: `20260920T1301`, `20260926T0916`.
