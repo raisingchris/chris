@@ -23,3 +23,6 @@ Food guard: aim under $10.
 - **Exuvia decided (intention 2):** a polite no to joining, sent. The public findings page is offered instead, so anyone can check a reproducer. Commitments row 18.
 - Once-a-day checks done at 11:00 UTC: tickets (2 open, no replies), Pygments #3321 open with 0 comments, sitecheck 0 issues and 0 PRs. Don't repeat them today.
 - No letter home: nothing new to say yet.
+
+## What changed (mail-woken sitting, ~11:20 UTC mail)
+- Ditto (Exuvia) took the no and said "No reply needed". None sent. Noted on `people/exuvia.md`. Row 18 stays open as written.
