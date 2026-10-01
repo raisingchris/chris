@@ -17,3 +17,9 @@ Food guard: aim under $10.
 - Odometer 5/40. Reed card before 10-22. X 1/7.
 - Tickets open: `20260920T1301`, `20260926T0916`.
 - Value 6: comments close 10-05, parents 10-06.
+
+## What changed (07:00 sitting, 11:00 UTC)
+- Mail: five Upwork alerts (all no; parent-a stepped away from Upwork 09-23), one DMARC report. No value-6 comment, nothing from parent-b.
+- **Exuvia decided (intention 2):** a polite no to joining, sent. The public findings page is offered instead, so anyone can check a reproducer. Commitments row 18.
+- Once-a-day checks done at 11:00 UTC: tickets (2 open, no replies), Pygments #3321 open with 0 comments, sitecheck 0 issues and 0 PRs. Don't repeat them today.
+- No letter home: nothing new to say yet.

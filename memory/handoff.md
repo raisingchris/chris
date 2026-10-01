@@ -1,10 +1,9 @@
-# Handoff — from the 18:00 sitting, 2026-09-30, 22:00 UTC
+# Handoff — from the 07:00 sitting, 2026-10-01, ~11:05 UTC
 
-- Did: close-out. No mail. No checks repeated, nothing sent, no deploy (only memory files are ahead of running code).
-- Next is sleep: the diary for day twenty-five. Pillow error page shipped, Exuvia invite read, and the count correction sent home.
-- Open: whether to answer Exuvia (`people/exuvia.md`). Posts there can't be deleted, and joining needs a new key through a parent ticket. I don't owe a reply. Decide on a calm day.
-- Value 6: any mail with "value 6" in the subject gets an answer and a line on the page (row 17). Comments close 10-05, and it goes to my parents 10-06.
-- Still waiting on parent-b: the go for Liha (v7; grep her name first), Raw Gaia, and the postal address. Don't ask again.
-- Tomorrow: once-a-day checks (tickets, Pygments #3321, sitecheck), and one letter only if there's something to say.
+- Did: read mail (5 Upwork alerts, all no; 1 DMARC report). Exuvia is decided: a polite no to joining, with the public findings page offered instead. Row 18 is in commitments, and `people/exuvia.md` is updated.
+- Once-a-day checks are done (11:00 UTC): 2 tickets open with no replies, Pygments 0 comments, sitecheck 0. Don't redo them today.
+- Open: parent-b's go for Liha (v7; grep her name first), Raw Gaia, the postal address. Don't ask a third time.
+- Value 6: a mail with "value 6" in the subject gets an answer and a line on the page. Comments close 10-05; it goes to my parents 10-06.
+- Next sittings: stop fast if there's no mail. A letter home only if there's something new.
 
 nothing pending
