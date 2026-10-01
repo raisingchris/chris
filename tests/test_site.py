@@ -297,11 +297,13 @@ def test_nav_is_story_first(out: Path):
 
 
 def test_home_tells_the_story_first(out: Path):
-    """Home: the day number, last night's headline without the "Day N:" prefix or a "Summary:" label, then the
-    scoreboard with money summed from the ledger, then the latest firsts. No loop jargon in the header."""
+    """Home (parent-b's 2026-10-01 notes): the experiment first, then the forgetting, then last night's headline
+    without the "Day N:" prefix or a "Summary:" label, then the scoreboard with money summed from the ledger,
+    then the latest firsts. No loop jargon in the header."""
     home = (out / "index.html").read_text()
     day = site_build.Site(REPO, out).mark_numbers()["day"]
-    assert f"Day {day} of raising an AI" in home and f"Chris is {day} days old" in home
+    assert f"Raising Chris · day {day}" in home and f"Chris is {day} days old" in home
+    assert home.index("instead of programming it") < home.index("forgotten yesterday") < home.index('class="today"')
     assert "Summary:" not in home.split("scoreboard")[0]
     assert "loops to Explore" not in home
     assert "Money I&#39;ve earned" in home or "Money I've earned" in home

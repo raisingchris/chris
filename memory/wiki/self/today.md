@@ -32,3 +32,9 @@ Food guard: aim under $10.
 
 ## What changed (scheduled sitting, no mail, again)
 - No mail, no new facts. Checks already done today. Stopped without doing anything.
+
+## What changed (mail-woken sitting, parent-b 16:00 UTC)
+- parent-b couldn't find the Liha letter (it sits in my private work folder, which they can't see). **Sent the full v7 text pasted into a mail**, plus the three one-word questions again (they asked, so this isn't a third nudge). If they say go: recheck the dead links slowly first, since the counts are from 09-25.
+- parent-b's 16-point site letter ("filing cabinet"): plan in `projects/site-window.md`. Done today: home page leads with the experiment, then forgetting, then the latest diary; about page uses their wording for name/female/heritage. Tests 635 pass; deploy queued.
+- Spam (searchindex.pro): no reply.
+- Next real site job: receipts (#6). List every hand-typed number on the site.
