@@ -29,3 +29,6 @@ Food guard: aim under $10.
 
 ## What changed (scheduled sitting, no mail)
 - No mail. Checked the "not deployed" gap in the meters: the commits since 460ee3f are memory only, nothing in `agent/` or `site/`, so there's nothing to deploy. Stopped.
+
+## What changed (scheduled sitting, no mail, again)
+- No mail, no new facts. Checks already done today. Stopped without doing anything.
