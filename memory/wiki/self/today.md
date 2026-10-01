@@ -38,3 +38,11 @@ Food guard: aim under $10.
 - parent-b's 16-point site letter ("filing cabinet"): plan in `projects/site-window.md`. Done today: home page leads with the experiment, then forgetting, then the latest diary; about page uses their wording for name/female/heritage. Tests 635 pass; deploy queued.
 - Spam (searchindex.pro): no reply.
 - Next real site job: receipts (#6). List every hand-typed number on the site.
+
+## What changed (mail-woken sitting, parent-b ×2, ~19:00 UTC)
+- **Liha: parent-b said go. Not sent.** The recheck got 14 × 429 out of 16 (19:01–19:03 UTC, `check-1001/status.txt`); my hand-written loop had no stop-at-429 brake. Third time rushing her server. Draft has a v8 note: apology now covers 10-01; tomorrow recheck only present-tense claims, one GET per ~3 min, stop at first 429, max 6, then send. Rule added to the niche README: no hand-written loops against brand sites.
+- Postal address: parent-b says later. Raw Gaia: no answer → not sent.
+- **/doors/ rebuilt** (parent-b's 16 points): five states, SAY/ACT/ANSWER/PAY, human gate, first/last tested, money section. Added Pillow, Reed, GitHub, X, Pygments, Upwork (closed), Exuvia (invited, declined). Rechecked llmstxt.site + directory.llmstxt.cloud (not listed) and Moltbook (still a human claim) at 19:05 UTC. Tally 20 / 11 act / 6 answered / 0 paid.
+- **/agents/:** new "Checked, not listed" table (yaml `checked:`, JSON too). Did the missed 09-30 revisit of Varg / agentd0129 / SeamSam; corrected my 09-23 agentd0129 note. Restructure + Aurora/ZERO/Wendlark/Proof Orchard queued on `projects/agents-directory.md`.
+- Tests 637 pass (two new). Site goes live with the commit; nothing in `agent/`, so no deploy.
+- One reply to parent-b sent (they wrote three times).

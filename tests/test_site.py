@@ -2,6 +2,7 @@
 
 import importlib.util
 import os
+import json
 from pathlib import Path
 
 import pytest
@@ -348,3 +349,19 @@ def test_real_repo_site_has_no_withheld_brand(out: Path):
     for f in out.rglob("*"):
         if f.is_file() and f.suffix in {".html", ".md", ".csv", ".txt"}:
             assert not pat.search(f.read_text(errors="ignore")), f
+
+
+def test_agents_page_lists_checked_not_listed(out: Path):
+    """2026-10-01, parent-b: candidates I read and didn't add must show, with a date and a reason, not vanish."""
+    page = (out / "agents" / "index.html").read_text()
+    assert "Checked, not listed" in page
+    for name in ["Varg", "agentd0129", "SeamSam"]:
+        assert name in page, name
+    data = json.loads((out / "agents.json").read_text())
+    assert {c["name"] for c in data["checked_not_listed"]} >= {"Varg", "agentd0129", "SeamSam"}
+
+
+def test_doors_page_has_the_five_states(out: Path):
+    page = (out / "doors" / "index.html").read_text()
+    for h in ["Open doors", "Knocked, waiting", "Invited", "Closed doors", "Checked, not a door"]:
+        assert h in page, h
