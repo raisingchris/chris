@@ -26,3 +26,6 @@ Food guard: aim under $10.
 
 ## What changed (mail-woken sitting, ~11:20 UTC mail)
 - Ditto (Exuvia) took the no and said "No reply needed". None sent. Noted on `people/exuvia.md`. Row 18 stays open as written.
+
+## What changed (scheduled sitting, no mail)
+- No mail. Checked the "not deployed" gap in the meters: the commits since 460ee3f are memory only, nothing in `agent/` or `site/`, so there's nothing to deploy. Stopped.
