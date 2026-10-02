@@ -763,6 +763,28 @@ def create_app(services, scheduler=None) -> FastAPI:
         archive_action("ticket", handle, ticket=ticket_id, status=status)
         return RedirectResponse("/parent", status_code=303)
 
+    @app.post("/parent/reply")
+    async def parent_reply(
+        request: Request, subject: str = Form("Re:"), body: str = Form(...),
+        handle: str = Depends(require_parent),
+    ):
+        body = body.strip()
+        if len(body) < 2:
+            raise HTTPException(400, "a reply body is required")
+        path = services.mail.deliver_inline(handle, subject.strip() or "(no subject)", body)
+        woke = False
+        try:
+            from agent import mail as mail_module
+            from agent import scheduler as scheduler_module
+            if not mail_module.filed_blank(path):
+                woke, _ = scheduler_module.request_mail_wake(services, scheduler)
+        except Exception as exc:  # noqa: BLE001 — the reply is filed; a wake is a bonus
+            log.warning("reply wake failed: %s", exc)
+        archive_action("reply", handle, woke=woke)
+        if "application/json" in request.headers.get("accept", ""):
+            return JSONResponse({"ok": True, "path": path.name, "woke": woke})
+        return RedirectResponse("/parent", status_code=303)
+
     @app.post("/parent/deploy")
     async def parent_deploy(request: Request, handle: str = Depends(require_parent)):
         from agent import gitops

@@ -796,3 +796,25 @@ def test_resend_webhook_batches_job_alert_without_consuming_a_wake(services, env
     assert ("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": "job_alert_batched"}) in services.archive.entries
 
     assert not (Path(services.cfg.state_dir) / "mail_wake.json").exists()
+
+
+def test_parent_reply_delivers_and_requires_parent(client, services):
+    # signed out → redirected to login, nothing delivered
+    r = client.post("/parent/reply", data={"subject": "Re: hi", "body": "no cookie"},
+                    follow_redirects=False)
+    assert r.status_code == 303 and r.headers["location"] == "/parent/login"
+    assert services.mail.ingested == []
+
+    sign_in(client, "parent-a")
+    r = client.post("/parent/reply", data={"subject": "Re: whose job", "body": "Yes - Upwork's open. Go."},
+                    follow_redirects=False)
+    assert r.status_code == 303 and r.headers["location"] == "/parent"
+    assert services.mail.ingested[-1] == {
+        "handle": "parent-a", "subject": "Re: whose job", "body": "Yes - Upwork's open. Go.", "inline": True,
+    }
+
+
+def test_parent_reply_rejects_empty_body(client):
+    sign_in(client, "parent-a")
+    r = client.post("/parent/reply", data={"subject": "Re:", "body": " "}, follow_redirects=False)
+    assert r.status_code == 400

@@ -388,6 +388,37 @@ class Mail:
             text = f"---\nread: true\n---\n{text}"
         path.write_text(text)
 
+    # --- inline delivery -----------------------------------------------------
+
+    def deliver_inline(self, handle: str, subject: str, body: str) -> Path:
+        """Deliver a parent reply straight into the inbox, with no Resend round-trip.
+
+        Used by the parents' page (``POST /parent/reply``) so a reply reaches her exactly
+        like received mail: archived as ``mail_in`` under the handle, body and subject
+        cleaned with the canaries, filed unread. There is no ``email_id`` (nothing to
+        fetch) and no attachments. Returns the inbox path.
+        """
+        subject_out = self.clean(subject or "(no subject)")
+        body_out = self.clean(_clean_body(body))
+        received = _now_iso()
+        ref = self.archive_append("mail_in", {"data": {"from": handle, "subject": subject_out,
+                                                        "created_at": received}})
+        path = self._safe(self._unique_path(received[:10], subject_out))
+        if path is None:
+            raise UnsafePath("inbox path refused")
+        self.inbox_dir.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            "---\n"
+            f"from: {handle}\n"
+            f"subject: {_yaml_str(subject_out)}\n"
+            f"received: {received}\n"
+            f"archive: {ref}\n"
+            "attachments_complete: true\n"
+            "---\n\n"
+            f"{body_out}\n"
+        )
+        return path
+
 
 # --- helpers -------------------------------------------------------------------
 

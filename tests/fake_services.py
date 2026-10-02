@@ -61,6 +61,10 @@ class FakeMail:
         self.ingested.append(payload)
         return Path("inbox.md")
 
+    def deliver_inline(self, handle, subject, body):
+        self.ingested.append({"handle": handle, "subject": subject, "body": body, "inline": True})
+        return Path(f"{handle}-reply.md")
+
     def list_unread(self):
         return list(self.unread)
 

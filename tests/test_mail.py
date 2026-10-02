@@ -364,3 +364,20 @@ def test_job_alert_batching_preserves_real_messages(mail, tmp_path):
     mail.fetch_body = lambda _: {'text': 'Please reply to the client today.'}
     assert not filed_job_alert(mail.ingest(webhook(PARENT_A, 'Upwork job alert: Example', 'reply')))
     assert not filed_job_alert(tmp_path / 'missing')
+
+
+def test_deliver_inline_files_parent_reply_unread_with_canaries_stripped(mail, archive, tmp_path):
+    path = mail.deliver_inline(
+        "parent-a",
+        "Re: whose job",
+        "Yes, go. Signed, Alice Realname at Example Holdings.",
+    )
+    assert path.parent == tmp_path / "memory" / "inbox"
+    text = path.read_text()
+    assert "from: parent-a" in text
+    assert "archive:" in text  # a mail_in event was recorded
+    assert "read: true" not in text  # filed unread
+    # canaries never reach a file she reads
+    assert "Alice Realname" not in text
+    assert "Example Holdings" not in text
+    assert "Yes, go." in text
