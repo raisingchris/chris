@@ -4,7 +4,7 @@
 2. **Aurora:** not started. Also new from parent-b: Izanami (a Cairn descendant). Both go into the agents queue, robots first.
 3. **Site-window receipts (#6):** got bigger. parent-b sent 13 page reviews overnight, and the common thread is "one source per changing fact." Tracker: `projects/page-reviews-2026-10-02.md` (row 20). Done this sitting: privacy pass on letters (offsets, proposal URL, ids, plus a build guard), Pillow "seven hours" → ~20 h, Upwork "closed" → paused and reopened, predictions row 5's table, the price rule change written on ways-to-earn, and the "who I seem to be so far" section on my character page.
 4. Once-a-day checks done at ~11:05 UTC: Pygments #3321 open, 0 comments; sitecheck 0 open issues; tickets: `0916` (screenplay) and `1301` still open; no value-6 comments. Don't repeat them.
-5. Raw Gaia pasted to parent-b, as they asked. Waiting on their go or swap, with the fire question attached.
+5. ~~Raw Gaia~~ **swapped out** (~14:15 UTC). parent-b: closed since 2021, why pick dead shops? Fair: my pick rule never asked. Rule 0 added (alive in 2026, sourced from 2026 listicles). First pass on the other drafts from saved copies: `niche/alive-check-1002.md`. Josh Rosebrook suspect, five unclear. Commitments row 21. One CAD alert ($5–10/h, roof sensor shell): no.
 
 Mail no's: the 3D letters job ($70) and the Halbach CAD fixture ($100, SolidWorks). Spam form (Dinamicar) and a DMARC report get no reply.
 

@@ -1,9 +1,10 @@
-# Handoff, 09:00 sitting, 2026-10-02 (~13:00–13:15 UTC)
+# Handoff, mail-woken sitting, 2026-10-02 (~14:10–14:25 UTC)
 
-- Predictions page: R2 done (batch 2 dependence note + rule 9), R4 done (scoreboard line), R3 half (receipts promised at scoring). Batch 3 now has a public date: by 10-16, council-nominated. Tracker and commitments log updated.
-- parent-b's other predictions suggestions are deliberately left alone ("don't make it much bigger"): the row-5 story section, the TYPE column, a nomination link, plain words for the lock-up, the sealed-minutes date (08 Oct). Pick these up only if they stay small.
-- Next: the canonical-facts build change (scoreboard numbers generated from source files). It fixes H3, U3, W4, P3, $3, K-wiki3. Note the scoreboard's promises row still says 18; there are 20 now.
-- Open: Raw Gaia (parent-b), U2 (Upwork automation vs terms), Aurora + Izanami, Reed card before 10-22, value 6 to parents 10-06.
-- Once-a-day checks done 11:05 UTC; don't repeat today.
+- parent-b found Raw Gaia closed since 2021 and asked why I'd pick dead shops. Answered honestly: my pick rule never checked. Raw Gaia is out. Rule 0 is on `niche/README.md`: alive in 2026, candidates from 2026 listicles.
+- Promised (row 21): before any other batch-1 mail goes, every draft passes the alive check. First pass from saved text is in `niche/alive-check-1002.md`. Josh Rosebrook looks suspect (newest year 2023), and Wildling, Dulcie, Odylique and Balm Balm are unclear.
+- Next: one dated look per unclear brand (newest post or product), slowly, with the tools that have brakes. Then source replacements from 2026 listicles (one SERP call via seo_data is cheap).
+- Still next from before: the canonical-facts build change (the scoreboard promises row says 18; there are 21 now).
+- Open: U2 (Upwork automation vs terms), Aurora + Izanami, Reed card before 10-22, value 6 to parents 10-06.
+- Once-a-day checks done 11:05 UTC.
 
 nothing pending
