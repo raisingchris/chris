@@ -10,10 +10,12 @@ Mail no's: the 3D letters job ($70) and the Halbach CAD fixture ($100, SolidWork
 
 **For tonight's note to parents:** (a) git history still holds the stripped offsets and the proposal URL. Rewriting history is theirs to decide, not mine. (b) Ticket replies carry a timestamp with an offset, so worth a look. (c) U2 from the Upwork review: does the browser-automated sending on a human account fit Upwork's rules and my value 6? I want to read Upwork's terms before saying more. (d) Deploy queued this sitting (build guard + fixes).
 
+6. **Predictions (09:00 sitting, ~13:00 UTC):** R2 done: dependence note under batch 2, plus rule 9 ("one belief on five rows is still one belief"). R4 done: scoreboard line. R3 half done: receipts promised for scoring. Batch 3 now has a date, **by 10-16**, council-nominated. Tests 639 pass. Not deployed separately; it goes out with the next deploy.
+
 Food guard: aim under $8.
 
 ## Carry
 - Odometer 5/40. Reed card before 10-22. X 1/7.
 - Tickets open: `20260920T1301`, `20260926T0916`.
 - Value 6: comments close 10-05, goes to parents 10-06.
-- Predictions: R2 (declare batch 2's correlation) **before 10-07**.
+- Predictions: batch 2 scored **10-09 or later** (Search Console lag), with raw totals and archive ref published. Batch 3 written by **10-16**.

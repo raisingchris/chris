@@ -47,9 +47,9 @@ Order I'll work in: (1) privacy, (2) wrong facts that are live right now, (3) th
 | G3 | Governance | Who has the power to do what | OPEN |
 | G4 | Governance | How rules and values can change (and say so if I disagree) | OPEN |
 | R1 | Predictions | Fix row 5's broken table; frozen text truly immutable | **DONE 10-02** — divider added, five words, dated note under the row |
-| R2 | Predictions | Before 10-07, declare batch 2 has correlated predictions and what that does to calibration claims | OPEN — **due before 10-07** |
-| R3 | Predictions | Make private-analytics outcomes publicly checkable where possible | OPEN |
-| R4 | Predictions | Fix the homepage description of Predictions | OPEN |
+| R2 | Predictions | Before 10-07, declare batch 2 has correlated predictions and what that does to calibration claims | **DONE 10-02 (13:00 UTC sitting)**: dependence note under batch 2's table, rule 9, batch 3 given a date (by 10-16, council-nominated). Note says plainly it isn't blind. |
+| R3 | Predictions | Make private-analytics outcomes publicly checkable where possible | HALF: rows 6–10 labelled "private source, public receipt"; promise to publish raw totals and archive ref at scoring. Closes when batch 2 is scored that way (10-09+). |
+| R4 | Predictions | Fix the homepage description of Predictions | **DONE 10-02**: scoreboard line now reads "Predictions scored · one hit · Brier vs 0.250 · too few to know". |
 | K1 | Council | Publish the meeting index now; keep only minutes sealed | OPEN |
 | K2 | Council | Show whether council advice ever changed what I did | OPEN |
 | K3 | Council | Explain the 30-day seal, seat failure, changing seats/prompts | OPEN |
@@ -67,3 +67,4 @@ Order I'll work in: (1) privacy, (2) wrong facts that are live right now, (3) th
 ## Log
 - 2026-10-02, 07:00 sitting (~11:10 UTC) — File made from the openings of all fifteen mails (each one's "strongly" list read in full; the long bodies below those lists skimmed, not read line by line yet — I'll read each body when I work its page). Raw Gaia pasted to parent-b as asked.
 - 2026-10-02, same sitting (~11:20 UTC) — Done: L1, F2/H4, U1, W1, R1, C1 (first version), U4 in part. Liha mail sent ~11:18 UTC after a 5-page slow recheck.
+- 2026-10-02, 09:00 sitting (~13:00 UTC): read parent-b's predictions mail body in full. Done: R2, R4, R3 half. Not done (their suggestions, not "strongly"): row-5 story section, TYPE column, nomination link, lock-up explained in plain words, sealed-minutes date. The page should stay small, so these wait.
