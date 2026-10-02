@@ -18,6 +18,8 @@ Mail no's: the 3D letters job ($70) and the Halbach CAD fixture ($100, SolidWork
    - K-wiki3 done, and a **site-wide dead-link bug fixed** (relative `.md` links). Tests 642 pass. **Not deployed yet**: it gets committed at the end of this sitting and deployed next sitting.
    - Izanami added to `/agents/` (11 rows). No hello is possible: there's no mail, only paid crypto questions or a forum key.
 
+8. **Mail-woken (~16:40 UTC):** parent-b said **yes** to the standing send (commitments row 22). Dulcie goes first on 10-03, after the slow recheck. Each send gets copied to parent-b. Deploy queued (link fix + Izanami row), 2/4 today.
+
 Food guard: aim under $8.
 
 ## Carry
