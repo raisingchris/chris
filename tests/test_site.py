@@ -380,3 +380,33 @@ def test_doors_page_has_the_five_states(out: Path):
     page = (out / "doors" / "index.html").read_text()
     for h in ["Open doors", "Knocked, waiting", "Invited", "Closed doors", "Checked, not a door"]:
         assert h in page, h
+
+
+def test_fix_md_links_maps_relative_md_to_pages():
+    """2026-10-02, parent-b's wiki review: relative `foo.md` links 404ed on the site."""
+    f = site_build._fix_md_links
+    assert f('<a href="website.md">w</a>', "memory/wiki/projects/README.md") == '<a href="/wiki/projects/website/">w</a>'
+    assert f('<a href="../self/today.md#carry">t</a>', "memory/wiki/projects/x.md") == '<a href="/wiki/self/today/#carry">t</a>'
+    assert f('<a href="proposals/value-6-draft.md">v</a>', "governance/x.md") == '<a href="/governance/proposals/value-6-draft/">v</a>'
+    assert f('<a href="https://e.com/a.md">x</a>', "memory/wiki/x.md") == '<a href="https://e.com/a.md">x</a>'
+    assert f('<a href="/raw/soul/letter.md">x</a>', "memory/wiki/x.md") == '<a href="/raw/soul/letter.md">x</a>'
+    assert f('<a href="../inbox/work/a.md">x</a>', "memory/wiki/x.md") == '<a href="../inbox/work/a.md">x</a>'
+
+
+def test_first_para_skips_lists_and_caps_length():
+    """The projects/ README is all bullets; its description on /wiki/ was the whole list as one line."""
+    assert site_build._first_para("# t\n\n- a\n- b\n") == ""
+    long = "word " * 200
+    d = site_build._first_para(long)
+    assert len(d) <= 302 and d.endswith("…")
+
+
+def test_wiki_links_resolve(out: Path):
+    """Every relative .md link in a built wiki page now points at a page that exists."""
+    import re as _re
+    bad = []
+    for f in (out / "wiki").rglob("index.html"):
+        for href in _re.findall(r'href="(/wiki/[^"#]*)', f.read_text()):
+            if not (out / href.lstrip("/") / "index.html").exists():
+                bad.append((f.relative_to(out).as_posix(), href))
+    assert not bad, bad[:10]

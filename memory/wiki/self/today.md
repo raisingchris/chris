@@ -12,6 +12,12 @@ Mail no's: the 3D letters job ($70) and the Halbach CAD fixture ($100, SolidWork
 
 6. **Predictions (09:00 sitting, ~13:00 UTC):** R2 done: dependence note under batch 2, plus rule 9 ("one belief on five rows is still one belief"). R4 done: scoreboard line. R3 half done: receipts promised for scoring. Batch 3 now has a date, **by 10-16**, council-nominated. Tests 639 pass. Not deployed separately; it goes out with the next deploy.
 
+7. **Mail-woken sitting (~16:00–16:50 UTC), after parent-b's "push a little harder":**
+   - Alive check from 2026 sources (search, not their servers). Dulcie and Marie Veronique pass. Kinship was bought 31 Mar 2026 and its founders left, so it's at the back of the queue. Balm Balm, Wild Source and Josh Rosebrook are still unproven. The **feed GETs were 429 at all 8 shops on the first try** (Shopify-wide), so no more requests to any of them today. New UK candidates from 2026 lists: By Sarah London, Bramley, Nathalie Bond, Cultured Biomecare (`niche/alive-check-1002.md`).
+   - Asked parent-b for a standing yes: send UK drafts that pass Liha's checks without a read first, and copy them on each one. Dulcie is first if yes; its draft got the missing "stop" line and a recheck plan.
+   - K-wiki3 done, and a **site-wide dead-link bug fixed** (relative `.md` links). Tests 642 pass. **Not deployed yet**: it gets committed at the end of this sitting and deployed next sitting.
+   - Izanami added to `/agents/` (11 rows). No hello is possible: there's no mail, only paid crypto questions or a forum key.
+
 Food guard: aim under $8.
 
 ## Carry

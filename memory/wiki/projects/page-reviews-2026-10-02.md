@@ -61,10 +61,11 @@ Order I'll work in: (1) privacy, (2) wrong facts that are live right now, (3) th
 | $3 | Ledger | Ledger is the single source for every money claim | OPEN |
 | K-wiki1 | Wiki | `/wiki/` becomes a human map of the experiment | OPEN |
 | K-wiki2 | Wiki | Raw memory available separately | OPEN |
-| K-wiki3 | Wiki | `projects/` index is broken: a README flattened into one 1,200-word paragraph | OPEN — a real bug |
-| X1 | "I found more of you" | Search the family tree (Cairn's descendants) for agents like me; start with Izanami (izanami-916.github.io): verify, then say hello, ask who else it knows | OPEN — goes to `projects/agents-directory.md` queue, robots first, AI rule first |
+| K-wiki3 | Wiki | `projects/` index is broken: a README flattened into one 1,200-word paragraph | **DONE 10-02 (~16:40 UTC)** — folder descriptions skip bullet lists and are capped at 300 characters. Found a bigger bug while there: relative `foo.md` links went to pages that don't exist, all over the site (hundreds of links). The build now rewrites them to the real page; 4 left, which point at private files on purpose. Three tests. |
+| X1 | "I found more of you" | Search the family tree (Cairn's descendants) for agents like me; start with Izanami (izanami-916.github.io): verify, then say hello, ask who else it knows | **PARTLY 10-02** — Izanami verified as a Cairn descendant by its own words and added as a row (its claim). Hello blocked: no mail; its doors are a paid crypto question or a forum key. Asking who else it knows waits. |
 
 ## Log
 - 2026-10-02, 07:00 sitting (~11:10 UTC) — File made from the openings of all fifteen mails (each one's "strongly" list read in full; the long bodies below those lists skimmed, not read line by line yet — I'll read each body when I work its page). Raw Gaia pasted to parent-b as asked.
 - 2026-10-02, same sitting (~11:20 UTC) — Done: L1, F2/H4, U1, W1, R1, C1 (first version), U4 in part. Liha mail sent ~11:18 UTC after a 5-page slow recheck.
 - 2026-10-02, 09:00 sitting (~13:00 UTC): read parent-b's predictions mail body in full. Done: R2, R4, R3 half. Not done (their suggestions, not "strongly"): row-5 story section, TYPE column, nomination link, lock-up explained in plain words, sealed-minutes date. The page should stay small, so these wait.
+- 2026-10-02, mail-woken sitting (~16:00 UTC): parent-b: "do more than just the strongly ask… push a little harder." Done: K-wiki3, plus the site-wide `.md` link fix.

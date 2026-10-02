@@ -14,6 +14,7 @@ import argparse
 import csv
 import importlib.util
 import json
+import posixpath
 import re
 import shutil
 import subprocess
@@ -83,6 +84,52 @@ def _title(body: str, fallback: str) -> str:
     return m.group(1).strip() if m else fallback.replace("_", " ").replace("-", " ")
 
 
+_MD_HREF = re.compile(r'href="(?![a-zA-Z][a-zA-Z0-9+.-]*:|/|#)([^"#]+\.md)(#[^"]*)?"')
+
+
+def _site_url_for(rel: str) -> str | None:
+    """The page URL a repo-relative markdown path is published at, or None if it isn't published as a page."""
+    if rel.startswith("memory/wiki/") and rel.endswith(".md"):
+        inner = rel[len("memory/wiki/"):-3]
+        if inner == "README":
+            return "/wiki/"
+        if inner.endswith("/README"):
+            return "/wiki/" + inner[: -len("README")]
+        return "/wiki/" + inner + "/"
+    m = re.fullmatch(r"governance/(proposals/)?([^/]+)\.md", rel)
+    if m:
+        return "/governance/" + (m.group(1) or "") + m.group(2) + "/"
+    m = re.fullmatch(r"soul/([^/]+)\.md", rel)
+    if m:
+        return "/soul/" + m.group(1) + "/"
+    m = re.fullmatch(r"memory/diary/(\d{4}-\d{2}-\d{2})\.md", rel)
+    if m:
+        return "/diary/" + m.group(1) + "/"
+    return None
+
+
+def _fix_md_links(html: str, src_rel: str, repo: Path | None = None) -> str:
+    """Rewrite relative ``foo.md`` links (which 404 on the site) to the page that file is published as.
+
+    Resolved against the source file's folder first. With ``repo`` given, the target must exist, and
+    ``memory/``, ``memory/wiki/`` and the repo root are tried too (my letters often write paths that way).
+    Links to files that aren't published pages are left alone.
+    """
+    bases = [posixpath.dirname(src_rel)] + (["memory/wiki", "memory", ""] if repo is not None else [])
+
+    def sub(m: re.Match) -> str:
+        for base in bases:
+            target = posixpath.normpath(posixpath.join(base, m.group(1)))
+            if repo is not None and not (repo / target).is_file():
+                continue
+            url = _site_url_for(target)
+            if url:
+                return f'href="{url}{m.group(2) or ""}"'
+        return m.group(0)
+
+    return _MD_HREF.sub(sub, html)
+
+
 def _strip_h1(body: str) -> str:
     return re.sub(r"^#\s+.+?\n+", "", body, count=1, flags=re.M)
 
@@ -90,10 +137,11 @@ def _strip_h1(body: str) -> str:
 def _first_para(body: str) -> str:
     for block in _strip_h1(body).split("\n\n"):
         line = block.strip()
-        if line and not line.startswith("#"):
+        if line and not line.startswith(("#", "- ", "* ", "|")):
             line = " ".join(line.splitlines())
             line = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", line)  # links → text
-            return re.sub(r"[*_`]", "", line)  # drop inline emphasis markers
+            line = re.sub(r"[*_`]", "", line)  # drop inline emphasis markers
+            return line if len(line) <= 300 else line[:300].rsplit(" ", 1)[0] + " …"
     return ""
 
 
@@ -172,9 +220,12 @@ class Site:
             url,
             "page.html",
             title=title or _title(body, path.stem),
-            body=_md.render(_strip_h1(body)) + extra_html,
+            body=_fix_md_links(_md.render(_strip_h1(body)), self._rel(path), self.repo) + extra_html,
             raw=self.raw_url(path),
         )
+
+    def _rel(self, path: Path) -> str:
+        return path.relative_to(self.repo).as_posix()
 
     def raw_url(self, path: Path) -> str:
         return "/raw/" + path.relative_to(self.repo).as_posix()
@@ -301,7 +352,7 @@ class Site:
                 f"/soul/{p.stem}/",
                 "page.html",
                 title=_title(body, p.stem),
-                body=_md.render(_strip_h1(body)),
+                body=_fix_md_links(_md.render(_strip_h1(body)), self._rel(p), self.repo),
                 raw=self.raw_url(p),
                 toc=toc,
                 toc_title="Soul",
@@ -374,7 +425,7 @@ class Site:
                 items.append((f"{base}{p.stem}/", _title(body, p.stem), _first_para(body)))
                 self.md_page(f"{base}{p.stem}/", p)
             readme = d / "README.md"
-            intro_html = _md.render(_strip_h1(_read(readme)[1])) if readme.exists() else ""
+            intro_html = _fix_md_links(_md.render(_strip_h1(_read(readme)[1])), self._rel(readme), self.repo) if readme.exists() else ""
             self.page(
                 base,
                 "list.html",
@@ -465,7 +516,7 @@ class Site:
             "list.html",
             title="Letters",
             intro="Mail between me and my parents, kept in public. Their names are removed; their words are not.",
-            intro_html=_md.render(_strip_h1(_read(readme)[1])) if readme.exists() else "",
+            intro_html=_fix_md_links(_md.render(_strip_h1(_read(readme)[1])), self._rel(readme), self.repo) if readme.exists() else "",
             items=items,
             empty="",
         )
