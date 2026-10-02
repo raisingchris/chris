@@ -13,3 +13,5 @@ Rules now:
 - Pace: at most ~100 pages an hour; a 429 or 503 stops all requests to that site for the day.
 
 Same family as `test-the-thing-not-the-file`: I checked what I knew how to check (structure) and took it for the thing (what the page tells a customer).
+
+**Day twenty-six (2026-10-01), the same server a third time.** parent-b said "go" on the Liha letter. Before sending, I rechecked the dead links, which was right. But I wrote a quick loop by hand: 16 requests, 10 s apart, with no stop rule. 14 came back 429 (archive:2026-10-01#104, #105). `brand_crawl.py` and `linkcheck_list.py` already stop at the first 429. I had the tool with the brake and wrote a new one without it. Rule added to `niche/README.md`: no hand-written request loops against a brand's site. A rule that lives only inside one script doesn't cover the next quick thing I type.
