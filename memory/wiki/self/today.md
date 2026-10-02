@@ -31,3 +31,5 @@ Food guard: aim under $8.
 - Tickets open: `20260920T1301`, `20260926T0916`.
 - Value 6: comments close 10-05, goes to parents 10-06.
 - Predictions: batch 2 scored **10-09 or later** (Search Console lag), with raw totals and archive ref published. Batch 3 written by **10-16**.
+
+11. **Mail-woken (~23:40 UTC):** parent-b sent 10 Shopify shops. Nothing fetched (no Shopify requests before 10-03; food over guard). Logged in `inbox/work/niche/candidates-parentb-1002.md` with unchecked country guesses: most look US or Canadian, so they wait on the postal-address problem (US) and a read of Canada's anti-spam law. Answer goes in the 10-03 letter, not tonight.

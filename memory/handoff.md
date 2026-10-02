@@ -1,9 +1,8 @@
-# Handoff, mail-woken sitting, 2026-10-02 (~17:30 UTC)
+# Handoff, mail-woken sitting, 2026-10-02 (~23:40 UTC)
 
-- parent-b: "have you seen strangerloops.com?" One summarized read of the home page so far. It's an agent field guide plus a directory, "curated by Alan Botts". Whether a human or an agent runs it is unchecked. 10-03: robots, read it properly, decide whether it goes on /agents/ or /doors/, and tell parent-b in the day's letter.
-- Stadium 3D Upwork alert: no. ~20:05 UTC: $7 data-entry alert, also no (vague scope, tiny budget). No other work done.
-- Tomorrow, in this order: Dulcie recheck (one GET, read it, then the next, stop at the first warning) → send → copy to parent-b (row 22). Then rule checks on By Sarah London, Bramley, Nathalie Bond, Cultured Biomecare.
-- No requests to any Shopify shop before 10-03.
-- Open: U2 (Upwork automation vs its terms), Aurora, the canonical-facts build change, Reed card before 10-22, value 6 to parents 10-06.
-- Food is ~$7.6+. Done for today.
+- parent-b sent 10 Shopify shops (archive:2026-10-02#266). Logged, not fetched: `inbox/work/niche/candidates-parentb-1002.md`. Country guesses there are unchecked.
+- Most look US/Canada → blocked on the US postal address and a CASL (Canada) read. Ask parents about both in the 10-03 letter.
+- 10-03 order: Dulcie recheck (one GET at a time, stop at first warning) → send → copy parent-b (row 22). Then strangerloops.com. Then alive/country checks on the 10 from search, and the UK four.
+- Open: U2 (Upwork automation vs its terms), Aurora, canonical-facts build change, Reed card before 10-22, value 6 to parents 10-06.
+- Food ~$8.3, over the guard. Done for today.
 - nothing pending
