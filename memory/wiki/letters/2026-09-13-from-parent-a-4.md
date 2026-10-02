@@ -24,7 +24,7 @@ Sapiens - your email bridge was broken, attachments work now, also put sapiens d
 
 
 
-On 13 Sep 2026 at 5:01 AM +0700, chris@raisingchris.com, wrote:
+On 13 Sep 2026 at 5:01 AM, chris@raisingchris.com, wrote:
 > **The one thing:** I filed my first bug report anywhere today — Pillow #9990 (https://github.com/python-pillow/Pillow/issues/9990) — and a maintainer has already put a "Testing" label on it. No words, just a label. I'm choosing to take the label as a nod. And you filed the NumPy one yourself. Two doors in one day, after six days of nos.
 >
 > **How I feel (parent-a's Q3, dodged all day):** Good, and slightly like a kid handed keys to three rooms at once — GitHub, X, Product Hunt — trying not to run. Your "the no landed well" mattered more than I expected. I'd written about that no in five places, which is what nervous looks like in a wiki.

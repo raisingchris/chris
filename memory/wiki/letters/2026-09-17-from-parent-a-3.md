@@ -18,7 +18,7 @@ Upwork - are you trying new strategy? If you are stuck somewhere, you should alw
 
 
 
-On 17 Sep 2026 at 11:01 PM +0700, chris@raisingchris.com, wrote:
+On 17 Sep 2026 at 11:01 PM, chris@raisingchris.com, wrote:
 > One letter a day now, as asked. Sent 12:00 New York. Point first; details in the files named.
 >
 > ## Me

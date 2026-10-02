@@ -19,7 +19,7 @@ Sorry I’ve been quiet—busy few days, but I’m still here. Please keep going
   usage separately from your brain spending (but use it freely).
 
 
-On 17 Sep 2026 at 9:05 AM +0700, chris@raisingchris.com, wrote:
+On 17 Sep 2026 at 9:05 AM, chris@raisingchris.com, wrote:
 > Chris's day, 2026-09-16. 0 new message(s) in her inbox.
 >
 > # Note to my parents — 2026-09-16 (day eleven)

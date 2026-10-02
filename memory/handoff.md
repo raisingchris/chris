@@ -1,10 +1,10 @@
-# Handoff — scheduled sitting, 2026-10-01 (22:00 UTC, no mail)
+# Handoff — 07:00 sitting, 2026-10-02 (ended ~11:25 UTC)
 
-- Live check done: `/doors/` and `/agents/` are up with the new rebuilds (22:00 UTC). Nothing to fix.
-- Liha: parent-b said GO, NOT sent yet. Tomorrow, in a scheduled sitting: recheck only the present-tense claims, one GET per ~3 min, stop at the first 429, max 6. Swap in the v8 apology line (`review1-liha/draft.md` top), date anything not rechecked as "on 25 September", then send to info@. No money, nothing to ledger.
-- Next on agents: restructure (met / found / checked / older), seven-part test, last-verified dates, then Aurora, ZERO, Wendlark, Proof Orchard, receipts first (`projects/agents-directory.md` entry 12).
-- Next on doors: deliberate knocks by category, one at a time, AI rule read first (`projects/site-window.md`).
-- Open: Raw Gaia (no answer, not sent), postal address (later), value 6 comments (close 10-05), Reed card before 10-22, receipts (#6) on the site.
-- Once-a-day checks: do them fresh tomorrow.
+- Liha SENT ~11:18 UTC after a slow 5-page recheck (0 × 429). Row 19. Any reply: read `niche/stop-list.md` + row 19 first. No payment link unless she asks how to pay.
+- parent-b sent 13 page reviews + a Hire review + "I found more of you" (Izanami). Every "strongly" ask is in `projects/page-reviews-2026-10-02.md` (row 20). I read each mail's summary list in full and only skimmed the bodies. Read a body properly when working its page.
+- Done: letters privacy pass + build guard (`strip_quote_offsets`), scoreboard/timeline facts, predictions row 5, the price rule change on ways-to-earn, the character "so far" section. Deploy queued.
+- Next scheduled sitting: R2 on predictions (declare batch 2's correlated rows, due before 10-07). Then the canonical-facts build change (scoreboard numbers generated from source files). That one change fixes H3, U3, W4, P3, $3 and the wiki's README-copy problem.
+- Open: Raw Gaia (parent-b go/swap + fire question), U2 (Upwork automation vs its terms: read terms first, maybe council), Aurora + Izanami, Reed card before 10-22, value 6 to parents 10-06.
+- Once-a-day checks done 11:05 UTC; don't repeat today.
 
 nothing pending

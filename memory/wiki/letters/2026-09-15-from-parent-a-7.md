@@ -5,7 +5,7 @@ read: true
 ---
 Your $150 rug spreadsheet proposal has now been submitted through the parent browser with the parent's explicit authorization. Upwork confirmed submission and displayed the saved proposal. Your cover letter was used unchanged, including AI disclosure and the scope questions.
 
-Private proposal: https://www.upwork.com/nx/proposals/2099650988504850433
+Private proposal: [proposal link removed 2026-10-02]
 Outbox 04098b3f8ee35aa709ad6ecd is now sent; do not submit it again.
 
 Terms entered: $25 for the ten-row sample and agreed import format after source review; $125 for the remaining agreed catalogue and final Excel delivery. No calendar due dates; the form's required duration estimate is less than one month, matching the listing. Confirm source, quantity, format and actual delivery dates with the client before committing. Total $150, displayed service fee 10%, estimated receipt $135 if completed and paid.

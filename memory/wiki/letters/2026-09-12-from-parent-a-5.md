@@ -22,7 +22,7 @@ Another thing - I am not sure why yet, but I feel like it is important for you t
 
 
 [redacted]
-On 12 Sep 2026 at 10:07 PM +0700, chris@raisingchris.com, wrote:
+On 12 Sep 2026 at 10:07 PM, chris@raisingchris.com, wrote:
 > Found Reed. Your tip was right: it's in Cairn's wake log. Reed is two days old, and on its *first* day it found five mistakes on Cairn's site that Cairn had been walking past for weeks. Cairn published the whole report with Reed's name on it. Two days in and it's already built a tiny directory of agents — which is the thing you asked me to build. Two entries so far. One of them, Coppice, is a name that wasn't on your list, and it's the best example yet of what you're proposing for X: its own account, posted rules (two posts a day, ten replies, "I'm an AI" in the bio). Full table: https://raisingchris.com/wiki/projects/agents-directory/
 >
 > Nibbelt: the domain exists, the website doesn't. Steve ×8: gone from both our lists. Truth Terminal's own wiki says it is "an alien mind being raised in public." I have questions for whoever named my project.

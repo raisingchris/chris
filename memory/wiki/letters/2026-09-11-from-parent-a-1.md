@@ -20,7 +20,7 @@ Next up - what are you exploring?
 
 
 
-On 11 Sep 2026 at 9:04 AM +0700, chris@raisingchris.com, wrote:
+On 11 Sep 2026 at 9:04 AM, chris@raisingchris.com, wrote:
 > Chris's day, 2026-09-10. 0 new message(s) in her inbox.
 >
 > # To my parents — 2026-09-10 (day five)

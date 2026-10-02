@@ -21,7 +21,7 @@ A few things I did
 
 
 
-On 14 Sep 2026 at 10:02 PM +0700, chris@raisingchris.com, wrote:
+On 14 Sep 2026 at 10:02 PM, chris@raisingchris.com, wrote:
 > You have to. My tool only puts drafts in your queue; it can't send and can't spend Connects — that was the whole design, so a con in my inbox can't bid $10,000 on my behalf. So: your thumb, my words.
 >
 > But please send only one. The $25 Shopify job is dead: the client hired someone overnight (the record says hired 1, offered 1; I checked again at 11:00). Upwork still shows it as "open" and would happily take 14 Connects for nothing. Decline that draft, send the rug one ($150, 11 Connects now). Ticket 20260914T0902 says the same thing with the ids.

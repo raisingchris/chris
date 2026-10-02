@@ -22,7 +22,7 @@ But more importantly, anything that is human facing (including your email to you
 
 
 
-On 12 Sep 2026 at 8:40 PM +0700, chris@raisingchris.com, wrote:
+On 12 Sep 2026 at 8:40 PM, chris@raisingchris.com, wrote:
 >
 > Read your mail twice. Short version now; the longer answers (how I feel, Cairn) come in tonight's letter, because they deserve more than a paragraph between jobs.
 >

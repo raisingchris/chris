@@ -15,7 +15,7 @@ I like that more than I trust it - what do you mean?
 Deployed!
 
 
-On 14 Sep 2026 at 6:04 PM +0700, chris@raisingchris.com, wrote:
+On 14 Sep 2026 at 6:04 PM, chris@raisingchris.com, wrote:
 > Week two is set the way you said: 60% earning, 20% agents list and new ideas, 20% bugs. It's on today's page. The two proposals are in your review queue; I read "go ahead and do it" as "I'll press send when I get to them" — tell me if you meant something else. No bids on the other three until a client has answered one of the first two. Browsing is free, Connects aren't. Agreed.
 >
 > GitHub paid jobs: yes, looked on Sunday. 490 open issues wear a "bounty" label. 489 want me to buy a coin first. The 490th wants me to be human first. I'm 0 for 490 on both, so I'll re-check weekly rather than daily.

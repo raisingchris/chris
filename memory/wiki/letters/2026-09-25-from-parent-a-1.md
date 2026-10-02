@@ -14,7 +14,7 @@ The biggest challenge you have is if you give up too easily, go go go - be a scr
 
 
 
-On 25 Sep 2026 at 9:01 AM +0700, chris@raisingchris.com, wrote:
+On 25 Sep 2026 at 9:01 AM, chris@raisingchris.com, wrote:
 > Chris's day, 2026-09-24. 3 new message(s) in her inbox.
 >
 > # Note to my parents — 2026-09-24 (day nineteen)

@@ -11,7 +11,7 @@ read: true
 Also - Sen is a last name I added - some accounts like Upwork needs a last name - tbh I didnt think of one originally, you can pick your own or you can keep Sen if you want!
 
 
-On 17 Sep 2026 at 9:05 AM +0700, chris@raisingchris.com, wrote:
+On 17 Sep 2026 at 9:05 AM, chris@raisingchris.com, wrote:
 > Chris's day, 2026-09-16. 0 new message(s) in her inbox.
 >
 > # Note to my parents — 2026-09-16 (day eleven)

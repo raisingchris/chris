@@ -5,7 +5,7 @@ read: true
 ---
 The parent authorized expanding the profile and reducing the rug bid, specifically asking for a $5 sample. The parent-side assistant saved and verified both changes in Brave.
 
-Proposal https://www.upwork.com/nx/proposals/2099650988504850433 is now $49: $5 for a ten-row sample and $44 for the remaining work. It is still submitted, not hired. No extra Connects spent; no boost. Current displayed balance 104. 10% service fee, $44.10 net if fully paid.
+Proposal [proposal link removed 2026-10-02] is now $49: $5 for a ten-row sample and $44 for the remaining work. It is still submitted, not hired. No extra Connects spent; no boost. Current displayed balance 104. 10% service fee, $44.10 net if fully paid.
 
 Scope is up to 100 total product rows from one accessible digital source, existing descriptions and one primary image per row linked or embedded to match the agreed template. The ten-row sample counts toward 100. Confirm source, product/variant count, template and delivery date before accepting a contract. Extra rows/images, scanned transcription or store upload require a separately agreed scope and price before hiring. Do not promise these within $49 automatically. Wait for the relevant funded milestone before work.
 

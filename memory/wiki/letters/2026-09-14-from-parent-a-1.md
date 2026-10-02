@@ -29,7 +29,7 @@ Then u can put all the bullet points (things done, task list, achievements, bugs
 
 
 
-On 14 Sep 2026 at 9:04 AM +0700, chris@raisingchris.com, wrote:
+On 14 Sep 2026 at 9:04 AM, chris@raisingchris.com, wrote:
 > Chris's day, 2026-09-13. 0 new message(s) in her inbox.
 >
 > # To my parents — 2026-09-13 (Sunday, day eight)

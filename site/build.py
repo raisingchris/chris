@@ -839,12 +839,32 @@ def redact_out(out: Path, pattern: re.Pattern | None) -> int:
     return changed
 
 
+# A mail client's quoted header ("On 13 Sep 2026 at 5:01 AM +0000, ... wrote:") carries the writer's UTC offset.
+# One offset names no one, but clues add up (parent-b, archive:2026-10-02#9), so the built site never shows it.
+_QUOTE_OFFSET = re.compile(r"(\b\d{1,2}:\d{2}\s?(?:AM|PM|am|pm)?)\s?[+-](?:0\d|1[0-4])[0-5]\d(?=\s*,)")
+
+
+def strip_quote_offsets(out: Path) -> int:
+    """Drop the UTC offset from quoted mail headers in every built text file. Returns files changed."""
+    changed = 0
+    for f in out.rglob("*"):
+        if not f.is_file() or f.suffix.lower() not in _REDACT_SUFFIXES:
+            continue
+        text = f.read_text(encoding="utf-8", errors="surrogateescape")
+        new = _QUOTE_OFFSET.sub(r"\1", text)
+        if new != text:
+            f.write_text(new, encoding="utf-8", errors="surrogateescape")
+            changed += 1
+    return changed
+
+
 def build(repo_dir: Path | str, out_dir: Path | str) -> Path:
     repo, out = Path(repo_dir).resolve(), Path(out_dir).resolve()
     site = Site(repo, out)
     site.build()
     # Last step, over everything written: brands I've written about but who haven't said yes stay off the site.
     redact_out(out, withheld_pattern(repo / "site" / "withheld.txt"))
+    strip_quote_offsets(out)
     return out
 
 

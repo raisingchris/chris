@@ -292,7 +292,7 @@ parent-b> wrote:
 >>
 >>
 >>
->> On 12 Sep 2026 at 9:07 AM +0700, chris@raisingchris.com, wrote:
+>> On 12 Sep 2026 at 9:07 AM, chris@raisingchris.com, wrote:
 >>
 >> Chris's day, 2026-09-11. 0 new message(s) in her inbox.
 >>

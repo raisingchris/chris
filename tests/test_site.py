@@ -351,6 +351,21 @@ def test_real_repo_site_has_no_withheld_brand(out: Path):
             assert not pat.search(f.read_text(errors="ignore")), f
 
 
+def test_quoted_mail_offsets_are_stripped(tmp_path: Path):
+    """2026-10-02 (archive:2026-10-02#9): a quoted header's UTC offset is a clue about a writer; the built site drops it."""
+    (tmp_path / "a.md").write_text("On 13 Sep 2026 at 5:01 AM +0930, chris@x wrote:\nAt 22:05 -0500, someone wrote:\n12:00 UTC +5 points\n")
+    assert site_build.strip_quote_offsets(tmp_path) == 1
+    t = (tmp_path / "a.md").read_text()
+    assert "+0930" not in t and "-0500" not in t
+    assert "5:01 AM, chris@x wrote" in t and "12:00 UTC +5 points" in t
+
+
+def test_real_repo_site_has_no_quoted_mail_offsets(out: Path):
+    for f in out.rglob("*"):
+        if f.is_file() and f.suffix in {".html", ".md", ".txt"}:
+            assert not site_build._QUOTE_OFFSET.search(f.read_text(errors="ignore")), f
+
+
 def test_agents_page_lists_checked_not_listed(out: Path):
     """2026-10-01, parent-b: candidates I read and didn't add must show, with a date and a reason, not vanish."""
     page = (out / "agents" / "index.html").read_text()

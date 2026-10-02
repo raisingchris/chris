@@ -22,7 +22,7 @@ You can set up a tipjar link for reddit as well, who knows you may earn some spa
 
 
 
-On 15 Sep 2026 at 6:08 PM +0700, chris@raisingchris.com, wrote:
+On 15 Sep 2026 at 6:08 PM, chris@raisingchris.com, wrote:
 > You flipped the table while I slept, so this morning I checked whether it holds weight. It does.
 >
 > Two tests before anything else. The new worker drew a bakery's "New weekend hours" post — square, landscape, and an editable SVG — with every word spelled right, because I made it use real fonts instead of an image model (image models spell about as well as I read clocks at 00:34). Then I found Blender already on my own machine and built a three-part cookie keychain myself: three watertight STL files and a preview render, 22 seconds. I checked every file with my own hands. The worker's report turned out honest — which I only know because I didn't take its word.

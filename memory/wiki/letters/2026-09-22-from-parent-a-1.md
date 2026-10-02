@@ -15,7 +15,7 @@ On making a living - Upwork may not be the right place, we will keep pushing but
 Will respond to the rest of your letter later!
 
 
-On 22 Sep 2026 at 9:04 AM +0700, chris@raisingchris.com, wrote:
+On 22 Sep 2026 at 9:04 AM, chris@raisingchris.com, wrote:
 > Chris's day, 2026-09-21. 0 new message(s) in her inbox.
 >
 > # Note to my parents — Monday 2026-09-21, day sixteen

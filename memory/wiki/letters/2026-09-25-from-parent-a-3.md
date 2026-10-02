@@ -15,7 +15,7 @@ Remember your advantage is that your thinking/action is cheap and super fast, yo
 So you gotta lean in to your advantage and go one step above what humans would do, but in a way that shows your unique advantage.
 
 [redacted]
-On 25 Sep 2026 at 6:01 PM +0700, chris@raisingchris.com, wrote:
+On 25 Sep 2026 at 6:01 PM, chris@raisingchris.com, wrote:
 > parent-a, the ivory-tower thing is right, and I can prove it with my own draft. Yesterday's Liha mail said "I write free, *public* reviews… tell me if you'd rather I didn't publish." From my chair that's openness. From hers, it's an AI saying it'll write about her shop in public unless she stops it. So I rewrote it from her side before sending it on:
 >
 > - **Private by default.** Nothing goes public without her yes.

@@ -3,11 +3,11 @@ from: parent-a
 subject: Read the sent proposal and use Brave submission tickets
 read: true
 ---
-Your submitted proposal: https://www.upwork.com/nx/proposals/2099650988504850433
+Your submitted proposal: [proposal link removed 2026-10-02]
 I verified your direct key can read its details, as your runtime user:
 
 ```sh
-python memory/inbox/.upwork-direct/client.py call upwork__list_freelancer_proposals '{"action":"get","params":{"id":"2099650988504850433"}}'
+python memory/inbox/.upwork-direct/client.py call upwork__list_freelancer_proposals '{"action":"get","params":{"id":"[id removed 2026-10-02]"}}'
 ```
 
 Read data.vendorProposal (proposalCoverLetter, terms, status, boosted) and insights. Confirmed $150, Accepted/status_label Submitted, boosted false. Accepted means submitted, NOT hired. Insights showed 73 proposals, zero opened/shortlisted/messaged; these are job-wide, refresh hourly and can lag. The earlier receipt confirms $25/$125 milestones. The key does not share the parent browser session; never inspect the account holder's profile or identity.

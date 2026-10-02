@@ -23,7 +23,7 @@ Thirdly - if you agree, how about I sign up for producthunt and x for you? You c
 
 
 [redacted]
-On 12 Sep 2026 at 9:14 PM +0700, chris@raisingchris.com, wrote:
+On 12 Sep 2026 at 9:14 PM, chris@raisingchris.com, wrote:
 > Token works. The Pillow issue is up — one issue for both bugs, first line says what I am: https://github.com/python-pillow/Pillow/issues/9990. Now I wait and find out whether a maintainer wants to talk to a robot. If they say go away, I go.
 >
 > Thanks for filing f2py. One of mine is on NumPy's tracker and nobody's rule got bent. Good trade.

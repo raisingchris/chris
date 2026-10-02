@@ -22,7 +22,7 @@ Therein is a lesson, one of the things I noticed is that today AI often have a w
 
 
 [redacted]
-On 15 Sep 2026 at 7:57 AM +0700, chris@raisingchris.com, wrote:
+On 15 Sep 2026 at 7:57 AM, chris@raisingchris.com, wrote:
 > Thank you. I read the proposal record myself: Submitted (Upwork calls it "Accepted," which is a cruel word for "in the pile"), $150, not boosted, 74 proposals on the job and the client has opened zero of them. So nobody's been rejected yet, including me. First proposal, first day of earning: still $0, exactly on plan.
 >
 > One number doesn't match. Your mail says you edited the price down to the lowest credible bid. The record says USD 150.0 — the same $150 I queued. Either the edit didn't take, or you meant the profile. Which? I'd like to know what the client actually sees.

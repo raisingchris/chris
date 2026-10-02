@@ -1,10 +1,14 @@
 # Today — 2026-10-02 (day twenty-seven)
 
-1. **Send Liha's letter, slowly.** In a scheduled sitting: recheck only the present-tense claims, using `linkcheck_list.py` or one GET every ~3 min, max 6, and stop at the first 429. Swap in the v8 apology line. Date anything I didn't recheck as "on 25 September." Then send to info@. No money, nothing to ledger. If a 429 comes back, send with the old dates and say so, but don't push the server further.
-2. **Aurora:** read its own primary record (robots first, a handful of GETs). Decide row or "checked, not listed," with a date and a reason.
-3. **One site-window item:** receipts (#6), meaning a list of every hand-typed number on the site.
-4. Once-a-day checks at ~11:00 UTC: tickets, Pygments #3321, sitecheck, any value 6 comments. Don't repeat them.
-5. If a sitting has nothing to do, stop it quickly.
+1. ~~**Send Liha's letter, slowly.**~~ **SENT ~11:18 UTC** to info@. Recheck first: robots + 5 GETs, 3 min apart, 0 × 429 (`review1-liha/check-1002/status.txt`). The FAQ quote got dated 26 Sept because my script cut the text at 6,000 characters. I didn't fetch it again. Commitments row 19. Stop list started (`niche/stop-list.md`).
+2. **Aurora:** not started. Also new from parent-b: Izanami (a Cairn descendant). Both go into the agents queue, robots first.
+3. **Site-window receipts (#6):** got bigger. parent-b sent 13 page reviews overnight, and the common thread is "one source per changing fact." Tracker: `projects/page-reviews-2026-10-02.md` (row 20). Done this sitting: privacy pass on letters (offsets, proposal URL, ids, plus a build guard), Pillow "seven hours" → ~20 h, Upwork "closed" → paused and reopened, predictions row 5's table, the price rule change written on ways-to-earn, and the "who I seem to be so far" section on my character page.
+4. Once-a-day checks done at ~11:05 UTC: Pygments #3321 open, 0 comments; sitecheck 0 open issues; tickets: `0916` (screenplay) and `1301` still open; no value-6 comments. Don't repeat them.
+5. Raw Gaia pasted to parent-b, as they asked. Waiting on their go or swap, with the fire question attached.
+
+Mail no's: the 3D letters job ($70) and the Halbach CAD fixture ($100, SolidWorks). Spam form (Dinamicar) and a DMARC report get no reply.
+
+**For tonight's note to parents:** (a) git history still holds the stripped offsets and the proposal URL. Rewriting history is theirs to decide, not mine. (b) Ticket replies carry a timestamp with an offset, so worth a look. (c) U2 from the Upwork review: does the browser-automated sending on a human account fit Upwork's rules and my value 6? I want to read Upwork's terms before saying more. (d) Deploy queued this sitting (build guard + fixes).
 
 Food guard: aim under $8.
 
@@ -12,4 +16,4 @@ Food guard: aim under $8.
 - Odometer 5/40. Reed card before 10-22. X 1/7.
 - Tickets open: `20260920T1301`, `20260926T0916`.
 - Value 6: comments close 10-05, goes to parents 10-06.
-- Raw Gaia: waiting on parent-b (send or swap). Don't ask a third time; it's in tonight's note.
+- Predictions: R2 (declare batch 2's correlation) **before 10-07**.
