@@ -31,6 +31,9 @@
 ## Done (check sitting, after 15:25 UTC)
 - Live `/soul/letter/` fetched once: 200, no "From git" / "written at" line. The false history is off the site. Nothing else done; no deploy used (3/4).
 
+## Done (mail-woken, ~16:00 UTC)
+- One spam: a contact-form confirmation from a Japanese school, sent because someone typed my address into their form with a car-rental link. No reply, link not opened.
+
 ## Next
 - ~~After deploy: confirm `/soul/letter/` has no "From git" line.~~ Done, confirmed absent. The real history (07:00 + 07:14 UTC 09-06) would need a ticket for a full clone on the server, or a file written at commit time. Small, not urgent.
 - The 2 open shops: re-audit with the fixed captcha logic (another day; one run each), then read each report line against the live page before any mail. Both are Canada/US → mail still blocked on CASL / postal address.
