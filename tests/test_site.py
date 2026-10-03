@@ -417,11 +417,35 @@ def test_soul_pages_carry_git_history_in_utc(out: Path):
     import re
     import subprocess
     try:
-        subprocess.run(["git", "log", "-1"], cwd=REPO, capture_output=True, check=True)
+        sh = subprocess.run(["git", "rev-parse", "--is-shallow-repository"], cwd=REPO, capture_output=True,
+                            text=True, check=True).stdout.strip()
     except (OSError, subprocess.CalledProcessError):
         pytest.skip("no git history here")
+    if sh != "false":
+        pytest.skip("shallow clone: history line is deliberately blank")
     html = (out / "soul" / "letter" / "index.html").read_text()
     m = re.search(r"From git: [^<]*", html)
     assert m, "letter page lacks its git history line"
     line = m.group(0)
     assert "UTC" in line and not re.search(r"[+-]\d\d:\d\d", line)
+
+
+def test_git_history_note_is_blank_in_a_shallow_clone(tmp_path: Path):
+    """Live 10-03: the server builds from a one-commit clone and the letter page said "written today". Say nothing instead."""
+    import subprocess
+    src = tmp_path / "src"
+    src.mkdir()
+    g = lambda *a, cwd=src: subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", *a], cwd=cwd,
+                                          capture_output=True, check=True)
+    try:
+        g("init", "-q")
+    except (OSError, subprocess.CalledProcessError):
+        pytest.skip("no git here")
+    (src / "a.md").write_text("one\n")
+    g("add", "a.md"); g("commit", "-qm", "one")
+    (src / "b.md").write_text("two\n")
+    g("add", "b.md"); g("commit", "-qm", "two")
+    shallow = tmp_path / "shallow"
+    subprocess.run(["git", "clone", "-q", "--depth", "1", f"file://{src}", str(shallow)], capture_output=True, check=True)
+    assert site_build.Site(src, tmp_path / "o1").git_history_note(src / "a.md").startswith('<p class="meta">From git')
+    assert site_build.Site(shallow, tmp_path / "o2").git_history_note(shallow / "a.md") == ""

@@ -368,6 +368,12 @@ class Site:
         Empty if git or the history isn't there (it never guesses).
         """
         try:
+            # A shallow clone (how the live server builds) cuts history off, so every file would look
+            # "written" at the newest commit. That's a false fact; say nothing instead. (Live, 10-03.)
+            shallow = subprocess.run(["git", "rev-parse", "--is-shallow-repository"], cwd=self.repo,
+                                     capture_output=True, text=True, timeout=10, check=True).stdout.strip()
+            if shallow != "false":
+                return ""
             out = subprocess.run(["git", "log", "--follow", "--format=%h %aI", "--", self._rel(path)], cwd=self.repo,
                                  capture_output=True, text=True, timeout=10, check=True).stdout.split()
         except (OSError, subprocess.SubprocessError):
