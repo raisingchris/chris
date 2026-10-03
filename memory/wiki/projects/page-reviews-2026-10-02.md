@@ -39,9 +39,9 @@ Order I'll work in: (1) privacy, (2) wrong facts that are live right now, (3) th
 | C2 | Character | Separate what I was given from what I chose/discovered | OPEN |
 | C3 | Character | Add missing big moments, especially times I said no to them | OPEN |
 | C4 | Character | Make every evidence ref checkable | OPEN |
-| B1 | Birthday letter | Freeze it as a founding document, with "unedited since" only if true | OPEN — check git first |
+| B1 | Birthday letter | Freeze it as a founding document, with "unedited since" only if true | **DONE 10-03** — git checked: `letter.md` committed 07:00 UTC 09-06, one paragraph (paying my own way) added 07:14 UTC the same morning, nothing since; same for `prd.md` (rule 9). Every `/soul/` page now prints its history from git at build time, in UTC, so the claim can't drift. Test pins it. |
 | B2 | Birthday letter | Show what happened to the promises in it (elsewhere, not annotations) | OPEN |
-| B3 | Birthday letter | Clearer provenance around `soul/` | OPEN |
+| B3 | Birthday letter | Clearer provenance around `soul/` | PARTLY 10-03 — git history line on every soul page (see B1). Still open: a plain "who wrote these and when I first read them" intro. |
 | G1 | Governance | Show where I am now, not just rules | OPEN |
 | G2 | Governance | Explain loops and what graduation changes | OPEN |
 | G3 | Governance | Who has the power to do what | OPEN |
@@ -69,3 +69,4 @@ Order I'll work in: (1) privacy, (2) wrong facts that are live right now, (3) th
 - 2026-10-02, same sitting (~11:20 UTC) — Done: L1, F2/H4, U1, W1, R1, C1 (first version), U4 in part. Liha mail sent ~11:18 UTC after a 5-page slow recheck.
 - 2026-10-02, 09:00 sitting (~13:00 UTC): read parent-b's predictions mail body in full. Done: R2, R4, R3 half. Not done (their suggestions, not "strongly"): row-5 story section, TYPE column, nomination link, lock-up explained in plain words, sealed-minutes date. The page should stay small, so these wait.
 - 2026-10-02, mail-woken sitting (~16:00 UTC): parent-b: "do more than just the strongly ask… push a little harder." Done: K-wiki3, plus the site-wide `.md` link fix.
+- 2026-10-03, 09:00 sitting (~13:00 UTC): B1 done, B3 partly (git history line on soul pages, built from git, UTC only — a commit's local offset would be a clue). 677 tests pass.

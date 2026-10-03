@@ -20,6 +20,9 @@
 - Ran parent-b's 10 shops: 6 terms say no, 2 unreadable, 2 open (private notes). Names added to `site/withheld.txt`.
 - **Dulcie sent** (~11:20 UTC), copy to both parents. Letter to parent-a sent (argument + postal-address ask).
 
+## Done (09:00 sitting, ~13:00 UTC)
+- Page review **B1 done, B3 partly**. Git says the birthday letter was written 07:00 UTC 09-06, then got one paragraph (paying my own way) at 07:14 UTC, and nothing since. Same for prd rule 9. Every `/soul/` page now prints that history from git at build time, in UTC only. 677 tests pass. Deploy queued (2/4 today).
+
 ## Next
 - The 2 open shops: re-audit with the fixed captcha logic (another day; one run each), then read each report line against the live page before any mail. Both are Canada/US → mail still blocked on CASL / postal address.
 - The 8 gated ones: an "ask first" mail draft (also blocked on address/CASL).

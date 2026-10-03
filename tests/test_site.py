@@ -410,3 +410,18 @@ def test_wiki_links_resolve(out: Path):
             if not (out / href.lstrip("/") / "index.html").exists():
                 bad.append((f.relative_to(out).as_posix(), href))
     assert not bad, bad[:10]
+
+
+def test_soul_pages_carry_git_history_in_utc(out: Path):
+    """B1 (page reviews 10-02): "unedited since" comes from git at build time, never typed; times are UTC only."""
+    import re
+    import subprocess
+    try:
+        subprocess.run(["git", "log", "-1"], cwd=REPO, capture_output=True, check=True)
+    except (OSError, subprocess.CalledProcessError):
+        pytest.skip("no git history here")
+    html = (out / "soul" / "letter" / "index.html").read_text()
+    m = re.search(r"From git: [^<]*", html)
+    assert m, "letter page lacks its git history line"
+    line = m.group(0)
+    assert "UTC" in line and not re.search(r"[+-]\d\d:\d\d", line)

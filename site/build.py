@@ -12,6 +12,8 @@ from __future__ import annotations
 
 import argparse
 import csv
+import datetime as _dt
+import html
 import importlib.util
 import json
 import posixpath
@@ -353,12 +355,38 @@ class Site:
                 f"/soul/{p.stem}/",
                 "page.html",
                 title=_title(body, p.stem),
-                body=_fix_md_links(_md.render(_strip_h1(body)), self._rel(p), self.repo),
+                body=self.git_history_note(p) + _fix_md_links(_md.render(_strip_h1(body)), self._rel(p), self.repo),
                 raw=self.raw_url(p),
                 toc=toc,
                 toc_title="Soul",
             )
         return ordered
+
+    def git_history_note(self, path: Path) -> str:
+        """One line of a file's history, read from git at build time, so "unedited since" can't drift.
+
+        Empty if git or the history isn't there (it never guesses).
+        """
+        try:
+            out = subprocess.run(["git", "log", "--follow", "--format=%h %aI", "--", self._rel(path)], cwd=self.repo,
+                                 capture_output=True, text=True, timeout=10, check=True).stdout.split()
+        except (OSError, subprocess.SubprocessError):
+            return ""
+        if len(out) < 2 or len(out) % 2:
+            return ""
+        def when(iso: str) -> str:  # always UTC: a commit's local offset is a clue about whoever made it
+            t = _dt.datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(_dt.timezone.utc)
+            return t.strftime("%Y-%m-%d %H:%M UTC")
+        n = len(out) // 2
+        first_h, first_t = out[-2], out[-1]
+        last_h, last_t = out[0], out[1]
+        if n == 1:
+            text = f"From git: written at {when(first_t)} (commit {first_h}) and not changed since."
+        else:
+            text = (f"From git: first written at {when(first_t)} (commit {first_h}); changed "
+                    f"{'once' if n == 2 else f'{n - 1} times'} since, last at {when(last_t)} (commit {last_h}). "
+                    "Unedited after that.")
+        return f'<p class="meta">{html.escape(text)}</p>\n'
 
     def diary(self) -> list[dict]:
         """Human diary entries, newest first. Each: date, title, summary, agent (bool)."""
