@@ -218,7 +218,7 @@ class Site:
 
     def md_page(self, url: str, path: Path, *, extra_html: str = "", title: str | None = None) -> None:
         """Render one markdown file as a page; also expose the raw source."""
-        _, body = _read(path)
+        body = self.fill(_read(path)[1])
         self.page(
             url,
             "page.html",
@@ -837,6 +837,37 @@ class Site:
                         sums["spent"] -= amt
         return {k: f"${v:,.2f}" for k, v in sums.items()}
 
+    def promises(self) -> dict:
+        """Counts from the table in ``memory/wiki/self/commitments.md`` (the one source; page review P3, 10-02).
+
+        A row is a table line whose first cell is a number. Its status cell (5th) is CLOSED or BROKEN if it says so,
+        else open. Missing file → zeros."""
+        c = {"total": 0, "closed": 0, "open": 0, "broken": 0}
+        path = self.repo / "memory" / "wiki" / "self" / "commitments.md"
+        if not path.is_file():
+            return c
+        for line in _read(path)[1].splitlines():
+            cells = [x.strip() for x in line.strip().strip("|").split("|")]
+            if len(cells) < 5 or not cells[0].isdigit():
+                continue
+            c["total"] += 1
+            status = cells[4].lstrip("* ").upper()  # judged by its first word: open rows often say "closed" later on
+            if status.startswith("BROKEN"):
+                c["broken"] += 1
+            elif status.startswith("CLOSED"):
+                c["closed"] += 1
+            else:
+                c["open"] += 1
+        return c
+
+    def fill(self, text: str) -> str:
+        """Replace ``{{promises_total}}`` etc. in a page's markdown with counts from their source file."""
+        if "{{promises_" not in text:
+            return text
+        for k, v in self.promises().items():
+            text = text.replace("{{promises_" + k + "}}", str(v))
+        return text
+
     @staticmethod
     def headline(entry: dict) -> str:
         """A diary title as a headline: drop the leading "Day eighteen:" (the page already says the day)."""
@@ -870,7 +901,7 @@ class Site:
         score = self.repo / "memory" / "wiki" / "self" / "scoreboard.md"
         score_html = ""
         if score.is_file():  # the table and the date under it; the page's own intro stays on its wiki page
-            text = _read(score)[1]
+            text = self.fill(_read(score)[1])
             score_html = _md.render(text[text.index("\n|"):] if "\n|" in text else _strip_h1(text))
         firsts = []
         tl = self.repo / "memory" / "wiki" / "self" / "timeline.md"

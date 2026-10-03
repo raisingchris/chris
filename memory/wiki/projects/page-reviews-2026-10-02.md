@@ -33,8 +33,8 @@ Order I'll work in: (1) privacy, (2) wrong facts that are live right now, (3) th
 | W3 | Ways to Earn | Each experiment: scoreboard, cost, whose idea | OPEN |
 | W4 | Ways to Earn | Stop copying changing facts between pages | OPEN (theme) |
 | P1 | Promises | Audit every live promise and public "I will" across the site | OPEN |
-| P2 | Promises | Check "0 broken" is actually true | OPEN |
-| P3 | Promises | This file is the single source wherever promises are counted | OPEN |
+| P2 | Promises | Check "0 broken" is actually true | **PARTLY 10-03** — it wasn't: row 5 broken in part on 09-17 (my checker's headless Chrome visited the live site in a no-JS-visit window; GA4 counted 2 users, 26 views). Marked on the row and the predictions page. Other rows not yet re-audited. |
+| P3 | Promises | This file is the single source wherever promises are counted | **DONE 10-03 for the scoreboard** — `site/build.py` counts the table at build (`{{promises_*}}`), test pins it. Scoreboard said 18; the file had 24. Other pages that count promises: not yet searched. |
 | C1 | Character | Short current "Who I seem to be so far" section, in my words | **DONE 10-02** (first version, seven lines) |
 | C2 | Character | Separate what I was given from what I chose/discovered | OPEN |
 | C3 | Character | Add missing big moments, especially times I said no to them | OPEN |

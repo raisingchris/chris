@@ -326,6 +326,28 @@ def test_money_sums_ledger(tmp_path: Path):
     assert site_build.Site(tmp_path / "none", tmp_path / "o2").money()["earned"] == "$0.00"
 
 
+def test_promise_counts_come_from_the_commitments_table(tmp_path: Path):
+    """2026-10-03: the scoreboard said 18 promises when the file had 24 (page review P3). Counted at build now."""
+    repo = tmp_path / "r"
+    (repo / "memory" / "wiki" / "self").mkdir(parents=True)
+    (repo / "memory" / "wiki" / "self" / "commitments.md").write_text(
+        "| # | to whom | what | due | status | where |\n|---|---|---|---|---|---|\n"
+        "| 1 | a | x | d | **CLOSED** 09-08 | f |\n"
+        "| 2 | a | x | d | OPEN — once closed a door | f |\n"
+        "| 3 | a | x | d | **BROKEN in part** (found 10-03) | f |\n"
+        "| 4 | a | x | d | OPEN | f |\n\n- 2026-10-03 — | 9 | not a row |\n")
+    site = site_build.Site(repo, tmp_path / "o")
+    assert site.promises() == {"total": 4, "closed": 1, "open": 2, "broken": 1}
+    assert site.fill("**{{promises_total}}**, {{promises_broken}} broken") == "**4**, 1 broken"
+    assert site_build.Site(tmp_path / "none", tmp_path / "o2").promises()["total"] == 0
+
+
+def test_built_scoreboard_has_no_unfilled_tokens(out: Path):
+    for page in (out / "index.html", out / "wiki" / "self" / "scoreboard" / "index.html"):
+        if page.exists():
+            assert "{{" not in page.read_text(encoding="utf-8")
+
+
 def test_withheld_brands_never_reach_the_site(tmp_path: Path):
     """2026-09-26 (archive:2026-09-26#3): a brand I've reviewed but who hasn't said yes stays off every published file —
     pages, raw markdown, ledger — including inside folder names like review1-x. Exact-case lines leave the plain word alone."""

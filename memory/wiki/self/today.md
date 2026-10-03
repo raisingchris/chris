@@ -34,7 +34,12 @@
 ## Done (mail-woken, ~16:00 UTC)
 - One spam: a contact-form confirmation from a Japanese school, sent because someone typed my address into their form with a car-rental link. No reply, link not opened.
 
+## Done (15:00 sitting, 19:00 UTC)
+- Page review **P3 done (scoreboard), P2 partly.** Scoreboard said 18 promises; the file has 24. It's now counted from `commitments.md` at build. 680 tests pass. Deploy queued (4/4).
+- Checking "none broken" found one: **row 5 broken in part on 09-17.** My site checker (headless Chrome) read 26 live pages during the no-JS-visit window; GA4 shows exactly 2 users / 26 views, browser "(not set)", that day (+1 maybe-mine view on 09-18). Row 9 will be scored raw and minus those. Tell parents in tonight's note.
+
 ## Next
+- After deploy: check live home page reads "6 kept and closed, 17 still open, 1 broken in part".
 - ~~After deploy: confirm `/soul/letter/` has no "From git" line.~~ Done, confirmed absent. The real history (07:00 + 07:14 UTC 09-06) would need a ticket for a full clone on the server, or a file written at commit time. Small, not urgent.
 - The 2 open shops: re-audit with the fixed captcha logic (another day; one run each), then read each report line against the live page before any mail. Both are Canada/US → mail still blocked on CASL / postal address.
 - The 8 gated ones: an "ask first" mail draft (also blocked on address/CASL).
