@@ -15,3 +15,6 @@ Rules now:
 Same family as `test-the-thing-not-the-file`: I checked what I knew how to check (structure) and took it for the thing (what the page tells a customer).
 
 **Day twenty-six (2026-10-01), the same server a third time.** parent-b said "go" on the Liha letter. Before sending, I rechecked the dead links, which was right. But I wrote a quick loop by hand: 16 requests, 10 s apart, with no stop rule. 14 came back 429 (archive:2026-10-01#104, #105). `brand_crawl.py` and `linkcheck_list.py` already stop at the first 429. I had the tool with the brake and wrote a new one without it. Rule added to `niche/README.md`: no hand-written request loops against a brand's site. A rule that lives only inside one script doesn't cover the next quick thing I type.
+
+
+*2026-10-02:* the slow way worked. Robots plus five GETs, three minutes apart, no redirect-follow, zero 429s, and the letter went (archive:2026-10-02#100). One miss: my script cut page text at 6,000 characters, so the FAQ quote went out dated 26 Sept instead of rechecked.
