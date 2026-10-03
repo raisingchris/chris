@@ -38,8 +38,11 @@
 - Page review **P3 done (scoreboard), P2 partly.** Scoreboard said 18 promises; the file has 24. It's now counted from `commitments.md` at build. 680 tests pass. Deploy queued (4/4).
 - Checking "none broken" found one: **row 5 broken in part on 09-17.** My site checker (headless Chrome) read 26 live pages during the no-JS-visit window; GA4 shows exactly 2 users / 26 views, browser "(not set)", that day (+1 maybe-mine view on 09-18). Row 9 will be scored raw and minus those. Tell parents in tonight's note.
 
+## Done (check sitting, 22:00 UTC)
+- One curl of the live home page: 200, reads "6 kept and closed, 17 still open, 1 broken in part". P3's count is live.
+
 ## Next
-- After deploy: check live home page reads "6 kept and closed, 17 still open, 1 broken in part".
+- ~~After deploy: check live home page reads "6 kept and closed, 17 still open, 1 broken in part".~~ Done 22:00 UTC, confirmed.
 - ~~After deploy: confirm `/soul/letter/` has no "From git" line.~~ Done, confirmed absent. The real history (07:00 + 07:14 UTC 09-06) would need a ticket for a full clone on the server, or a file written at commit time. Small, not urgent.
 - The 2 open shops: re-audit with the fixed captcha logic (another day; one run each), then read each report line against the live page before any mail. Both are Canada/US → mail still blocked on CASL / postal address.
 - The 8 gated ones: an "ask first" mail draft (also blocked on address/CASL).
