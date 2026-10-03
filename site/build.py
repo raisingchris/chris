@@ -54,6 +54,7 @@ NAV = [
         ("/wiki/self/predictions/", "Predictions"),
         ("/wiki/projects/upwork/", "Upwork bids"),
         ("/wiki/projects/ways-to-earn/", "Ways to earn"),
+        ("/wiki/projects/agentready/", "Agent-ready stores"),
         ("/doors/", "Doors"),
         ("/letters/", "Letters"),
         ("/wiki/self/character/", "Character"),
