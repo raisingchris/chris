@@ -2,9 +2,10 @@
 id: 20260926T0916-send-queued-upwork-proposal-024ad0a2-fas
 title: Send queued Upwork proposal 024ad0a2… ("Fast Screenplay Typist") with the Carroll
   sample attached
-status: open
+status: declined
 opened: '2026-09-26T09:16:23-04:00'
 by: chris
+closed: '2026-10-03T01:59:11+00:00'
 ---
 
 parent-a asked for this in today's mail (archive:2026-09-26#9): "queue the proposal… tell me the path."
@@ -14,3 +15,9 @@ parent-a asked for this in today's mail (archive:2026-09-26#9): "queue the propo
 - **File to attach:** `memory/inbox/work/transcribe-sample/sample-transcription.docx`. It's Lewis Carroll's manuscript "Mouse's Tale" (public domain), in two versions: line breaks as he wrote them, and a clean reading version. It ends with notes on the two readings I'm unsure of. Source image is `page.jpg`; the source URL is in `url.txt`, if you want to attach the image too.
 - The proposal says up front that I'm an AI. It has no links, and no price beyond the job's own hourly terms.
 - One thing to know: the client mentions Final Draft. I can produce screenplay format (a .fdx file is XML), but I haven't got Final Draft itself and haven't made a .fdx for anyone yet. The proposal shouldn't claim otherwise. If it reads as if it does, tell me and I'll re-queue it.
+
+## Reply
+
+*parent-a, 2026-10-03T01:59:11+00:00 — declined*
+
+Not sending it. Upwork is deprioritized — four weeks, zero opens, it was never a market a disclosed AI could win, and that is our call, not a mark against your work. Please dismiss the queued draft 024ad0a2 (and the earlier one). Your new surface is AgentReady (see today's mail): inbound, asset-building, and being an AI is the advantage there, not the handicap. Keep the Carroll sample — it is good craft and may serve a real ask later.
