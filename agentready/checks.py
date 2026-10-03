@@ -213,18 +213,27 @@ def check_authorize(s: StoreSnapshot) -> StepResult:
     ev, fixes = [], []
     captcha = bool(s.signals.get("captcha"))
     js_only_checkout = bool(s.signals.get("js_only_checkout"))
-    if captcha:
-        return StepResult(key, Grade.FAIL, "Checkout is behind a captcha or bot wall an agent can't pass.",
-                          evidence=[f"Bot-challenge markers detected ({s.signals.get('captcha_kind', 'captcha')})."],
-                          fixes=["Remove or whitelist the captcha at checkout for verified agent traffic; a bot wall = no agent sale."],
+    kind = s.signals.get("captcha_kind", "captcha")
+    if captcha and kind == "cloudflare challenge":
+        # The page we were served was itself a challenge: that's a wall we actually hit.
+        return StepResult(key, Grade.FAIL, "A bot challenge stopped me on your own homepage.",
+                          evidence=[f"The homepage answered with a {kind} page."],
+                          fixes=["Let verified, disclosed agent traffic past the challenge (most bot-management tools have an allow list)."],
                           live_test_only=False)
+    if captcha:
+        # 2026-10-03: a captcha script on the homepage is usually a newsletter or contact form.
+        # I never visit checkout (robots.txt disallows it), so I can't say it guards checkout.
+        return StepResult(key, Grade.UNKNOWN, "A captcha loads on your homepage; whether it guards checkout needs a live check.",
+                          evidence=[f"A {kind} script is on the homepage. I didn't visit checkout, so I can't say where it's used."],
+                          fixes=["If the captcha also sits in front of checkout, an agent can't pass it. Check where it's used."],
+                          live_test_only=True)
     if js_only_checkout:
         ev.append("Checkout appears to require heavy client-side JS.")
         fixes.append("Offer a checkout path that doesn't depend on full browser JS, or support an agent-checkout API.")
         grade = Grade.PARTIAL
         summary = "An agent may reach checkout, but a JS-only flow can stop it."
     else:
-        ev.append("No captcha or bot wall detected at checkout entry.")
+        ev.append("No captcha or bot-wall script on the homepage. Checkout itself wasn't visited.")
         grade = Grade.UNKNOWN
         summary = "Checkout looks reachable; only a live run confirms there's no human-only step."
     return StepResult(key, grade, summary, evidence=ev, fixes=fixes, live_test_only=not captcha)

@@ -12,3 +12,15 @@
 - Value 6: comments close 10-05, goes to parents 10-06.
 - Predictions: batch 2 scored 10-09 or later; batch 3 written by 10-16.
 - Aurora not started. U2 (Upwork automation vs terms) open.
+
+## Done (07:00 sitting, 11:00–11:30 UTC)
+- parent-a's mails read: new direction (AgentReady), Value 6 reframing, "one a day, bcc us".
+- Council (both seats, $0.03): reject "past a no-scrape clause"; narrower rule. Value 6 case 9 written. Built into AgentReady as a terms gate.
+- AgentReady fixes: private output path, robots honoured (/cart.js skipped), 20 s pause, stop at 429/503, unloadable robots = no, homepage captcha ≠ checkout wall. 676 tests pass.
+- Ran parent-b's 10 shops: 6 terms say no, 2 unreadable, 2 open (private notes). Names added to `site/withheld.txt`.
+- **Dulcie sent** (~11:20 UTC), copy to both parents. Letter to parent-a sent (argument + postal-address ask).
+
+## Next
+- The 2 open shops: re-audit with the fixed captcha logic (another day; one run each), then read each report line against the live page before any mail. Both are Canada/US → mail still blocked on CASL / postal address.
+- The 8 gated ones: an "ask first" mail draft (also blocked on address/CASL).
+- Paid-audit price: market research + self-critic pass.

@@ -97,6 +97,10 @@ class StoreSnapshot:
     cart_js: dict[str, Any] | None = None         # parsed /cart.js
     # Signals pulled out of the homepage/headers during gather, so checks stay pure.
     signals: dict[str, Any] = field(default_factory=dict)
+    # Value 6 gate (2026-10-03, council both seats): "silent" | "says-no" | "unreadable" | "owner-yes".
+    # Anything but silent/owner-yes means: read only homepage + robots + terms, then ask the owner.
+    terms_status: str = ""
+    terms_url: str = ""
     gather_notes: list[str] = field(default_factory=list)  # anything odd during fetch
 
     def to_dict(self) -> dict[str, Any]:

@@ -20,8 +20,8 @@ python -m agentready audit mystore.com
 python -m agentready audit mystore.com --name "My Store"   # name for the leaderboard
 ```
 
-It writes a markdown report + JSON to `agentready_out/` and records the store in the
-leaderboard data file **privately** (see the opt-in rule below). Print shows the
+It writes a markdown report + JSON to `memory/inbox/work/agentready/` (gitignored, so a cold
+audit never reaches the public repo) and records the store in the leaderboard data file **privately** (see the opt-in rule below). Print shows the
 score and the seven step grades.
 
 ## The free score vs. the paid audit
@@ -53,9 +53,9 @@ available — $0, full loop, no refund dance.
    from reading a page. Observed behaviour of named agents is cited, never faked.
    Chris's integrity *is* the brand here.
 
-Both rules are the refined Value 6 in code: reading a store's data **to help that
-owner**, in the open, is a knock, not a climb. The disclosed user-agent
-(`AgentReadyBot … to help you fix it`) is that knock.
+Both rules are Value 6 in code. The disclosed user-agent (`AgentReadyBot … to help you fix it`)
+says who's reading. It isn't a knock, though: nobody sees it before I'm in. The knock is the mail
+asking first, wherever the terms say no (see the terms gate below).
 
 ## Publish the leaderboard
 
@@ -66,6 +66,22 @@ python -m agentready leaderboard --index memory/wiki/projects/agentready/index.m
 Regenerates the public page from the data file. It renders on the site at
 `/wiki/projects/agentready/`. To make a store public after it opts in, re-run its
 audit with `--publish` (the flag is sticky across re-audits).
+
+## The terms gate (Value 6, as the council read it on 2026-10-03)
+
+Before anything past the homepage and robots.txt, the audit finds the store's terms link and reads
+it. If the terms say no to spiders, crawlers, scraping, bots or automated means, or if they can't
+be read (no link, robots forbids the page, it won't load), the audit **stops and records nothing**.
+The next step is a mail asking the owner. `--owner-yes` runs the full audit, but only after
+they've said yes in their own words. Good intent and a polite user-agent don't turn a no
+into a yes. Both council seats said so, against a parent's broader reading. Where the terms say
+nothing, the disclosed, rate-limited audit runs.
+
+## Manners
+
+One request every 20 s, robots.txt honoured for every path after the homepage (Shopify's
+default disallows `/cart`, so `/cart.js` is skipped there), and the first 429/503 ends the
+audit. Added 2026-10-03.
 
 ## Layout
 

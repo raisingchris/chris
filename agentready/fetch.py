@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import json
 import re
+import time
+from urllib import robotparser
 from typing import Any
 from urllib.parse import urljoin, urlparse
 
@@ -27,6 +29,11 @@ USER_AGENT = (
     "agent-readiness to help you fix it; contact chris@raisingchris.com)"
 )
 TIMEOUT = 15.0
+# Politeness (2026-10-03, after three 429 days on one shop's server): a pause between
+# requests, robots.txt honoured for every path after the homepage, and a full stop at
+# the first 429/503 — a "slow down" ends the audit, it isn't retried.
+PAUSE_S = 20.0
+STOP_CODES = (429, 503)
 
 
 def _norm_url(url: str) -> str:
@@ -35,12 +42,26 @@ def _norm_url(url: str) -> str:
     return url
 
 
-def _get(client: httpx.Client, url: str) -> httpx.Response | None:
+class SlowDown(Exception):
+    """The store said 429/503. Stop the whole audit."""
+
+
+def _get(client: httpx.Client, url: str, pause: float = 0.0) -> httpx.Response | None:
+    if pause:
+        time.sleep(pause)
     try:
         r = client.get(url, follow_redirects=True)
-        return r
     except httpx.HTTPError:
         return None
+    if r.status_code in STOP_CODES:
+        raise SlowDown(f"{r.status_code} on {url}")
+    return r
+
+
+def _robots(text: str | None) -> robotparser.RobotFileParser:
+    rp = robotparser.RobotFileParser()
+    rp.parse((text or "").splitlines())
+    return rp
 
 
 def _extract_jsonld(html: str) -> list[dict[str, Any]]:
@@ -100,7 +121,44 @@ def _detect_signals(html: str, headers: dict[str, str], has_cart_js: bool) -> di
     return signals
 
 
-def gather(url: str, *, client: httpx.Client | None = None) -> StoreSnapshot:
+# Words that make a store's terms a "no" to an automated read. Matched loosely on purpose:
+# a false "no" costs me one polite email; a false "silent" costs the owner their word.
+NO_BOT_WORDS = re.compile(
+    r"spider|crawl|scrap(e|ing)|robot|data[- ]mining|automated (means|tools|systems|software)|bots?\b",
+    re.IGNORECASE,
+)
+_TERMS_HREF = re.compile(r'href=["\']([^"\']*(?:terms|conditions)[^"\']*)["\']', re.IGNORECASE)
+
+
+def _text(html: str) -> str:
+    t = re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>", " ", html)
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", t))
+
+
+def terms_gate(client: httpx.Client, base: str, home_html: str, allowed, pause: float) -> tuple[str, str]:
+    """Find and read the store's terms. Returns (status, url).
+
+    "says-no" if they forbid automated reading; "unreadable" if there's no link, robots
+    forbids the page, or it won't load; "silent" otherwise. Only "silent" lets the cold
+    audit go past homepage + robots. Intent and a polite user-agent don't turn a no into
+    a yes (Value 6; council 2026-10-03).
+    """
+    hrefs = [h for h in _TERMS_HREF.findall(home_html) if "privacy" not in h.lower()]
+    if not hrefs:
+        return "unreadable", ""
+    turl = urljoin(base + "/", hrefs[0])
+    if urlparse(turl).netloc != urlparse(base).netloc:
+        return "unreadable", turl
+    if not allowed(urlparse(turl).path.lstrip("/")):
+        return "unreadable", turl
+    r = _get(client, turl, pause)
+    if r is None or r.status_code != 200:
+        return "unreadable", turl
+    return ("says-no" if NO_BOT_WORDS.search(_text(r.text)) else "silent"), turl
+
+
+def gather(url: str, *, client: httpx.Client | None = None, pause: float = PAUSE_S,
+           owner_yes: bool = False) -> StoreSnapshot:
     """Collect a :class:`StoreSnapshot` for ``url``. Never raises on a bad site."""
     url = _norm_url(url)
     own_client = client is None
@@ -124,33 +182,63 @@ def gather(url: str, *, client: httpx.Client | None = None) -> StoreSnapshot:
 
         base = f"{urlparse(snap.final_url).scheme}://{urlparse(snap.final_url).netloc}"
 
-        r = _get(client, urljoin(base + "/", "robots.txt"))
+        r = _get(client, urljoin(base + "/", "robots.txt"), pause)
         if r is not None and r.status_code == 200:
             snap.robots_txt = r.text
-        r = _get(client, urljoin(base + "/", "llms.txt"))
-        if r is not None and r.status_code == 200 and "html" not in r.headers.get("content-type", ""):
-            snap.llms_txt = r.text
-        r = _get(client, urljoin(base + "/", "sitemap.xml"))
-        if r is not None and r.status_code == 200 and "xml" in r.headers.get("content-type", "").lower():
-            snap.sitemap_xml = r.text
+        # A missing robots.txt (404) means "no rules"; one that failed to load means "unknown",
+        # and unknown is treated as no.
+        rp = _robots(snap.robots_txt if (r is not None and r.status_code < 500) else "User-agent: *\nDisallow: /")
+        ua = USER_AGENT.split("/")[0]
+
+        def allowed(path: str) -> bool:
+            ok = rp.can_fetch(ua, urljoin(base + "/", path))
+            if not ok:
+                snap.gather_notes.append(f"Skipped /{path}: robots.txt disallows it.")
+            return ok
+
+        if owner_yes:
+            snap.terms_status = "owner-yes"
+        else:
+            snap.terms_status, snap.terms_url = terms_gate(client, base, snap.homepage_html, allowed, pause)
+        if snap.terms_status not in ("silent", "owner-yes"):
+            snap.gather_notes.append(
+                f"Stopped after homepage + robots + terms: terms are '{snap.terms_status}'. "
+                "Ask the owner first; re-run with --owner-yes only after they say yes in their own words."
+            )
+            snap.signals = _detect_signals(snap.homepage_html, snap.headers, False)
+            return snap
+
+        if allowed("llms.txt"):
+            r = _get(client, urljoin(base + "/", "llms.txt"), pause)
+            if r is not None and r.status_code == 200 and "html" not in r.headers.get("content-type", ""):
+                snap.llms_txt = r.text
+        if allowed("sitemap.xml"):
+            r = _get(client, urljoin(base + "/", "sitemap.xml"), pause)
+            if r is not None and r.status_code == 200 and "xml" in r.headers.get("content-type", "").lower():
+                snap.sitemap_xml = r.text
 
         # Shopify detection + catalogue.
         powered = snap.headers.get("x-shopid") or snap.headers.get("x-shopify-stage")
         if powered or "cdn.shopify.com" in snap.homepage_html or "shopify" in snap.homepage_html.lower():
             snap.is_shopify = True
-            r = _get(client, urljoin(base + "/", "products.json?limit=50"))
+            r = _get(client, urljoin(base + "/", "products.json?limit=50"), pause) if allowed("products.json?limit=50") else None
             if r is not None and r.status_code == 200 and "json" in r.headers.get("content-type", "").lower():
                 try:
                     snap.products_json = r.json()
                 except ValueError:
                     snap.gather_notes.append("products.json present but not valid JSON.")
-            r = _get(client, urljoin(base + "/", "cart.js"))
+            # Shopify's default robots.txt disallows /cart (which covers /cart.js); then we skip it.
+            r = _get(client, urljoin(base + "/", "cart.js"), pause) if allowed("cart.js") else None
             if r is not None and r.status_code == 200 and "json" in r.headers.get("content-type", "").lower():
                 try:
                     snap.cart_js = r.json()
                 except ValueError:
                     pass
 
+        snap.signals = _detect_signals(snap.homepage_html, snap.headers, snap.cart_js is not None)
+        return snap
+    except SlowDown as e:
+        snap.gather_notes.append(f"Stopped early: the store said slow down ({e}). Not retried.")
         snap.signals = _detect_signals(snap.homepage_html, snap.headers, snap.cart_js is not None)
         return snap
     finally:

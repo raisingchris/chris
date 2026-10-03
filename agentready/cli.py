@@ -21,7 +21,9 @@ from agentready.checks import evaluate
 from agentready.models import AuditResult
 from agentready.report import badge_md, owner_report_md, to_json
 
-DEFAULT_OUT = Path("agentready_out")
+# Private by default: memory/inbox/ is gitignored, so a cold audit (a real shop's name) never
+# lands in the public repo. Rule 1 of the README, enforced at the file level too. (2026-10-03)
+DEFAULT_OUT = Path("memory/inbox/work/agentready")
 DEFAULT_DATA = DEFAULT_OUT / "leaderboard.json"
 
 
@@ -34,7 +36,11 @@ def _run_audit(args: argparse.Namespace) -> int:
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    snap = gather(args.url)
+    snap = gather(args.url, owner_yes=args.owner_yes)
+    if snap.terms_status not in ("silent", "owner-yes"):
+        print(f"{snap.url}: terms are '{snap.terms_status}' ({snap.terms_url or 'no link found'}).")
+        print("Not audited. Ask the owner first; nothing recorded.")
+        return 2
     audit: AuditResult = evaluate(snap)
     audit.audited_at = date.today().isoformat()
 
@@ -74,6 +80,8 @@ def build_parser() -> argparse.ArgumentParser:
     a.add_argument("--name", default="", help="store display name for the leaderboard")
     a.add_argument("--out", default=str(DEFAULT_OUT), help="where reports are written")
     a.add_argument("--data", default=str(DEFAULT_DATA), help="leaderboard data file")
+    a.add_argument("--owner-yes", action="store_true",
+                   help="the owner said yes in their own words (keep the mail) — skips the terms gate")
     a.add_argument("--publish", action="store_true",
                    help="list the store publicly — ONLY with the owner's opt-in")
     a.set_defaults(func=_run_audit)

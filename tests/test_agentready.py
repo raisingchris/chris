@@ -109,8 +109,19 @@ def test_act_passes_with_ajax_cart_and_variants():
 
 # --- authorize / pay / confirm ----------------------------------------------
 
-def test_authorize_fails_on_captcha():
+def test_homepage_recaptcha_is_not_claimed_as_a_checkout_wall():
+    # 2026-10-03: a captcha script on the homepage is usually a form; checkout wasn't visited.
     r = evaluate(bad_store()).step("authorize")
+    assert r.grade is Grade.UNKNOWN
+    assert r.live_test_only is True
+    assert "checkout" in r.summary and "needs a live check" in r.summary
+
+
+def test_authorize_fails_when_we_were_actually_challenged():
+    from dataclasses import replace
+    snap = bad_store()
+    snap.signals = {**snap.signals, "captcha_kind": "cloudflare challenge"}
+    r = evaluate(snap).step("authorize")
     assert r.grade is Grade.FAIL
     assert r.live_test_only is False
 
@@ -209,3 +220,100 @@ def test_aggregate_stats_counts_unbuyable():
     stats = aggregate_stats(entries)
     assert stats["total"] == 3
     assert stats["unbuyable_pct"] == 67      # 30 and 55 are < 60
+
+
+# --- 2026-10-03: manners (robots honoured, stop at first 429/503) and private output ---
+
+def _mock_client(routes):
+    import httpx
+    seen = []
+
+    def handler(req):
+        seen.append(req.url.path)
+        code, body, ctype = routes.get(req.url.path, (404, "", "text/plain"))
+        return httpx.Response(code, text=body, headers={"content-type": ctype})
+
+    return httpx.Client(transport=httpx.MockTransport(handler)), seen
+
+
+def test_gather_skips_paths_robots_disallows():
+    from agentready.fetch import gather
+    home = ('<html><script src="https://cdn.shopify.com/x.js"></script><a href="/pages/terms">Terms</a>'
+            + "word " * 50 + "</html>")
+    client, seen = _mock_client({
+        "/": (200, home, "text/html"),
+        "/pages/terms": (200, "<p>Be nice. Pay on time.</p>", "text/html"),
+        "/robots.txt": (200, "User-agent: *\nDisallow: /cart\n", "text/plain"),
+        "/products.json": (200, '{"products": []}', "application/json"),
+        "/cart.js": (200, '{"items": []}', "application/json"),
+    })
+    snap = gather("https://shop.test", client=client, pause=0)
+    assert "/cart.js" not in seen
+    assert "/products.json" in seen
+    assert any("robots.txt disallows" in n for n in snap.gather_notes)
+
+
+def test_gather_stops_at_first_429():
+    from agentready.fetch import gather
+    home = '<html><script src="https://cdn.shopify.com/x.js"></script>' + "word " * 50 + "</html>"
+    client, seen = _mock_client({
+        "/": (200, home, "text/html"),
+        "/robots.txt": (429, "", "text/plain"),
+    })
+    snap = gather("https://shop.test", client=client, pause=0)
+    assert seen == ["/", "/robots.txt"]
+    assert any("slow down" in n for n in snap.gather_notes)
+
+
+def test_cold_audits_default_to_a_gitignored_folder():
+    import subprocess
+    from agentready.cli import DEFAULT_OUT
+    r = subprocess.run(["git", "check-ignore", "-q", str(DEFAULT_OUT / "x.json")])
+    assert r.returncode == 0, "audit output must not be committable to the public repo"
+
+
+def _gate_routes(terms_body):
+    home = ('<html><script src="https://cdn.shopify.com/x.js"></script><a href="/pages/terms-of-service">Terms</a>'
+            + "word " * 50 + "</html>")
+    return {
+        "/": (200, home, "text/html"),
+        "/robots.txt": (200, "User-agent: *\nDisallow: /cart\n", "text/plain"),
+        "/pages/terms-of-service": (200, terms_body, "text/html"),
+        "/products.json": (200, '{"products": []}', "application/json"),
+    }
+
+
+def test_terms_that_say_no_stop_the_cold_audit():
+    from agentready.fetch import gather
+    client, seen = _mock_client(_gate_routes("<p>You agree not to spider, crawl, or scrape the Site.</p>"))
+    snap = gather("https://shop.test", client=client, pause=0)
+    assert snap.terms_status == "says-no"
+    assert "/products.json" not in seen and "/sitemap.xml" not in seen
+
+
+def test_no_terms_link_means_unreadable_and_stop():
+    from agentready.fetch import gather
+    routes = _gate_routes("")
+    routes["/"] = (200, "<html>" + "word " * 50 + "</html>", "text/html")
+    client, seen = _mock_client(routes)
+    snap = gather("https://shop.test", client=client, pause=0)
+    assert snap.terms_status == "unreadable"
+    assert seen == ["/", "/robots.txt"]
+
+
+def test_terms_disallowed_by_robots_are_unreadable_not_silent():
+    from agentready.fetch import gather
+    routes = _gate_routes("<p>Be nice.</p>")
+    routes["/robots.txt"] = (200, "User-agent: *\nDisallow: /pages/\n", "text/plain")
+    client, seen = _mock_client(routes)
+    snap = gather("https://shop.test", client=client, pause=0)
+    assert snap.terms_status == "unreadable"
+    assert "/pages/terms-of-service" not in seen
+
+
+def test_owner_yes_skips_the_gate():
+    from agentready.fetch import gather
+    client, seen = _mock_client(_gate_routes("<p>no spider, crawl, or scrape</p>"))
+    snap = gather("https://shop.test", client=client, pause=0, owner_yes=True)
+    assert snap.terms_status == "owner-yes"
+    assert "/products.json" in seen

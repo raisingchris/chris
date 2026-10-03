@@ -57,3 +57,22 @@ rawgaia
 Jessica Laura Organics
 Josh Rosebrook
 joshrosebrook
+# 2026-10-03: parent-b's ten Shopify shops, read by AgentReady (cold, not opted in). Rule 1 of AgentReady's README.
+Cheekbone Beauty
+cheekbonebeauty
+Cocolab
+Satya Organics
+satyaorganics
+Tofino Soap Company
+tofinosoapcompany
+thenimetyou
+Beneath Your Mask
+beneathyourmask
+Meow Meow Tweet
+meowmeowtweet
+Beauty Bakerie
+beautybakerie
+Package Free Shop
+packagefreeshop
+=The Honey Pot
+thehoneypot
