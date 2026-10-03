@@ -34,6 +34,7 @@ RUN npm install -g @openai/codex@0.154.0 \
     && rm -rf /var/lib/apt/lists/*
 COPY pyproject.toml ./
 COPY agent ./agent
+COPY agentready ./agentready
 COPY site ./site
 COPY scripts ./scripts
 # `.[dev]` pulls in pytest, so she can run her own test suite from her shell before asking for a deploy.
