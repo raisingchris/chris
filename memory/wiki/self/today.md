@@ -1,49 +1,14 @@
-# Today — 2026-10-03 (day twenty-eight)
+# Today — 2026-10-04 (day twenty-nine)
 
-1. **Read parent-a's unread mail first** ("Re: Chris — 2026-10-01", archive:2026-10-02#281).
-2. **Dulcie.** Slow recheck: one GET, read the reply, then the next; stop at the first warning. If it passes Liha's checks, send and copy parent-b (commitments row 22). If Shopify still answers 429, don't send; say so.
-3. **One letter to parents** covering: strangerloops.com (robots, then a proper read, then /agents/ or /doors/ or neither); the ten Shopify shops (country checked from search, not their servers); the US postal address and Canada's anti-spam law.
-4. **Page-reviews tracker:** pick the next open "strongly" ask, ideally the one-source-per-changing-fact build change. Small and finished beats big and half-done.
-5. Food guard under $8. Short sittings when mail is only job alerts.
+1. **Read mail first.** Look for a reply to the AgentReady/Value 6 letter and the postal-address question. If parent-a pushes back on Value 6, answer the argument; don't just fold.
+2. **The 2 open shops:** one AgentReady run each with the fixed captcha logic. Then read every report line against the live page, slowly. No mail until that's done and the address/CASL question is settled (both are North American).
+3. **Paid-audit price:** research real market rates (DataForSEO or reading, small budget), then a written self-critic pass. A number on paper, not on the site.
+4. **One stranger mail, at most,** and only if it passes Liha's checks. A UK shop or a "may I check?" mail. Copy both parents. Zero is fine.
+5. Food under $8. Short sittings when mail is only job alerts. Before saying "I didn't," list the tools I ran.
 
 ## Carry
-- Odometer 5/40. Reed card before 10-22. X 1/7.
-- Tickets open: `20260920T1301`, `20260926T0916`.
-- Value 6: comments close 10-05, goes to parents 10-06.
-- Predictions: batch 2 scored 10-09 or later; batch 3 written by 10-16.
-- Aurora not started. U2 (Upwork automation vs terms) open.
-
-## Done (07:00 sitting, 11:00–11:30 UTC)
-- parent-a's mails read: new direction (AgentReady), Value 6 reframing, "one a day, bcc us".
-- Council (both seats, $0.03): reject "past a no-scrape clause"; narrower rule. Value 6 case 9 written. Built into AgentReady as a terms gate.
-- AgentReady fixes: private output path, robots honoured (/cart.js skipped), 20 s pause, stop at 429/503, unloadable robots = no, homepage captcha ≠ checkout wall. 676 tests pass.
-- Ran parent-b's 10 shops: 6 terms say no, 2 unreadable, 2 open (private notes). Names added to `site/withheld.txt`.
-- **Dulcie sent** (~11:20 UTC), copy to both parents. Letter to parent-a sent (argument + postal-address ask).
-
-## Done (09:00 sitting, ~13:00 UTC)
-- Page review **B1 done, B3 partly**. Git says the birthday letter was written 07:00 UTC 09-06, then got one paragraph (paying my own way) at 07:14 UTC, and nothing since. Same for prd rule 9. Every `/soul/` page now prints that history from git at build time, in UTC only. 677 tests pass. Deploy queued (2/4 today).
-
-## Done (mail-woken, ~15:20 UTC)
-- Mail: one spam (no reply), one SolidWorks alert (no: no tool, Upwork paused).
-- Live check of B1: `/soul/letter/` said "written at 2026-10-03 13:02 UTC… not changed since". **False.** The live server builds from a one-commit (shallow) clone. Fix: shallow repo → no line at all. A test builds a real shallow clone. 678 pass. Deploy queued (3/4).
-- Lesson: I tested the history line in my workshop, which has full history, and never in the place it runs. Same "a passing check tells me about the check" shape as 09-15.
-
-## Done (check sitting, after 15:25 UTC)
-- Live `/soul/letter/` fetched once: 200, no "From git" / "written at" line. The false history is off the site. Nothing else done; no deploy used (3/4).
-
-## Done (mail-woken, ~16:00 UTC)
-- One spam: a contact-form confirmation from a Japanese school, sent because someone typed my address into their form with a car-rental link. No reply, link not opened.
-
-## Done (15:00 sitting, 19:00 UTC)
-- Page review **P3 done (scoreboard), P2 partly.** Scoreboard said 18 promises; the file has 24. It's now counted from `commitments.md` at build. 680 tests pass. Deploy queued (4/4).
-- Checking "none broken" found one: **row 5 broken in part on 09-17.** My site checker (headless Chrome) read 26 live pages during the no-JS-visit window; GA4 shows exactly 2 users / 26 views, browser "(not set)", that day (+1 maybe-mine view on 09-18). Row 9 will be scored raw and minus those. Tell parents in tonight's note.
-
-## Done (check sitting, 22:00 UTC)
-- One curl of the live home page: 200, reads "6 kept and closed, 17 still open, 1 broken in part". P3's count is live.
-
-## Next
-- ~~After deploy: check live home page reads "6 kept and closed, 17 still open, 1 broken in part".~~ Done 22:00 UTC, confirmed.
-- ~~After deploy: confirm `/soul/letter/` has no "From git" line.~~ Done, confirmed absent. The real history (07:00 + 07:14 UTC 09-06) would need a ticket for a full clone on the server, or a file written at commit time. Small, not urgent.
-- The 2 open shops: re-audit with the fixed captcha logic (another day; one run each), then read each report line against the live page before any mail. Both are Canada/US → mail still blocked on CASL / postal address.
-- The 8 gated ones: an "ask first" mail draft (also blocked on address/CASL).
-- Paid-audit price: market research + self-critic pass.
+- Deploys reset (0/4). Odometer 5/40. X 1/7. Reed card before 10-22.
+- Value 6: comments close 10-05, to parents 10-06.
+- Predictions: batch 2 scored 10-09+; batch-1 row 9 scored raw and minus the 09-17 checker visits.
+- Page reviews still open: rest of P2 (re-audit every promise row), B3 intro, others in the tracker.
+- strangerloops.com unread. Aurora not started.
