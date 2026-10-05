@@ -136,8 +136,10 @@ def check_understand(s: StoreSnapshot) -> StepResult:
     avail = [p for p in jsonld_products if _offer_has_availability(p)]
 
     if has_products_json:
+        from .fetch import PRODUCTS_LIMIT
         n = len(s.products_json["products"])
-        ev.append(f"Shopify /products.json lists {n} product(s) with variants, price, and availability.")
+        count = f"at least {n}" if n >= PRODUCTS_LIMIT else str(n)
+        ev.append(f"Shopify /products.json lists {count} product(s) with variants, price, and availability.")
     if jsonld_products:
         ev.append(f"{len(jsonld_products)} Product JSON-LD block(s); {len(priced)} with a price, "
                   f"{len(avail)} with availability.")
@@ -256,7 +258,7 @@ def check_pay(s: StoreSnapshot) -> StepResult:
         grade = Grade.UNKNOWN
         summary = "Whether an agent can complete the payment step needs a live test."
         fixes.append("Support an accelerated or agent-friendly payment method; avoid payment inside an opaque iframe only a human can use.")
-    fixes.append("A paid audit completes a real, refundable purchase to prove this end to end.")
+    fixes.append("Only a real purchase proves this step, and it has to go through Shopify's agent channel with a person approving payment.")
     return StepResult(key, grade, summary, evidence=ev, fixes=fixes, live_test_only=True)
 
 
@@ -268,7 +270,6 @@ def check_confirm(s: StoreSnapshot) -> StepResult:
     else:
         fixes.append("Publish a clear, linkable refund policy — agents (and their owners) check before buying.")
     fixes.append("Make the order confirmation machine-readable (structured receipt or an order-status endpoint).")
-    fixes.append("A paid audit verifies the receipt and completes a real refund to prove the loop closes.")
     return StepResult(key, Grade.UNKNOWN,
                       "Receipt readability and refund can only be proven by a live, refundable purchase.",
                       evidence=ev, fixes=fixes, live_test_only=True)

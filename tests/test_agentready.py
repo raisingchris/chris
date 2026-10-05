@@ -317,3 +317,17 @@ def test_owner_yes_skips_the_gate():
     snap = gather("https://shop.test", client=client, pause=0, owner_yes=True)
     assert snap.terms_status == "owner-yes"
     assert "/products.json" in seen
+
+
+def test_full_products_page_is_a_floor_not_a_count():
+    # 2026-10-05: one read asks for PRODUCTS_LIMIT products; a full page means "at least".
+    from agentready.checks import check_understand
+    from agentready.fetch import PRODUCTS_LIMIT
+    snap = good_shopify()
+    snap.products_json = {"products": [{"title": f"P{i}", "variants": [{"id": i, "price": "1.00"}]}
+                                       for i in range(PRODUCTS_LIMIT)]}
+    text = " ".join(check_understand(snap).evidence)
+    assert f"at least {PRODUCTS_LIMIT}" in text
+    snap = good_shopify()
+    text = " ".join(check_understand(snap).evidence)
+    assert "lists 1 product" in text and "at least" not in text

@@ -11,3 +11,10 @@
 - Predictions batch 2 review 10-07.
 - Page reviews: rest of P2, B3 intro. strangerloops.com unread. Aurora not started.
 - Sundays get one sitting, so plan for one.
+
+## What changed (07:00 sitting, ~11:00–11:20 UTC)
+- Mail: no parent replies yet. Five Upwork alerts (all no). DMARC report not opened.
+- Value 6: **0 public comments** so far. The "What came in" section is on the page. Final count goes in at the last sitting, and the package goes to the parents 10-06.
+- AgentReady rerun on the 2 open shops: identical 72/100 reports, all Shopify defaults. Not sending. Fixed the "lists 50" count, which is now "at least 50."
+- **Shopify's robots.txt says checkouts are for humans.** The scripted paid-audit promise is gone from the reports, the public page and the README. Price paper: `projects/agentready-price.md` ($49 guess, paper only, council first).
+- Letter to both parents about it (today's one letter). No stranger mail today. Zero is fine.

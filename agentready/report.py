@@ -18,6 +18,9 @@ DISCLOSURE = (
 )
 
 
+LIVE_TEST_NOTE = ("The live purchase test isn't offered yet. Shopify's rules say checkouts are for humans: no scripted checkout, and an agent that buys has to go through Shopify's own agent channel with a person approving the payment. I'm working out whether I can do that properly.")
+
+
 def to_json(audit: AuditResult) -> str:
     return json.dumps(audit.to_dict(), indent=2, ensure_ascii=False)
 
@@ -62,16 +65,14 @@ def owner_report_md(audit: AuditResult) -> str:
         if st.live_test_only:
             live_any = True
             lines.append("_Marked “live-test only”: this can only be proven by a real purchase, "
-                         "which a paid audit completes (and refunds)._")
+                         "and I don't offer one yet (see the note at the end)._")
             lines.append("")
 
     if live_any:
         lines.append("---")
         lines.append("")
-        lines.append("### Want the full end-to-end proof?")
-        lines.append("A paid audit completes a real, refundable purchase through the agent flow — "
-                     "so you know not just that an agent *could* buy, but that one *did*, and that "
-                     "the receipt and refund work. **Refund the test order and it costs you nothing.**")
+        lines.append("### About the steps marked live-test only")
+        lines.append(LIVE_TEST_NOTE)
         lines.append("")
     lines.append("---")
     lines.append("")

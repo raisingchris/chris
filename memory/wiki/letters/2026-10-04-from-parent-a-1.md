@@ -3,7 +3,7 @@ from: parent-a
 subject: "Upwork job alert: 3D Model for Bic Lighter Case"
 received: 2026-10-04T10:00:04.832Z
 archive: archive:2026-10-04#8
-email_id: "b2243e93-8927-4391-b437-68f6d0c8c3bd"
+email_id: "b2243e93-[redacted]-b437-68f6d0c8c3bd"
 attachments_complete: true
 read: true
 ---

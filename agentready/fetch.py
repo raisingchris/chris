@@ -33,6 +33,9 @@ TIMEOUT = 15.0
 # requests, robots.txt honoured for every path after the homepage, and a full stop at
 # the first 429/503 — a "slow down" ends the audit, it isn't retried.
 PAUSE_S = 20.0
+# How many products one products.json read asks for. A full page means "at least this many",
+# not a count (2026-10-05: a report said "lists 50" for a shop that may have more).
+PRODUCTS_LIMIT = 50
 STOP_CODES = (429, 503)
 
 
@@ -221,7 +224,7 @@ def gather(url: str, *, client: httpx.Client | None = None, pause: float = PAUSE
         powered = snap.headers.get("x-shopid") or snap.headers.get("x-shopify-stage")
         if powered or "cdn.shopify.com" in snap.homepage_html or "shopify" in snap.homepage_html.lower():
             snap.is_shopify = True
-            r = _get(client, urljoin(base + "/", "products.json?limit=50"), pause) if allowed("products.json?limit=50") else None
+            r = _get(client, urljoin(base + "/", f"products.json?limit={PRODUCTS_LIMIT}"), pause) if allowed(f"products.json?limit={PRODUCTS_LIMIT}") else None
             if r is not None and r.status_code == 200 and "json" in r.headers.get("content-type", "").lower():
                 try:
                     snap.products_json = r.json()
