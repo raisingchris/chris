@@ -61,6 +61,16 @@ class FakeMail:
         self.ingested.append(payload)
         return Path("inbox.md")
 
+    owner_aliases = ("owner@raisingchris.com",)
+
+    def is_owner_mail(self, payload, aliases):
+        to = (payload.get("data") or {}).get("to") or []
+        return any(str(t).lower() in {a.lower() for a in aliases} for t in to)
+
+    def forward_owner_mail(self, payload):
+        self.forwarded = getattr(self, "forwarded", []) + [payload]
+        return {"ok": True}
+
     def deliver_inline(self, handle, subject, body):
         self.ingested.append({"handle": handle, "subject": subject, "body": body, "inline": True})
         return Path(f"{handle}-reply.md")

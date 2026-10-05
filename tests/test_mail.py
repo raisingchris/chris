@@ -381,3 +381,19 @@ def test_deliver_inline_files_parent_reply_unread_with_canaries_stripped(mail, a
     assert "Alice Realname" not in text
     assert "Example Holdings" not in text
     assert "Yes, go." in text
+
+
+def test_owner_mail_is_recognised_by_alias_only(mail):
+    aliases = ["owner@raisingchris.com"]
+    assert mail.is_owner_mail({"data": {"to": ["Owner <OWNER@raisingchris.com>"]}}, aliases)
+    assert mail.is_owner_mail({"data": {"to": "owner@raisingchris.com"}}, aliases)
+    assert not mail.is_owner_mail({"data": {"to": [CHRIS]}}, aliases)
+    assert not mail.is_owner_mail({"data": {"to": ["owner@raisingchris.com"]}}, [])
+
+
+def test_owner_mail_is_never_filed_and_the_archive_keeps_no_content(mail, archive, tmp_path):
+    out = mail.forward_owner_mail({"data": {"email_id": "e9", "to": ["owner@raisingchris.com"],
+                                            "from": "noreply@moltbook.com", "subject": "Your login link SECRET"}})
+    assert out["dry_run"] is True and out["to"] == 2
+    assert not (tmp_path / "memory" / "inbox").exists()
+    assert "SECRET" not in str(vars(archive))

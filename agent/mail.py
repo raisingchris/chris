@@ -388,6 +388,50 @@ class Mail:
             text = f"---\nread: true\n---\n{text}"
         path.write_text(text)
 
+    # --- owner mail ----------------------------------------------------------
+
+    def is_owner_mail(self, payload: dict, aliases: Iterable[str]) -> bool:
+        """True when a received event is addressed to one of the parents' owner aliases."""
+        wanted = {a.strip().lower() for a in aliases if a and a.strip()}
+        if not wanted:
+            return False
+        data = payload.get("data", payload)
+        found: list[str] = []
+        for key in ("to", "cc"):
+            value = data.get(key) or []
+            found.extend([value] if isinstance(value, str) else [str(v) for v in value])
+        for address in found:
+            m = _EMAIL_IN_ANGLE.search(address)
+            if (m.group(1) if m else address).strip().lower() in wanted:
+                return True
+        return False
+
+    def forward_owner_mail(self, payload: dict) -> dict:
+        """Pass mail for an owner alias straight to the parents. It is theirs, not hers: nothing is
+        filed in her inbox, and the archive records only that it happened (no subject, no body), so
+        a login or claim link can never surface through ``recall``."""
+        data = payload.get("data", payload)
+        email_id = str(data.get("email_id") or "")
+        self.archive_append("owner_mail", {"kind": "owner_mail", "email_id": email_id})
+        recipients = [a for a in self.parents.values() if a]
+        if self.dry_run or not recipients:
+            return {"dry_run": True, "to": len(recipients)}
+        import resend
+
+        if self.resend_api_key:
+            resend.api_key = self.resend_api_key
+        body = self.fetch_body(email_id) if email_id else {}
+        params: dict = {
+            "from": self.chris_email,
+            "to": recipients,
+            "subject": f"[owner mail] {data.get('subject') or '(no subject)'}",
+            "text": (f"Sent to an owner alias on Chris's domain by {data.get('from', 'unknown')}. "
+                     "Chris has not seen it.\n\n" + (body.get("text") or _html_to_text(body.get("html") or ""))),
+        }
+        if body.get("html"):
+            params["html"] = body["html"]
+        return resend.Emails.send(params)
+
     # --- inline delivery -----------------------------------------------------
 
     def deliver_inline(self, handle: str, subject: str, body: str) -> Path:

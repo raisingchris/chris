@@ -434,6 +434,10 @@ def create_app(services, scheduler=None) -> FastAPI:
         except json.JSONDecodeError:
             raise HTTPException(400, "bad json")
         if payload.get("type") == "email.received":
+            if services.mail.is_owner_mail(payload, getattr(cfg, "owner_aliases", ())):
+                # A parent's account mail (a login or claim link): forwarded to them, never filed for her.
+                await asyncio.to_thread(services.mail.forward_owner_mail, payload)
+                return {"ok": True}
             from agent.attachments import AttachmentError
             try:
                 path = await asyncio.to_thread(services.mail.ingest, payload)

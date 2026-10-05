@@ -818,3 +818,15 @@ def test_parent_reply_rejects_empty_body(client):
     sign_in(client, "parent-a")
     r = client.post("/parent/reply", data={"subject": "Re:", "body": " "}, follow_redirects=False)
     assert r.status_code == 400
+
+
+def test_resend_webhook_forwards_owner_mail_instead_of_filing_it(client, services):
+    payload = {"type": "email.received", "data": {"email_id": "e7", "to": ["owner@raisingchris.com"]}}
+    body = json.dumps(payload).encode()
+    ts = int(time.time())
+    r = client.post("/webhooks/resend", content=body, headers={
+        "svix-id": "msg_o", "svix-timestamp": str(ts), "svix-signature": sign_svix("msg_o", ts, body, SECRET),
+    })
+    assert r.status_code == 200
+    assert services.mail.forwarded == [payload]
+    assert services.mail.ingested == []

@@ -23,6 +23,7 @@ from agent.analytics import Analytics
 from agent.dataforseo import DataForSEO
 from agent.google_auth import GoogleWIF
 from agent.mail import Mail
+from agent.moltbook import Moltbook
 from agent.x_client import XClient
 from agent.upwork import Upwork
 
@@ -97,6 +98,7 @@ class Services:
     dataforseo_meter: Meter | None = None  # weekly DataForSEO spend
     dataforseo: Any = None  # DataForSEO proxy, or None when no credential is configured
     x_meter: Meter | None = None  # weekly count of posted tweets
+    moltbook: Any = None  # Moltbook client; the key it holds is written at registration, never in env
     x: Any = None  # XClient (post to X via Typefully), or None when no key is configured
     google: Any = None  # GoogleWIF, or None when the provider/SA are not configured
     ga4_property: str = ""
@@ -309,4 +311,7 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
         gsc_site=secrets.gsc_site_url,
         analytics=analytics,
         upwork=Upwork(cfg.state_dir, cfg.canaries),
+        moltbook=Moltbook(cfg.state_dir, archive.append, cfg.canaries,
+                          Meter("moltbook_posts", "day", cfg.state_dir, tz=cfg.tz),
+                          Meter("moltbook_comments", "day", cfg.state_dir, tz=cfg.tz)),
     )

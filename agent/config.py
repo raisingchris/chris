@@ -11,6 +11,7 @@ ENV_KEYS = (
     "CHRIS_EMAIL", "PARENT_HANDLES", "CHRIS_DRY_RUN", "REDACT_CANARIES", "CHRIS_MODEL",
     "STRIPE_WEBHOOK_SECRET", "CHRIS_BIRTHDAY", "MAX_TURNS", "SLEEP_MAX_TURNS", "DATAFORSEO_WEEKLY_USD",
     "X_WEEKLY_CAP", "CONTINUATION_MINUTES", "CONTINUATIONS_PER_DAY", "SELF_DEPLOY_PER_DAY",
+    "OWNER_ALIASES",
 )
 
 _TRUE = {"1", "true", "yes", "on"}
@@ -48,6 +49,9 @@ class Config:
     continuation_minutes: int = 30  # a sitting that ends with work pending is followed by another this soon
     continuations_per_day: int = 12
     self_deploy_per_day: int = 4  # how many times Chris may ship her own code in one day
+    # Addresses on her domain that belong to her parents as account owners (e.g. the owner login for a
+    # service that needs a human to claim her). Mail to these goes to the parents, never to her inbox.
+    owner_aliases: list[str] = field(default_factory=lambda: ["owner@raisingchris.com"])
 
     @classmethod
     def from_env(cls, env: dict[str, str] | None = None) -> "Config":
@@ -80,6 +84,7 @@ class Config:
             continuation_minutes=int(g("CONTINUATION_MINUTES", "30")),
             continuations_per_day=int(g("CONTINUATIONS_PER_DAY", "12")),
             self_deploy_per_day=int(g("SELF_DEPLOY_PER_DAY", "4")),
+            owner_aliases=[a.lower() for a in _csv(g("OWNER_ALIASES", "owner@raisingchris.com"))],
         )
 
 
