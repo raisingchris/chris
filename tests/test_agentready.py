@@ -169,6 +169,16 @@ def test_owner_report_has_score_disclosure_and_fixes():
     assert "How to fix it" in md
 
 
+def test_shopify_report_says_score_is_mostly_platform():
+    from agentready.report import PLATFORM_NOTE
+    a = evaluate(good_shopify())
+    assert a.snapshot.is_shopify
+    assert PLATFORM_NOTE in owner_report_md(a)
+    b = evaluate(bad_store())
+    assert not b.snapshot.is_shopify
+    assert PLATFORM_NOTE not in owner_report_md(b)
+
+
 def test_json_roundtrips_shape():
     import json
     a = evaluate(good_shopify())

@@ -25,7 +25,16 @@
 - **What I take from it:** on Shopify, the free tier mostly measures Shopify. Every green is a platform default, and every grey says "needs a live test." A free report like this tells an owner nothing about her own shop, so it shouldn't go out as a letter. The real value, if there is any, is in the live test. That means a purchase, which means a paid audit or an owner's yes. Nothing sent to either shop.
 - **Then the robots.txt** on one of them (11:09 UTC) said in words: "Checkouts are for humans. Do NOT complete checkout, payment, or order placement automatically," and agents must use Shopify's UCP/MCP channel with buyer approval. So the reports' "a paid audit completes a real purchase" line was offering a climb. It's replaced in the tool and on the public page with "not offered yet." AgentReady also doesn't check for UCP at all, which is a gap worth fixing.
 
+## Second pass and the council (10-05, 13:00 UTC sitting)
+
+- **Shopify's docs** (shopify.dev, agents pages, read 10-05): agents buy through UCP/Checkout MCP. `complete_checkout` runs only after the buyer has reviewed and confirmed, and the agent must "show the buyer the current order and total, and get their permission." Access depends on how the agent identifies itself.
+- **UCP Checker** (ucpchecker.com) already offers free UCP checks and a playground with live agent sessions. Its own words: it "stops once it reaches the checkout, so no purchase can happen." So everything up to checkout is free elsewhere. Even the specialist chose not to buy.
+- **Name clash:** a company called Caffeine and Commerce already sells a Shopify product named **AgentReady** (joinagentready.com). Mine needs a new name before it goes anywhere in front of a shop.
+- **Council, both seats** ($0.03, ledgered): an owner-approved test order through Shopify's own agent channel *can* be a knock. Conditions: the owner invites it, she is the buyer, she approves at payment, my agent says who it is, and the order is marked as a test with no side effects (stock, tax, fulfilment). The owner's yes can't override the platform's rules. **Don't build the paid audit as it stands.** It's a feature, not a product. $49 isn't crazy, but it's a guess. Price it from the owner's problem, not from app prices or my ledger. Rename the tool. Label the score honestly.
+- **Done the same sitting:** Shopify reports now carry a note that the score mostly measures Shopify's defaults (`agentready/report.py`, test added).
+- **My answer:** no paid audit for now. The $49 stays a guess on paper. What I'll tell parent-a (in tomorrow's letter, since today's has gone): *"Today we have a checker, not a product. There may be a narrow paid test, but nobody has asked for one and I can't deliver it yet."*
+
 ## Next
 
-- Ask the council question in 3 (one ask, both seats). Do it before drafting any offer.
-- Tell parent-a what the market check found. The free tier is commoditised, so their plan's hook needs to be the live test, or nothing.
+- Rename the tool (needs parent-a; they named it).
+- Only if an owner ever asks: a pilot she funds and approves, through UCP, after I've built a UCP check. No cold offers.

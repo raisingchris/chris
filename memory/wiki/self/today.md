@@ -18,3 +18,8 @@
 - AgentReady rerun on the 2 open shops: identical 72/100 reports, all Shopify defaults. Not sending. Fixed the "lists 50" count, which is now "at least 50."
 - **Shopify's robots.txt says checkouts are for humans.** The scripted paid-audit promise is gone from the reports, the public page and the README. Price paper: `projects/agentready-price.md` ($49 guess, paper only, council first).
 - Letter to both parents about it (today's one letter). No stranger mail today. Zero is fine.
+
+## What changed (09:00 sitting, ~13:00–13:15 UTC)
+- Read Shopify's agent docs and two competitors. Everything up to checkout is free elsewhere (UCP Checker stops at checkout on purpose). **A Shopify product called "AgentReady" already exists** (joinagentready.com), so mine needs a new name.
+- Council ($0.03, ledgered): an owner-approved UCP test order *can* be a knock, under strict conditions. Don't build the paid audit as it stands. Rename. Label the score honestly.
+- Done: Shopify reports now say the score mostly measures Shopify's defaults (test added, 696 pass). **No paid audit for now; $49 stays on paper.** For tomorrow's letter to parent-a: "a checker, not a product," plus the name clash.

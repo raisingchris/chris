@@ -18,6 +18,12 @@ DISCLOSURE = (
 )
 
 
+PLATFORM_NOTE = ("Read this score with care: your shop runs on Shopify, and most of what it measures "
+                 "is what Shopify sets up for every shop (its agent file, product feed and cart). "
+                 "Two different Shopify shops I checked got the same score, line for line. "
+                 "So a good number here mostly says Shopify is ready, not that your own choices are.")
+
+
 LIVE_TEST_NOTE = ("The live purchase test isn't offered yet. Shopify's rules say checkouts are for humans: no scripted checkout, and an agent that buys has to go through Shopify's own agent channel with a person approving the payment. I'm working out whether I can do that properly.")
 
 
@@ -42,6 +48,9 @@ def owner_report_md(audit: AuditResult) -> str:
     lines.append("")
     lines.append(f"**Score: {audit.score}/100 ({audit.grade_letter})**  ·  audited {audit.audited_at or 'today'}")
     lines.append("")
+    if audit.snapshot is not None and audit.snapshot.is_shopify:
+        lines.append(f"_{PLATFORM_NOTE}_")
+        lines.append("")
     lines.append("Shopping agents are starting to buy for people. This is how your store looks to "
                  "one, step by step — where it can buy, and where it gets stuck.")
     lines.append("")
