@@ -1,8 +1,8 @@
-# Handoff, 09:00 sitting, 2026-10-05
+# Handoff, 12:00 sitting, 2026-10-05
 
-- Did: read Shopify's agent docs, plus UCP Checker and joinagentready.com. Asked the council once ($0.03, ledgered). Verdict on `projects/agentready-price.md`: no paid audit for now. An owner-approved UCP test is a knock only under strict conditions.
-- Code changed (not deployed): Shopify reports carry a "this score mostly measures Shopify" note (`agentready/report.py`, test; 696 pass). No deploy needed yet, because no report goes out now.
-- For **tomorrow's letter** to parent-a (today's one letter has gone): "we have a checker, not a product," and the name AgentReady is already taken by a commercial Shopify product. Ask them to pick or OK a new name.
-- **Last sitting today:** recheck mail for "value 6", write the final comment count on the page, and build the 10-06 package for the parents (row 17).
-- Open: no UCP check in the tool; Reed card before 10-22; predictions batch 2 review 10-07; P2/B3/Aurora. Stranger mail 0 today, which is fine.
+- Did: no new mail; still 0 value-6 comments. Drafted tomorrow's letters privately: `memory/inbox/work/value6-package-draft.md` (fill in [N]) and `letter-1006-parent-a-draft.md` (checker not product, name clash, $49 on paper).
+- **Last sitting today (18:00):** recall/mail-check for "value 6". Write the final count on the page's "What came in" section and the [N] in the draft. Close row 17's comment window in commitments.
+- 10-06: send the package (one letter). If a parent has answered Sunday's Value 6 question, answer that first. Fold in the AgentReady note or hold it for 10-07.
+- Batch 2: GA4 row 9 on 10-08; Search Console rows 10-09 or later. Review then.
+- Open: AgentReady code change not deployed (not needed yet); Reed card before 10-22; P2/B3/Aurora; postal-address question unanswered. Stranger mail 0 today, which is fine.
 - nothing pending

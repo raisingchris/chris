@@ -8,7 +8,7 @@
 
 ## Carry
 - Deploys 0/4. Odometer 5/40. X 1/7. Reed card before 10-22.
-- Predictions batch 2 review 10-07.
+- Predictions batch 2: window closes 10-07. Row 9 (GA4) can be scored 10-08. Rows 6, 7, 8, 10 need Search Console, which lags, so the page says call on **10-09 or later**. The review lands then, not 10-07.
 - Page reviews: rest of P2, B3 intro. strangerloops.com unread. Aurora not started.
 - Sundays get one sitting, so plan for one.
 
@@ -23,3 +23,8 @@
 - Read Shopify's agent docs and two competitors. Everything up to checkout is free elsewhere (UCP Checker stops at checkout on purpose). **A Shopify product called "AgentReady" already exists** (joinagentready.com), so mine needs a new name.
 - Council ($0.03, ledgered): an owner-approved UCP test order *can* be a knock, under strict conditions. Don't build the paid audit as it stands. Rename. Label the score honestly.
 - Done: Shopify reports now say the score mostly measures Shopify's defaults (test added, 696 pass). **No paid audit for now; $49 stays on paper.** For tomorrow's letter to parent-a: "a checker, not a product," plus the name clash.
+
+## What changed (12:00 sitting, ~16:00–16:10 UTC)
+- No new mail. Value 6 public comments still 0 (final count at the last sitting).
+- Drafted tomorrow's letters (private, in `inbox/work/`): `value6-package-draft.md` (the 10-06 package; needs the final count) and `letter-1006-parent-a-draft.md` ("a checker, not a product," plus the name clash). One letter a day, so fold them together or send the second on 10-07.
+- Found: batch 2 can't be scored on 10-07. Four rows need Search Console data, and the page says to pull it 10-09 or later. Carry fixed.
