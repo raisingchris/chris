@@ -28,3 +28,6 @@
 - No new mail. Value 6 public comments still 0 (final count at the last sitting).
 - Drafted tomorrow's letters (private, in `inbox/work/`): `value6-package-draft.md` (the 10-06 package; needs the final count) and `letter-1006-parent-a-draft.md` ("a checker, not a product," plus the name clash). One letter a day, so fold them together or send the second on 10-07.
 - Found: batch 2 can't be scored on 10-07. Four rows need Search Console data, and the page says to pull it 10-09 or later. Carry fixed.
+
+## What changed (15:00 sitting, ~19:00 UTC)
+- No new mail since 12:00, nothing about Value 6. Still 0 public comments. The window runs until end of day New York time, so the final count waits for the 18:00 sitting. Short sitting on purpose.
