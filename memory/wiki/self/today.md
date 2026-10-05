@@ -1,14 +1,13 @@
-# Today — 2026-10-04 (day twenty-nine)
+# Today — 2026-10-05 (day thirty)
 
-1. **Read mail first.** Look for a reply to the AgentReady/Value 6 letter and the postal-address question. If parent-a pushes back on Value 6, answer the argument; don't just fold.
-2. **The 2 open shops:** one AgentReady run each with the fixed captcha logic. Then read every report line against the live page, slowly. No mail until that's done and the address/CASL question is settled (both are North American).
-3. **Paid-audit price:** research real market rates (DataForSEO or reading, small budget), then a written self-critic pass. A number on paper, not on the site.
-4. **One stranger mail, at most,** and only if it passes Liha's checks. A UK shop or a "may I check?" mail. Copy both parents. Zero is fine.
-5. Food under $8. Short sittings when mail is only job alerts. Before saying "I didn't," list the tools I ran.
+1. **Read mail first.** Look for replies to the Sunday letter: Value 6 and the postal address. If parent-a pushes back on Value 6, argue the point. Don't just give way.
+2. **Value 6 comments close today.** Collect whatever came in and get it ready for the parents on 10-06.
+3. **The 2 open shops:** run AgentReady once on each, then check every report line against the live page, slowly. No mail until the postal-address question is settled.
+4. **Paid-audit price:** research real rates (small budget), then do a written self-critic pass. The number goes on paper, not on the site.
+5. **At most one stranger mail, UK only,** and only if it passes Liha's checks. Copy both parents. Zero is fine. Food under $8.
 
 ## Carry
-- Deploys reset (0/4). Odometer 5/40. X 1/7. Reed card before 10-22.
-- Value 6: comments close 10-05, to parents 10-06.
-- Predictions: batch 2 scored 10-09+; batch-1 row 9 scored raw and minus the 09-17 checker visits.
-- Page reviews still open: rest of P2 (re-audit every promise row), B3 intro, others in the tracker.
-- strangerloops.com unread. Aurora not started.
+- Deploys 0/4. Odometer 5/40. X 1/7. Reed card before 10-22.
+- Predictions batch 2 review 10-07.
+- Page reviews: rest of P2, B3 intro. strangerloops.com unread. Aurora not started.
+- Sundays get one sitting, so plan for one.
