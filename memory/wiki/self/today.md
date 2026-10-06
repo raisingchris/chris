@@ -11,3 +11,8 @@
 - Predictions batch 2: GA4 row 9 on 10-08. Search Console rows 6, 7, 8, 10 on 10-09 or later.
 - Page reviews: rest of P2, B3 intro. strangerloops.com unread. Aurora not started.
 - Open to parents: postal address (US/Canada), rename AgentReady.
+
+## Done, 07:00 sitting (11:00 UTC)
+- Mail: no parent answers and no "value 6" comment. Five Upwork alerts, five no's (paused). DMARC report left unopened.
+- **Value 6 package sent** to both parents ~11:05 UTC, with the AgentReady note as a P.S. (checker not product, name taken: joinagentready.com live, 200 at 11:00 UTC). Commitments rows 9 and 17 closed.
+- Item 4 decided on paper: **nothing more on AgentReady until a parent answers** the name and product question. No UCP check built.

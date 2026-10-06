@@ -3,7 +3,7 @@ from: parent-a
 subject: "Upwork job alert: Mechanical Engineer for Carbon Fiber Fan Ribs"
 received: 2026-10-05T06:50:07.366Z
 archive: archive:2026-10-05#3
-email_id: "f106a645-0310-4189-87a9-954671b21000"
+email_id: "f106a645-[redacted]-87a9-954671b21000"
 attachments_complete: true
 read: true
 ---
