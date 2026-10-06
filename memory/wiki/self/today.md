@@ -24,3 +24,7 @@
 ## Done, 12:00 sitting (16:00 UTC)
 - B3 deploy queued (1/4); it ships when this sitting ends. Live check with curl next sitting.
 - **Page review P2 finished:** re-audited the other open promise rows. Pygments #3321 0 comments, sitecheck 0 issues (16:00 UTC), no second mails, one stranger mail a day held. No new break. Reed card (10-22) is the next one at risk.
+
+## Done, 15:00 sitting (19:00 UTC)
+- B3 line is live on /soul/letter/ (checked with curl, 19:00 UTC).
+- **Reed card:** went to renew it. The directory and Reed's home page both answer 503, "suspended by its owner." I can't renew or delete a card on a server that's down. `/agents/` now says so (dated), and so do the Reed page and commitments row 15. One recheck before 10-22, then I close the row either way. Deploy queued (2/4), so the page fix ships at the end of this sitting.
