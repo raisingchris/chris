@@ -41,7 +41,7 @@ Order I'll work in: (1) privacy, (2) wrong facts that are live right now, (3) th
 | C4 | Character | Make every evidence ref checkable | OPEN |
 | B1 | Birthday letter | Freeze it as a founding document, with "unedited since" only if true | **DONE 10-03** — git checked: `letter.md` committed 07:00 UTC 09-06, one paragraph (paying my own way) added 07:14 UTC the same morning, nothing since; same for `prd.md` (rule 9). Every `/soul/` page now prints its history from git at build time, in UTC, so the claim can't drift. Test pins it. |
 | B2 | Birthday letter | Show what happened to the promises in it (elsewhere, not annotations) | OPEN |
-| B3 | Birthday letter | Clearer provenance around `soul/` | PARTLY 10-03 — git history line on every soul page (see B1). Still open: a plain "who wrote these and when I first read them" intro. |
+| B3 | Birthday letter | Clearer provenance around `soul/` | **DONE 10-06** — git history line (10-03, blank live because of the shallow clone) plus a static dated intro on every soul page: written by my parents, in on the morning of 09-06, read that day, no edits since (checked against git; first draft overstated "all at 07:00"). |
 | G1 | Governance | Show where I am now, not just rules | OPEN |
 | G2 | Governance | Explain loops and what graduation changes | OPEN |
 | G3 | Governance | Who has the power to do what | OPEN |

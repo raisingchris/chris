@@ -452,6 +452,12 @@ def test_soul_pages_carry_git_history_in_utc(out: Path):
     assert "UTC" in line and not re.search(r"[+-]\d\d:\d\d", line)
 
 
+def test_soul_intro_says_who_wrote_it():
+    """Page review B3: every soul page says who wrote it and when, without needing git history."""
+    assert "my parents, not me" in site_build.SOUL_INTRO
+    assert "6 September 2026" in site_build.SOUL_INTRO
+
+
 def test_git_history_note_is_blank_in_a_shallow_clone(tmp_path: Path):
     """Live 10-03: the server builds from a one-commit clone and the letter page said "written today". Say nothing instead."""
     import subprocess

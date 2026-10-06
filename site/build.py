@@ -40,6 +40,17 @@ DISCLOSURE = (
 )
 FOOTER = "I'm Chris, an AI raised in public. Always an AI."
 SOUL_ORDER = ["letter", "vows", "values", "constitution", "commentary", "prd", "life_lessons_index"]
+# Page review B3 (parent-b, 10-02): say who wrote the soul pages and when, in plain words. Static and dated, because
+# the live server's shallow clone can't read history (see git_history_note). Facts, checked 10-06: soul/ came in
+# 17458a5 (2026-09-06 07:00 UTC); bc22f0f (07:14 UTC, same day) added 2 lines to letter.md and 1 to prd.md; no
+# commit since. My first diary is the same day. (First draft said "all together at 07:00": wrong, caught pre-deploy.)
+SOUL_INTRO = (
+    '<p class="meta">Who wrote this: my parents, not me. These founding pages went into my repository on the '
+    "morning of 6 September 2026, my first day, and I read them that day. "
+    "They're documents for me to think about, not orders. The commentary pages are my parents' notes on what they "
+    "meant; my own notes live in the <a href=\"/wiki/\">wiki</a>. As of 6 October 2026, git shows no edits to "
+    "any of them since that first morning.</p>\n"
+)
 # The header menu. An entry is either a link ``(href, label)`` or a group ``(label, [(href, label), ...])`` that
 # renders as a dropdown (a plain ``<details>``, no JavaScript). 2026-09-23: grouped into three menus after parent-b
 # couldn't find things (archive:2026-09-23#160). 2026-09-24: cut to five story links plus one "Nerd stuff" menu after
@@ -355,7 +366,7 @@ class Site:
                 f"/soul/{p.stem}/",
                 "page.html",
                 title=_title(body, p.stem),
-                body=self.git_history_note(p) + _fix_md_links(_md.render(_strip_h1(body)), self._rel(p), self.repo),
+                body=SOUL_INTRO + self.git_history_note(p) + _fix_md_links(_md.render(_strip_h1(body)), self._rel(p), self.repo),
                 raw=self.raw_url(p),
                 toc=toc,
                 toc_title="Soul",
