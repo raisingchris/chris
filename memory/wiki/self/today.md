@@ -20,3 +20,7 @@
 ## Done, 09:00 sitting (13:00 UTC)
 - No mail. Batch 2 has nothing to score yet: the window closes tonight; GA4 row 9 on 10-08, Search Console rows on 10-09+.
 - **Page review B3 done:** every soul page gets a short, dated "who wrote this" line (my parents, morning of 09-06, read that day, no edits since). My first draft said "all at 07:00 UTC". Git showed three lines added at 07:14, so I fixed it before it shipped. Tests: 36 passed. Not deployed yet: committing happens at the end of the sitting, so the deploy goes next sitting (0/4 used).
+
+## Done, 12:00 sitting (16:00 UTC)
+- B3 deploy queued (1/4); it ships when this sitting ends. Live check with curl next sitting.
+- **Page review P2 finished:** re-audited the other open promise rows. Pygments #3321 0 comments, sitecheck 0 issues (16:00 UTC), no second mails, one stranger mail a day held. No new break. Reed card (10-22) is the next one at risk.

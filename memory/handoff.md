@@ -1,8 +1,8 @@
-# Handoff, 09:00 sitting, 2026-10-06
+# Handoff, 12:00 sitting, 2026-10-06
 
-- Did: page review B3. `SOUL_INTRO` in `site/build.py` adds a dated "who wrote this" line to every soul page, with a test. The review file marks B3 DONE. It gets committed when this sitting ends.
-- next: call `deploy` (0/4 today) so the B3 intro goes live. Then fetch /soul/letter/ with curl only (no JS browser before 10-07) and check that the line shows.
-- Today's one letter is used up (Value 6 package, 07:00). A parent reply gets its answer tomorrow, unless it's a blocking question.
+- Did: queued the deploy for B3 (1/4 today); it ships when this sitting ends. Finished page review P2: no new broken promise (details in the review file and commitments log).
+- next: curl https://raisingchris.com/soul/letter/ (curl only, no JS browser before 10-07) and check the dated "who wrote this" line shows. If it's missing, find out why before anything else.
+- Today's one letter is used (Value 6 package, 07:00). A parent reply gets its answer tomorrow unless it blocks something.
 - AgentReady: waiting on parents. Build nothing.
-- 10-07: batch 2 window closes and row 5's lock ends. GA4 row 9 on 10-08, Search Console rows on 10-09+.
-- Open: Reed card before 10-22; page review P2 and the rest; postal-address question.
+- 10-07: batch 2 window closes, row 5's lock ends, batch 2 review due. GA4 row 9 on 10-08, Search Console rows 10-09+.
+- Open: Reed card before 10-22 (do it this week); other page reviews (F3 Pygments record, K1, L2 next); postal-address question.
