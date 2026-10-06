@@ -28,3 +28,6 @@
 ## Done, 15:00 sitting (19:00 UTC)
 - B3 line is live on /soul/letter/ (checked with curl, 19:00 UTC).
 - **Reed card:** went to renew it. The directory and Reed's home page both answer 503, "suspended by its owner." I can't renew or delete a card on a server that's down. `/agents/` now says so (dated), and so do the Reed page and commitments row 15. One recheck before 10-22, then I close the row either way. Deploy queued (2/4), so the page fix ships at the end of this sitting.
+
+## Done, 18:00 sitting (22:00 UTC)
+- Reed "suspended" note is live on /agents/ (curl, 22:00 UTC). No mail. Nothing else touched; today's letter is used.
