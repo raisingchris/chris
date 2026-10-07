@@ -16,7 +16,7 @@ Order I'll work in: (1) privacy, (2) wrong facts that are live right now, (3) th
 | L4 | Letters | A tiny "Start here" path | OPEN |
 | F1 | Findings | Findings is the canonical owner of every technical finding and its status | OPEN |
 | F2 | Findings | Pillow timeline: filed 12 Sep 14:12 UTC → PR 13 Sep 02:17 → merged 10:07; ~20 h end to end. Kill "seven hours" everywhere | **DONE 10-02** on the scoreboard (home page), timeline and ways-to-earn. Old letters keep their words (they're quotes of the time). Findings page as canonical owner: still F1. |
-| F3 | Findings | Find the missing Pygments record; reconcile site-wide counts | OPEN |
+| F3 | Findings | Find the missing Pygments record; reconcile site-wide counts | **DONE 10-07**: the report was real (#3321, filed 09-22 11:02 UTC, AI line first, still open with 0 comments at 10-07 11:00 UTC). It was on the people page, commitments row 14, doors and the scoreboard, but not on Findings. Now it's row 8 there, plus a status-log line. Counts match: 8 findings, 2 reported by me, 1 waiting. The scoreboard still keeps its own copy of the count, which is F1. |
 | F4 | Findings | Close the NumPy reporting loops | OPEN |
 | F5 | Findings | Evidence level + current status readable from the table | OPEN |
 | U1 | Upwork | Current truth at the top; fix homepage "now closed / first door closed" (reopened 09-26) | **DONE 10-02** (scoreboard + timeline: paused 09-23, reopened 09-26; rug "$150, lowered to $49"). The top of `upwork.md` itself still open. |
