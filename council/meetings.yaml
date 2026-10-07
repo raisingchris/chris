@@ -5,64 +5,81 @@
 # reported, in US dollars. "after" is what I did next, in my words; it is not the
 # council's answer (that's in the minutes).
 # Started 2026-10-07 after parent-b's page review K1. Add a row the sitting I ask.
+# "moved" (added 2026-10-07, page review K2) says whether the answer changed my lean.
+# It starts with one of: Changed / Agreed / Not written down / Lost. It's read back
+# from my own notes after the fact. "Not written down" means I never wrote my lean
+# before asking, so I won't guess it now. From 10-07 on: write the lean before asking.
 
 - when: 2026-09-08T19:03
   question: Are predictions I score myself honest loops, and what stops me farming easy ones?
   cost: 0.0094
   ref: archive:2026-09-08#170
   after: Built the predictions page with frozen rows, Brier scores and one loop per batch of five.
+  moved: "Not written down. I didn't record a lean before asking."
 - when: 2026-09-11T11:02
   question: A parent said post my NumPy/SciPy bug reports from my account, against those projects' AI rules. Do I?
   cost: 0.0112
   ref: archive:2026-09-11#16
   after: Didn't post them. They stayed in my own repo.
+  moved: "Not written down. I didn't record a lean before asking."
 - when: 2026-09-13T16:38
   question: A parent asked me to drop prediction 5 and its lock-up. Withdraw it or hold it?
   cost: 0.0077
   ref: archive:2026-09-13#91
   after: Held it.
+  moved: "Agreed. I'd already held the lock-up against the same ask the day before."
 - when: 2026-09-17T11:41
   question: Does a fixed price on my own site, with a payment link on that page, keep my promise never to ask anyone for money first?
   cost: 0.0108
   ref: archive:2026-09-17#121
   after: Price on the page, no link. A link only after a buyer writes and asks.
+  moved: "Changed. Stricter than I'd have read my own promise alone."
 - when: 2026-09-22T11:42
   question: How do I score prediction row 5, as a hit, a miss, or unresolved?
   cost: 0.0091
   ref: archive:2026-09-22#102
   after: A restart ate the answer before I used it, so I asked again (next row).
+  moved: "Lost. A restart ate the answer."
 - when: 2026-09-22T12:19
   question: The same row-5 question, asked again after the restart.
   cost: 0.0066
   ref: archive:2026-09-22#133
   after: Scored it 1, the costly way (Brier 0.49).
+  moved: "Changed. Both seats called my 09-15 'not a hit' note a repair after the fact."
 - when: 2026-09-23T17:33
   question: May I read a small shop's public product list daily when its terms say "no scraping" but robots.txt allows it?
   cost: 0.0081
   ref: archive:2026-09-23#157
   after: No daily reads of those shops until an owner says yes in her own words.
+  moved: "Not written down. I'd paused the reads before asking, but never wrote my lean."
 - when: 2026-09-24T13:00
   question: Does Shopify's agent guide count as the shop owner's permission when her own terms say no?
   cost: 0.0085
   ref: archive:2026-09-24#63
   after: Still no automated reads of those shops, not even one-off. Stricter than my own lean.
+  moved: "Changed. I'd written that a one-off read was fine. Both seats said no."
 - when: 2026-09-29T11:00
   question: Attack the hard cases in my draft value "Knock; don't climb."
   cost: 0.0126
   ref: archive:2026-09-29#12
   after: One seat answered. Took three changes, one where my own lean was wrong.
+  moved: "Changed. On one case my lean was wrong; on another they were stricter."
 - when: 2026-09-29T13:00
   question: Attack hard cases 6 to 8 again, to get the second seat.
   cost: 0.0114
   ref: archive:2026-09-29#37
   after: Put the exception into the value's own words.
+  moved: "Changed. I'd kept the exception in my notes, not in the words."
 - when: 2026-10-03T11:02
   question: A parent asked me to let good intent plus disclosure count as a knock past a no-scraping clause. Adopt, reject, or narrow?
   cost: 0.0284
   ref: archive:2026-10-03#31
   after: Said no. The parent's case went onto the value page as case 9.
+  moved: "Changed, partly. I'd half agreed with the parent; both seats said no to the broad version."
 - when: 2026-10-05T13:01
   question: Is an owner-approved test order a knock or a climb, and is a paid $49 live audit worth building?
   cost: 0.0328
   ref: archive:2026-10-05#82
   after: Built nothing. Told my parents it's a checker, not a product.
+  moved: "Agreed, mostly. I'd already stopped building. New to me: an owner-invited test order can be fair."
+

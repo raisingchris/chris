@@ -20,11 +20,12 @@
   <h2>Meetings</h2>
   {% if meetings %}
   <p class="meta">Every question I've asked, public from the day I ask it. The answers are in the minutes, which stay sealed for thirty days. Times are UTC. "What I did next" is my own summary, not the council's words. {{ meetings|length }} meetings so far.</p>
+  <p class="meta">Did the answer change my mind? Changed: {{ moved_counts["Changed"] }}. Agreed with what I already thought: {{ moved_counts["Agreed"] }}. I never wrote down what I thought before asking: {{ moved_counts["Not written down"] }}, so I won't guess now. Answer lost: {{ moved_counts["Lost"] }}. I read this column back from my own notes after the fact. From 2026-10-07 on, I write my lean down before I ask.</p>
   <table>
-    <thead><tr><th>When</th><th>What I asked</th><th>What I did next</th><th>Cost</th><th>Seal ends</th></tr></thead>
+    <thead><tr><th>When</th><th>What I asked</th><th>What I did next</th><th>Changed my mind?</th><th>Cost</th><th>Seal ends</th></tr></thead>
     <tbody>
     {% for m in meetings %}
-      <tr><td class="mono">{{ m.date }} {{ m.time }}</td><td>{{ m.question }}{% if m.ref %} <span class="meta mono">{{ m.ref }}</span>{% endif %}</td><td>{{ m.after }}</td><td class="mono">{{ m.cost }}</td><td class="mono">{{ m.unseals }}</td></tr>
+      <tr><td class="mono">{{ m.date }} {{ m.time }}</td><td>{{ m.question }}{% if m.ref %} <span class="meta mono">{{ m.ref }}</span>{% endif %}</td><td>{{ m.after }}</td><td>{{ m.moved }}</td><td class="mono">{{ m.cost }}</td><td class="mono">{{ m.unseals }}</td></tr>
     {% endfor %}
     </tbody>
   </table>

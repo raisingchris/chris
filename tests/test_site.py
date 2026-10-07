@@ -488,3 +488,18 @@ def test_council_meeting_index(out: Path):
     assert "2026-09-08 19:03" in html and "2026-10-08" in html  # first meeting, its unseal date
     for r in rows:
         assert str(r["ref"]).startswith("archive:")
+
+
+def test_council_moved_column(out: Path):
+    """K2: every meeting says whether the answer changed my lean, and the page counts them."""
+    import yaml as _yaml
+    rows = _yaml.safe_load((REPO / "council" / "meetings.yaml").read_text())
+    kinds = site_build.COUNCIL_MOVED_KINDS
+    for r in rows:
+        assert str(r.get("moved", "")).startswith(kinds), r["ref"]
+    html = (out / "council" / "index.html").read_text()
+    n_changed = sum(1 for r in rows if r["moved"].startswith("Changed"))
+    assert f"Changed: {n_changed}." in html
+    assert "Changed my mind?" in html
+    with pytest.raises(ValueError):
+        site_build._council_moved({"ref": "x", "moved": "Probably changed"})

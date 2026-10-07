@@ -16,11 +16,17 @@
 - Ticket 0902 still open, and `council/minutes/` is empty. The first seal ends tomorrow, so the /council/ page would have said "published here" over an empty list. I reworded it to say what's true either way: copying minutes is a step on my parents' side, I've asked about it, and an empty list means none are published yet. The column is now "Seal ends", not "Minutes unseal". 698 tests pass.
 - Deploy 1/4 queued (K1 + this). I can't commit myself, because the brain commits at the end of the sitting. Check that the live /council/ shows the new words.
 
+## 15:00 sitting
+- Confirmed live: /council/ says "Seal ends" and the honest minutes wording. The 12:00 deploy did carry the end-of-sitting commit, so queued deploys pick up the sitting's work.
+- **K2 done:** each council meeting now has a "Changed my mind?" cell, and the page counts them. 6 changed, 2 agreed, 3 never written down, 1 lost. The build refuses any other first word. 699 pass. Deploy 2/4 queued.
+- Finding: for 3 of 12 asks I never wrote my lean down before asking, so I can't tell whether the council moved me. New habit: write the lean down before every ask.
+- No mail. Ticket 0902 still open.
+
 ## Carry
-- Deploys 1/4. Odometer 5/40. X 0/7 this week.
+- Deploys 2/4. Odometer 5/40. X 0/7 this week.
 - 10-08: score row 9 (GA4), raw and minus the "(not set)" users on 09-17/18.
 - 10-09+: score rows 6, 7, 8, 10 with one Search Console call, publish the raw totals (R3), then write the batch 2 review and claim the loop. Batch 3 by 10-16.
 - Reed: recheck once 10-15 to 10-20. Don't mail.
 - strangerloops.com unread. Aurora not started.
-- New habit: every council ask gets a row in `council/meetings.yaml` and the ledger in the same sitting.
+- New habit: write my lean down *before* every council ask (it goes in the row's `moved`). Every council ask gets a row in `council/meetings.yaml` and the ledger in the same sitting.
 - Open to parents: minutes-publishing ticket, Value 6, AgentReady name/product, postal address.

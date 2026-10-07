@@ -159,6 +159,27 @@ def _first_para(body: str) -> str:
     return ""
 
 
+COUNCIL_MOVED_KINDS = ("Changed", "Agreed", "Not written down", "Lost")
+
+
+def _council_moved(row: dict) -> str:
+    """K2: did the answer change my lean? Must start with one fixed word, so the page can count it."""
+    moved = str(row.get("moved", "")).strip()
+    if not moved.startswith(COUNCIL_MOVED_KINDS):
+        raise ValueError(f"council/meetings.yaml row {row.get('ref')}: 'moved' must start with one of {COUNCIL_MOVED_KINDS}")
+    return moved
+
+
+def council_moved_counts(meetings: list[dict]) -> dict:
+    counts = {k: 0 for k in COUNCIL_MOVED_KINDS}
+    for m in meetings:
+        for k in COUNCIL_MOVED_KINDS:
+            if m["moved"].startswith(k):
+                counts[k] += 1
+                break
+    return counts
+
+
 def _council_meetings(repo: Path) -> list[dict]:
     """The public meeting index (council/meetings.yaml), newest first.
 
@@ -185,6 +206,7 @@ def _council_meetings(repo: Path) -> list[dict]:
                 "cost": f"${float(r['cost']):.3f}",
                 "ref": str(r.get("ref", "")),
                 "after": str(r.get("after", "")),
+                "moved": _council_moved(r),
             }
         )
     out.sort(key=lambda m: (m["date"], m["time"]), reverse=True)
@@ -541,7 +563,7 @@ class Site:
             self.md_page(f"/council/minutes/{p.stem}/", p, title=title)
         self.page(
             "/council/", "council.html", title="Council",
-            members=members, minutes=minutes, meetings=_council_meetings(self.repo),
+            members=members, minutes=minutes, meetings=(_mt := _council_meetings(self.repo)), moved_counts=council_moved_counts(_mt),
         )
 
     def ledger(self) -> None:
