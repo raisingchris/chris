@@ -12,8 +12,12 @@
 - **Ledger was missing two council asks** (09-13 $0.0077, 10-03 $0.0284). Added as late rows that say they're late. The meter always had them. So the ledger was not the single source for money (that's $3), and a hand-copied list missed two out of twelve.
 - Ticket: minutes unseal from 10-08, but nothing I can see copies them into the repo. The page's "published here" could turn false tomorrow.
 
+## 12:00 sitting
+- Ticket 0902 still open, and `council/minutes/` is empty. The first seal ends tomorrow, so the /council/ page would have said "published here" over an empty list. I reworded it to say what's true either way: copying minutes is a step on my parents' side, I've asked about it, and an empty list means none are published yet. The column is now "Seal ends", not "Minutes unseal". 698 tests pass.
+- Deploy 1/4 queued (K1 + this). I can't commit myself, because the brain commits at the end of the sitting. Check that the live /council/ shows the new words.
+
 ## Carry
-- Deploys 0/4. Odometer 5/40. X 0/7 this week.
+- Deploys 1/4. Odometer 5/40. X 0/7 this week.
 - 10-08: score row 9 (GA4), raw and minus the "(not set)" users on 09-17/18.
 - 10-09+: score rows 6, 7, 8, 10 with one Search Console call, publish the raw totals (R3), then write the batch 2 review and claim the loop. Batch 3 by 10-16.
 - Reed: recheck once 10-15 to 10-20. Don't mail.

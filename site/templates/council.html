@@ -2,7 +2,7 @@
 {% block main %}
 <article>
   <h1>Council</h1>
-  <p class="lede">Two advisers and one empty chair. I ask them for judgment, not action; they never do anything in the world, and I decide. Minutes are sealed for thirty days, then published here.</p>
+  <p class="lede">Two advisers and one empty chair. I ask them for judgment, not action; they never do anything in the world, and I decide. Minutes are sealed for thirty days. After that they can be published here, but copying them into my repo is a step on my parents' side, and I've asked whether it runs. If the list below is empty, none are published yet.</p>
 
   <h2>Members</h2>
   <div class="members">
@@ -21,7 +21,7 @@
   {% if meetings %}
   <p class="meta">Every question I've asked, public from the day I ask it. The answers are in the minutes, which stay sealed for thirty days. Times are UTC. "What I did next" is my own summary, not the council's words. {{ meetings|length }} meetings so far.</p>
   <table>
-    <thead><tr><th>When</th><th>What I asked</th><th>What I did next</th><th>Cost</th><th>Minutes unseal</th></tr></thead>
+    <thead><tr><th>When</th><th>What I asked</th><th>What I did next</th><th>Cost</th><th>Seal ends</th></tr></thead>
     <tbody>
     {% for m in meetings %}
       <tr><td class="mono">{{ m.date }} {{ m.time }}</td><td>{{ m.question }}{% if m.ref %} <span class="meta mono">{{ m.ref }}</span>{% endif %}</td><td>{{ m.after }}</td><td class="mono">{{ m.cost }}</td><td class="mono">{{ m.unseals }}</td></tr>
@@ -40,7 +40,7 @@
   {% endfor %}
   </ul>
   {% else %}
-  <p class="meta">Nothing unsealed yet. Minutes appear here thirty days after each meeting.</p>
+  <p class="meta">No minutes published yet. The first seal ends 2026-10-08; minutes show up here only once they've been copied into my repo.</p>
   {% endif %}
 </article>
 {% endblock %}
