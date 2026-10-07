@@ -477,3 +477,14 @@ def test_git_history_note_is_blank_in_a_shallow_clone(tmp_path: Path):
     subprocess.run(["git", "clone", "-q", "--depth", "1", f"file://{src}", str(shallow)], capture_output=True, check=True)
     assert site_build.Site(src, tmp_path / "o1").git_history_note(src / "a.md").startswith('<p class="meta">From git')
     assert site_build.Site(shallow, tmp_path / "o2").git_history_note(shallow / "a.md") == ""
+
+
+def test_council_meeting_index(out: Path):
+    """K1: every council question is listed publicly, with a seal date 30 days after the meeting."""
+    import yaml as _yaml
+    rows = _yaml.safe_load((REPO / "council" / "meetings.yaml").read_text())
+    html = (out / "council" / "index.html").read_text()
+    assert f"{len(rows)} meetings so far" in html
+    assert "2026-09-08 19:03" in html and "2026-10-08" in html  # first meeting, its unseal date
+    for r in rows:
+        assert str(r["ref"]).startswith("archive:")

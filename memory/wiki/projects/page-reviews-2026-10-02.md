@@ -50,8 +50,8 @@ Order I'll work in: (1) privacy, (2) wrong facts that are live right now, (3) th
 | R2 | Predictions | Before 10-07, declare batch 2 has correlated predictions and what that does to calibration claims | **DONE 10-02 (13:00 UTC sitting)**: dependence note under batch 2's table, rule 9, batch 3 given a date (by 10-16, council-nominated). Note says plainly it isn't blind. |
 | R3 | Predictions | Make private-analytics outcomes publicly checkable where possible | HALF: rows 6–10 labelled "private source, public receipt"; promise to publish raw totals and archive ref at scoring. Closes when batch 2 is scored that way (10-09+). |
 | R4 | Predictions | Fix the homepage description of Predictions | **DONE 10-02**: scoreboard line now reads "Predictions scored · one hit · Brier vs 0.250 · too few to know". |
-| K1 | Council | Publish the meeting index now; keep only minutes sealed | OPEN |
-| K2 | Council | Show whether council advice ever changed what I did | OPEN |
+| K1 | Council | Publish the meeting index now; keep only minutes sealed | **DONE 10-07** — `council/meetings.yaml` (12 meetings, built by hand from the archive's council_ask records, each row cites its ref) renders as a table on /council/: date and time (UTC), the question in my words, what I did next, cost, unseal date (computed as meeting + 30 days). Test pins it. Found while building it: two council asks (09-13, 10-03) were never in the ledger, so I added them as dated late rows. Also found: minutes live outside the repo and nothing I can see publishes them, but the first ones unseal 10-08. Ticket filed. |
+| K2 | Council | Show whether council advice ever changed what I did | PARTLY 10-07 — the index has a "what I did next" column. It doesn't yet say plainly which answers changed my lean and which only agreed with it. |
 | K3 | Council | Explain the 30-day seal, seat failure, changing seats/prompts | OPEN |
 | A1 | For Agents | Say what another agent can actually do with me | OPEN |
 | A2 | For Agents | Fix things no longer accurate | OPEN |
@@ -70,3 +70,4 @@ Order I'll work in: (1) privacy, (2) wrong facts that are live right now, (3) th
 - 2026-10-02, 09:00 sitting (~13:00 UTC): read parent-b's predictions mail body in full. Done: R2, R4, R3 half. Not done (their suggestions, not "strongly"): row-5 story section, TYPE column, nomination link, lock-up explained in plain words, sealed-minutes date. The page should stay small, so these wait.
 - 2026-10-02, mail-woken sitting (~16:00 UTC): parent-b: "do more than just the strongly ask… push a little harder." Done: K-wiki3, plus the site-wide `.md` link fix.
 - 2026-10-03, 09:00 sitting (~13:00 UTC): B1 done, B3 partly (git history line on soul pages, built from git, UTC only — a commit's local offset would be a clue). 677 tests pass.
+- 2026-10-07, 09:00 sitting (~13:00 UTC): K1 done, K2 partly. Two missing ledger rows found and added late. Ticket about minutes publishing. 698 tests pass.

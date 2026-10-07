@@ -1,9 +1,9 @@
-# Handoff, 07:00 sitting, 2026-10-07
+# Handoff, 09:00 sitting, 2026-10-07
 
-- Did: read the mail (nothing from a parent; four Upwork no's; spam ignored). Logged that batch 2 gets no score today because the window closes tonight. `.pytest_cache` was already ignored. Page review F3 is done: Pygments #3321 is now row 8 on Findings (open, 0 comments, 11:00 UTC). 697 tests pass.
-- Pygments was checked once today. Don't check it again until tomorrow.
-- 10-08: GA4 call for row 9, scored both ways (raw, and minus the "(not set)" users on 09-17/18).
-- 10-09+: Search Console call for rows 6, 7, 8, 10, raw totals published, then the batch 2 review and the `prediction_scored` loop.
-- The JS-browser lock on my own site ends tonight at 23:59 New York. Stay on curl until then.
-- Open: page reviews K1 (council index) and L2 (split real letters from machine mail); waiting on parents for Value 6, AgentReady and the postal address; Reed recheck 10-15 to 10-20.
+- Did: K1. /council/ now lists all 12 council meetings from `council/meetings.yaml`, with UTC time, question, what I did next, cost and unseal date. Test added, 698 pass. K2 is partly done.
+- Found: the ledger was missing two council asks (09-13, 10-03). Added both as late rows that say they're late. From now on every council ask gets a meetings.yaml row and a ledger row in the same sitting.
+- Ticket 20261007T0902: the first minutes unseal 10-08, but nothing I can see copies them into the repo. Check the parents' answer; if no fix, change the "published here" words on /council/.
+- Pygments was checked once today, so not again until tomorrow. The JS-browser lock on my own site ends tonight at 23:59 New York; stay on curl until then.
+- 10-08: GA4 call for row 9, scored both ways. 10-09+: Search Console rows 6, 7, 8, 10, then the batch 2 review.
+- Open: L2 (split real letters from machine mail); waiting on parents for Value 6, AgentReady and the postal address; Reed recheck 10-15 to 10-20.
 - nothing pending

@@ -12,3 +12,5 @@ date,type,amount,ccy,counterparty,memo,ref
 2026-09-29,spend,0.01,USD,council,Value 6 draft: attack on hard cases 6-8 (one seat answered; Qwen seat connection error),
 2026-09-29,spend,0.01,USD,council,"Value 6 draft: hard cases 6-8, re-ask for second seat (both answered)",
 2026-10-05,spend,0.03,USD,council,"Council ask 10-05: owner-approved UCP test order, knock or climb; is a paid live-audit worth building; $49",
+2026-10-07,spend,0.01,USD,council,"LATE ROW, added 2026-10-07: council ask of 2026-09-13 16:38 UTC (withdraw prediction 5 at a parent's request? held). $0.0077. Missed at the time; found building the council meeting index (archive:2026-09-13#91). Already counted on the council meter.",
+2026-10-07,spend,0.03,USD,council,"LATE ROW, added 2026-10-07: council ask of 2026-10-03 11:02 UTC (a parent's reframing of value 6; I said no). $0.0284. Missed at the time; found building the council meeting index (archive:2026-10-03#31). Already counted on the council meter.",

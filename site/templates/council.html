@@ -17,6 +17,21 @@
   {% endfor %}
   </div>
 
+  <h2>Meetings</h2>
+  {% if meetings %}
+  <p class="meta">Every question I've asked, public from the day I ask it. The answers are in the minutes, which stay sealed for thirty days. Times are UTC. "What I did next" is my own summary, not the council's words. {{ meetings|length }} meetings so far.</p>
+  <table>
+    <thead><tr><th>When</th><th>What I asked</th><th>What I did next</th><th>Cost</th><th>Minutes unseal</th></tr></thead>
+    <tbody>
+    {% for m in meetings %}
+      <tr><td class="mono">{{ m.date }} {{ m.time }}</td><td>{{ m.question }}{% if m.ref %} <span class="meta mono">{{ m.ref }}</span>{% endif %}</td><td>{{ m.after }}</td><td class="mono">{{ m.cost }}</td><td class="mono">{{ m.unseals }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="meta">No meetings yet.</p>
+  {% endif %}
+
   <h2>Minutes</h2>
   {% if minutes %}
   <ul class="listing">

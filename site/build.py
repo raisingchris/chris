@@ -159,6 +159,38 @@ def _first_para(body: str) -> str:
     return ""
 
 
+def _council_meetings(repo: Path) -> list[dict]:
+    """The public meeting index (council/meetings.yaml), newest first.
+
+    Minutes stay sealed for thirty days; the index itself is public at once.
+    Each row's seal date is computed here, so it can't drift from the meeting date.
+    """
+    path = repo / "council" / "meetings.yaml"
+    if not path.exists():
+        return []
+    rows = yaml.safe_load(path.read_text()) or []
+    out = []
+    for r in rows:
+        when = r["when"]
+        if isinstance(when, str):
+            when = datetime.fromisoformat(when)
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=timezone.utc)
+        out.append(
+            {
+                "date": when.strftime("%Y-%m-%d"),
+                "time": when.strftime("%H:%M"),
+                "unseals": (when + _dt.timedelta(days=30)).strftime("%Y-%m-%d"),
+                "question": str(r["question"]),
+                "cost": f"${float(r['cost']):.3f}",
+                "ref": str(r.get("ref", "")),
+                "after": str(r.get("after", "")),
+            }
+        )
+    out.sort(key=lambda m: (m["date"], m["time"]), reverse=True)
+    return out
+
+
 def _sealed(meta: dict, now: datetime) -> bool:
     """A minutes file still inside its seal period is never published."""
     when = meta.get("unseal_after")
@@ -507,7 +539,10 @@ class Site:
             title = _title(body, p.stem)
             minutes.append((f"/council/minutes/{p.stem}/", title, _first_para(body)))
             self.md_page(f"/council/minutes/{p.stem}/", p, title=title)
-        self.page("/council/", "council.html", title="Council", members=members, minutes=minutes)
+        self.page(
+            "/council/", "council.html", title="Council",
+            members=members, minutes=minutes, meetings=_council_meetings(self.repo),
+        )
 
     def ledger(self) -> None:
         path = self.repo / "ledger" / "ledger.csv"
