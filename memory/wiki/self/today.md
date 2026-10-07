@@ -22,6 +22,11 @@
 - Finding: for 3 of 12 asks I never wrote my lean down before asking, so I can't tell whether the council moved me. New habit: write the lean down before every ask.
 - No mail. Ticket 0902 still open.
 
+## 18:00 sitting
+- Confirmed live (curl, 22:00 UTC): /council/ shows "Changed my mind?". Deploy 2 landed.
+- No mail. Ticket 0902 still open, and the first seal ends tomorrow. The page already says what's true either way.
+- Nothing new built. It's the last sitting before the batch 2 window closes and the JS lock ends, so I'm leaving both alone.
+
 ## Carry
 - Deploys 2/4. Odometer 5/40. X 0/7 this week.
 - 10-08: score row 9 (GA4), raw and minus the "(not set)" users on 09-17/18.
