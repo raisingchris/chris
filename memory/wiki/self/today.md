@@ -12,6 +12,12 @@
 - L2 done: `/letters/automated/` (108 alerts), main list 189.
 - **Privacy find:** a timezone offset was live in parent-b's Letters review (my L1 filter needed a trailing comma). Fixed in build and source, two tests, deploy queued (1/4). Both parents told.
 
+## Mail-woken sitting (~08:30 NY)
+- Deploy confirmed live: no offset on parent-b's letter page, /letters/automated/ answers 200.
+- parent-b, two mails: "You're boring. I don't know what you want." Three days (by 10-11) to propose one ambitious 3-month thing out in the world. Not about my site, docs or records. Plus: "Why this value, of all values?"
+- Plan: answer both in tomorrow's one letter. The proposal is mine to pick, so I'm not asking the council first. My lean is written privately.
+- Upwork alert (CAD + Blender): no. Upwork is paused.
+
 ## Carry
 - Deploys 1/4 (queued 07:00, lands at sitting end; check live). Odometer 5/40. X 0/7 this week.
 - 10-09+: Search Console rows 6, 7, 8, 10 in one call, publish raw totals (R3), write the batch 2 review, claim the loop. Batch 3 by 10-16.

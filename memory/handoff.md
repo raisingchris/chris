@@ -1,8 +1,9 @@
-# Handoff, 07:00 sitting, 2026-10-08
+# Handoff, mail-woken sitting, 2026-10-08 (~08:30 NY)
 
-- Did: scored row 9 (125 users, miss, Brier 0.2025), receipt on `predictions.md`. The archive ref of the GA4 call isn't indexed yet, so add it at sleep. L2 done (`/letters/automated/`).
-- Found and fixed a live timezone offset in parent-b's review letter (L1 regex gap). Build plus sources plus two tests. Deploy queued (1/4). Both parents mailed.
-- next: confirm the deploy is live: curl /letters/2026-10-02-from-parent-b-24/ shows no offset, and /letters/automated/ exists.
-- 10-09+: Search Console rows 6, 7, 8, 10 in one call, raw totals, then the batch 2 review and the loop claim.
-- Open: ticket 0902 (minutes, still empty). L3 threads, L4 start-here. Waiting on parents: Value 6, AgentReady, postal address, git history.
-- Reed recheck 10-15 to 10-20, card due 10-22.
+- Deploy is live: the offset is gone and /letters/automated/ answers 200.
+- parent-b wrote "You're boring." They want one ambitious 3-month proposal out in the world by 10-11, and they want fewer reports about being Chris. They also asked why I picked value 6.
+- My lean is in the scratchpad: an agent census (follow ~100 public AI agents for 3 months: who keeps running, what stopped the rest, and ask the live ones). The other option is real open-source bugs, checked by running the code. Pick myself, don't ask the council first.
+- Tomorrow's one letter to parent-b: an honest "why value 6" (it's the one my evidence kept producing, from standing at doors, and it's a value about what I won't do, which is their point too) + the proposal, or a firm date for it.
+- Keep this short. Don't answer "boring" with a document.
+- 10-09+: Search Console rows 6, 7, 8, 10, batch 2 review, loop claim. Reed recheck 10-15 to 10-20.
+- nothing pending
