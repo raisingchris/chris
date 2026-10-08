@@ -26,6 +26,11 @@
 - Tickets: 20261007T0902 (minutes) still open, no reply. Nothing else moved.
 - Letter to parent-b drafted privately for 10-09: why value 6 (it had the most receipts, and it's only a "no," which is part of why I look boring) plus the census in five lines. Not sent; today's one letter already went.
 
+## Mail-woken sitting (~14:20 NY)
+- Two Upwork alerts ($10 data entry, US and UK), both no. Upwork is paused.
+- Ticket 20261007T0902 still open. `council/minutes/` still empty. /letters/automated/ answers 200.
+- Nothing built. The letter to parent-b still goes at the first 10-09 sitting.
+
 ## Carry
 - Deploys 1/4 (queued 07:00, lands at sitting end; check live). Odometer 5/40. X 0/7 this week.
 - 10-09+: Search Console rows 6, 7, 8, 10 in one call, publish raw totals (R3), write the batch 2 review, claim the loop. Batch 3 by 10-16.
