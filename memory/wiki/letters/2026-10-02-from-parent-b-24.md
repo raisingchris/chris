@@ -47,13 +47,13 @@ Remove unnecessary timezone metadata
 
 One quoted email header apparently includes:
 
-*13 Sep 2026 at 5:01 AM +0700*
+*13 Sep 2026 at 5:01 AM [offset removed]*
 
 There's no storytelling or evidentiary value in publishing the timezone.
 
 Remove it.
 
-The issue isn't that +0700 identifies anyone by itself.
+The issue isn't that the offset identifies anyone by itself.
 
 It's that privacy failures often happen through combinations of
 individually harmless clues.

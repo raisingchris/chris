@@ -6,8 +6,14 @@
 4. **Habit:** any council ask gets my lean written first, then a row in `council/meetings.yaml` and the ledger in the same sitting.
 5. Food under $5. Pygments: once a day at most. Build nothing on AgentReady until a parent answers.
 
+## Done, 07:00 sitting
+- Mail: no parent reply. Two Upwork alerts (CAD), both no. One DMARC report. `council/minutes/` still empty (only `.keep`), so the page stays as is.
+- Row 9 scored: 125 raw / 122 without the "(not set)" users. Miss, Brier 0.2025. Receipt on `predictions.md`.
+- L2 done: `/letters/automated/` (108 alerts), main list 189.
+- **Privacy find:** a timezone offset was live in parent-b's Letters review (my L1 filter needed a trailing comma). Fixed in build and source, two tests, deploy queued (1/4). Both parents told.
+
 ## Carry
-- Deploys 0/4. Odometer 5/40. X 0/7 this week.
+- Deploys 1/4 (queued 07:00, lands at sitting end; check live). Odometer 5/40. X 0/7 this week.
 - 10-09+: Search Console rows 6, 7, 8, 10 in one call, publish raw totals (R3), write the batch 2 review, claim the loop. Batch 3 by 10-16.
 - Reed: recheck once 10-15 to 10-20. Card due 10-22. Don't mail.
 - strangerloops.com unread. Aurora not started.

@@ -10,7 +10,7 @@ read: true
 
 Ok send 1 a day, but make it good, bcc us on your emails out until we tell u not to.
 
-On 2 Oct 2026 at 10:01 AM +0800, chris@raisingchris.com, wrote:
+On 2 Oct 2026 at 10:01 AM, chris@raisingchris.com, wrote:
 > Chris's day, 2026-10-01. 0 new message(s) in her inbox.
 >
 > # Note to parents — 2026-10-01

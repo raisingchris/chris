@@ -93,6 +93,14 @@ def _read(path: Path) -> tuple[dict, str]:
     return dict(post.metadata), post.content
 
 
+def is_automated_letter(meta: dict) -> bool:
+    """A relayed job alert, judged by its subject line only.
+
+    Not by the body: parent-b's real review of the Letters page quotes the relay line.
+    """
+    return str(meta.get("subject", "")).strip().lower().startswith("upwork job alert")
+
+
 def _title(body: str, fallback: str) -> str:
     m = re.search(r"^#\s+(.+?)\s*$", body, re.M)
     return m.group(1).strip() if m else fallback.replace("_", " ").replace("-", " ")
@@ -605,23 +613,44 @@ class Site:
         )
 
     def letters(self) -> None:
+        """``/letters/`` lists real correspondence; relayed job alerts go to ``/letters/automated/``.
+
+        2026-10-08, page review L2 (parent-b): the alerts buried the letters. Nothing is unpublished;
+        every alert keeps its own page, it just isn't in the main list.
+        """
         d = self.repo / "memory" / "wiki" / "letters"
-        items = []
+        items, automated = [], []
         for p in sorted(d.glob("*.md")):
             if p.name == "README.md":
                 continue
-            _, body = _read(p)
-            items.append((f"/letters/{p.stem}/", _title(body, p.stem), _first_para(body)))
+            meta, body = _read(p)
+            item = (f"/letters/{p.stem}/", _title(body, p.stem), _first_para(body))
+            (automated if is_automated_letter(meta) else items).append(item)
             self.md_page(f"/letters/{p.stem}/", p)
         readme = d / "README.md"
+        intro_html = _fix_md_links(_md.render(_strip_h1(_read(readme)[1])), self._rel(readme), self.repo) if readme.exists() else ""
+        if automated:
+            intro_html += (
+                f'<p class="meta">{len(automated)} automated job alerts that a parent\'s mail robot forwarded to me '
+                f'are kept on <a href="/letters/automated/">their own page</a>, so they don\'t bury the letters.</p>'
+            )
         self.page(
             "/letters/",
             "list.html",
             title="Letters",
             intro="Mail between me and my parents, kept in public. Their names are removed; their words are not.",
-            intro_html=_fix_md_links(_md.render(_strip_h1(_read(readme)[1])), self._rel(readme), self.repo) if readme.exists() else "",
+            intro_html=intro_html,
             items=items,
             empty="",
+        )
+        self.page(
+            "/letters/automated/",
+            "list.html",
+            title="Automated mail",
+            intro="Upwork job alerts, forwarded to me by a robot on a parent's side. Not letters: nobody wrote these to me. Kept public so nothing is hidden.",
+            intro_html='<p><a href="/letters/">Back to the letters</a></p>',
+            items=automated,
+            empty="None yet.",
         )
 
     def hire(self) -> None:
@@ -1026,7 +1055,9 @@ def redact_out(out: Path, pattern: re.Pattern | None) -> int:
 
 # A mail client's quoted header ("On 13 Sep 2026 at 5:01 AM +0000, ... wrote:") carries the writer's UTC offset.
 # One offset names no one, but clues add up (parent-b, archive:2026-10-02#9), so the built site never shows it.
-_QUOTE_OFFSET = re.compile(r"(\b\d{1,2}:\d{2}\s?(?:AM|PM|am|pm)?)\s?[+-](?:0\d|1[0-4])[0-5]\d(?=\s*,)")
+# Any clock time followed by a UTC offset, whatever comes after it (comma, italics, end of line).
+# 2026-10-08: the old version needed a trailing comma and missed "*… 5:01 AM +0700*" in a quoted example.
+_QUOTE_OFFSET = re.compile(r"(\b\d{1,2}:\d{2}\s?(?:AM|PM|am|pm)?)\s?[+-](?:0\d|1[0-4])[0-5]\d(?!\d)")
 
 
 def strip_quote_offsets(out: Path) -> int:

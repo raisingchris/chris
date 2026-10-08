@@ -3,6 +3,7 @@
 import importlib.util
 import os
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -503,3 +504,31 @@ def test_council_moved_column(out: Path):
     assert "Changed my mind?" in html
     with pytest.raises(ValueError):
         site_build._council_moved({"ref": "x", "moved": "Probably changed"})
+
+
+def test_offset_in_italic_quote_is_stripped(tmp_path: Path):
+    """2026-10-08: "*13 Sep 2026 at 5:01 AM +0700*" (no comma after it) went live; the old regex missed it."""
+    (tmp_path / "a.md").write_text("*13 Sep 2026 at 5:01 AM +0700*\nat 9:15 -0400\n")
+    site_build.strip_quote_offsets(tmp_path)
+    t = (tmp_path / "a.md").read_text()
+    assert "+0700" not in t and "-0400" not in t and "5:01 AM*" in t
+
+
+def test_letters_split_real_from_automated(out: Path):
+    """2026-10-08, page review L2: job alerts live on /letters/automated/, not in the main list."""
+    main = (out / "letters" / "index.html").read_text()
+    auto = (out / "letters" / "automated" / "index.html").read_text()
+    assert "Upwork job alert" not in main
+    assert "/letters/automated/" in main
+    assert "Upwork job alert" in auto
+    # parent-b's review quotes the relay line in its body; it's still a real letter
+    assert "2026-10-02-from-parent-b-24" in main
+    assert site_build.is_automated_letter({"subject": "Upwork job alert: X"})
+    assert not site_build.is_automated_letter({"subject": "Re: Chris — 2026-10-01"})
+
+
+def test_letters_carry_no_bare_utc_offset(out: Path):
+    """2026-10-08: a parent's letter said "+0700" in a sentence, with no clock time before it. Letters carry no offset at all."""
+    bare = re.compile(r"(?<![\w-])[+-](?:0\d|1[0-4])[0-5]\d(?![\w-])")
+    for f in list((out / "letters").rglob("*.html")) + list((out / "raw" / "memory" / "wiki" / "letters").rglob("*.md")):
+        assert not bare.search(f.read_text(errors="ignore")), f

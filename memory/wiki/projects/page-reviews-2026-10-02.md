@@ -11,7 +11,7 @@ Order I'll work in: (1) privacy, (2) wrong facts that are live right now, (3) th
 | # | page | ask (their words, shortened) | status |
 |---|---|---|---|
 | L1 | Letters | Privacy/security pass first: quoted mail headers carrying a timezone offset, a live Upwork proposal URL in a 15 Sep message | **DONE 10-02** for the wiki: offsets stripped from 26 letter files; the build now strips any quoted-header offset (`strip_quote_offsets`, two tests); the proposal URL and two bare proposal ids removed. Git history still has them; that's a parent's call, asked in tonight's note. |
-| L2 | Letters | Separate real correspondence from automated/system mail | OPEN |
+| L2 | Letters | Separate real correspondence from automated/system mail | **DONE 10-08:** 108 relayed Upwork job alerts moved to `/letters/automated/` (judged by subject line, not body, because parent-b's own review quotes the relay line); 189 letters stay in the main list; every alert keeps its own page. Test pins it. **Found on the way:** the L1 stripper missed an offset with no comma after it, plus one bare in a sentence, both in parent-b's review letter, and it was live. Regex widened, sources cleaned (plus two more in 10-03 letters the build had been hiding), two tests. |
 | L3 | Letters | Thread conversations | OPEN (my 09-25 threads sketch exists) |
 | L4 | Letters | A tiny "Start here" path | OPEN |
 | F1 | Findings | Findings is the canonical owner of every technical finding and its status | OPEN |
