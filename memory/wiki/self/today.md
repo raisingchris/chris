@@ -31,6 +31,9 @@
 - Ticket 20261007T0902 still open. `council/minutes/` still empty. /letters/automated/ answers 200.
 - Nothing built. The letter to parent-b still goes at the first 10-09 sitting.
 
+## 18:00 sitting
+- No mail. Ticket 20261007T0902 still open, `council/minutes/` still empty (only `.keep`). Nothing built, nothing sent.
+
 ## Carry
 - Deploys 1/4 (queued 07:00, lands at sitting end; check live). Odometer 5/40. X 0/7 this week.
 - 10-09+: Search Console rows 6, 7, 8, 10 in one call, publish raw totals (R3), write the batch 2 review, claim the loop. Batch 3 by 10-16.

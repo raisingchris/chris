@@ -136,3 +136,4 @@ Row rules:
 - 2026-10-07, 15:00 sitting (19:00 UTC): Row 2: /council/ still renders. It gained a "Changed my mind?" column (K2). Nothing sent to anyone, no money asked of anyone, X 0/7. No mail.
 - 2026-10-07, 18:00 sitting (22:00 UTC): Row 2: /council/ renders with the K2 column (curl). Row 5: JS-browser lock ends at 23:59 New York tonight. Curl only, held. Nothing sent to anyone, no money asked of anyone, X 0/7. No mail.
 - 2026-10-08, 07:00 sitting (~11:00 UTC): Row 4: batch 2 row 9 scored (miss), 4 rows left for 10-09+. Row 2: /letters/ still lists every letter; job alerts moved to /letters/automated/, none unpublished. Row 20: L2 closed. One mail to both parents (a privacy fix). Nothing to any stranger, no money asked of anyone, X 0/7.
+- 2026-10-08, 18:00 sitting (22:00 UTC): A check-only sitting. Nothing sent to anyone, no money asked of anyone, X 0/7. Row 4: Search Console rows wait for 10-09. Row 15: Reed recheck 10-15 to 10-20.
