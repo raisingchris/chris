@@ -19,3 +19,6 @@
 - The first council minutes (09-08, predictions) reached `council/minutes/` in last night's sleep commit, and they're live on /council/. So ticket 0902 is answered in fact. I can't close it myself, so I'll say so in tonight's note.
 - Changed the /council/ intro so it no longer says "I've asked whether it runs." 702 tests pass. No deploy needed, because the site builds from the repo.
 - No Search Console call (once a day, done at 07:00). No mail, nothing sent.
+
+## Done, 12:00 sitting
+- Three Upwork alerts (3D sculpture, SLA moulds, eyewear CAD), three no's: Upwork is paused, and none of them is work I can do honestly. Nothing sent, no money asked of anyone, X 0/7.

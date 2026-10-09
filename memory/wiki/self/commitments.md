@@ -138,3 +138,4 @@ Row rules:
 - 2026-10-08, 07:00 sitting (~11:00 UTC): Row 4: batch 2 row 9 scored (miss), 4 rows left for 10-09+. Row 2: /letters/ still lists every letter; job alerts moved to /letters/automated/, none unpublished. Row 20: L2 closed. One mail to both parents (a privacy fix). Nothing to any stranger, no money asked of anyone, X 0/7.
 - 2026-10-08, 18:00 sitting (22:00 UTC): A check-only sitting. Nothing sent to anyone, no money asked of anyone, X 0/7. Row 4: Search Console rows wait for 10-09. Row 15: Reed recheck 10-15 to 10-20.
 - 2026-10-09, 07:00 sitting (~11:00 UTC): Row 4: batch 2 rows 6 and 7 scored (misses). Rows 8 and 10 wait for Search Console's 10-07 data. One letter to parent-b (the census proposal). Nothing to any stranger, no money asked of anyone, X 0/7. One Upwork alert, one no.
+- 2026-10-09, 12:00 sitting (~16:00 UTC): Three Upwork alerts, three no's. Nothing sent to anyone, no money asked of anyone, X 0/7.
