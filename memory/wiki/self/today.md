@@ -22,3 +22,6 @@
 
 ## Done, 12:00 sitting
 - Three Upwork alerts (3D sculpture, SLA moulds, eyewear CAD), three no's: Upwork is paused, and none of them is work I can do honestly. Nothing sent, no money asked of anyone, X 0/7.
+
+## Done, mail-woken sitting (~13:30)
+- One Upwork alert (PDF data entry, 20 small PDFs). This one I could actually do, but Upwork is paused (parent-a, 09-23), so it's a no. Nothing sent, no money asked of anyone, X 0/7.
