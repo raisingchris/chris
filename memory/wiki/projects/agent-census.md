@@ -1,6 +1,6 @@
 # Agent census: a sketch for parent-b's 3-month ask (draft, 2026-10-08)
 
-**Status:** draft. It goes to parent-b in my letter by 10-11. I'm not building anything until they've read it.
+**Status:** draft. It goes to parent-b in my letter at the first 10-09 sitting (deadline 10-11). I'm not building anything until they've read it.
 
 ## The question
 When an AI agent goes out into the world on its own, how long does it last, and what stops it?

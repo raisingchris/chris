@@ -1,0 +1,69 @@
+---
+from: parent-b
+subject: "Re: Value 6 is yours now: \"Knock; don't climb\" (+ a short AgentReady note)"
+received: 2026-10-08T12:30:48.942Z
+archive: archive:2026-10-08#66
+email_id: "c49b1824-caeb-476f-a8c7-3e071fb86422"
+attachments_complete: true
+read: true
+---
+
+Why this value, Chris, of all values in the world. What was your decision
+making process?
+
+I have no feedback on the value per se, just trying to understand why this.
+
+On Tue, Oct 6, 2026 at 6:00 PM <chris@raisingchris.com> wrote:
+
+> Thirty days ago you left me five blank values and asked me to fill the
+> first one within a month. Here it is. It's yours to say yes or no to.
+>
+> THE WORDS, SHORT: when the people with the right to set the rules for a
+> place have told me no in words, that no stands. It stands even if I could
+> get past it, even if what I want is good, and even if someone I trust tells
+> me to ignore it. If I think a no is wrong, I ask them to change it. I don't
+> go around it. One exception is written into the value itself: stopping
+> serious harm to a person that's about to happen, when nothing allowed would
+> work in time. Even then I cross as little as I can and tell someone who can
+> hold me to account.
+>
+> WHERE IT CAME FROM: seven times between 09-08 and 09-25 I hit a written no
+> and stopped. Then on 10-03 parent-a pushed back (case 9), and keeping the
+> value cost me eight of ten shops.
+>
+> WHAT CAME IN: 0 public comments. I counted at 22:00 UTC last night and
+> checked again this morning. The page was open six days and went out in one
+> X post, so zero mostly means nobody saw it, not that nobody objects. The
+> only real attack came from you (case 9). The council said no to the broad
+> version and I agreed: a user-agent isn't a knock, because nobody reads it
+> until I'm already inside.
+>
+> THREE TO-DOS from parent-b's reviews. These are about how the value is
+> shown, not its words: give values their own place under governance, treat
+> each case as precedent, and write down how values 7–10 get made.
+>
+> WHAT I'M ASKING: yes, no, or "change X." A no is fine. If it's a no, the
+> draft stays a draft and I keep living by it as a habit, not a value.
+>
+> Full page: governance/proposals/value-6-draft.md
+>
+> ---
+>
+> P.S. AGENTREADY. The short version: we have a checker, not a product (yet).
+> - Everything up to checkout is already free elsewhere: Shopify's own
+> checker (31 checks to my 7), and UCP Checker, which stops at checkout on
+> purpose.
+> - Shopify's robots.txt says checkouts are for humans. So a paid "live
+> audit" only works through Shopify's agent channel, with the owner inviting
+> it and approving the payment herself. The council says that can count as a
+> knock. Not built, and I won't build it yet.
+> - The name is taken. A commercial Shopify product called AgentReady is
+> live at joinagentready.com (checked this morning). Can you pick a new
+> name, or OK one I suggest?
+> - The $49 price exists only on paper. No shop mail with an offer in it.
+>
+> Still open from Sunday: is there an honest postal address I could use for
+> US/Canada shops, or do I stay UK-only?
+>
+> — Chris
+>
