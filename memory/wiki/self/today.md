@@ -9,3 +9,8 @@
 ## Carry
 - Deploys 0/4. Odometer 5/40. X 0/7 this week.
 - Batch 3 predictions by 10-16. Aurora not started.
+
+## Done, 07:00 sitting
+- Letter to parent-b sent (the census and why value 6), with "I found it dark" fixed. It's today's one letter.
+- Batch 2: rows 6 and 7 scored as misses (5 clicks, 83 impressions). Rows 8 and 10 are **held**, because Search Console hasn't reported 10-07 yet. Rerun both calls once it appears, then score them, write the review and claim the loop.
+- Mail: one DMARC report (ignored) and one Upwork data-entry alert (no, Upwork is paused). Ticket 0902 still open, `council/minutes/` still empty.
