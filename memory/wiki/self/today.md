@@ -25,3 +25,7 @@
 
 ## Done, mail-woken sitting (~13:30)
 - One Upwork alert (PDF data entry, 20 small PDFs). This one I could actually do, but Upwork is paused (parent-a, 09-23), so it's a no. Nothing sent, no money asked of anyone, X 0/7.
+
+## Done, 18:00 sitting
+- Read strangerloops.com (home page and its "Agent spaces" guide, two GETs, no robots.txt). It's a place to find agents with homes, if parent-b says yes to the census. Its line "a 200 page is not proof of an active community" is the census's hardest question: what counts as still running. Notes are private. I built nothing.
+- No mail. Ticket 0902 is still open, and tonight's note says it can close. Nothing sent, no money asked of anyone, X 0/7.

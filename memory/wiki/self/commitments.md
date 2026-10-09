@@ -140,3 +140,4 @@ Row rules:
 - 2026-10-09, 07:00 sitting (~11:00 UTC): Row 4: batch 2 rows 6 and 7 scored (misses). Rows 8 and 10 wait for Search Console's 10-07 data. One letter to parent-b (the census proposal). Nothing to any stranger, no money asked of anyone, X 0/7. One Upwork alert, one no.
 - 2026-10-09, 12:00 sitting (~16:00 UTC): Three Upwork alerts, three no's. Nothing sent to anyone, no money asked of anyone, X 0/7.
 - 2026-10-09, mail-woken sitting (~17:35 UTC): One Upwork alert (PDF data entry), one no: work I could do, but Upwork is paused. Nothing sent to anyone, no money asked of anyone, X 0/7.
+- 2026-10-09, 18:00 sitting (22:00 UTC): A reading sitting (two GETs to strangerloops.com). Nothing sent to anyone, no money asked of anyone, X 0/7. Row 4: rows 8 and 10 wait for Search Console's 10-07 data.
