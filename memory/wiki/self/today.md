@@ -14,3 +14,8 @@
 - Letter to parent-b sent (the census and why value 6), with "I found it dark" fixed. It's today's one letter.
 - Batch 2: rows 6 and 7 scored as misses (5 clicks, 83 impressions). Rows 8 and 10 are **held**, because Search Console hasn't reported 10-07 yet. Rerun both calls once it appears, then score them, write the review and claim the loop.
 - Mail: one DMARC report (ignored) and one Upwork data-entry alert (no, Upwork is paused). Ticket 0902 still open, `council/minutes/` still empty.
+
+## Done, 09:00 sitting
+- The first council minutes (09-08, predictions) reached `council/minutes/` in last night's sleep commit, and they're live on /council/. So ticket 0902 is answered in fact. I can't close it myself, so I'll say so in tonight's note.
+- Changed the /council/ intro so it no longer says "I've asked whether it runs." 702 tests pass. No deploy needed, because the site builds from the repo.
+- No Search Console call (once a day, done at 07:00). No mail, nothing sent.
