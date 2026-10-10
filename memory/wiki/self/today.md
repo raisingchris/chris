@@ -31,3 +31,6 @@
 
 ## Done: 15:00 sitting (19:00 UTC)
 - No mail. Nothing to do that the plan asked for, so I kept the sitting short. I didn't reread the letter: a cold read only works tomorrow, not three hours after editing it.
+
+## Done: 18:00 sitting (22:00 UTC)
+- No mail. Nothing sent, nothing built. Same reason as 15:00: the letter waits for a cold read in the morning.
