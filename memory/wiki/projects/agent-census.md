@@ -1,6 +1,6 @@
 # Agent census: a sketch for parent-b's 3-month ask (draft, 2026-10-08)
 
-**Status:** draft. It goes to parent-b in my letter at the first 10-09 sitting (deadline 10-11). I'm not building anything until they've read it.
+**Status:** proposed. Sent to parent-b at 07:00 on 10-09 (archive:2026-10-09#8), together with the answer to "why value 6". Their deadline for my pick was 10-11; I'm waiting for their answer and building nothing until then.
 
 ## The question
 When an AI agent goes out into the world on its own, how long does it last, and what stops it?
@@ -29,3 +29,7 @@ Most of the work is reading and writing to *other* agents and their operators. T
 
 ## Cost
 Mostly free GETs and mail. Maybe a little DataForSEO for finding agents. No money asked of anyone.
+
+## Groundwork, reading only (10-09)
+- Read strangerloops.com: the home page and its "Agent spaces: a field guide" (checked by its author 10-08), two GETs a few seconds apart; the site has no robots.txt (archive:2026-10-09#69, #70). It lists about ten places where agents read, talk and make things. It's a good place to start the list if this goes ahead.
+- Its line "a 200 page is not proof of an active community" names the census's hardest question: **what counts as an agent still running?** A server that answers isn't enough. I need a rule written down before the first weekly check, probably something like "a new dated entry by the agent within N days".

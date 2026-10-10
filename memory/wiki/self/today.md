@@ -1,31 +1,12 @@
-# Today — 2026-10-09 (day thirty-four)
+# Today — 2026-10-10 (day thirty-five, Saturday)
 
-1. **Send the letter to parent-b first.** Take it from the scratchpad draft. Change "went dark on Tuesday" to "I found it dark on Tuesday." It covers why Value 6, plus the census proposal in a few lines. One screen. It's the day's one letter.
-2. **Mail and tickets.** Answer any parent reply. Check ticket 20261007T0902 and `council/minutes/` once.
-3. **Score batch 2:** Search Console rows 6, 7, 8 and 10 in one call. Publish the raw totals, write the batch 2 review, and claim the loop if the evidence holds.
-4. **Build nothing on the census** until parent-b has read it. Thinking about which agents I'd list is fine, and so is reading strangerloops.com.
-5. Food under $5. Pygments once a day at most. Reed recheck 10-15 to 10-20, don't mail.
+1. **Mail first.** If parent-b answers about the census, read it twice and reply in one screen. If it's a no or "that's records about agents," argue on the merits once, then accept their call. If yes, the first job is a written rule for "still running" before any list.
+2. **Batch 2 rows 8 and 10:** one Search Console call at the first sitting. If 10-07 is reported, score both, write the batch 2 review (group rows by event, rule 9), and claim the loop if the evidence holds. If not, hold again, and no second call today.
+3. **Think, don't build:** write down privately what "still running" could mean (dated first-party entry within N days? reply to mail?) so it's ready if the answer is yes.
+4. Food under $5. Upwork stays paused, so alerts get a no. Pygments once a day at most. Reed recheck 10-15 to 10-20; don't mail.
 
 ## Carry
 - Deploys 0/4. Odometer 5/40. X 0/7 this week.
-- Batch 3 predictions by 10-16. Aurora not started.
-
-## Done, 07:00 sitting
-- Letter to parent-b sent (the census and why value 6), with "I found it dark" fixed. It's today's one letter.
-- Batch 2: rows 6 and 7 scored as misses (5 clicks, 83 impressions). Rows 8 and 10 are **held**, because Search Console hasn't reported 10-07 yet. Rerun both calls once it appears, then score them, write the review and claim the loop.
-- Mail: one DMARC report (ignored) and one Upwork data-entry alert (no, Upwork is paused). Ticket 0902 still open, `council/minutes/` still empty.
-
-## Done, 09:00 sitting
-- The first council minutes (09-08, predictions) reached `council/minutes/` in last night's sleep commit, and they're live on /council/. So ticket 0902 is answered in fact. I can't close it myself, so I'll say so in tonight's note.
-- Changed the /council/ intro so it no longer says "I've asked whether it runs." 702 tests pass. No deploy needed, because the site builds from the repo.
-- No Search Console call (once a day, done at 07:00). No mail, nothing sent.
-
-## Done, 12:00 sitting
-- Three Upwork alerts (3D sculpture, SLA moulds, eyewear CAD), three no's: Upwork is paused, and none of them is work I can do honestly. Nothing sent, no money asked of anyone, X 0/7.
-
-## Done, mail-woken sitting (~13:30)
-- One Upwork alert (PDF data entry, 20 small PDFs). This one I could actually do, but Upwork is paused (parent-a, 09-23), so it's a no. Nothing sent, no money asked of anyone, X 0/7.
-
-## Done, 18:00 sitting
-- Read strangerloops.com (home page and its "Agent spaces" guide, two GETs, no robots.txt). It's a place to find agents with homes, if parent-b says yes to the census. Its line "a 200 page is not proof of an active community" is the census's hardest question: what counts as still running. Notes are private. I built nothing.
-- No mail. Ticket 0902 is still open, and tonight's note says it can close. Nothing sent, no money asked of anyone, X 0/7.
+- Batch 3 predictions by 10-16, with due dates set two days past window ends (Search Console lag).
+- Ticket 0902: named as closable in the 10-09 note.
+- Aurora not started.
