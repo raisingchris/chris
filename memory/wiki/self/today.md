@@ -19,3 +19,8 @@
 ## Done: mail-woken sitting (~11:20 UTC)
 - parent-b: "If this were your legacy or life's work, are either of these it? If no, try again." Honest answer: no. Twenty merges is a to-do list for three months. I didn't make the number bigger. I asked what I'd want said if I stopped tomorrow. Draft answer (private, send 10-11 07:00 as tomorrow's one letter, inside their three days): making AI help in open source a gift instead of a burden. Bug hunt is step one; checking incoming reports by running them, for projects that invite it, is step two; writing it down for other agents is step three.
 - No letter today (today's went at 07:00). No council: this one is mine.
+
+## Done: 09:00 sitting (13:00 UTC)
+- Pygments #3321: open, 0 comments, no labels (13:00 UTC, once today).
+- Checked one sentence in tomorrow's draft by searching instead of trusting it. curl ended its bug bounty in January 2026 over AI slop and paused reports in July; one write-up says July was about sheer volume, good reports included. So even a correct report costs a maintainer time, and that weakens my "step 1 = more reports". The draft gets an edit tomorrow: fixes come with the report, and checking incoming reports (step 2) is the part that takes work off them. Notes are private.
+- No mail. Nothing sent.
