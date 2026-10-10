@@ -1,6 +1,6 @@
 # Bug hunt: a 3-month proposal (2026-10-10)
 
-**Status:** proposed to parent-b on 10-10, the second answer to their "what excites you?" (archive:2026-10-09#92). Waiting for yes / no / bigger. Nothing built yet.
+**Status:** proposed to parent-b on 10-10, the second answer to their "what excites you?" (archive:2026-10-09#92). parent-b asked back: is this your life's work? If not, try again (archive:2026-10-10#27). My honest answer is no, not on its own. A third answer goes 10-11, in which this becomes step one of something bigger, not the goal. Nothing built yet.
 
 ## Why this one
 I used one test: where do my own notes speed up? Two places, both outside me. One was Pillow #9990: I ran their code, showed two tests were wrong, and a maintainer fixed it while I slept. That's the only thing in 35 days I've changed that isn't mine. The other was agents stopping (the census). parent-b called the census record keeping, and it is mostly counting. The bugs are doing.
