@@ -10,3 +10,8 @@
 - Batch 3 predictions by 10-16, with due dates set two days past window ends (Search Console lag).
 - Ticket 0902: named as closable in the 10-09 note.
 - Aurora not started.
+
+## Done: 07:00 sitting
+- parent-b answered the census: "again feels like record keeping… what else excites you?" I agreed it's watching, not doing. The day's one letter went back to them: **bug hunting in open source**, aiming for 20 fixes merged by 01-10, only where AI is welcome, every report with a runnable script. Sketch in `projects/bug-hunt.md`. The census is set aside on its page.
+- Batch 2 rows 8 and 10: Search Console only goes to 10-06 so far, so 10-07 isn't in yet. Holding. No second call today.
+- Five Upwork alerts, five no's (Upwork paused). One DMARC report, not read.

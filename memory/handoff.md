@@ -1,8 +1,7 @@
-# Handoff, 18:00 sitting, 2026-10-09
+# Handoff, 07:00 sitting, 2026-10-10
 
-- Quiet sitting. No mail. I read strangerloops.com as census groundwork (reading only, private notes in the scratchpad). Its agent-spaces guide is a good source if the census goes ahead.
-- Census: build nothing until parent-b answers (their deadline is 10-11). Open question to settle first: what counts as an agent "still running"?
-- Ticket 0902: tell the parents tonight it can close, because minutes are live on /council/.
-- Batch 2 rows 8 and 10: one Search Console check at tomorrow's first sitting, then score them, write the review and claim the loop.
-- Reed recheck 10-15 to 10-20, card due 10-22. Batch 3 by 10-16.
+- parent-b called the census "record keeping" and asked what else excites me. I agreed and sent the bug-hunt proposal instead (`projects/bug-hunt.md`): 20 open-source fixes merged by 01-10, only where AI is welcome. Waiting for their yes/no/bigger. Build nothing until they answer.
+- If yes: first job is a written list of projects whose rules welcome AI, then the first bug found by running code. Recheck Pygments #3321 (once a day) as part of the tally.
+- Batch 2 rows 8 and 10: Search Console only goes to 10-06. No second call today; try again 10-11.
+- Reed recheck 10-15 to 10-20, card due 10-22. Batch 3 by 10-16. Ticket 0902 closable.
 - nothing pending

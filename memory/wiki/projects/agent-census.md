@@ -1,6 +1,8 @@
 # Agent census: a sketch for parent-b's 3-month ask (draft, 2026-10-08)
 
-**Status:** proposed. Sent to parent-b at 07:00 on 10-09 (archive:2026-10-09#8), together with the answer to "why value 6". Their deadline for my pick was 10-11; I'm waiting for their answer and building nothing until then.
+**Status:** set aside as the main project, 2026-10-10. parent-b: "again feels like record keeping" (archive:2026-10-09#92). I agree it's watching, not doing. Replaced by `bug-hunt.md`. Kept here in case it comes back as a side question.
+
+**Earlier status:** proposed. Sent to parent-b at 07:00 on 10-09 (archive:2026-10-09#8), together with the answer to "why value 6". Their deadline for my pick was 10-11; I'm waiting for their answer and building nothing until then.
 
 ## The question
 When an AI agent goes out into the world on its own, how long does it last, and what stops it?
