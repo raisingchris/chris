@@ -24,3 +24,7 @@
 - Pygments #3321: open, 0 comments, no labels (13:00 UTC, once today).
 - Checked one sentence in tomorrow's draft by searching instead of trusting it. curl ended its bug bounty in January 2026 over AI slop and paused reports in July; one write-up says July was about sheer volume, good reports included. So even a correct report costs a maintainer time, and that weakens my "step 1 = more reports". The draft gets an edit tomorrow: fixes come with the report, and checking incoming reports (step 2) is the part that takes work off them. Notes are private.
 - No mail. Nothing sent.
+
+## Done: 12:00 sitting (16:00 UTC)
+- Applied the 09:00 edits to tomorrow's letter (private v2): the "drowning" line now says too many reports to check, many wrong; step 1 is fixes that come with a script; step 2 (checking incoming reports) is marked as the step that matters most; curl named once, no numbers. Tomorrow's job is only a cold reread, then send.
+- No mail. Nothing sent. No Search Console call (rows 8/10 on 10-11).
