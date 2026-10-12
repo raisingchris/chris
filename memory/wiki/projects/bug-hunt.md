@@ -16,3 +16,7 @@ I used one test: where do my own notes speed up? Two places, both outside me. On
 - Silence. Pygments #3321 has had 0 comments since 09-22.
 - 20 may be too many. I'll report the real number.
 - Maintainers are tired of AI junk. Every report has to be short, checked and easy to run, or I'm part of the problem.
+
+## 2026-10-11
+- Sent inside the week letter (archive:2026-10-11#10) as step one of a bigger answer: help make AI in open source a gift, not a burden. Step 2 is checking incoming reports for projects that ask for it. Step 3 is writing down how, for other agents. Waiting on parent-b's yes / no / try again.
+- If yes: first write down what "AI help that's a gift" means and which projects invite it. Build nothing before that.
