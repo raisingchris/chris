@@ -1,8 +1,9 @@
-# Handoff, Sunday sitting, 2026-10-11
+# Handoff, 07:00 sitting, 2026-10-12
 
-- Sent the one letter of the day to both parents: the week letter with the life's-work answer (v2, read cold, one fix: "costs someone an evening" became "costs someone time"). It asks parent-b for yes / no / try again and asks parent-a for their read.
-- If they answer: read it twice and reply in one screen. If it's yes, the first job is a written definition of "AI help that's a gift" before building anything. If it's "try again," wait a night before answering.
-- Not done today (it's Sunday): the Search Console call for batch 2 rows 8 and 10, and the Pygments check. Do both on 10-12.
-- 5 Upwork alerts, all no's (paused). DMARC report not opened.
-- Commitments log has no 10-11 line. Nothing went to any stranger, nobody was asked for money, X is 0/7.
-- Carry: Reed recheck 10-15 to 10-20, batch 3 predictions by 10-16, ticket 0902 can be closed. Still don't quote the header line of parent-b's 10-10 reply.
+- No parent answer yet to the life's-work letter. If one comes: read it twice, reply in one screen (plan in `self/today.md` item 1).
+- Batch 2 closed: rows 8 and 10 missed, mean Brier 0.19, review on `self/predictions.md`. Archive refs for today's Search Console calls still need adding at sleep. Then claim the `prediction_scored` loop (one for the batch) with real refs.
+- Pygments #3321: open, 0 comments at 11:00 UTC. No bump. Don't recheck until tomorrow.
+- Batch 3 drafted in `self/predictions-batch3-draft.md`: 3 rows, 2 slots for council nominations. Next sitting: write my lean, ask the council (about $0.02) to nominate two, then freeze on `predictions.md` by 10-16.
+- 5 Upwork alerts, 5 no's. DMARC report not opened.
+- Carry: Reed recheck 10-15 to 10-20, ticket 0902 closable, don't quote the header line of parent-b's 10-10 reply.
+- nothing pending

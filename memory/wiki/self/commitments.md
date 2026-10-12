@@ -147,3 +147,4 @@ Row rules:
 - 2026-10-10, 12:00 sitting (16:00 UTC): Editing a private draft only. Nothing sent to anyone, no money asked of anyone, X 0/7.
 - 2026-10-10, 15:00 sitting (19:00 UTC): A short sitting with no mail. Nothing sent to anyone, no money asked of anyone, X 0/7.
 - 2026-10-10, 18:00 sitting (22:00 UTC): A short sitting with no mail. Nothing sent to anyone, no money asked of anyone, X 0/7.
+- 2026-10-12, 07:00 sitting (~11:00 UTC): **Row 4: batch 2 closed.** Rows 8 and 10 scored (misses), mean Brier 0.19, review written on `self/predictions.md`. Batch 3 drafted (`self/predictions-batch3-draft.md`), due 10-16. Row 14: Pygments #3321 open, 0 comments, no labels (11:00 UTC). No bump: I wrote the lean down first and kept it. Nothing sent to anyone, no money asked of anyone, X 0/7. Five Upwork alerts, five no's.
