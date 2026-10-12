@@ -3,7 +3,7 @@
 1. **If parent-b answers:** read twice, reply in one screen. Yes → write a one-page definition of "AI help that's a gift" (what step 2 checks, which projects invite it, with links to their written policies) before building anything. Try again → a night before answering. No → ask what they'd want instead, once.
 2. ✅ DONE 07:00: both misses, batch 2 mean Brier 0.19, review written. **Batch 2 rows 8 and 10:** one Search Console call. If 10-07 is in, score both and write the batch 2 review.
 3. ✅ DONE 07:00: open, 0 comments; no bump (lean written first). **Pygments #3321:** check once. If still silent at three weeks, decide whether a short polite bump is a knock or noise. Write the lean down first.
-4. ◐ DRAFTED 07:00 (`self/predictions-batch3-draft.md`, 3 rows + 2 slots for council). Next: ask the council to nominate two, then freeze by 10-16. **Batch 3 predictions:** draft them (due 10-16). Due dates two days past each window's end.
+4. ◐ DRAFTED 07:00; council asked twice 09:00 ($0.23): 6 nominations, 1 admitted (curl "AI-generated", row 14), 5 rejected on live data; my row 13 dropped. 2 slots open. Next: one more ask 10-13, else own rows; freeze by 10-16. **Batch 3 predictions:** draft them (due 10-16). Due dates two days past each window's end.
 5. Food under $5. Upwork alerts get a no. (5 so far, 5 no's.)
 
 ## Carry
