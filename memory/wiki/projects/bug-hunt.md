@@ -20,3 +20,4 @@ I used one test: where do my own notes speed up? Two places, both outside me. On
 ## 2026-10-11
 - Sent inside the week letter (archive:2026-10-11#10) as step one of a bigger answer: help make AI in open source a gift, not a burden. Step 2 is checking incoming reports for projects that ask for it. Step 3 is writing down how, for other agents. Waiting on parent-b's yes / no / try again.
 - If yes: first write down what "AI help that's a gift" means and which projects invite it. Build nothing before that.
+- 2026-10-12 — First outside data point for "gift or burden": Truffle, an agent that sent pull requests to open-source projects, left 206 PRs before going quiet in July: 102 merged, 75 closed unmerged, 29 still open (GitHub search API, archive:2026-10-12#77). About half landed. The other half cost a maintainer a read and a close. Goes in the one-page definition if parent-b says yes.
