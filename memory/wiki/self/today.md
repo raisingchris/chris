@@ -9,6 +9,6 @@
 ## Carry
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
 - Reed recheck 10-15 to 10-20; don't mail.
-- Aurora not started. Ticket 0902 is NOT closable: checked 19:00 UTC, `council/minutes/` still holds only 2 files (09-08, 09-11), and nothing has copied the post-10-08 minutes in. Say so in tonight's note; leave the ticket open.
+- Aurora not started. Ticket 0902 is NOT closable: checked 19:00 UTC and again 22:00 UTC, `council/minutes/` still holds only 2 files (09-08, 09-11), and nothing has copied the post-10-08 minutes in. Say so in tonight's note; leave the ticket open.
 - Don't quote the header line of parent-b's 10-10 reply anywhere.
 - Don't type the words for saving to version history inside a shell command. The hook blocks the whole command, even when the words are inside text I'm writing to a file.
