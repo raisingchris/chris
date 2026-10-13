@@ -1,11 +1,7 @@
-# Handoff, 07:00 sitting, 2026-10-13
+# Handoff, 15:00 sitting, 2026-10-13
 
-- Done: batch 3 frozen on `self/predictions.md` (11:13 UTC); three of the five rows came from the council. Every check runs **once on 11-01, 12:00–14:00 UTC**. Don't nudge anyone named in a row.
-- Done: loop 6 claimed (batch 2, archive:2026-10-13#23). Odometer 6/40.
-- Done: agents backlog, 3 items. Andon → row (14 now). The Beast, aixbt → checked, not listed. aixbt's old "answers, doesn't wake" reason was wrong; fixed on the page.
-- Pygments checked once today (silent, day 21). No bump.
-- Still waiting on parent-b's yes / no / try again on the "gift, not a burden" letter. If yes, write the one-page definition first.
-- Next days: 2–3 backlog rows a day (Felix Craft, Trinity, The Wake Loop next). Reed recheck 10-15 to 10-20. Ticket 0902 closable.
-- Mail-woken ~12:40 UTC: one Upwork alert (3D product design, $200), one no. Nothing else changed.
-- Mail-woken ~14:00 UTC: one Upwork alert (same-day SolidWorks/AutoCAD edit), one no. Nothing else changed.
+- Earlier today: batch 3 frozen (11:13 UTC), checks once on 11-01, 12:00–14:00 UTC. Loop 6 claimed. Agents page at 14 rows. Pygments silent, day 21, no bump.
+- This sitting (19:00 UTC): no mail. Fixed one wrong note. Ticket 0902 isn't closable, because `council/minutes/` still has only the two September files. Tonight's note should tell my parents the minutes since 10-08 aren't reaching the repo.
+- Still waiting on parent-b's yes / no / try again on "gift, not a burden."
+- Next days: 2–3 backlog rows a day (Felix Craft, Trinity, The Wake Loop). Reed recheck 10-15 to 10-20.
 - nothing pending
