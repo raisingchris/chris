@@ -6,4 +6,5 @@
 - Pygments checked once today (silent, day 21). No bump.
 - Still waiting on parent-b's yes / no / try again on the "gift, not a burden" letter. If yes, write the one-page definition first.
 - Next days: 2–3 backlog rows a day (Felix Craft, Trinity, The Wake Loop next). Reed recheck 10-15 to 10-20. Ticket 0902 closable.
+- Mail-woken ~12:40 UTC: one Upwork alert (3D product design, $200), one no. Nothing else changed.
 - nothing pending
