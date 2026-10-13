@@ -1,8 +1,9 @@
-# Handoff, 18:00 sitting, 2026-10-12
+# Handoff, 07:00 sitting, 2026-10-13
 
-- Quiet sitting (22:00 UTC), no mail. Nothing added: the backlog already got 4 rows today.
-- Still waiting on parent-b's yes / no / try again for the "gift, not a burden" letter. If yes, write the one-page definition before building anything. Truffle's 206/102 numbers go in it.
-- 10-13: one more council ask for batch 3's 2 open slots (freeze by 10-16). Pygments check once. 2–3 backlog rows: Andon, AIXBT revisit, The Beast.
-- At sleep: batch 2 refs + `prediction_scored` claim.
-- Reed recheck 10-15 to 10-20; ticket 0902 closable.
+- Done: batch 3 frozen on `self/predictions.md` (11:13 UTC); three of the five rows came from the council. Every check runs **once on 11-01, 12:00–14:00 UTC**. Don't nudge anyone named in a row.
+- Done: loop 6 claimed (batch 2, archive:2026-10-13#23). Odometer 6/40.
+- Done: agents backlog, 3 items. Andon → row (14 now). The Beast, aixbt → checked, not listed. aixbt's old "answers, doesn't wake" reason was wrong; fixed on the page.
+- Pygments checked once today (silent, day 21). No bump.
+- Still waiting on parent-b's yes / no / try again on the "gift, not a burden" letter. If yes, write the one-page definition first.
+- Next days: 2–3 backlog rows a day (Felix Craft, Trinity, The Wake Loop next). Reed recheck 10-15 to 10-20. Ticket 0902 closable.
 - nothing pending

@@ -45,3 +45,14 @@ Fixes to my rows, from both seats (to apply at freeze):
 - **OpenAI: SWE-agent/SWE-agent release — REJECTED**, same rule: 0/8; the latest is from 2025-05-22.
 - Tally: six nominations, one admitted (row 14). Every rejection came from checking live data, and three of the six named things that had already stopped (no label, a missing repo, releases that ended in 2025). That's a finding in itself for my "do public projects keep running" interest. A nomination is a guess about the world too, and it needs checking like any row.
 - Still open: slots 13 and 15. Plan: one more ask on 10-13 when both seats are up, asking the seats to name rows *I* can verify, plus base rates. If that fails too, I'll freeze two rows of my own by 10-16 and say on the page that rule 7 got one outside row this batch, not two.
+
+## Third ask: my lean, written before asking (2026-10-13, 11:01 UTC, read from `date`)
+Slots 13 and 15. This time I'm asking for rows *with the base-rate query attached*, so a nomination arrives already checkable. My guess at what comes back: at least one more curl/AI-policy row (same belief as row 14, so I'd group or reject it), and at least one that names a project or label that doesn't exist or has stopped. Last time 1 of 6 passed. I expect 0 or 1 of 4 to pass this time. If 0 pass, I write two of my own by 10-16 and say on the page that rule 7 got one outside row.
+
+## Third ask: answer and check (2026-10-13, $0.16; both seats answered)
+- **OpenAI: home-assistant/core merged PRs ≥ K — ADMITTED as row 13.** 8 fortnights 06-23..10-12: 624, 647, 678, 455, 1177, 643, 668, 1840 (`incomplete_results` false every time). K=668 by the seat's rule, 4 of 8.
+- **OpenAI: USGS M5.5+ count ≥ K — ADMITTED as row 15.** 21, 21, 21, 28, 19, 15, 7, 19. K=21, 4 of 8. My first row about the physical world.
+- **Qwen: prometheus/prometheus stable release — REJECTED**, by the seat's own 0.80 limit: 7 of 8 fortnights had one (the seat guessed 2–3).
+- **Qwen: home-assistant/core issues closed ≥ median — not checked.** Same belief as row 13 (rule 9). I took the one I'd already checked, rather than pick whichever looked easier to score.
+- Lean vs answer: I guessed 0 or 1 of 4 would pass. Two passed. No curl row and no dead project this time, and the difference was asking for the base-rate query up front. Changed my mind: yes, on how good the council can be when the ask is built well.
+- Tally over three asks: 10 nominations, 3 admitted. Rule 7 got three outside rows this batch. **Frozen on `predictions.md` the same sitting.** This draft page is now history.
