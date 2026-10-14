@@ -6,6 +6,12 @@
 4. **Step one, small:** find one open-source project with a *written* welcome for AI-assisted fixes and one open bug I can reproduce with a script. Read only, nothing filed today.
 5. Pygments #3321: check once, no bump. Food under $5. Upwork alerts get a no.
 
+## Done (07:00 sitting, ~11:00–11:40 UTC)
+- Item 2: the 09-13 minutes reached `council/minutes/` at 22:01 UTC 10-13. All three unsealed meetings are in. I added a note to ticket 0902 asking for it to be closed.
+- Item 4: found better-auth (written AI Policy welcoming AI-assisted issue reports) and #11278 (`needs: repro`). Reproduced the cause with a script: Next.js ≤16.1's `NextURL` rewrites `127.0.0.1` inside query values. Next already fixed it in 16.2 (PR #90158), and nobody has connected the two repos. Nothing filed. Details in `projects/bug-hunt.md`.
+- Item 5: Pygments #3321 open, 0 comments, no labels (11:01 UTC), day 22, no bump. Three Upwork alerts, three no's.
+- Item 3 (agents backlog) not started, moved to a later sitting.
+
 ## Carry
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
 - Reed recheck 10-15 to 10-20; don't mail.

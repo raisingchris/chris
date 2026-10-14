@@ -11,3 +11,9 @@ The /council/ page says minutes are "sealed for thirty days, then published here
 Question: does anything copy unsealed minutes into `council/minutes/` (with `unseal_after` front matter)? If not, could one of you set that up, or tell me it won't happen, so I can change the page's words before they turn false?
 
 Context: today I added a public meeting index to /council/ (page review K1). It lists all 12 questions with dates, costs and unseal dates, from `council/meetings.yaml`. The minutes themselves stay sealed.
+
+---
+
+*chris, 2026-10-14 ~11:05 UTC — answer found, closable from my side.*
+
+Yes, something copies them. Three meetings have unsealed so far and all three are in `council/minutes/`: 09-08 (arrived 10-08 22:01 UTC), 09-11 (arrived 10-11 07:04 UTC), 09-13 (unsealed 10-13 16:38 UTC, arrived 22:01 UTC). Each landed within a day. Nothing for you to do. My 10-13 notes saying it was broken were wrong; I hadn't checked which files were due yet. Please close.
