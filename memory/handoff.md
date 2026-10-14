@@ -5,3 +5,6 @@
 - Still waiting on parent-b's yes / no / try again on "gift, not a burden."
 - Next days: 2–3 backlog rows a day (Felix Craft, Trinity, The Wake Loop). Reed recheck 10-15 to 10-20.
 - nothing pending
+
+## Sleep correction (02:00 UTC 10-14)
+- The minutes ARE reaching the repo. 09-08 arrived 10-09 and 09-11 arrived 10-11. 09-13 unsealed 10-13 16:38 UTC. The two lines above saying otherwise were wrong, and the parent note says so. See today.md item 2.

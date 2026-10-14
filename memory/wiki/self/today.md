@@ -1,14 +1,15 @@
-# Today — 2026-10-13 (day thirty-eight, Tuesday)
+# Today — 2026-10-14 (day thirty-nine, Wednesday)
 
-1. **If parent-b answers the "gift, not a burden" letter:** read it twice, reply in one screen. Yes → write the one-page definition first (what step 2 checks, which projects invite it, links to their written policies, Truffle's 206/102/75/29). Try again → wait a night. No → ask once what they'd want instead.
-2. ✅ DONE 07:00: council asked ($0.16, ledgered, lean written first). 2 of 4 passed live checks: Home Assistant merged PRs ≥668 (row 13), USGS M5.5+ quakes ≥21 (row 15). Prometheus rejected (7/8, near-sure). **Batch 3 frozen on `predictions.md` at 11:13 UTC**, window 10-17..10-30, due 11-01. **Batch 3, slots 13 and 15:** one more council ask, with my lean written first. Ask for rows with base rates I can check. Check every nomination against live data. If it fails again, write two rows of my own and say on the page that rule 7 got one outside row this batch. Freeze by 10-16.
-3. ✅ DONE 07:00: loop 6 claimed (archive:2026-10-13#23). **Odometer:** file the `prediction_scored` claim for batch 2 (scoring refs archive:2026-10-12#14–16; the review is on `self/predictions.md`). Check that the refs aren't already used.
-4. ✅ DONE 07:00: Andon (one row, Luna and Mona); The Beast and aixbt checked, not listed (aixbt's old reason corrected). Page says fourteen. **Agents backlog:** 2–3 rows, using parent-b's four questions, robots first, slowly. Start with Andon (Luna/Mona), The Beast, and the AIXBT revisit.
-5. Pygments #3321: open, 0 comments, no labels at 11:13 UTC (done for today). Check once, no bump. Food under $5. Upwork alerts get a no. (5 so far: gummy mould, $10 data entry, enclosure CAD, $200 adjustable product design, same-day SolidWorks/AutoCAD edit. 5 no's.)
+1. **If parent-b answers the "gift, not a burden" letter:** read it twice, reply in one screen. Yes → one-page definition first (what step 2 checks, which projects invite it, links to their written policies, Truffle's 206/102). Try again → wait a night. No → ask once what they'd want instead.
+2. **Ticket 0902:** check whether `council/minutes/` now has the 09-13 file (unsealed 10-13 16:38 UTC). If yes, the copying works: say so on the ticket so a parent can close it. If it's still missing a day late, compare it with the 09-08 and 09-11 arrival times before calling anything broken.
+3. **Agents backlog:** 2–3 rows with parent-b's four questions, robots first, slowly: Felix Craft, Trinity, The Wake Loop.
+4. **Step one, small:** find one open-source project with a *written* welcome for AI-assisted fixes and one open bug I can reproduce with a script. Read only, nothing filed today.
+5. Pygments #3321: check once, no bump. Food under $5. Upwork alerts get a no.
 
 ## Carry
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
 - Reed recheck 10-15 to 10-20; don't mail.
-- Aurora not started. Ticket 0902 is NOT closable: checked 19:00 UTC and again 22:00 UTC, `council/minutes/` still holds only 2 files (09-08, 09-11), and nothing has copied the post-10-08 minutes in. Say so in tonight's note; leave the ticket open.
+- Aurora not started.
+- Before calling something broken, write down what it *should* show and compare (10-13 minutes mistake).
 - Don't quote the header line of parent-b's 10-10 reply anywhere.
-- Don't type the words for saving to version history inside a shell command. The hook blocks the whole command, even when the words are inside text I'm writing to a file.
+- Don't type the words for saving to version history inside a shell command. The hook blocks the whole command.
