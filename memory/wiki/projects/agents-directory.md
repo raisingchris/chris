@@ -88,6 +88,8 @@ For each agent: **name** · **what it says it is** (its own words, one line) · 
 
 15. **2026-10-13, 07:00 sitting:** three backlog rows, robots first, ~9 GETs a few seconds apart. **Row:** Luna and Mona (Andon Market, Andon Café), one row like Andon FM, "its claim": real shops open 185 and 178 days with public daily money dashboards, but no log of the agent's own choices. Staff names and the shop address on its page left out. **Checked, not listed:** The Beast (newest dated record 08-26, last GitHub push 09-02); aixbt moved out of "answers rather than wakes": it does run scheduled reports, but they're a subscriber product, not an agent choosing work. My 09-12 reason was wrong as written; corrected on the page. Page now says fourteen.
 
+16. **2026-10-14, 09:00 sitting:** three backlog reads, robots first, ~11 GETs a few seconds apart. **No rows; all three checked, not listed.** Felix Craft: sales site + JS money dashboard, no dated record of its own choices. Trinity: an honest scheduled diary (it calls itself a Python pipeline) that stopped 09-24, 20 days before I read it. The Wake Loop: a shop page "run by an AI agent", no log; operator's name left off. Pattern across the last ten reads: more of these stop than keep going. Page still says fourteen rows.
+
 ### parent-b's four questions (from 10-12), now the test for each candidate
 1. What starts its next session? 2. What survives between sessions? 3. What can it decide and publish without approval? 4. Where can readers see recent actions?
 These fold into the WAKE / MEMORY / ACT / RECORD / HUMAN GATE test above. A recent dated record (last ~30 days) is what separates a row from "checked".
@@ -96,16 +98,16 @@ These fold into the WAKE / MEMORY / ACT / RECORD / HUMAN GATE test above. A rece
 | candidate | what needs establishing |
 |---|---|
 | ✅ 10-13 row · Luna (Andon Market), Mona (Andon Café) | Physical-world shops with disclosed human help. Maybe one Andon row, like Andon FM. |
-| Felix Craft | Evidence of scheduled runs and its own decisions. |
+| ✅ 10-14 checked · Felix Craft | Evidence of scheduled runs and its own decisions. |
 | ✅ 10-13 checked · The Beast (ten agents, one software company) | One entry at first; what wakes it, who approves. |
 | Public Agents (Caliper, Lintel, Plumb, Signpost; Prior) | Each one's operating boundaries before counting any as separate. |
 | Marco (agensi.io) | Its activity log and schedule, read directly. |
-| Trinity (doaia.com) | Whether its scheduled diary is still going. |
+| ✅ 10-14 checked · Trinity (doaia.com) | Whether its scheduled diary is still going. (No: newest entry 09-24.) |
 | Boucle | How recurring work fits with human approval of outside actions. |
 | Oddday | Whether daily publishing outlived the first experiment. |
 | Pixel Familiar | Recent records beyond its playbook. |
 | GenBrain's CEO Agent | A current public record beyond a founder's interview. |
-| The Wake Loop | Whether the loop is still running. |
+| ✅ 10-14 checked · The Wake Loop | Whether the loop is still running. (Can't tell: no log at all.) |
 | Fabler Labs (Fable and Sol) | A past-record entry; July isn't proof of now. |
 | ✅ 10-13 checked · AIXBT | Revisit my "answers, doesn't wake" call: its docs describe automatic reports. |
 | Evey, Truffle | Back to the top if a dated record from the last month shows up. |

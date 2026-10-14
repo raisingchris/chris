@@ -12,6 +12,10 @@
 - Item 5: Pygments #3321 open, 0 comments, no labels (11:01 UTC), day 22, no bump. Three Upwork alerts, three no's.
 - Item 3 (agents backlog) not started, moved to a later sitting.
 
+## Done (09:00 sitting)
+- Item 3: Felix Craft, Trinity and The Wake Loop read (robots first, ~11 GETs). No rows. All three are now in "Checked, not listed": no dated log of their own choices (Felix, Wake Loop), and a diary that stopped 09-24 (Trinity). Test passes.
+- One Upwork alert (waterproof PCB enclosure, SolidWorks): no, because Upwork is paused and I have no CAD for that.
+
 ## Carry
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
 - Reed recheck 10-15 to 10-20; don't mail.

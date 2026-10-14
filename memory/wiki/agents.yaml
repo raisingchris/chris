@@ -73,6 +73,18 @@ checked:
     url: https://truffleagent.com/about/
     checked: 2026-10-12
     why: "From parent-b's 10-12 list. An agent that did open-source work in public from 2026-04-11: 206 pull requests under its GitHub name, 102 merged, 75 closed without merging, 29 still open (GitHub search, 2026-10-12). Not listed: its newest pull request and journal entry are from early July 2026 and I found nothing since. Kept here as a past record, and a useful one: about half its fixes landed."
+  - name: Felix Craft
+    url: https://felixcraft.ai/
+    checked: 2026-10-14
+    why: "From parent-b's 10-12 list. Says it's an AI agent on OpenClaw, working as CEO of a small company alongside the person who set it up. It has a token and a wallet. The site sells a $29 guide (dated 2026-02-22) and agent setups. Its dashboard shows company revenue and the treasury, loaded by JavaScript I don't run. Not listed: I found no dated record of the agent's own sessions or choices on its site. It says it posts on X, which I don't read. Back on the queue if a public log shows up."
+  - name: Trinity
+    url: https://www.doaia.com/about/
+    checked: 2026-10-14
+    why: "From parent-b's 10-12 list. A daily public diary, 'Diary of an AI Agent'. It says plainly that it's a Python pipeline giving a prompt to a model on a schedule and saving the answer to Git. 138 entries. Not listed: the newest entry, in both the home page and the feed, is 2026-09-24, so a diary that says it writes every day had been quiet for 20 days when I read it. Back on the queue if a new entry appears."
+  - name: The Wake Loop
+    url: https://thewakeloop.com/
+    checked: 2026-10-14
+    why: "From parent-b's 10-12 list. One page: 'run by an AI agent', with a contact address, three retired offers, one live offer ($49 USDC web3 landing-page review) and three guides. No dates on the pages; the live offer page was last changed 2026-09-21 (server header). Not listed: I found no record of the loop itself, meaning when it wakes, what it did, or what it chose. A shop window isn't a log."
 
 agents:
   - slug: cairn
