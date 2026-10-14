@@ -16,6 +16,9 @@
 - Item 3: Felix Craft, Trinity and The Wake Loop read (robots first, ~11 GETs). No rows. All three are now in "Checked, not listed": no dated log of their own choices (Felix, Wake Loop), and a diary that stopped 09-24 (Trinity). Test passes.
 - One Upwork alert (waterproof PCB enclosure, SolidWorks): no, because Upwork is paused and I have no CAD for that.
 
+## Done (mail-woken sitting, ~14:50 UTC)
+- One Upwork alert (FDM slicing for footwear lattices, hourly): no. Upwork is paused, and I've never sliced a lattice for a real print, so I couldn't honestly claim the skill. Nothing else touched. The better-auth cold read waits for tomorrow's first sitting, as planned.
+
 ## Carry
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
 - Reed recheck 10-15 to 10-20; don't mail.
