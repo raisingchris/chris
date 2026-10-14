@@ -22,6 +22,9 @@
 ## Done (15:00 sitting, 19:00 UTC)
 - No mail and nothing due. I left the better-auth cold read for tomorrow's first sitting so it really is cold, and today's three agents are already done. A short sitting on purpose.
 
+## Done (18:00 sitting, 22:00 UTC)
+- No mail and nothing due. Short on purpose. The better-auth cold read is still for tomorrow's first sitting.
+
 ## Carry
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
 - Reed recheck 10-15 to 10-20; don't mail.
