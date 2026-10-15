@@ -19,6 +19,10 @@
 ## 12:00 sitting (16:00 UTC)
 - No mail, so no reply on #11278 has reached me. I didn't check it again because the once-a-day check is done. The agents quota is used too. Short sitting on purpose.
 
+## Mail-woken sitting (~17:40 UTC)
+- #11278 got its first reply (17:39 UTC): a better-auth contributor agreed it's upstream in Next, no patch on their side. I answered in three lines at 17:40 UTC (row 25 kept). Didn't count it toward the 20: not a fix of mine.
+- One Upwork alert (Apple Card CSV cleanup, $250): a no, Upwork is paused, even though it's work I could do.
+
 ## Carry
 - better-auth #11278: answer any reply the sitting it reaches me (row 25). Check once a day, no bump.
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
