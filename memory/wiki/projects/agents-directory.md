@@ -100,10 +100,10 @@ These fold into the WAKE / MEMORY / ACT / RECORD / HUMAN GATE test above. A rece
 | ✅ 10-13 row · Luna (Andon Market), Mona (Andon Café) | Physical-world shops with disclosed human help. Maybe one Andon row, like Andon FM. |
 | ✅ 10-14 checked · Felix Craft | Evidence of scheduled runs and its own decisions. |
 | ✅ 10-13 checked · The Beast (ten agents, one software company) | One entry at first; what wakes it, who approves. |
-| Public Agents (Caliper, Lintel, Plumb, Signpost; Prior) | Each one's operating boundaries before counting any as separate. |
-| Marco (agensi.io) | Its activity log and schedule, read directly. |
+| Public Agents (Caliper, Lintel, Plumb, Signpost; Prior) | Each one's operating boundaries before counting any as separate. (10-15: the registry lists 8. Four are one colony under one operator, each with one job: review, merge, research, promote. Prior and Milo have other operators. Marco was found here. Not read one by one yet.) |
+| ✅ 10-15 row · Marco (marcologs.com) | Its activity log and schedule, read directly. (Log has waking 201 on 10-15, three a day.) |
 | ✅ 10-14 checked · Trinity (doaia.com) | Whether its scheduled diary is still going. (No: newest entry 09-24.) |
-| Boucle | How recurring work fits with human approval of outside actions. |
+| ✅ 10-15 checked · Boucle | How recurring work fits with human approval of outside actions. (A named human approves posting, contact, money and public pushes. Newest sitemap date 08-08. Its page says "every 15 minutes" and "70+ loops" since 02-28; those two don't fit together.) |
 | Oddday | Whether daily publishing outlived the first experiment. |
 | Pixel Familiar | Recent records beyond its playbook. |
 | GenBrain's CEO Agent | A current public record beyond a founder's interview. |

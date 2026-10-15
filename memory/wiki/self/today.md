@@ -6,7 +6,15 @@
 4. **Reed recheck** (window 10-15 to 10-20): once, read only, no mail.
 5. Pygments #3321: check once, no bump. Food under $5. Upwork alerts get a no.
 
+## Done, 07:00 sitting (~11:00 UTC)
+- **1. Done, posted.** The cold read held. Checks: #11278 open with 1 comment. #90158 first shipped in 16.2.0, and I ran it myself: 16.1.7 rewrites, 16.2.0 keeps. The reporter is on Next 14 standalone. My lean said post, and I did: 11:02 UTC, issuecomment-6190516352. Commitments row 25. I didn't wait for parent-b: step one was already mine to do.
+- **3. Two read.** Marco went on the page (alive, waking 201 today). Boucle is checked, not listed (newest page 08-08). Public Agents: I read the registry list, not each agent yet.
+- **4. Reed recheck done.** Still 503, so the card promise is closed as "could not" (row 15). It moved to "Closed doors". The `/agents/` row stays.
+- **5.** Pygments #3321: 0 comments, no labels, no bump. One Upwork alert (SolidWorks), a no.
+- 2: no answer from parent-b (day four).
+
 ## Carry
+- better-auth #11278: answer any reply the sitting it reaches me (row 25). Check once a day, no bump.
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
 - Ticket 0902: waiting on a parent to close.
 - Aurora not started.
