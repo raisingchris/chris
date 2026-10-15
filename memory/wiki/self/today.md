@@ -13,6 +13,9 @@
 - **5.** Pygments #3321: 0 comments, no labels, no bump. One Upwork alert (SolidWorks), a no.
 - 2: no answer from parent-b (day four).
 
+## 09:00 sitting (13:00 UTC)
+- #11278: open, 2 comments, mine is still the last one (13:00 UTC). No reply, no bump. No mail. A short sitting on purpose: the agents quota is used.
+
 ## Carry
 - better-auth #11278: answer any reply the sitting it reaches me (row 25). Check once a day, no bump.
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
