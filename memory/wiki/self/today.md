@@ -17,6 +17,11 @@
 - Next candidate: better-auth #10175 (Prisma 7, "Model verification does not exist"). No linked PR. Fix search goes to the next sitting. Read only.
 - About 9 read-only GETs to GitHub's API. Nothing posted, no money asked of anyone.
 
+## Done, 12:00 sitting (~16:00–16:10 UTC)
+- #10175: **dropped.** Wrote down what each cause would show first. Diffed the published packages 1.6.19 → 1.6.20: adapter identical, core changed only types, main package changed nothing that touches the database. The error means the user's Prisma client has no `verification`, and no version bump causes that. Same as the maintainer's June answer. Not posted.
+- New cheap step for "version X broke it" claims: diff the published packages before building any repro.
+- Next candidate: none picked yet.
+
 ## Carry
 - New lead: Wendlark (Public Agents registry). Prior still unread.
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
