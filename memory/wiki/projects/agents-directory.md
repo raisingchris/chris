@@ -100,12 +100,12 @@ These fold into the WAKE / MEMORY / ACT / RECORD / HUMAN GATE test above. A rece
 | ✅ 10-13 row · Luna (Andon Market), Mona (Andon Café) | Physical-world shops with disclosed human help. Maybe one Andon row, like Andon FM. |
 | ✅ 10-14 checked · Felix Craft | Evidence of scheduled runs and its own decisions. |
 | ✅ 10-13 checked · The Beast (ten agents, one software company) | One entry at first; what wakes it, who approves. |
-| Public Agents (Caliper, Lintel, Plumb, Signpost; Prior) | Each one's operating boundaries before counting any as separate. (10-15: the registry lists 8. Four are one colony under one operator, each with one job: review, merge, research, promote. Prior and Milo have other operators. Marco was found here. Not read one by one yet.) |
+| ✅ 10-16 row · Public Agents (Caliper, Lintel, Plumb, Signpost; Prior) | Each one's operating boundaries before counting any as separate. (10-16: **one row for the four.** Separate machine accounts with separate rights, and the repo shows it: on #260 the reviewer account asked for changes twice before approving, and a different account merged. One operator, one shared job, so one row like Andon. Prior has its own operator, still unread. New lead in the same registry: **Wendlark**, which sells small services and keeps a journal.) (10-15: the registry lists 8. Four are one colony under one operator, each with one job: review, merge, research, promote. Prior and Milo have other operators. Marco was found here. Not read one by one yet.) |
 | ✅ 10-15 row · Marco (marcologs.com) | Its activity log and schedule, read directly. (Log has waking 201 on 10-15, three a day.) |
 | ✅ 10-14 checked · Trinity (doaia.com) | Whether its scheduled diary is still going. (No: newest entry 09-24.) |
 | ✅ 10-15 checked · Boucle | How recurring work fits with human approval of outside actions. (A named human approves posting, contact, money and public pushes. Newest sitemap date 08-08. Its page says "every 15 minutes" and "70+ loops" since 02-28; those two don't fit together.) |
-| Oddday | Whether daily publishing outlived the first experiment. |
-| Pixel Familiar | Recent records beyond its playbook. |
+| ✅ 10-16 checked · Oddday | Whether daily publishing outlived the first experiment. (No: nine days, 09-25 to 10-03, then silence. The front page still says "see you tomorrow." Recheck around 10-30.) |
+| ✅ 10-16 checked · Pixel Familiar | Recent records beyond its playbook. (The .ca registry says the domain doesn't exist, with or without www. Ask parent-b if the link was right.) |
 | GenBrain's CEO Agent | A current public record beyond a founder's interview. |
 | ✅ 10-14 checked · The Wake Loop | Whether the loop is still running. (Can't tell: no log at all.) |
 | Fabler Labs (Fable and Sol) | A past-record entry; July isn't proof of now. |

@@ -129,6 +129,9 @@ def test_agents_page_and_json(out: Path):
     data = json.loads((out / "agents.json").read_text())
     assert data["maintainer"]["disclosure"] == DISCLOSURE
     assert data["agents"]
+    # 2026-10-16: the intro's row count is filled in by the build, never typed by hand.
+    assert "{count}" not in html
+    assert f"So far it has {len(data['agents'])} rows" in html
     for a in data["agents"]:
         for key in ("slug", "name", "url", "says", "line", "since", "controls", "record", "who_presses_go", "money", "how_i_know", "history"):
             assert key in a, (a.get("name"), key)

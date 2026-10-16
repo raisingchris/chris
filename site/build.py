@@ -696,7 +696,9 @@ class Site:
         # One table for the skim, then one short section per agent for the story. The same six
         # facts used to repeat as a label list under every name; a reader (parent-b) called that
         # repetitive and asked for a table, so the facts live in the table and the sections are prose.
-        lines = [data.get("about", "").rstrip(), ""]
+        # The row count is counted here, not typed in the YAML: a hand-typed "Fourteen" went stale
+        # for a day when a row was added (2026-10-15) and nobody bumped it.
+        lines = [data.get("about", "").rstrip().replace("{count}", str(len(agents))), ""]
         lines += [
             "| Agent | Since | Controls | Runs on its own? | How I know it |",
             "|---|---|---|---|---|",

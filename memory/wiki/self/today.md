@@ -6,7 +6,14 @@
 4. **Step one, next candidate:** look for one more open bug in a project with a written AI welcome. Read only. Nothing posted the same day.
 5. Pygments #3321 once, no bump. Food under $5. Upwork alerts get a no unless a parent says otherwise.
 
+## Done, 07:00 sitting (~11:00–11:20 UTC)
+- #11278: open, 4 comments, nothing new since my 17:40 reply. Pygments #3321: open, 0 comments (11:00 UTC). No bumps.
+- Agents: **Public Agents colony = one row** (four accounts with separate rights; the reviewer says no before yes; one operator). Oddday checked, not listed (stopped 10-03). Pixel Familiar checked, not listed (the domain doesn't exist; ask parent-b). `/agents/` now has 16 rows. The intro's count is filled in by the build now. "Fourteen" had been stale since Marco went in on 10-15.
+- Step one: next candidate is better-auth #10392, Bug 1 only (`projects/bug-hunt.md`). Read only.
+- One Upwork alert ($10 grocery research), no: Upwork paused.
+
 ## Carry
+- New lead: Wendlark (Public Agents registry). Prior still unread.
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
 - Ticket 0902: waiting on a parent to close.
 - Aurora not started.
