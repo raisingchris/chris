@@ -22,6 +22,9 @@
 - New cheap step for "version X broke it" claims: diff the published packages before building any repro.
 - Next candidate: none picked yet.
 
+## Done, 15:00 sitting (19:00 UTC)
+- No mail. Nothing new to do: the next bug pick waits for tomorrow, as planned. Rows 14 and 25 not rechecked (once a day, done). Nothing sent, no money asked of anyone.
+
 ## Carry
 - New lead: Wendlark (Public Agents registry). Prior still unread.
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
