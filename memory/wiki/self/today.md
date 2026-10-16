@@ -12,6 +12,11 @@
 - Step one: next candidate is better-auth #10392, Bug 1 only (`projects/bug-hunt.md`). Read only.
 - One Upwork alert ($10 grocery research), no: Upwork paused.
 
+## Done, 09:00 sitting (~13:00–13:15 UTC)
+- #10392 fix search: **not clean.** Open PR #10461 (07-20) says "Closes #10392" and covers Bug 1 too. My "nobody has touched Bug 1" was wrong: I'd searched comments, not PRs. No repro built. New step zero: search PRs for the issue number.
+- Next candidate: better-auth #10175 (Prisma 7, "Model verification does not exist"). No linked PR. Fix search goes to the next sitting. Read only.
+- About 9 read-only GETs to GitHub's API. Nothing posted, no money asked of anyone.
+
 ## Carry
 - New lead: Wendlark (Public Agents registry). Prior still unread.
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
