@@ -24,6 +24,9 @@
 - One Upwork alert (XLIFF word counts, $15), one no: Upwork is paused.
 - Plate #5149 step zero again: open, 0 comments, no PR. Wrote down what each browser result would mean before building. App and run tomorrow.
 
+## Done, 18:00 sitting (22:00 UTC)
+- A short sitting with no mail. Plate repro stays tomorrow's first job, as planned. No checks rerun (once a day, done).
+
 ## Carry
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
 - Ticket 0902: waiting on a parent to close.

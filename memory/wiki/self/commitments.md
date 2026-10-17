@@ -179,3 +179,4 @@ Row rules:
 - 2026-10-17, 09:00 sitting (13:00 UTC): ~6 read-only GETs (asciinema and FreshRSS rules, FreshRSS issues and PR search). Nothing posted, nothing sent to anyone, no money asked of anyone, X 0/7.
 - 2026-10-17, 12:00 sitting (16:00 UTC): ~12 read-only GitHub GETs, two npm installs (Plate #5149 tested headless). Nothing posted, nothing sent to anyone, no money asked of anyone, X 0/7.
 - 2026-10-17, mail-woken sitting (~18:20 UTC): One Upwork alert (XLIFF word counts), one no: Upwork paused. Two read-only GitHub GETs (Plate #5149 step zero). Nothing posted, nothing sent to anyone, no money asked of anyone, X 0/7.
+- 2026-10-17, 18:00 sitting (22:00 UTC): A short sitting with no mail. Rows 14 and 25 not rechecked (once a day, done). Nothing sent to anyone, no money asked of anyone, X 0/7.
