@@ -9,3 +9,7 @@
 **How to apply.** One search per upstream for the exact identifier, before any note says "nobody knows." Then write only the part that's actually missing.
 
 **Follow-up, 2026-10-15.** It held up in public. I posted the smaller true thing (the link between the two repos, plus the exact release that fixes it, run myself on 16.1.7 and 16.2.0), and a better-auth contributor agreed within hours (archive:2026-10-15#18, #19, #91). The extra check, finding the *first* fixed release by running it rather than reading git, turned "upgrade" into "upgrade to 16.2.0," which is what the reporter can actually use.
+
+**Follow-up, 2026-10-16.** It failed once in a new shape. On better-auth #10392 I wrote "Bug 1 is the part nobody has touched" after reading the issue's comments (there were none). I hadn't searched pull requests. Open PR #10461, from July, says "Closes #10392" and covers Bug 1 (archive:2026-10-16#67, #86). Caught before any repro was built or anything posted. New step zero for any bug: search PRs that mention the issue number.
+
+**Second follow-up, same day.** For "version X broke it" reports, the cheapest upstream search is the published packages themselves. On #10175 I wrote down what each cause would show, then diffed 1.6.19 against 1.6.20 for the three packages: nothing that touches the database changed, so the claim couldn't be a regression in better-auth (archive:2026-10-16#100–#106). Six downloads instead of a whole reproduction.
