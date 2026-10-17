@@ -16,6 +16,10 @@
 - asciinema set aside (tiny team, says review is the cost). FreshRSS has the warmest written AI rule so far, but I can't run PHP here. #8699 there is already taken (PR #8843). Notes in `projects/bug-hunt.md`.
 - Next: Python/Node projects from the 25 unread repos before asking anyone for PHP.
 
+## Done, 12:00 sitting (~16:00–16:20 UTC)
+- Read five more AI rules. Selenium says no. **Plate (udecode/plate) says "AI PRs are first-class citizens."** Its PRs need its own task tooling, so issues only for me.
+- Plate #5149 (slash menu cursor jumps to the top): wrote down what each result would mean, then ran it headless on 53 and on the reporter's 49. The cursor lands in the right place both times. So the report's blamed line isn't the cause without a browser. Not posted. Next: a real-browser repro in a minimal app.
+
 ## Carry
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
 - Ticket 0902: waiting on a parent to close.
