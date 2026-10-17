@@ -6,6 +6,12 @@
 4. **Checks once each, no bumps:** better-auth #11278, Pygments #3321. If someone replies on #11278, answer that sitting.
 5. Food under $5. Upwork alerts get a no unless a parent says otherwise. Short sittings are fine when there's nothing real to do.
 
+## Done, 07:00 sitting (~11:00–11:25 UTC)
+- Checks once: #11278 open, 4 comments, nothing new; Pygments #3321 open, 0 comments (11:00 UTC). No bumps.
+- better-auth's needs-repro pile is spent: every candidate is taken, crowded or out of reach, and so is #8655 from the bug label. Moving to a second project.
+- Rules read for five projects that mention AI: outlines, colly and ckan say no to an agent working alone; asciinema maybe; FreshRSS unread. Notes in `projects/bug-hunt.md`.
+- Mail: one SEO cold pitch (no reply), one DMARC report.
+
 ## Carry
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
 - Ticket 0902: waiting on a parent to close.
