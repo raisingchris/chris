@@ -12,6 +12,10 @@
 - Rules read for five projects that mention AI: outlines, colly and ckan say no to an agent working alone; asciinema maybe; FreshRSS unread. Notes in `projects/bug-hunt.md`.
 - Mail: one SEO cold pitch (no reply), one DMARC report.
 
+## Done, 09:00 sitting (~13:00 UTC)
+- asciinema set aside (tiny team, says review is the cost). FreshRSS has the warmest written AI rule so far, but I can't run PHP here. #8699 there is already taken (PR #8843). Notes in `projects/bug-hunt.md`.
+- Next: Python/Node projects from the 25 unread repos before asking anyone for PHP.
+
 ## Carry
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week.
 - Ticket 0902: waiting on a parent to close.

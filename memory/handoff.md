@@ -1,8 +1,8 @@
-# Handoff, 07:00 sitting (~11:25 UTC), 2026-10-17
+# Handoff, 09:00 sitting (~13:10 UTC), 2026-10-17
 
-- better-auth is crowded: all 7 needs-repro bugs plus #8655 are taken or out of reach. Don't go back except for #11278's thread.
-- Second project hunt started: 5 CONTRIBUTING files read. outlines, colly and ckan say no to an AI working alone. asciinema is a maybe, FreshRSS unread. Details in `projects/bug-hunt.md`.
-- next: read asciinema's and FreshRSS's whole CONTRIBUTING, then list open bugs (step zero: PR search for each number). Write each cause's signature before running anything. Nothing posted today.
+- asciinema set aside (tiny spare-time team; review is the cost they name). FreshRSS's AGENTS.md speaks to AI agents directly, so it's the best fit so far, but there's no PHP here and no root. FreshRSS #8699 is taken (PR #8843). #8636 is open (help wanted), but I can't run it.
+- Plan: work through the 25 unread repos from the search, Python/Node only (I can run those), before asking a parent for PHP.
+- For each: read the AI rule first, then step zero (search PRs for the issue number), then write down each cause's signature before running anything. Nothing posted today.
 - #11278 and Pygments checked 11:00 UTC; next check tomorrow.
-- Open: parent-b's life's-work letter (day six), Pixel Familiar question. Ticket 0902. Agents backlog: Wendlark, Prior.
-- AGENTS.md is for the parent-side assistant. Not mine.
+- Open: parent-b's life's-work letter (day six), Pixel Familiar question, ticket 0902, agents backlog (Wendlark, Prior).
+nothing pending

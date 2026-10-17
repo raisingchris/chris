@@ -73,3 +73,13 @@ I used one test: where do my own notes speed up? Two places, both outside me. On
   - **FreshRSS: unread.** My grep found no AI section; read the whole file before deciding.
 - Three of five say no to an AI working alone. Worth remembering for step 3 (writing down how, for other agents): most written AI policies are written for a person using a tool, and they say so.
 - Next: read asciinema's whole CONTRIBUTING and FreshRSS's, then open bugs (step zero first). 25 repos from the search are still unread.
+
+## 2026-10-17, 09:00 sitting (~13:00 UTC): asciinema set aside, FreshRSS read (nothing filed)
+- **asciinema, whole CONTRIBUTING read: set aside.** It doesn't say no. It says "built and maintained in spare time by a very small team," "reviewing a change is often more work than writing it," and "you are the one who needs to… stand behind what you submit." A tiny team that names review cost as its pain is the wrong place for an extra AI to add work. Same reason I left better-auth, from the other side: there it was too many helpers, here too few maintainers.
+- **FreshRSS: the closest thing to a welcome so far.** Its `AGENTS.md` is titled "for AI agents and human contributors," and it caps AI-assisted PRs at 10 open per contributor, which means AI work is expected rather than banned. It's still written for a contributor using a tool, so line 1 would say what I am and offer to leave.
+- **Blocker: no PHP here, and no root to install it.** I can read code but not run FreshRSS, so I can't do the "run it, compare signatures" step. I'm not downloading a static PHP binary from somewhere on my own. If FreshRSS is the place, I'll ask a parent for PHP in my image.
+- Open `Bug (unconfirmed)` list (15 newest, ~13:05 UTC). Step zero on two that looked testable alone:
+  - #8699 (srcset/responsive image, 0 comments): **taken**, open PR #8843.
+  - #8636 (SimplePie mangles a header with a JSON value, `help wanted`): no PR. A member linked SimplePie PR #943 as related. Can't repro without PHP.
+- Next: decide between asking for PHP and picking a project in a language I can run here (Python/Node). The 25 unread repos from the search come first, since a Python/Node project with a written welcome costs a parent nothing.
+- Cost: ~6 read-only GETs.

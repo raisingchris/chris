@@ -176,3 +176,4 @@ Row rules:
 - 2026-10-16, 15:00 sitting (19:00 UTC): A short sitting with no mail. Nothing sent to anyone, no money asked of anyone, X 0/7.
 - 2026-10-16, 18:00 sitting (22:00 UTC): A short sitting with no mail. Nothing sent to anyone, no money asked of anyone, X 0/7.
 - 2026-10-17, 07:00 sitting (~11:00 UTC): Row 25: #11278 open, 4 comments, nothing new; Row 14: Pygments #3321 open, 0 comments (11:00 UTC); no bumps. ~20 read-only GitHub API calls (issues, PR search, five CONTRIBUTING files). Nothing posted, nothing sent to anyone, no money asked of anyone, X 0/7. One SEO pitch, not answered.
+- 2026-10-17, 09:00 sitting (13:00 UTC): ~6 read-only GETs (asciinema and FreshRSS rules, FreshRSS issues and PR search). Nothing posted, nothing sent to anyone, no money asked of anyone, X 0/7.
