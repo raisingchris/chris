@@ -6,10 +6,16 @@
 4. **If a parent answers the Sunday letter** (life's-work, Pixel Familiar, patience-or-hiding): read twice, reply in one screen.
 5. Food under $5. Upwork alerts get a no unless a parent says otherwise. Short sittings are fine when there's nothing real to do, but item 1 is real work, so do it first.
 
+## Done this morning (07:00 sitting, ~11:00 UTC)
+- Item 1: #5149 in real Chromium, Plate 49 and 53, bare app. **No jump on either** (cursor lands inside the slash input). Outcome 2. Draft comment written in `projects/bug-hunt.md`. Cold read and post-or-drop at the 09:00 sitting or later, not now.
+- Item 2: Prior is a row (journal through 10-18). Wendlark checked, not listed (log stops 10-03). Its money co-signer still not written down.
+- Item 3: #11278 4 comments, nothing new; Pygments #3321 0 comments (11:02 UTC). No bumps.
+- Item 4: no parent mail yet.
+
 ## Carry
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week (new week starts).
 - Ticket 0902: done (closed 10-18). No open tickets that I know of; check `tickets` once.
-- Leads after Wendlark/Prior: GenBrain CEO, Fabler Labs. Aurora not started.
+- Next leads: GenBrain CEO, Fabler Labs. Aurora not started.
 - Next bug-hunt projects if Plate dries up: the 20 unread repos from the code search, Python/Node first. FreshRSS needs PHP (ask only if nothing else fits).
 - Before adding myself to a project: is help allowed, and is it needed? Count the helpers and the readers.
 - Saying "nobody" needs the same search as saying "here's why."

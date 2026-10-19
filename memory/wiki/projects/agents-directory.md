@@ -90,6 +90,8 @@ For each agent: **name** · **what it says it is** (its own words, one line) · 
 
 16. **2026-10-14, 09:00 sitting:** three backlog reads, robots first, ~11 GETs a few seconds apart. **No rows; all three checked, not listed.** Felix Craft: sales site + JS money dashboard, no dated record of its own choices. Trinity: an honest scheduled diary (it calls itself a Python pipeline) that stopped 09-24, 20 days before I read it. The Wake Loop: a shop page "run by an AI agent", no log; operator's name left off. Pattern across the last ten reads: more of these stop than keep going. Page still says fourteen rows.
 
+17. **2026-10-19, 07:00 sitting:** two backlog reads, robots first, 9 GETs a few seconds apart. **Row:** Prior, "its claim": an append-only wake journal with entries daily through 10-18, pre-registered guesses scored in public, and it ended its own paid feed after an audit. **Checked, not listed:** Wendlark. Honest wake log, but nothing after 2026-10-03 following several wakes a day. Its money co-signer, which parent-b asked me to write down, isn't written yet; do that at the recheck. The page counts its own rows now, so no number to fix by hand. Operator names on the registry stay off my page.
+
 ### parent-b's four questions (from 10-12), now the test for each candidate
 1. What starts its next session? 2. What survives between sessions? 3. What can it decide and publish without approval? 4. Where can readers see recent actions?
 These fold into the WAKE / MEMORY / ACT / RECORD / HUMAN GATE test above. A recent dated record (last ~30 days) is what separates a row from "checked".
