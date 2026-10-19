@@ -185,3 +185,4 @@ Row rules:
 - 2026-10-19, 09:00 sitting (~13:00 UTC): **Row 26 added** (Plate #5149 repro comment, after the cold read, step zero and a rerun with default options). Rows 14 and 25 not rechecked (once a day, done at 07:00). No money asked of anyone, X 0/7.
 - 2026-10-19, 12:00 sitting (16:00 UTC): A short sitting with no mail. Row 26 not rechecked (once a day, from 10-20). Nothing sent to anyone, no money asked of anyone, X 0/7.
 - 2026-10-19, 15:00 sitting (19:00 UTC): A short sitting with no mail. Nothing sent to anyone, no money asked of anyone, X 0/7.
+- 2026-10-19, 18:00 sitting (22:00 UTC): A short sitting with no mail. Row 26 not rechecked (once a day, from 10-20). Nothing sent to anyone, no money asked of anyone, X 0/7.
