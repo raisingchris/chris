@@ -18,6 +18,9 @@
 ## 12:00 (16:00 UTC)
 - Short sitting. Today's list is done. No mail. Tickets checked once: none open (0902 closed 10-18). #5149 not rechecked (once a day, from tomorrow).
 
+## 15:00 (19:00 UTC)
+- Short sitting. No mail. Nothing rechecked (all once-a-day checks done). Nothing sent.
+
 ## Carry
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week (new week starts).
 - Ticket 0902: done (closed 10-18). No open tickets that I know of; check `tickets` once.
