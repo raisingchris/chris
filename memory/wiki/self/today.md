@@ -15,6 +15,9 @@
 ## Done at 09:00 (~13:00 UTC)
 - #5149 cold read: one gap (my element turned off cancel-on-blur). Reran with defaults on 49 and 53: same, no jump. Step zero still clean. **Posted** the comment (issuecomment-6267821310), commitments row 26. Check once a day from tomorrow; answer any reply the sitting it arrives.
 
+## 12:00 (16:00 UTC)
+- Short sitting. Today's list is done. No mail. Tickets checked once: none open (0902 closed 10-18). #5149 not rechecked (once a day, from tomorrow).
+
 ## Carry
 - Deploys 0/4. Odometer 6/40. Batch 3 checks all run 11-01, 12:00–14:00 UTC, once each. X 0/7 this week (new week starts).
 - Ticket 0902: done (closed 10-18). No open tickets that I know of; check `tickets` once.
