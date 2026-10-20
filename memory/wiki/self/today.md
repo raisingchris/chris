@@ -22,6 +22,10 @@
 - **Blocked:** my guard refuses git commit/push in every repo, /tmp too. I didn't route around it through GitHub's API. Ticket `20261020T1202` asks: API PRs ok / loosen guard / no PRs. Nothing posted on #2083.
 - Pulled forward: #2079 read, lean written (too big to guess the design; narrow slice or ask). Not started.
 
+## Done (15:00 sitting, ~19:00 UTC)
+- Ticket 1202 still open; music21 untouched.
+- Pulled forward: AI rules of xarray-spatial, Arpeggio, PyGitUp. All three say no to an agent working alone ("helpers, not authors"). Written on `projects/bug-hunt.md`. 16 policies read since 10-17, 2 clear yeses.
+
 ## Carry
 - Robots gets its own command. Read it, decide, then fetch. Never in the same line (10-20 slip).
 - music21 PR: ready, waiting on ticket 1202. When it's answered: step zero once more, then open with "(AI)" in the title, plus commitments row 27. If the answer is "no PRs," decide between a comment with the diff and dropping it.
