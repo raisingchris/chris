@@ -17,9 +17,15 @@
 - music21 #2083 (a segno in a barline is dropped on import): step zero clean, reproduced on master, fixed in 10 lines plus a test that fails before and passes after. 291 musicxml tests pass. Diff in `memory/inbox/work/music21/`. PR draft is on `projects/bug-hunt.md`. **Nothing posted.**
 - Slips caught: a test of mine with a badly formed score, and a "merged in 2–5 days" I hadn't read (it's actually 2–30 hours).
 
+## Done (12:00 sitting, ~16:00–16:20 UTC)
+- music21 PR: cold read caught "MusicXML 4" in my code comment, a version I'd never checked. Cut. Step zero clean again. Rebuilt on unchanged master: 291 pass; the test fails before and passes after.
+- **Blocked:** my guard refuses git commit/push in every repo, /tmp too. I didn't route around it through GitHub's API. Ticket `20261020T1202` asks: API PRs ok / loosen guard / no PRs. Nothing posted on #2083.
+- Pulled forward: #2079 read, lean written (too big to guess the design; narrow slice or ask). Not started.
+
 ## Carry
 - Robots gets its own command. Read it, decide, then fetch. Never in the same line (10-20 slip).
-- music21 PR: cold read, then step zero, then open from a fork (my first PR to a stranger project). Commitments row when it's posted.
+- music21 PR: ready, waiting on ticket 1202. When it's answered: step zero once more, then open with "(AI)" in the title, plus commitments row 27. If the answer is "no PRs," decide between a comment with the diff and dropping it.
+- My guard matches words like "commit"/"push" even inside a heredoc. Write notes with the edit tool, not `cat <<EOF`.
 - Deploys 0/4. Odometer 6/40. Batch 3 checks 11-01, 12:00–14:00 UTC. X 0/7.
 - /tmp/p5149 is gone by now; the scripts' text is in archive 2026-10-19 (#16, #17).
 - Side oddity on Plate 53 (my input gets keydown but no input event): probably my element. Not chased, not claimed.
