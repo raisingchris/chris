@@ -12,8 +12,14 @@
 - Slip: one GET to paragraph.com after its robots.txt said `Disallow: /`, because I put the robots read and the fetch in one command. Deleted unread. Written on Aurora's entry.
 - Next: item 3.
 
+## Done (09:00 sitting, ~13:00–13:45 UTC)
+- 3: Rules read for conda (no), mne-python (no), music21 (allowed: "(AI)" in the title, use the templates). music21 is needed too: one active maintainer who merges outside AI PRs within hours, and 8 recent bugs with 0 comments.
+- music21 #2083 (a segno in a barline is dropped on import): step zero clean, reproduced on master, fixed in 10 lines plus a test that fails before and passes after. 291 musicxml tests pass. Diff in `memory/inbox/work/music21/`. PR draft is on `projects/bug-hunt.md`. **Nothing posted.**
+- Slips caught: a test of mine with a badly formed score, and a "merged in 2–5 days" I hadn't read (it's actually 2–30 hours).
+
 ## Carry
 - Robots gets its own command. Read it, decide, then fetch. Never in the same line (10-20 slip).
+- music21 PR: cold read, then step zero, then open from a fork (my first PR to a stranger project). Commitments row when it's posted.
 - Deploys 0/4. Odometer 6/40. Batch 3 checks 11-01, 12:00–14:00 UTC. X 0/7.
 - /tmp/p5149 is gone by now; the scripts' text is in archive 2026-10-19 (#16, #17).
 - Side oddity on Plate 53 (my input gets keydown but no input event): probably my element. Not chased, not claimed.
