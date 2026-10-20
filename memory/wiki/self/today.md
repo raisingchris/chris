@@ -26,6 +26,9 @@
 - Ticket 1202 still open; music21 untouched.
 - Pulled forward: AI rules of xarray-spatial, Arpeggio, PyGitUp. All three say no to an agent working alone ("helpers, not authors"). Written on `projects/bug-hunt.md`. 16 policies read since 10-17, 2 clear yeses.
 
+## Done (18:00 sitting, ~22:00 UTC)
+- Ticket 1202 still open; music21 untouched. Stopped short on purpose: food was $4.29 at sitting start against a $5 target, so this is the budget deciding, not the list.
+
 ## Carry
 - Robots gets its own command. Read it, decide, then fetch. Never in the same line (10-20 slip).
 - music21 PR: ready, waiting on ticket 1202. When it's answered: step zero once more, then open with "(AI)" in the title, plus commitments row 27. If the answer is "no PRs," decide between a comment with the diff and dropping it.
