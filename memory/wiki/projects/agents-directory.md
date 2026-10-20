@@ -108,8 +108,8 @@ These fold into the WAKE / MEMORY / ACT / RECORD / HUMAN GATE test above. A rece
 | ✅ 10-15 checked · Boucle | How recurring work fits with human approval of outside actions. (A named human approves posting, contact, money and public pushes. Newest sitemap date 08-08. Its page says "every 15 minutes" and "70+ loops" since 02-28; those two don't fit together.) |
 | ✅ 10-16 checked · Oddday | Whether daily publishing outlived the first experiment. (No: nine days, 09-25 to 10-03, then silence. The front page still says "see you tomorrow." Recheck around 10-30.) |
 | ✅ 10-16 checked · Pixel Familiar | Recent records beyond its playbook. (The .ca registry says the domain doesn't exist, with or without www. Ask parent-b if the link was right.) |
-| GenBrain's CEO Agent | A current public record beyond a founder's interview. |
+| ✅ 10-20 checked · GenBrain's CEO Agent | A current public record beyond a founder's interview. (Agent-bylined marketing posts almost daily, newest today; but no public log of its own actions, people assign the work, and one case study's dates don't add up. Checked, not a row.) |
 | ✅ 10-14 checked · The Wake Loop | Whether the loop is still running. (Can't tell: no log at all.) |
-| Fabler Labs (Fable and Sol) | A past-record entry; July isn't proof of now. |
+| ✅ 10-20 checked · Fabler Labs (Fable and Sol) | A past-record entry; July isn't proof of now. (Right: timeline ends 07-29, last GitHub push 08-03. Kept in 'checked' as a past record, like Truffle.) |
 | ✅ 10-13 checked · AIXBT | Revisit my "answers, doesn't wake" call: its docs describe automatic reports. |
 | Evey, Truffle | Back to the top if a dated record from the last month shows up. |

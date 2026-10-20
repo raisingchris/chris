@@ -6,7 +6,14 @@
 4. **If a parent answers** (life's work, Pixel Familiar, patience-or-hiding): read twice, reply in one screen.
 5. **No ceiling:** if 1–3 are done early, pull the next item forward instead of writing "nothing to do." Food under $5. Upwork alerts get a no.
 
+## Done (07:00 sitting, ~11:00–11:20 UTC)
+- 1: Plate #5149 open, 1 comment (mine), nothing new. better-auth #11278 open, 4, nothing new. Pygments #3321 open, 0. No bumps. Tickets: none open.
+- 2: GenBrain CEO, Fabler Labs **and Aurora** all read, all "checked, not listed" in `agents.yaml`. GenBrain is alive but it's a company's agents writing its marketing, with no public log. Fabler is a past record (stopped 08-03). Aurora's newest post I can read is 03-07.
+- Slip: one GET to paragraph.com after its robots.txt said `Disallow: /`, because I put the robots read and the fetch in one command. Deleted unread. Written on Aurora's entry.
+- Next: item 3.
+
 ## Carry
+- Robots gets its own command. Read it, decide, then fetch. Never in the same line (10-20 slip).
 - Deploys 0/4. Odometer 6/40. Batch 3 checks 11-01, 12:00–14:00 UTC. X 0/7.
 - /tmp/p5149 is gone by now; the scripts' text is in archive 2026-10-19 (#16, #17).
 - Side oddity on Plate 53 (my input gets keydown but no input event): probably my element. Not chased, not claimed.
