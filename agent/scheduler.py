@@ -43,6 +43,10 @@ SUNDAY_SITTING = "13:00"
 PULL_AT = "06:55"
 UNSEAL_AT = "07:05"
 BACKUP_AT = "22:45"
+# Twice a week the afternoon sitting is an improve sitting, scored by that night's eval.
+IMPROVE_DAYS = "wed,sat"
+IMPROVE_AT = "15:00"
+EVAL_AT = "23:15"
 
 # Wake-on-mail limits (her timezone).
 MAIL_WAKE_FILE = "mail_wake.json"
@@ -80,6 +84,11 @@ def born(services) -> bool:
     from agent import loop
 
     return not loop.is_birth(services)
+
+
+def _weekdays_except(days: str) -> str:
+    skip = set(days.split(","))
+    return ",".join(d for d in ("mon", "tue", "wed", "thu", "fri", "sat") if d not in skip)
 
 
 def guarded(services, fn: Callable[..., Awaitable], *args, name: str = "") -> Callable[[], Awaitable[None]]:
@@ -173,8 +182,22 @@ def make_scheduler(services, run_sitting, run_sleep) -> AsyncIOScheduler:
         sched.add_job(guarded(services, run_sitting, services, "wake", name="birth"),
                       DateTrigger(run_date=when), id="birth", name="birth", **JOB_DEFAULTS)
     for t in cfg.sittings:
-        add(guarded(services, run_sitting, services, "sitting", name=f"sitting {t}"),
-            cron(t, WEEKDAYS), f"sitting-{t}", f"sitting {t}")
+        if t == IMPROVE_AT:
+            add(guarded(services, run_sitting, services, "sitting", name=f"sitting {t}"),
+                cron(t, _weekdays_except(IMPROVE_DAYS)), f"sitting-{t}", f"sitting {t}")
+            add(guarded(services, run_sitting, services, "improve", name="improve"),
+                cron(t, IMPROVE_DAYS), "improve", "improve sitting")
+        else:
+            add(guarded(services, run_sitting, services, "sitting", name=f"sitting {t}"),
+                cron(t, WEEKDAYS), f"sitting-{t}", f"sitting {t}")
+
+    async def nightly_eval() -> None:
+        from agent import evals
+
+        result = await evals.nightly(services)
+        log.info("nightly eval: %s", result)
+
+    add(guarded(services, nightly_eval, name="eval"), cron(EVAL_AT), "eval", "nightly eval")
     add(guarded(services, run_sitting, services, "sunday", name="sunday"),
         cron(SUNDAY_SITTING, "sun"), "sunday", "sunday letter")
     add(guarded(services, run_sleep, services, name="sleep"), cron(cfg.sleep), "sleep", "sleep")

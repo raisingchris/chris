@@ -25,7 +25,8 @@ RUN groupadd -g 1000 chris && useradd -m -u 1000 -g chris chris \
     && printf '%s\n' \
          "Defaults:brain umask_override" \
          "Defaults:brain umask=0002" \
-         "brain ALL=(chris) NOPASSWD:SETENV: /usr/local/bin/claude" > /etc/sudoers.d/brain \
+         "brain ALL=(chris) NOPASSWD:SETENV: /usr/local/bin/claude" \
+         "brain ALL=(chris) NOPASSWD: /usr/local/bin/chris-exec" > /etc/sudoers.d/brain \
     && chmod 0440 /etc/sudoers.d/brain
 
 WORKDIR /app
@@ -37,8 +38,13 @@ COPY agent ./agent
 COPY agentready ./agentready
 COPY site ./site
 COPY scripts ./scripts
+COPY evals ./evals
 # `.[dev]` pulls in pytest, so she can run her own test suite from her shell before asking for a deploy.
-RUN pip install --no-cache-dir ".[dev]" && chown -R root:root /app && chmod -R a+rX /app && chmod 755 /app/scripts/*.sh
+RUN pip install --no-cache-dir ".[dev]" uv && chown -R root:root /app && chmod -R a+rX /app && chmod 755 /app/scripts/*.sh
+# Her eval (agent/evals.py): per-task venvs and repos on the image's own disk, rebuilt lazily after a
+# deploy. Her repro scripts run as chris through chris-exec, never as the brain.
+RUN install -o root -g root -m 755 /app/scripts/chris-exec.sh /usr/local/bin/chris-exec \
+    && install -d -o brain -g chris -m 2755 /opt/evals
 
 # The GitHub CLI, from GitHub's own apt repo (https://cli.github.com/packages). Chris has no GitHub
 # token: `gh` runs unauthenticated, which is enough for public data (`gh api repos/<owner>/<repo>`,

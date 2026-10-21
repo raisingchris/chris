@@ -98,6 +98,7 @@ class Services:
     dataforseo_meter: Meter | None = None  # weekly DataForSEO spend
     dataforseo: Any = None  # DataForSEO proxy, or None when no credential is configured
     x_meter: Meter | None = None  # weekly count of posted tweets
+    eval_meter: Meter | None = None  # weekly spend on her eval (agent/evals.py), apart from food
     moltbook: Any = None  # Moltbook client; the key it holds is written at registration, never in env
     x: Any = None  # XClient (post to X via Typefully), or None when no key is configured
     google: Any = None  # GoogleWIF, or None when the provider/SA are not configured
@@ -121,6 +122,8 @@ class Services:
             m["dataforseo"] = self.dataforseo_meter
         if self.x_meter is not None:
             m["x"] = self.x_meter
+        if self.eval_meter is not None:
+            m["evals"] = self.eval_meter
         return m
 
     def birthday(self) -> date:
@@ -221,6 +224,7 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
     council_meter = Meter("council", "week", cfg.state_dir, tz=cfg.tz)
     dataforseo_meter = Meter("dataforseo", "week", cfg.state_dir, tz=cfg.tz)
     x_meter = Meter("x", "week", cfg.state_dir, tz=cfg.tz)
+    eval_meter = Meter("evals", "week", cfg.state_dir, tz=cfg.tz)
 
     handles = list(cfg.parent_handles) + ["parent-a", "parent-b"][len(cfg.parent_handles):]
     parents = {handles[0]: cfg.parent_a_email, handles[1]: cfg.parent_b_email}
@@ -305,6 +309,7 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
         dataforseo_meter=dataforseo_meter,
         dataforseo=dataforseo,
         x_meter=x_meter,
+        eval_meter=eval_meter,
         x=x,
         google=google,
         ga4_property=secrets.ga4_property_id,

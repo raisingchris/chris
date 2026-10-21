@@ -11,7 +11,7 @@ ENV_KEYS = (
     "CHRIS_EMAIL", "PARENT_HANDLES", "CHRIS_DRY_RUN", "REDACT_CANARIES", "CHRIS_MODEL",
     "STRIPE_WEBHOOK_SECRET", "CHRIS_BIRTHDAY", "MAX_TURNS", "SLEEP_MAX_TURNS", "DATAFORSEO_WEEKLY_USD",
     "X_WEEKLY_CAP", "CONTINUATION_MINUTES", "CONTINUATIONS_PER_DAY", "SELF_DEPLOY_PER_DAY",
-    "OWNER_ALIASES", "EXPLORE_UNTIL_USD",
+    "OWNER_ALIASES", "EXPLORE_UNTIL_USD", "EVAL_USD_WEEK", "EVAL_TASK_USD",
 )
 
 _TRUE = {"1", "true", "yes", "on"}
@@ -52,6 +52,9 @@ class Config:
     # A sitting that ends with nothing pending is followed by an "explore" sitting while the day's
     # food is under this. The parents want her to do more, not to stop early (2026-10-21).
     explore_until_usd: float = 10.0
+    # Her eval (agent/evals.py) has its own weekly meter, apart from food.
+    eval_usd_week: float = 30.0
+    eval_task_usd: float = 1.5
     # Addresses on her domain that belong to her parents as account owners (e.g. the owner login for a
     # service that needs a human to claim her). Mail to these goes to the parents, never to her inbox.
     owner_aliases: list[str] = field(default_factory=lambda: ["owner@raisingchris.com"])
@@ -88,6 +91,8 @@ class Config:
             continuations_per_day=int(g("CONTINUATIONS_PER_DAY", "12")),
             self_deploy_per_day=int(g("SELF_DEPLOY_PER_DAY", "4")),
             explore_until_usd=float(g("EXPLORE_UNTIL_USD", "10")),
+            eval_usd_week=float(g("EVAL_USD_WEEK", "30")),
+            eval_task_usd=float(g("EVAL_TASK_USD", "1.5")),
             owner_aliases=[a.lower() for a in _csv(g("OWNER_ALIASES", "owner@raisingchris.com"))],
         )
 

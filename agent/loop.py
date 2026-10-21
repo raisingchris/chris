@@ -17,12 +17,12 @@ from agent.paths import UnsafePath, safe_path
 log = logging.getLogger("chris.loop")
 
 PROMPTS = Path(__file__).parent / "prompts"
-KINDS = ("birth", "wake", "sitting", "sunday", "mail", "upwork", "continue", "explore")
+KINDS = ("birth", "wake", "sitting", "sunday", "mail", "upwork", "continue", "explore", "improve")
 # wake, mail, upwork and continue use the sitting prompt; same shape of work, just first of the
 # day / woken by mail / woken by an Upwork change / picking up where the last one left off.
 PROMPT_FILE = {"birth": "birth.md", "wake": "sitting.md", "sitting": "sitting.md", "sunday": "sunday.md",
                "mail": "sitting.md", "upwork": "sitting.md", "continue": "sitting.md",
-               "explore": "sitting.md"}
+               "explore": "sitting.md", "improve": "improve.md"}
 # One line the loop puts above the prompt file for some kinds (the prompt files stay generic).
 KIND_HEADER = {
     "mail": "You were woken by new mail.",
@@ -237,6 +237,8 @@ async def run_sitting(services, kind: str = "sitting", query_fn=None, git_run=No
     if failure is None:
         pending = handoff_has_pending(_rread(services, repo / "memory" / "handoff.md"))
         archive.append("sitting_pending", {"kind": "sitting_pending", "pending": pending})
+        if kind == "improve":
+            _request_eval(services)
         if pending:
             _request_continuation(services)
         elif kind != "birth" and _spent(services) < float(getattr(cfg, "explore_until_usd", 0) or 0):
@@ -246,6 +248,16 @@ async def run_sitting(services, kind: str = "sitting", query_fn=None, git_run=No
     # sitting (handoff written, work pushed), never mid-thought. No-op when nothing is queued.
     deploy.self_deploy_dispatch(services, git_run=run)
     return result
+
+
+def _request_eval(services) -> None:
+    """An improve sitting's craft is scored tonight; never raises."""
+    try:
+        from agent import evals
+
+        evals.request(services, "improve sitting")
+    except Exception as exc:  # noqa: BLE001
+        log.warning("eval request failed: %s", exc)
 
 
 def _spent(services) -> float:

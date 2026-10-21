@@ -49,6 +49,14 @@ PROTECTED_PATHS = (
     "tests/test_guards.py",
     "tests/test_redaction.py",
     "tests/test_invariants.py",
+    # Her eval and the gate on her craft: a grader she could rewrite would grade nothing (2026-10-21).
+    "agent/evals.py",
+    "agent/craft.py",
+    "evals/",
+    "tests/test_evals.py",
+    "tests/test_craft.py",
+    "scripts/chris-exec.sh",
+    "Dockerfile",
 )
 
 STATE_FILE = "self_deploy.json"
