@@ -286,7 +286,8 @@ async def test_request_continuation_adds_one_off_job_and_counts(services, calls)
     assert read_continuation_state(services.cfg.state_dir) == {"day": "2026-09-07", "count": 1}
     assert continuations_today(services.cfg.state_dir, _mon(11, 5)) == 1
     assert continuations_today(services.cfg.state_dir, _mon(11, 5).replace(day=8)) == 0
-    assert services.archive.entries[-1][1] == {"kind": "continuation", "at": "2026-09-07T11:00:00-04:00", "n_today": 1}
+    assert services.archive.entries[-1][1] == {"kind": "continuation", "at": "2026-09-07T11:00:00-04:00", "n_today": 1,
+                                                 "sitting_kind": "continue"}
 
     # over the soft cap → skipped and archived
     services.meters["inference"]._spent = 30.0

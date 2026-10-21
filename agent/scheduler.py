@@ -531,8 +531,10 @@ def _spent_today(services) -> float:
         return 0.0
 
 
-def request_continuation(services, sched, run_sitting=None, now: datetime | None = None) -> tuple[bool, str]:
-    """Called by the loop when a sitting ends with work pending in the handoff.
+def request_continuation(services, sched, run_sitting=None, now: datetime | None = None,
+                         kind: str = "continue") -> tuple[bool, str]:
+    """Called by the loop when a sitting ends with work pending in the handoff (``kind="continue"``),
+    or ends early with nothing pending while food is left (``kind="explore"``).
 
     If ``continuation_decision`` allows it, adds (or replaces) the one-off ``continuation``
     job ``cfg.continuation_minutes`` out and counts it in ``continuation.json``;
@@ -563,11 +565,11 @@ def request_continuation(services, sched, run_sitting=None, now: datetime | None
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"day": today, "count": count + 1}, indent=1))
     when = now + timedelta(minutes=int(getattr(cfg, "continuation_minutes", 30)))
-    sched.add_job(guarded(services, run_sitting, services, "continue", name="continuation"),
+    sched.add_job(guarded(services, run_sitting, services, kind, name="continuation"),
                   DateTrigger(run_date=when), id="continuation", name="continuation", replace_existing=True,
                   **JOB_DEFAULTS)
     services.archive.append("continuation", {"kind": "continuation", "at": when.isoformat(timespec="seconds"),
-                                             "n_today": count + 1})
+                                             "n_today": count + 1, "sitting_kind": kind})
     return True, "ok"
 
 

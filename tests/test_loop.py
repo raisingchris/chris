@@ -215,23 +215,31 @@ async def test_sitting_end_requests_continuation_when_pending(services, repo, mo
     seen = []
     real = scheduler_module.request_continuation
 
-    def spy(svc, sched, run_sitting=None, now=None):
-        seen.append(sched)
-        return real(svc, sched, run_sitting=run_sitting,
+    def spy(svc, sched, run_sitting=None, now=None, kind="continue"):
+        seen.append((sched, kind))
+        return real(svc, sched, run_sitting=run_sitting, kind=kind,
                     now=datetime(2026, 9, 7, 10, 30, tzinfo=ZoneInfo(services.cfg.tz)))
 
     monkeypatch.setattr(scheduler_module, "request_continuation", spy)
 
-    # no pending work → archived as not pending, scheduler untouched
+    # no pending work and the day's food already past the explore line → scheduler untouched
     (repo / "memory/handoff.md").write_text("All done. nothing pending\n")
+    monkeypatch.setattr(loop, "_spent", lambda svc: 50.0)
     await loop.run_sitting(services, "sitting", query_fn=fake_messages(), git_run=FakeGit())
     assert '"pending": false' in archive_text(services)
     assert seen == [] and fs.jobs == []
 
+    # no pending work with food left → an explore sitting 30 minutes out
+    monkeypatch.setattr(loop, "_spent", lambda svc: 1.0)
+    await loop.run_sitting(services, "sitting", query_fn=fake_messages(), git_run=FakeGit())
+    assert seen == [(fs, "explore")]
+    assert '"sitting_kind": "explore"' in archive_text(services)
+
     # pending work → the loop asks the scheduler for a continuation 30 minutes out
+    seen.clear()
     (repo / "memory/handoff.md").write_text("Next: finish the sitemap.\n")
     await loop.run_sitting(services, "sitting", query_fn=fake_messages(), git_run=FakeGit())
-    assert seen == [fs]
+    assert seen == [(fs, "continue")]
     fn, trigger, kw = fs.jobs[-1]
     assert kw["id"] == "continuation"
     assert trigger.run_date == datetime(2026, 9, 7, 11, 0, tzinfo=ZoneInfo(services.cfg.tz))

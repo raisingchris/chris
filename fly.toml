@@ -10,11 +10,12 @@ primary_region = "iad"
   STATE_DIR = "/data/state"
   TZ = "America/New_York"
   SITTINGS = "09:00,12:00,15:00,18:00"
-  SOFT_USD = "25"
-  HARD_USD = "40"
+  SOFT_USD = "15"
+  HARD_USD = "25"
   MAX_TURNS = "150"
   CONTINUATION_MINUTES = "30"
   CONTINUATIONS_PER_DAY = "12"
+  EXPLORE_UNTIL_USD = "10"
 
 [http_service]
   internal_port = 8080
