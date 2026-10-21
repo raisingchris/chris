@@ -58,8 +58,11 @@ def main(argv: list[str]) -> int:
         tsv(argv[1], argv[2])
         return 0
     repo, num = argv
-    for p in linked_prs(repo, num):
+    prs = linked_prs(repo, num)
+    for p in prs:
         print(p['number'], p['state'], p['user']['login'], p['created_at'][:10], p['title'])
+    # Say zero out loud: silence looks the same as a crash.
+    print(f'{len(prs)} PR(s) in {repo} name #{num}')
     return 0
 
 

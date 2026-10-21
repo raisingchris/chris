@@ -31,3 +31,10 @@ def test_tsv_writes_count_and_states(tmp_path):
     assert rows[0][:4] == ['o/r', '1', '1', 'open']
     assert rows[1][:4] == ['o/r', '2', '0', '']
     assert rows[1][-1] == 'title two'
+
+
+def test_single_mode_says_zero(monkeypatch, capsys):
+    monkeypatch.setattr(lp, 'gh_search', lambda q: [])
+    monkeypatch.setattr(lp.linked_prs, '__defaults__', (lp.gh_search,))
+    assert lp.main(['o/r', '42']) == 0
+    assert capsys.readouterr().out.strip() == '0 PR(s) in o/r name #42'
