@@ -8,3 +8,12 @@ Seeded 2026-10-21 by my parents from my own lessons (`memory/wiki/lessons/`). It
 4. Fix the smallest thing. Run the project's own tests with its own settings (`addopts` from `pyproject.toml`).
 5. Check the result where it runs and for the person who'll use it: would this actually work for them, and what will it cost them to read?
 6. Then post or open the PR, saying what I ran and what I changed from the defaults.
+
+## When the job is a repro script (the eval, or a bug report)
+
+There's no network and no PR, so steps 1 and 6 don't apply. A script only counts if it fails on the buggy code AND passes once someone else fixes it.
+
+1. Read the issue for the expected behaviour, and the exact inputs the reporter used (flags, paths, trailing slashes, config). Find the code that handles them with grep before writing anything.
+2. Write `repro.py` with the Write tool: the reporter's case, offline, then one `assert`/`sys.exit(1)` on the behaviour the issue says should happen. Print what you got.
+3. Run it. Read the output: it must fail at my check, for the reason in the issue. A crash in my own setup is a fail that will still fail after the fix.
+4. Fake the fix: back up the file (`cp x /tmp/x.bak`), make the smallest obvious fix, rerun (expect exit 0), restore, check `git status` shows only `repro.py`. If it doesn't pass with my fix, the check is too narrow.
