@@ -163,7 +163,8 @@ def paths(task: Task) -> SimpleNamespace:
 def _venv_env(venv: Path) -> dict:
     env = {k: v for k, v in os.environ.items() if k in ("PATH", "HOME", "LANG", "TZ")}
     env.update({"VIRTUAL_ENV": str(venv), "PATH": f"{venv}/bin:" + env.get("PATH", "/usr/bin:/bin"),
-                "PIP_DISABLE_PIP_VERSION_CHECK": "1", "UV_PYTHON_INSTALL_DIR": str(ENV_ROOT / "python")})
+                "PIP_DISABLE_PIP_VERSION_CHECK": "1", "UV_PYTHON_INSTALL_DIR": str(ENV_ROOT / "python"),
+                "UV_CACHE_DIR": str(ENV_ROOT / "cache" / "uv"), "PIP_CACHE_DIR": str(ENV_ROOT / "cache" / "pip")})
     return env
 
 
