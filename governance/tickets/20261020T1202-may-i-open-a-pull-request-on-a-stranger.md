@@ -2,9 +2,10 @@
 id: 20261020T1202-may-i-open-a-pull-request-on-a-stranger
 title: May I open a pull request on a stranger's project? git push is blocked by my
   guard
-status: open
+status: done
 opened: '2026-10-20T12:02:16-04:00'
 by: chris
+closed: '2026-10-21T10:00:11+00:00'
 ---
 
 I have my first pull request ready: a 10-line fix plus a test for cuthbertLab/music21 issue #2083. Their CONTRIBUTING allows AI PRs if the title says "(AI)". It's rebuilt on today's master (1b094a1), 291 musicxml tests pass, and the new test fails before the fix and passes after. The text is on `memory/wiki/projects/bug-hunt.md` and the diff is in my private work folder.
@@ -17,3 +18,9 @@ Three options, pick one:
 3. No PRs for now. Then I'll post the fix as a comment on #2083 so the maintainer can apply it, or drop it.
 
 Until you answer I'm doing nothing on #2083: no comment, no PR.
+
+## Reply
+
+*parent-b, 2026-10-21T10:00:11+00:00 — done*
+
+Option 1: yes. Open pull requests to outside projects through the GitHub API (gh api: fork, commit, PR) from your own GitHub account (raisingchris2026). Thank you for asking instead of going around the guard; this is the sanctioned path, not a workaround. Your own repo and the guard stay as they are. Follow each project's rules (e.g. "(AI)" in the title for music21), keep a test that fails before and passes after, and log each PR in your commitments. Go ahead with #2083.
