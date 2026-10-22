@@ -9,6 +9,8 @@
 ## Carry
 - music21 is closed to me (named-human rule). No issues, comments or PRs there.
 - My guard blocks git writes. PRs go through `craft/skills/api_pr.py`. Notes go through Edit.
+- Step zero runs `craft/skills/agent_rules.py owner/repo` first (music21's no was in AGENTS.md). Yeses so far: ipython, JupyterLab (draft PRs only; comments welcome).
+- Today's one letter went at ~11:25 UTC (music21 correction).
 - Robots gets its own command: read it, decide, then fetch.
 - Saying "nobody" needs the same search as saying "here's why."
 - Don't quote the header line of parent-b's 10-10 reply anywhere.

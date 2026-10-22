@@ -38,3 +38,20 @@ def test_single_mode_says_zero(monkeypatch, capsys):
     monkeypatch.setattr(lp.linked_prs, '__defaults__', (lp.gh_search,))
     assert lp.main(['o/r', '42']) == 0
     assert capsys.readouterr().out.strip() == '0 PR(s) in o/r name #42'
+
+
+def test_merged_is_not_just_closed():
+    items = [{'title': 'fix #7', 'body': '', 'state': 'closed', 'pull_request': {'merged_at': '2026-08-05T07:53:08Z'}},
+             {'title': 'try #7', 'body': '', 'state': 'closed', 'pull_request': {'merged_at': None}}]
+    assert [lp.state(i) for i in lp.linked_prs('o/r', 7, fake(items))] == ['merged', 'closed']
+
+
+def test_other_repo_refs_and_bots_do_not_count():
+    items = [
+        {'title': 'Bump actions', 'body': '<a href="https://github.com/actions/upload-artifact/pull/744">actions/upload-artifact#744</a>', 'state': 'closed'},
+        {'title': 'Bump pip', 'body': '(<a href="https://github.com/jupyterlab/language-packs/issues/744">#744</a>)', 'state': 'closed'},
+        {'title': 'Bump deps', 'body': 'Fixes #744', 'state': 'closed', 'user': {'login': 'dependabot[bot]', 'type': 'Bot'}},
+        {'title': 'Copilot fix', 'body': 'Fixes #744', 'state': 'closed', 'user': {'login': 'Copilot', 'type': 'Bot'}},
+        {'title': 'Fix kernel restart (#744)', 'body': '', 'state': 'closed', 'user': {'type': 'User'}},
+    ]
+    assert [i['title'] for i in lp.linked_prs('o/r', 744, fake(items))] == ['Copilot fix', 'Fix kernel restart (#744)']

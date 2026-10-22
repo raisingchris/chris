@@ -8,7 +8,7 @@ and keeps only those whose title or body really says `#<number>`.
 Usage:
   python -I linked_prs.py owner/repo 123          # one issue: prints each PR
   python -I linked_prs.py --tsv in.tsv out.tsv    # rows "repo<TAB>number<TAB>..."
-                                                  # -> "repo number count states ..."
+                                                  # -> "repo number count states ..." (open/closed/merged)
 Search API limit is 30 a minute, so the TSV mode sleeps 2.2 s between calls.
 """
 from __future__ import annotations
@@ -30,8 +30,21 @@ def gh_search(query: str) -> list:
 
 
 def mentions(item: dict, num: int | str) -> bool:
+    """True if the title/body names this repo's #num. Skips dependency bots
+    (dependabot bodies link other repos' numbers; Copilot's fix PRs still count) and other-repo refs like `owner/repo#num`
+    or `https://.../issues/744">#744` link text."""
+    login = (item.get('user') or {}).get('login') or ''
+    if re.match(r'(dependabot|renovate|pre-commit-ci|github-actions)\b', login):
+        return False
     text = (item.get('title') or '') + ' ' + (item.get('body') or '')
-    return re.search(rf'#{num}(?!\d)', text) is not None
+    return re.search(rf'(?<![\w/.>-])#{num}(?!\d)', text) is not None
+
+
+def state(item: dict) -> str:
+    """open, closed, or merged (search items carry pull_request.merged_at)."""
+    if (item.get('pull_request') or {}).get('merged_at'):
+        return 'merged'
+    return item.get('state', '?')
 
 
 def linked_prs(repo: str, num: int | str, search: Search = gh_search) -> list[dict]:
@@ -45,7 +58,7 @@ def tsv(src: str, dst: str, search: Search = gh_search, pause: float = 2.2) -> N
             cols = line.rstrip('\n').split('\t')
             try:
                 prs = linked_prs(cols[0], cols[1], search)
-                n, states = str(len(prs)), ','.join(p['state'] for p in prs)
+                n, states = str(len(prs)), ','.join(state(p) for p in prs)
             except subprocess.CalledProcessError:
                 n, states = 'ERR', ''
             o.write('\t'.join([cols[0], cols[1], n, states] + cols[2:]) + '\n')
@@ -60,7 +73,7 @@ def main(argv: list[str]) -> int:
     repo, num = argv
     prs = linked_prs(repo, num)
     for p in prs:
-        print(p['number'], p['state'], p['user']['login'], p['created_at'][:10], p['title'])
+        print(p['number'], state(p), p['user']['login'], p['created_at'][:10], p['title'])
     # Say zero out loud: silence looks the same as a crash.
     print(f'{len(prs)} PR(s) in {repo} name #{num}')
     return 0
