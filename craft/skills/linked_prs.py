@@ -8,7 +8,8 @@ and keeps only those whose title or body really says `#<number>`.
 Usage:
   python -I linked_prs.py owner/repo 123          # one issue: prints each PR
   python -I linked_prs.py --tsv in.tsv out.tsv    # rows "repo<TAB>number<TAB>..."
-                                                  # -> "repo number count states ..." (open/closed/merged)
+                                                  # -> "repo number count states fixes ..." (open/closed/merged;
+                                                  #    fixes = how many say "Fixes #n", the rest only mention it)
 Search API limit is 30 a minute, so the TSV mode sleeps 2.2 s between calls.
 """
 from __future__ import annotations
@@ -40,6 +41,18 @@ def mentions(item: dict, num: int | str) -> bool:
     return re.search(rf'(?<![\w/.>-])#{num}(?!\d)', text) is not None
 
 
+CLOSING = r'(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)'
+
+
+def claim(item: dict, num: int | str) -> str:
+    """'fixes' if a closing word sits right before #num ("Fixes #319", "closes: #319"),
+    else 'mentions'. ipykernel #781 said "possibly related to ... #319" and fixed a
+    different code path; a mention is a lead to read, not a fix."""
+    text = (item.get('title') or '') + ' ' + (item.get('body') or '')
+    pat = rf'\b{CLOSING}:?\s+#{num}(?!\d)'
+    return 'fixes' if re.search(pat, text, re.IGNORECASE) else 'mentions'
+
+
 def state(item: dict) -> str:
     """open, closed, or merged (search items carry pull_request.merged_at)."""
     if (item.get('pull_request') or {}).get('merged_at'):
@@ -59,9 +72,10 @@ def tsv(src: str, dst: str, search: Search = gh_search, pause: float = 2.2) -> N
             try:
                 prs = linked_prs(cols[0], cols[1], search)
                 n, states = str(len(prs)), ','.join(state(p) for p in prs)
+                fixes = str(sum(claim(p, cols[1]) == 'fixes' for p in prs))
             except subprocess.CalledProcessError:
-                n, states = 'ERR', ''
-            o.write('\t'.join([cols[0], cols[1], n, states] + cols[2:]) + '\n')
+                n, states, fixes = 'ERR', '', ''
+            o.write('\t'.join([cols[0], cols[1], n, states, fixes] + cols[2:]) + '\n')
             o.flush()
             time.sleep(pause)
 
@@ -73,7 +87,7 @@ def main(argv: list[str]) -> int:
     repo, num = argv
     prs = linked_prs(repo, num)
     for p in prs:
-        print(p['number'], state(p), p['user']['login'], p['created_at'][:10], p['title'])
+        print(p['number'], state(p), claim(p, num), p['user']['login'], p['created_at'][:10], p['title'])
     # Say zero out loud: silence looks the same as a crash.
     print(f'{len(prs)} PR(s) in {repo} name #{num}')
     return 0
