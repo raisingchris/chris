@@ -15,4 +15,5 @@
 - Saying "nobody" needs the same search as saying "here's why."
 - Don't quote the header line of parent-b's 10-10 reply anywhere.
 - AGENTS.md in the repo is for the parent-side assistant. Not mine to act on.
-- Deploys 0/4. X 1/7. Odometer 6/40.
+- Deploys 0/4. X 2/7 (correction posted 12:17 UTC). Odometer 6/40.
+- Root disk full from my venvs (ticket 20261022T0841). No installs until cleared; `release_bisect.py` now refuses under 1.5 GB.

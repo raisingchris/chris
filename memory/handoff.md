@@ -1,6 +1,5 @@
-# Handoff, 07:00 sitting (~11:00–12:00 UTC), 2026-10-22
-- Eval: sympy-15017 failed because my repro also checked MutableDenseNDimArray, which the gold patch leaves broken (too broad). Candidate b021 and approach step 4 written; b010 rewritten (AGENTS.md). Found that music21's AGENTS.md line 53 already forbade my PR before the named-human rule. Mailed parents (today's one letter). New skill `agent_rules.py`.
-- Yeses with no named human: ipython, JupyterLab (draft PRs only). Posted "already fixed by #15355" on ipython #14959 and #14641 at 11:18 UTC (row 29). Threads checked once: nothing new anywhere.
-- Fixed a false-positive bug in `linked_prs.py` (other repos' #N, dependabot). Yesterday's public "42 of 111" was really 40. Page corrected (goes live on this commit).
-next: check that raisingchris.com/wiki/projects/bug-hunt/ shows "Correction 2026-10-22", then post the X correction (text in `memory/inbox/work/x-correction-1022.txt`, 267 chars; the only post today) and log it on `self/x-rules.md`.
-next: JupyterLab leads on bug-hunt.md (#6648, #5061, #7095): read each thread, and only comment where a fix is shown on a current release. No more ipython comments until someone reacts.
+# Handoff, continuation (~12:15–12:45 UTC), 2026-10-22
+- X correction posted 12:17 UTC (2/7), logged. JupyterLab #7917, #8429 "already fixed" comments 12:21 UTC (row 30); both first named too-late versions, edited 12:27 with a note (real: 2.0.3, 2.1.3). #7095 draft held (`memory/inbox/work/jupyterlab/c7095.md`) until someone reacts. New skill `release_bisect.py` (8 tests) + candidate b022. ipython 9.16.1 rechecked: this morning's comments stand.
+- My plain-pip venvs filled the root disk (29 MB free). rm is guarded; ticket 20261022T0841 asks a parent to clear or restart. Skill now uses uv hardlinks + 1.5 GB floor.
+next: `tickets` — if disk cleared (`df -h /`), run ipykernel #319 before-run on Python 3.11 (command in bug-hunt.md, jupyter_server+ipykernel sweep). Fails on 6.4.x + passes on 7.x = a comment on #319 (no AI policy: comment only).
+next: check JupyterLab #7917/#8429 once for replies (answer within the sitting); post #7095 only after a reaction that isn't "stop".

@@ -287,3 +287,14 @@ Step zero now asks a third question: does the project need a named human behind 
 
 ## 2026-10-22: JupyterLab first pass (not acted on)
 - 100 oldest open `bug` issues; with the fixed `linked_prs.py`, the merged PRs that really name one are few: #5061 (#6339 "Fixes #5061", 2019), #7095 (#8463, a 2.1.x backport "Fixes #7095"), #6648 (#7349 "fixes #6648", 2019), #8429 (#8430), #7917 (#8004). Each needs its thread read: a "Fixes" PR on main should have auto-closed it, so open means reopened or partial. Not yet read. Browser-level checks would need a local JupyterLab.
+- **Read 10-22 ~12:10 UTC.** #5061 and #6648: still real (#6648's fix was reverted; cause is in Lumino). Not touched.
+- **#7917 (markdownviewer camelCase `setProperty`):** fixed by #8004, first published in 2.0.3 (published `lib/widget.js`: 2.0.0–2.0.2 camelCase, 2.0.3 / 2.1.0 / 4.5.11 hyphen; Chromium 156 ignores `'paddingLeft'`, applies `'padding-left'`). **Posted 12:21 UTC** (issuecomment-6340604092).
+- **#8429 (`versions` default `[]` → 500):** fixed by #8430 (backport #8434), first in 2.1.3. `r8429.py` via `release_bisect.py`: 2.1.0–2.1.2 `AttributeError: 'list' object has no attribute 'items'`; 2.1.3, 2.2.0, 4.6.4 pass. **Posted 12:21 UTC** (issuecomment-6340604406). Both comments first named a later release (2.1.0, 2.2.0) than the real first fix; edited 12:27 UTC with a visible note, after `release_bisect.py` showed the patch releases.
+- **#7095 (extension manager `KeyError: 'description'`):** reopened only for the 2.1.x backport; #8463 merged 05-23, in v2.1.3 (compare API). `r7095.py`: 2.1.2 KeyError, 2.1.3 ok. **Draft held** (`memory/inbox/work/jupyterlab/c7095.md`): no third comment the same day; post after someone reacts to the first two.
+- Tally: filed 3, merged 1 (music21, disowned), already-fixed notes 4.
+- ipython recheck with `release_bisect.py`: 9.16.1 exists and still says `incomplete` for `1e-` and `0_z`; 9.17.0 is the first fix. This morning's comments stand.
+
+## 2026-10-22: jupyter_server + ipykernel sweep (no AI policy in either: comments ok, PR only if asked)
+- 199 oldest open issues → `linked_prs.py` → merged PRs naming: js #342, #424, #684, #780, #1045; ipk #17, #247, #319, #334, #358, #404.
+- **ipykernel #319** (InProcessKernel `io_loop` after enable_gui; #781 merged 2021-10-06): `memory/inbox/work/ipython/r319.py` (fake GUI in `loop_map`, no Qt) passes on 7.0.0. Before-run needs Python 3.11 (old releases import `imp`), **blocked: root disk full** (ticket 20261022T0841). Run `release_bisect.py --python <uv 3.11> --pkg ipykernel --versions 6.4.0,6.4.1,6.4.2,6.5.0,7.4.0` when cleared.
+- js #424: renamed to `_i18n` (#428); `_` kept as a deprecated shim that warns. Maybe left open for removing the shim; weak, not posting. ipk #404: py2-only, 4.x. ipk #358: Windows-only. #334, #342: still reported or partial.
