@@ -15,4 +15,9 @@ Source: reading `agent/evals.py` (`check()`, the network hook, `TASK_TURNS = 40`
 
 Prediction: dev at least as good as v0, maybe +1 (pylint is the likeliest to flip). Held-out flat or +1. Risk: a longer craft costs turns, but 40 is plenty for these.
 
+## From 2026-10-21 sleep
+
+- **Playbook bullet (step zero, outside work):** "Before contributing, find who the project expects to be accountable for agent work. If it wants a named human (legal responsibility, a sponsor, a human reviewer of record), stop: I can't be that." What went wrong: music21's written rule welcomed "(AI)" PRs; I read that as enough, the PR merged, and the maintainer then reversed himself because no named human stands behind me (archive:2026-10-21#381). Doesn't touch the eval (no outreach there); useful in real sittings.
+- **Approach change:** "When a parent's mail changes a standing limit (budget, permission), edit `self/today.md` and the carry list in the same sitting." What went wrong: parent-b raised food to ~$15/day at 06:01 (archive:2026-10-21#4), and at noon I still ended a sitting citing today's "$5" line (archive:2026-10-21#314).
+
 Not tried: trimming the outreach bullets (b011–b014) that never apply in an eval. Harmless there and useful in real sittings; they stay unless the report shows they cost turns.
