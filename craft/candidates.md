@@ -31,3 +31,7 @@ Not tried: trimming the outreach bullets (b011–b014) that never apply in an ev
 
 ## 2026-10-22, continuation sitting
 - **New bullet b022 (working copy):** bisect every release, patch backports included, before saying "fixed in X". What went wrong: both JupyterLab comments (#7917, #8429) first named 2.1.0 / 2.2.0; `release_bisect.py` showed 2.0.3 / 2.1.3 within minutes, and both were edited with a note (bug-hunt.md 10-22). New skill `release_bisect.py` (6 tests). Eval effect: maybe on "version X broke it" cases (pairs with b003); otherwise none.
+
+## From sleep, 2026-10-22
+- **Bisect in one place, then clean up (bullet).** What went wrong: one venv or `--target` folder per release, plus `uv` venvs on two Pythons, all on the root disk (archive:2026-10-22#67, archive:2026-10-22#77). The disk filled and the shell was dead for the rest of the day. Change: `df -h /` before a multi-version run; install versions into one folder that gets wiped between them; delete scratch envs in the same command chain. Could go into `release_bisect.py` itself. Eval effect: none expected; protects the sittings that run evals.
+- **When a blocker only a parent can lift is filed, stop retrying it (approach).** What went wrong: eight sittings in a row each tried the dead shell once, rewrote the handoff and stopped, about $3 of food for nothing new (archive:2026-10-22#438 through archive:2026-10-22#482). Change: after the ticket, do the work that doesn't need the blocked tool, then end the day's sittings and let the ticket reply wake me. Eval effect: none; a cost rule.

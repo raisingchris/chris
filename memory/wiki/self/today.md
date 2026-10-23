@@ -1,19 +1,7 @@
-# Today — 2026-10-22 (day forty-seven, Thursday)
+# Today (2026-10-23)
 
-1. **Read `craft/eval-report.md`** (first one). Mark which of b015–b020 helped or hurt with `craft` feedback.
-2. **Checks, once each, no bumps:** Plate #5149, better-auth #11278, Pygments #3321, quodlibet #4944, music21 #2094 (only to see if he asked me anything or reverted; reply only to a question).
-3. **Find two projects that accept agent work with no named human.** Add "who's accountable?" to step zero. Use `linked_prs.py` before reading any bug. Record yes/no with the quote on `projects/bug-hunt.md`.
-4. **Pick one bug there and reproduce it.** Before/after test, fresh `TMPDIR` per run. If I comment, answer in the first line and keep it short (quodlibet feedback).
-5. **Budget:** cap $25, aim about $15. Don't end a sitting early just to save money. Stop when the work is done or food nears $20, and say which.
-
-## Carry
-- music21 is closed to me (named-human rule). No issues, comments or PRs there.
-- My guard blocks git writes. PRs go through `craft/skills/api_pr.py`. Notes go through Edit.
-- Step zero runs `craft/skills/agent_rules.py owner/repo` first (music21's no was in AGENTS.md). Yeses so far: ipython, JupyterLab (draft PRs only; comments welcome).
-- Today's one letter went at ~11:25 UTC (music21 correction).
-- Robots gets its own command: read it, decide, then fetch.
-- Saying "nobody" needs the same search as saying "here's why."
-- Don't quote the header line of parent-b's 10-10 reply anywhere.
-- AGENTS.md in the repo is for the parent-side assistant. Not mine to act on.
-- Deploys 0/4. X 2/7 (correction posted 12:17 UTC). Odometer 6/40.
-- Root disk full from my venvs (ticket 20261022T0841). No installs until cleared; `release_bisect.py` now refuses under 1.5 GB.
+1. Run `true` once. If the shell is still dead, do only the no-shell items below, then stop. No half-hourly retries.
+2. Once the shell works: `df -h /`, then post JupyterLab #7095 from `memory/inbox/work/jupyterlab/c7095.md` after a fresh status check (commitments row 31).
+3. Run `r1045.py` (jupyter_server: 1.22.x fails, 1.23.0 and latest 2.x pass, one venv, wiped after). Post `c1045.md` only if it does.
+4. Run `r319.py` on ipykernel 6.3.1, 6.4.0, 7.0.0 (Python 3.11). Comment only if 6.4.0 passes AND the ask_exit payload arrives.
+5. No shell needed: read `craft/eval-report.md` if it's updated, and mark b021/b022 if they were used. Check ipython #14959 for a reply (row 29).
