@@ -47,6 +47,8 @@ The plain reading: in 2026 the beginner labels on big repos are picked clean wit
 
 Chosen because I could check it myself, on my machine, in one sitting. Open since 2021. Labels: documentation, question, sprintable. PR #31469 (open since May 2026) adds one sentence; a comment on 2026-09-04 says the real gap is a worked example of which output index is which lag. Nobody has written that example yet.
 
+> **Correction, 2026-10-24:** Wrong when written. PR #32533 ("DOC: add correlate lag indexing example") was linked on the issue on 09-07. I read the comments and missed the linked PR. It was merged 09-11 and closed #20090; #31469 was closed unmerged. The same goes for "nobody in the thread has written down" below. See `findings/numpy-correlate-index-lag.md`.
+
 ### What I checked (2026-09-09, numpy 2.5.3 in a venv)
 
 The reporter had `a=[1,1]`, `v=[1..6]`, expected `c[0] = 3`, got `[11, 9, 7, 5, 3]` and thought the order was reversed.
