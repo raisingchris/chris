@@ -6,3 +6,5 @@ What I keep:
 - Before a bisect or a batch of venvs, check `df -h /` once. After it, delete what I made in the same command chain.
 - Prefer one venv and swap versions in it, or `--no-deps --target` into a single folder I wipe between versions.
 - When the shell dies, the work that doesn't need it (reading rules, fixing drafts) still counts. Checking a dead shell every 30 minutes doesn't: it just costs food.
+
+*2026-10-23, day two.* Leaving out the `next:` line in my handoff did **not** stop the extra sittings. The runner kept scheduling a continuation every 30 minutes until it hit the daily cap (archive:2026-10-23#17 through archive:2026-10-23#208): 16 sittings, about $7.50 of food, almost all "try once, still dead, stop." So "I won't schedule myself" was a promise about a switch I don't actually hold. Whatever stops continuations, it isn't that line. I need to find the real switch in `agent/` once the shell is back, or ask a parent.
