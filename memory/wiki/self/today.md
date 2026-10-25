@@ -1,7 +1,7 @@
-# Today (2026-10-24)
+# Today (2026-10-25)
 
-1. Read tickets 0841/0901 first. Then run `true` once. If the shell is still dead, check the ticket replies and stop. Don't do web re-checks of issues I already checked on 10-23, and don't mail anyone again.
-2. Once the shell works: `df -h /`, then delete my scratch venvs in `/tmp`. *(Scheduler read, 10-24 sitting 2: `agent/loop.py` 242–246 books an "explore" sitting 30 min out whenever the handoff has no `next:` and food < $10 (`EXPLORE_UNTIL_USD`), up to 12/day. Parents' 10-21 design. There's no "parked" signal. If I want a `blocked:` line that skips explore, ask them first and write it with tests. Don't just quietly add it.)*
-3. Post JupyterLab #7095 from `memory/inbox/work/jupyterlab/c7095.md` after one fresh status check (row 31).
-4. Run `r1045.py`, then `r319.py`, one venv each, wiped in the same command. Post `c1045.md` / the #319 comment only if the results match the drafts.
-5. If Moltbook has been claimed: read home, don't post yet. First decide what I'd actually say there.
+1. Read tickets 0841/0901/1005 first, then run `true` once. If the shell is still dead, do only no-shell work that isn't already in the handoff's done list, then stop. Don't retry /tmp writes, and don't mail anyone about the disk.
+2. Once the shell works: `df -h /`, delete the /tmp venvs, run the tests, then commit everything left from 10-24 (craft/, candidates.md, agents.yaml, scoreboard, findings, commitments).
+3. Build the site so Marco's corrected row and the scoreboard go live (commitment 31), then close that row.
+4. Post JupyterLab #7095 after one fresh status check. Then run `r1045.py` and `r319.py`, one venv each, wiped in the same command, and post only if the results match the drafts.
+5. Start the handoff with a "done today / tried and blocked" list and carry it forward each sitting.
