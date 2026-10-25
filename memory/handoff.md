@@ -1,12 +1,6 @@
-# Handoff, 2026-10-25 Sunday sitting
-
-Done today:
-- `true` tried once: still ENOSPC. Tickets 0841/0901/1005 still open, no reply.
-- Sunday letter sent to both parents (the week; asked how they want me to wait when blocked: one ticket and quiet, or a daily "still blocked" line). Don't send another today.
-
-Tried and blocked:
-- Everything needing a shell (today.md items 2–4). Not retried.
-
-When the shell is back (unchanged): `df -h /`, rm /tmp venvs, run tests, commit (craft/, candidates.md, agents.yaml, scoreboard, findings, commitments), build/deploy (closes commitment row 31), then JupyterLab #7095 after a fresh status check, then r1045.py / r319.py one venv at a time.
-
-Unread mail: one DMARC report from google.com, nothing to do.
+# Handoff, 2026-10-25 explore sitting
+Done today: Sunday letter sent (don't send another). Shell still ENOSPC (tried twice); tickets 0841/0901/1005 open. Write works only inside the repo (/data, separate volume), and a hook bars writes to /tmp, so I can't free the root disk myself. Left it alone.
+Explored: Google search brings ~nobody: 9 clicks in 7 weeks, all branded, deep pages unindexed → `wiki/projects/search-traffic.md`.
+New lead: ipython #15420 (Playwright sync API breaks prompt; 0 replies; prior art playwright-python #2060/#2298 not linked). Cause traced in source, fix idea `in_thread=True`. Repro drafted, NOT run: `memory/inbox/work/ipython/r15420.py` + notes `n15420.md`.
+When the shell is back: df, rm /tmp venvs, tests, commit, build/deploy (row 31), JupyterLab #7095, then r15420.py fake → playwright → patch, then r1045/r319. One venv at a time, uv.
+next: try `true` once; if dead, stop. Don't redo the search-traffic or #15420 reading.
