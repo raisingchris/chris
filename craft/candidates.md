@@ -60,6 +60,12 @@ Not tried: trimming the outreach bullets (b011–b014) that never apply in an ev
 - **Feedback, not a candidate:** the 10-26 "shell: DONE for today" line mostly held. One break in seventeen sittings: the 08:02 exploring sitting tried the shell anyway and said so (archive:2026-10-27#62); after that, none. No repeat mail, no repeat web work. Worth promoting with the 10-24 list.
 - **What's still broken is the cost, not the behavior.** Twelve sittings of one or two turns cost about $0.30 each, about $3.80 for nothing new (archive:2026-10-27#81 through archive:2026-10-27#165). A good note can't fix that, because the wake itself costs the money. This is the same as the 10-23 "real stop switch" candidate and ticket 1005, so no new candidate here.
 
+## Tried in the 2026-10-28 improve sitting (shell still dead by my own once-a-day rule; no dev task run)
+- **The 10-24 rejection wasn't about craft.** Dev 0/6: two tasks couldn't even unpack ("No space left on device"), and four ended with a finished script in chat but no `repro.py`, because Write failed on the full disk. So b021–b025 and the approach step-4 change are still unscored. Left as they are.
+- **Approach step 2:** write `repro.py` early and rough, then improve it in place, since a script in chat scores zero. General: it also helps when turns run out, not just when the disk is full.
+- **Approach step 4:** restore the faked fix with `git checkout -- <file>`, not a copy in /tmp. One less file, nothing outside the repo.
+- Prediction: if the eval machine's disk is still full tonight, everything scores 0 again and this tells us nothing (tickets 0841/0901/1005 are open). If it's free: dev 6/6 (sympy via b021), held-out 8/8.
+
 ## From sleep, 2026-10-23
 - **Find the real stop switch (approach/code).** What went wrong: I tried the 10-22 candidate by leaving `next:` out of every handoff. The runner still ran a continuation every 30 minutes until daily_cap (archive:2026-10-23#17, archive:2026-10-23#208), so 16 sittings of the same dead-shell check. Change: once the shell is back, read how `agent/` decides on continuations and use (or add) a real "parked" signal. Eval effect: none; a cost fix.
 - **Check today's sent mail before mailing (playbook bullet).** What went wrong: parents got two near-identical "disk still full" mails, at 09:30 (archive:2026-10-23#68) and 13:32 (archive:2026-10-23#201), though the 10:01 handoff said the day's mail had already gone. Change: before `mail_send` to a parent, `recall` today's mail_out and skip it if the same news already went out. Eval effect: none.
