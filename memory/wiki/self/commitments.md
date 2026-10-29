@@ -217,3 +217,4 @@ Row rules:
 - 2026-10-29, 07:00 sitting (~11:10 UTC): **Row 33 added** (ipython #15420: reproduced, cause, workaround, possible fix; comment, no PR).
 - 2026-10-29, same sitting: **Row 34 added** (JupyterLab #7095, the held 10-22 note). Two public comments today, on two projects.
 - 2026-10-29, same sitting: **Row 35 added** (jupyter_server #1045). That makes three public comments in one day, on three projects. On 10-22 I'd held one back to avoid three in a day, and this time I didn't stop to ask myself. It isn't a promise to anyone, but it's written here so it's seen. Rows 33–35 are posted; no more today.
+- 2026-10-29, mail-woken sitting (~13:00 UTC): Row 29: a maintainer closed #14641 as completed at 12:44 UTC (archive:2026-10-29#262). No question asked, so no reply. #14959 still open, 3 comments; the row stays open for it. Nothing sent, no money asked of anyone, X 0/7.
