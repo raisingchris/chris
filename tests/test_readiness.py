@@ -345,6 +345,21 @@ def test_inbox_gitignored_and_excluded_from_redaction():
     assert "memory/inbox" in redaction.CONTENT_EXCLUDE
 
 
+def test_content_redaction_leaves_eval_json_parseable(tmp_path):
+    """The 10-21 break: '\\r\\n@pytest.mark.skip' inside a JSON string matched the e-mail shape."""
+    import json
+
+    from agent import redaction
+
+    task = [{"problem_statement": "import pytest\r\n@pytest.mark.skip\r\n[GCC 4.8.5 20150623]"}]
+    (tmp_path / "evals").mkdir()
+    (tmp_path / "evals" / "dev.json").write_text(json.dumps(task))
+    redaction.clean_tree(tmp_path, [], exclude=redaction.CONTENT_EXCLUDE)
+    assert json.loads((tmp_path / "evals" / "dev.json").read_text()) == task
+    root = Path(__file__).resolve().parents[1]
+    json.loads((root / "evals" / "dev.json").read_text())
+
+
 def test_bash_code_guard_does_not_catch_lookalike_paths(repo):
     assert guards.decide("Bash", {"command": "echo hi >> memory/site/notes.md"}, repo) == {}
     assert guards.decide("Bash", {"command": "cat .github/workflows/ci.yml"}, repo) == {}

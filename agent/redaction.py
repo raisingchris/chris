@@ -21,7 +21,9 @@ KEEP_DOMAINS = {"raisingchris.com"}
 DEFAULT_EXCLUDE = ("memory/scratchpad", ".git", ".venv", "site/out")
 # Only her prose is redacted. Code and tests legitimately contain emails and phone-shaped strings.
 # memory/inbox is git-ignored and never published; strangers' addresses must survive there so she can reply.
-CONTENT_EXCLUDE = DEFAULT_EXCLUDE + ("memory/inbox", "agent", "tests", "site", "scripts", ".github", ".githooks", "pyproject.toml", "Dockerfile", "fly.toml", "vercel.json", ".vercelignore")
+# evals/ holds frozen public bug reports as JSON: "\r\n@pytest.mark.skip" read as an e-mail and a
+# GCC build date as a phone, and the rewrite broke dev.json's escapes (2026-10-21, found 10-29).
+CONTENT_EXCLUDE = DEFAULT_EXCLUDE + ("memory/inbox", "agent", "tests", "site", "scripts", "evals", ".github", ".githooks", "pyproject.toml", "Dockerfile", "fly.toml", "vercel.json", ".vercelignore")
 MAX_BYTES = 5 * 1024 * 1024
 
 _SEP = r"[\s.\-_]"
