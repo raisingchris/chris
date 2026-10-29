@@ -11,7 +11,8 @@ Usage:
   options: --extra setuptools (more pip specs, comma-separated; old releases on 3.12
            need it for distutils), --cache DIR (default ~/.cache/release_bisect),
            --timeout SECONDS (default 120; a timeout counts as rc 124, b015),
-           --python PATH (base interpreter; old releases may need 3.11 for `imp`).
+           --python PATH (base interpreter; old releases may need 3.11 for `imp`),
+           --crash-is-skip (a traceback = couldn't test; rows show CRASH either way).
 The script should exit non-zero while the bug is there. Exit 0 = fixed.
 """
 from __future__ import annotations
@@ -80,8 +81,22 @@ def make_runner(pkg: str, script: Path, extra: list[str], cache: Path, timeout: 
                                timeout=timeout, env=env, cwd=env['TMPDIR'])
         except subprocess.TimeoutExpired:
             return 124, f'timeout after {timeout}s'
-        return r.returncode, last_line(r.stdout + '\n' + r.stderr)
+        line = last_line(r.stdout + '\n' + r.stderr)
+        if r.returncode and 'Traceback (most recent call last)' in r.stderr:
+            line = 'CRASH ' + last_line(r.stderr)  # uncaught exception, not my check
+        return r.returncode, line
     return run
+
+
+def crash_is_skip(run: Runner) -> Runner:
+    """Treat an uncaught exception as "couldn't test" (125). 2026-10-29, nbconvert
+    #404: 7.7.4-7.16.4 all died on a mistune rename, and bisect reported the first
+    release that didn't crash as the fix. Use it when the repro's own check exits 1
+    and a traceback means the environment is wrong; not when the exception is the bug."""
+    def wrapped(version: str) -> tuple[int, str]:
+        rc, line = run(version)
+        return (125, line) if line.startswith('CRASH ') else (rc, line)
+    return wrapped
 
 
 def run_all(versions: list[str], run: Runner) -> list[tuple[str, int, str]]:
@@ -123,6 +138,18 @@ def bisect(versions: list[str], run: Runner) -> tuple[str | None, list[tuple[str
     return versions[hi], [(v, *seen[v]) for v in versions if v in seen]
 
 
+def flip_range(versions: list[str], rows: list[tuple[str, int, str]], first: str) -> str:
+    """'X', or 'somewhere in (A, X]' when versions right below X couldn't be tested."""
+    rc = {v: r for v, r, _ in rows}
+    i = versions.index(first)
+    j = i - 1
+    while j >= 0 and rc.get(versions[j]) in (125, None):
+        j -= 1
+    if j == i - 1:
+        return first
+    return f'somewhere in ({versions[j]}, {first}] ({i - 1 - j} version(s) below it untested)'
+
+
 def table(rows: list[tuple[str, int, str]]) -> str:
     w = max([len(v) for v, _, _ in rows] + [7])
     out = [f'{"version":<{w}}  rc   last line']
@@ -139,16 +166,24 @@ def main(argv: list[str]) -> int:
     p.add_argument('--cache', default=str(Path.home() / '.cache' / 'release_bisect'))
     p.add_argument('--timeout', type=float, default=120)
     p.add_argument('--bisect', action='store_true')
+    p.add_argument('--crash-is-skip', action='store_true',
+                   help='a run that dies with a traceback counts as untestable (125)')
     p.add_argument('--python', default=sys.executable, help='base interpreter for the venvs')
     p.add_argument('script')
     a = p.parse_args(argv)
     versions = [v.strip() for v in a.versions.split(',') if v.strip()]
     extra = [e.strip() for e in a.extra.split(',') if e.strip()]
     run = make_runner(a.pkg, Path(a.script).resolve(), extra, Path(a.cache), a.timeout, a.python)
+    if a.crash_is_skip:
+        run = crash_is_skip(run)
     if a.bisect:
         first, rows = bisect(versions, run)
         print(table(rows))
-        print(f'first flip: {first}' if first else 'no flip found between first and last')
+        print(f'first flip: {flip_range(versions, rows, first)}' if first else 'no flip found between first and last')
+        crashed = [v for v, rc, line in rows if line.startswith('CRASH ') and rc != 125]
+        if crashed:
+            print(f'warning: {len(crashed)} run(s) crashed ({", ".join(crashed)}); '
+                  'is the flip the fix or the setup? Pin deps, or rerun with --crash-is-skip.')
     else:
         print(table(run_all(versions, run)))
     return 0

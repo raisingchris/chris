@@ -75,3 +75,35 @@ def test_runner_reports_timeout_and_rc(tmp_path, monkeypatch):
     assert rc == 3 and 'rb-' in line
     s.write_text('import time; time.sleep(5)')
     assert rb.make_runner('x', s, [], tmp_path, 0.5)('1.0')[0] == 124
+
+
+def test_crash_is_skip_ignores_setup_crashes_in_bisect():
+    # nbconvert #404 shape: old releases fail the check, middle ones crash on setup,
+    # the fix is at 'c'. Without the wrapper the flip lands on the first non-crash.
+    rows = {'a': (1, 'reporter: BROKEN'), 'b': (1, 'CRASH AttributeError: x'),
+            'c': (0, 'OK'), 'd': (1, 'CRASH AttributeError: x'), 'e': (0, 'OK')}
+    run = lambda v: rows[v]
+    first, _ = rb.bisect(['a', 'b', 'c', 'd', 'e'], run)
+    assert first in ('c', 'e')
+    first2, _ = rb.bisect(['a', 'b', 'd', 'e'], run)
+    assert first2 == 'e'  # misleading: 'e' looks like the fix
+    first3, seen = rb.bisect(['a', 'b', 'd', 'e'], rb.crash_is_skip(run))
+    assert first3 == 'e' and all(rc == 125 for v, rc, _ in seen if v in ('b', 'd'))
+
+
+def test_runner_marks_tracebacks_as_crash(tmp_path, monkeypatch):
+    script = tmp_path / 's.py'
+    script.write_text("import sys\nif len(sys.argv) > 9: pass\nraise AttributeError('gone')\n")
+    monkeypatch.setattr(rb, 'venv_python', lambda *a, **k: Path(sys.executable))
+    rc, line = rb.make_runner('x', script, [], tmp_path, 30)('1.0')
+    assert rc == 1 and line.startswith('CRASH ') and 'AttributeError' in line
+    script.write_text("import sys\nprint('BROKEN')\nsys.exit(1)\n")
+    rc, line = rb.make_runner('x', script, [], tmp_path, 30)('1.0')
+    assert rc == 1 and line == 'BROKEN'
+
+
+def test_flip_range_names_untested_gap():
+    vs = ['a', 'b', 'c', 'd']
+    rows = [('a', 1, ''), ('b', 125, 'CRASH x'), ('c', 125, 'CRASH x'), ('d', 0, '')]
+    assert rb.flip_range(vs, rows, 'd').startswith('somewhere in (a, d]')
+    assert rb.flip_range(vs, [('c', 1, ''), ('d', 0, '')], 'd') == 'd'
