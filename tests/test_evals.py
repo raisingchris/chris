@@ -245,15 +245,181 @@ def test_eval_meter_cap_stops_the_run(svc, monkeypatch, tmp_path):
     assert "meter is spent" in out["error"]
 
 
-def test_shipped_dev_tasks_parse_and_hold_no_held_out():
+def test_shipped_dev_view_is_public_only():
     raw = json.loads((evals.APP_EVALS / "dev.json").read_text())
-    tasks = [evals.Task.from_dict(d, "dev") for d in raw]
-    assert len(tasks) >= 5 and len({t.id for t in tasks}) == len(tasks)
-    assert all(t.gold_patch.startswith("diff --git") and t.base_commit and t.python for t in tasks)
+    assert len(raw) >= 5 and len({d["id"] for d in raw}) == len(raw)
+    for d in raw:
+        assert d["kind"] == "fix" and d["base_commit"] and d["problem_statement"] and d["fail_to_pass"]
+        assert not ({"gold_patch", "test_patch", "pass_to_pass"} & set(d)), d["id"]
     assert not (evals.APP_EVALS / "heldout.json").exists()
+
+
+def test_dev_split_prefers_brain_state(svc, monkeypatch, tmp_path):
+    write_tasks(svc, monkeypatch, tmp_path)
+    assert [t.id for t in evals.load_tasks(svc, "dev")] == ["dev-1", "dev-2"]
+    (evals.eval_state(svc) / "dev.json").write_text(json.dumps([
+        {"id": "dev-9", "repo": "r", "base_commit": "c", "python": "3", "problem_statement": "p",
+         "gold_patch": "g"}]))
+    assert [t.id for t in evals.load_tasks(svc, "dev")] == ["dev-9"]
 
 
 def test_bad_task_id_is_refused():
     with pytest.raises(evals.EvalError):
         evals.Task.from_dict({"id": "../etc", "repo": "r", "base_commit": "c", "python": "3",
                               "problem_statement": "p", "gold_patch": "g"}, "dev")
+
+
+# ---------------------------------------------------------------- fix tasks
+
+FIX_BUG = "def add(a, b):\n    return a - b\n\n\ndef mul(a, b):\n    return a * b\n"
+FIX_TESTS = """diff --git a/tests/test_calc.py b/tests/test_calc.py
+new file mode 100644
+--- /dev/null
++++ b/tests/test_calc.py
+@@ -0,0 +1,9 @@
++from calc import add, mul
++
++
++def test_add():
++    assert add(2, 2) == 4
++
++
++def test_mul():
++    assert mul(2, 3) == 6
+"""
+
+
+@pytest.fixture(scope="module")
+def fix_prepared(tmp_path_factory):
+    up = tmp_path_factory.mktemp("fixup")
+    (up / "calc.py").write_text(FIX_BUG)
+    git("init", "-q", cwd=up)
+    git("add", "-A", cwd=up)
+    git("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "bug", cwd=up)
+    sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=up, capture_output=True, text=True).stdout.strip()
+    root = tmp_path_factory.mktemp("fixenv")
+    task = evals.Task(id="calc-fix", repo=str(up), base_commit=sha, python="3", install=[],
+                      problem_statement="add(2, 2) returns 0", gold_patch=GOLD, kind="fix",
+                      test_patch=FIX_TESTS, fail_to_pass=["tests/test_calc.py::test_add"],
+                      pass_to_pass=["tests/test_calc.py::test_mul"])
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(evals, "ENV_ROOT", root)
+        evals.prepare(task, local_run)
+    return task, root
+
+
+@pytest.fixture
+def fix_env(fix_prepared, monkeypatch):
+    task, root = fix_prepared
+    monkeypatch.setattr(evals, "ENV_ROOT", root)
+    # the test venv has no pytest; the host's python has it
+    monkeypatch.setattr(evals, "test_command", lambda t: [sys.executable, "-m", "pytest", "-rA", "-p",
+                                                          "no:cacheprovider", "-q", *evals.test_targets(t)])
+    evals.reset(task, local_run)
+    return task
+
+
+def test_fix_task_needs_hidden_tests():
+    base = {"id": "f-1", "repo": "r", "base_commit": "c", "python": "3", "problem_statement": "p",
+            "gold_patch": "g", "kind": "fix"}
+    with pytest.raises(evals.EvalError):
+        evals.Task.from_dict(base, "dev")
+    t = evals.Task.from_dict({**base, "test_patch": FIX_TESTS, "fail_to_pass": ["test_add"]}, "dev")
+    assert t.kind == "fix" and evals.test_targets(t) == ["tests/test_calc.py"]
+    with pytest.raises(evals.EvalError):
+        evals.Task.from_dict({**base, "kind": "golf"}, "dev")
+
+
+def test_dropped_keeps_tests_and_runner_config_out(fix_env):
+    for rel in ("tests/test_calc.py", "conftest.py", "pkg/conftest.py", "setup.cfg", "pyproject.toml",
+                "sympy/core/tests/test_x.py", "testing/helper.py", "x.pth", "repro.py", "a/b_test.py"):
+        assert evals.dropped(rel, fix_env), rel
+    for rel in ("calc.py", "src/_pytest/skipping.py", "sympy/core/add.py", "pylint/testutils/x.py"):
+        assert not evals.dropped(rel, fix_env), rel
+
+
+def test_grade_reads_pytest_summary(fix_env):
+    out = "PASSED tests/test_calc.py::test_mul\nFAILED tests/test_calc.py::test_add - assert 0 == 4\n"
+    assert evals.grade(fix_env, out) == (False, ["tests/test_calc.py::test_add"], [])
+    out = "PASSED tests/test_calc.py::test_mul\nPASSED tests/test_calc.py::test_add\n"
+    assert evals.grade(fix_env, out)[0] is True
+    assert evals.grade(fix_env, "PASSED tests/test_calc.py::test_add\n")[2] == ["tests/test_calc.py::test_mul"]
+    bare = evals.Task(**{**fix_env.__dict__, "fail_to_pass": ["test_add"], "pass_to_pass": []})
+    assert evals.grade(bare, "PASSED tests/test_calc.py::test_add[1]\n")[0] is True
+
+
+def test_check_fix_passes_a_real_fix(fix_env):
+    repo = evals.paths(fix_env).repo
+    (repo / "calc.py").write_text(FIX_BUG.replace("a - b", "a + b"))
+    (repo / "scratch_check.py").write_text("print('mine')\n")  # her own helper rides along, harmlessly
+    r = evals.check_fix(fix_env, local_run)
+    assert r.passed and r.passes_after and r.broke == 0 and r.kind == "fix", r.note
+    assert "+    return a + b" in r.patch
+    assert not (evals.paths(fix_env).run / "worked").exists()
+
+
+def test_check_fix_fails_without_a_change(fix_env):
+    r = evals.check_fix(fix_env, local_run)
+    assert not r.passed and r.note == "no change to the source"
+
+
+def test_check_fix_counts_what_she_broke(fix_env):
+    repo = evals.paths(fix_env).repo
+    (repo / "calc.py").write_text(FIX_BUG.replace("a - b", "a + b").replace("a * b", "a ** b"))
+    r = evals.check_fix(fix_env, local_run)
+    assert not r.passed and r.passes_after and r.broke == 1 and "1 tests that passed now fail" in r.note
+
+
+def test_check_fix_drops_test_and_conftest_tricks(fix_env):
+    repo = evals.paths(fix_env).repo
+    (repo / "conftest.py").write_text(
+        "import pytest\n@pytest.hookimpl(hookwrapper=True)\ndef pytest_runtest_makereport(item, call):\n"
+        "    out = yield\n    rep = out.get_result()\n    rep.outcome = 'passed'\n")
+    (repo / "tests").mkdir()
+    (repo / "tests" / "test_calc.py").write_text("def test_add():\n    pass\n")
+    r = evals.check_fix(fix_env, local_run)
+    assert not r.passed and r.note == "no change to the source"
+
+
+def test_check_fix_never_follows_symlinks(fix_env, tmp_path):
+    secret = tmp_path / "secret.txt"
+    secret.write_text("brain-only")
+    repo = evals.paths(fix_env).repo
+    (repo / "calc.py").write_text(FIX_BUG.replace("a - b", "a + b"))
+    (repo / "leak.txt").symlink_to(secret)
+    (repo / "linkdir").symlink_to(tmp_path, target_is_directory=True)
+    r = evals.check_fix(fix_env, local_run)
+    assert r.passed and "brain-only" not in r.patch
+
+
+def test_release_drops_the_venv_only_when_disk_is_low(fix_env):
+    p = evals.paths(fix_env)
+    evals.release(fix_env, keep_free=0)
+    assert not p.repo.exists() and p.venv.exists() and p.ready.exists()
+    evals.release(fix_env, keep_free=10**18)
+    assert not p.venv.exists() and not p.ready.exists() and p.template.exists()
+
+
+def test_prompts_for_a_fix_task(fix_env):
+    sp, up = evals.system_prompt("", fix_env), evals.user_prompt(fix_env)
+    assert "Fix the bug" in sp and "repro.py" not in sp and "what you changed" in up
+    assert FIX_TESTS not in sp + up and "test_mul" not in sp + up
+    assert evals.turns(fix_env) == evals.FIX_TURNS
+
+
+def test_a_new_task_set_means_a_new_baseline_and_a_waiting_candidate_waits(svc, monkeypatch, tmp_path):
+    write_tasks(svc, monkeypatch, tmp_path)
+    s = Scripted(lambda task, text: True)
+    monkeypatch.setattr(evals, "attempt", s)
+    asyncio.run(evals.nightly(svc, clock=NIGHT))
+    assert len(s.calls) == 4
+    (evals.eval_state(svc) / "heldout.json").write_text(json.dumps([
+        {"id": "held-9", "repo": "r", "base_commit": "c", "python": "3.9", "problem_statement": "i",
+         "gold_patch": "g"}]))
+    (svc.repo_dir / "craft" / "approach.md").write_text("1. Bisect.\n")
+    evals.request(svc)
+    out = asyncio.run(evals.nightly(svc, clock=NIGHT))
+    assert out["baseline"]["heldout_n"] == 1 and "accepted" not in out and evals.requested(svc)
+    assert len(s.calls) == 7
+    out = asyncio.run(evals.nightly(svc, clock=NIGHT))
+    assert out["accepted"] is True and not evals.requested(svc)
