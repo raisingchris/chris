@@ -172,12 +172,13 @@ class SuiteResult:
 
 
 def eval_state(services) -> Path:
-    """Brain-only: a folder `chris` can write is a folder where she could swap the held-out tasks."""
+    """Brain-only: from a folder `chris` could write she could swap the held-out tasks, and from one she
+    could read she'd see their results (results.jsonl holds held-out ids, diffs and transcripts)."""
     p = Path(services.state_dir) / "evals"
     p.mkdir(parents=True, exist_ok=True)
     try:
-        if p.stat().st_mode & 0o022:
-            p.chmod(0o750)
+        if p.stat().st_mode & 0o077:
+            p.chmod(0o700)
     except OSError:
         pass
     return p
