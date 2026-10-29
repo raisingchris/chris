@@ -423,3 +423,10 @@ def test_a_new_task_set_means_a_new_baseline_and_a_waiting_candidate_waits(svc, 
     assert len(s.calls) == 7
     out = asyncio.run(evals.nightly(svc, clock=NIGHT))
     assert out["accepted"] is True and not evals.requested(svc)
+
+
+def test_eval_state_is_not_writable_by_her(svc):
+    p = svc.state_dir / "evals"
+    p.mkdir(mode=0o775)
+    p.chmod(0o775)
+    assert evals.eval_state(svc).stat().st_mode & 0o777 == 0o750
