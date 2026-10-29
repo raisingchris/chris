@@ -24,6 +24,8 @@ import asyncio
 import json
 import os
 import logging
+import shutil
+import subprocess
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
 from typing import Awaitable, Callable
@@ -47,6 +49,13 @@ BACKUP_AT = "22:45"
 IMPROVE_DAYS = "wed,sat"
 IMPROVE_AT = "15:00"
 EVAL_AT = "23:15"
+# The image disk (/tmp, her ~/.cache, the eval venvs) is ~8 GB and not backed up. On 2026-10-24 her
+# scratch filled it and the eval scored 0. Before the eval, if it's low, clear her old scratch.
+TIDY_AT = "23:05"
+TIDY_BELOW_BYTES = 2_500_000_000
+TIDY_DAYS = 2
+TIDY_CMD = ("find /tmp -mindepth 1 -maxdepth 1 -user chris -mtime +{days} -exec rm -rf {{}} + ; "
+            "find /home/chris/.cache -mindepth 1 -maxdepth 1 -mtime +{days} -exec rm -rf {{}} + ; true")
 
 # Wake-on-mail limits (her timezone).
 MAIL_WAKE_FILE = "mail_wake.json"
@@ -84,6 +93,25 @@ def born(services) -> bool:
     from agent import loop
 
     return not loop.is_birth(services)
+
+
+def tidy_disk(services, run=subprocess.run, free=None) -> dict:
+    """Clear her scratch older than TIDY_DAYS when the image disk is low; never raises."""
+    free = free or (lambda: shutil.disk_usage("/").free)
+    try:
+        before = free()
+        if before >= TIDY_BELOW_BYTES:
+            return {"tidied": False, "free": before}
+        # As chris: /tmp is sticky, so only she may delete her own files there.
+        run(["sudo", "-n", "-u", "chris", "/usr/local/bin/chris-exec", "600", "/tmp", "bash", "-c",
+             TIDY_CMD.format(days=TIDY_DAYS)], capture_output=True, text=True, timeout=660)
+        after = free()
+        rec = {"kind": "disk_tidy", "free_before": before, "free_after": after}
+        services.archive.append("disk_tidy", rec)
+        return {"tidied": True, **rec}
+    except Exception as exc:  # noqa: BLE001
+        log.warning("disk tidy failed: %s", exc)
+        return {"tidied": False, "error": str(exc)[:200]}
 
 
 def _weekdays_except(days: str) -> str:
@@ -198,6 +226,11 @@ def make_scheduler(services, run_sitting, run_sleep) -> AsyncIOScheduler:
         log.info("nightly eval: %s", result)
 
     add(guarded(services, nightly_eval, name="eval"), cron(EVAL_AT), "eval", "nightly eval")
+
+    async def tidy() -> None:
+        await asyncio.to_thread(tidy_disk, services)
+
+    add(tidy, cron(TIDY_AT), "tidy", "disk tidy")
     add(guarded(services, run_sitting, services, "sunday", name="sunday"),
         cron(SUNDAY_SITTING, "sun"), "sunday", "sunday letter")
     add(guarded(services, run_sleep, services, name="sleep"), cron(cfg.sleep), "sleep", "sleep")

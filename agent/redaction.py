@@ -21,7 +21,7 @@ KEEP_DOMAINS = {"raisingchris.com"}
 DEFAULT_EXCLUDE = ("memory/scratchpad", ".git", ".venv", "site/out")
 # Only her prose is redacted. Code and tests legitimately contain emails and phone-shaped strings.
 # memory/inbox is git-ignored and never published; strangers' addresses must survive there so she can reply.
-CONTENT_EXCLUDE = DEFAULT_EXCLUDE + ("memory/inbox", "agent", "tests", "site", "scripts", ".github", ".githooks", "pyproject.toml", "Dockerfile", "fly.toml", "vercel.json", ".vercelignore")
+CONTENT_EXCLUDE = DEFAULT_EXCLUDE + ("memory/inbox", "agent", "tests", "site", "scripts", ".github", ".githooks", "evals", "pyproject.toml", "Dockerfile", "fly.toml", "vercel.json", ".vercelignore")
 MAX_BYTES = 5 * 1024 * 1024
 
 _SEP = r"[\s.\-_]"

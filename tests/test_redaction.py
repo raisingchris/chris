@@ -152,3 +152,13 @@ def test_decimal_numbers_are_not_phone_numbers():
         assert redact(t, CANARIES)[0] == t
     # a dotted phone number still goes: more than one separator
     assert "[redacted]" in redact("call 415.555.0199 now", CANARIES)[0]
+
+
+def test_eval_tasks_are_not_redacted(tmp_path):
+    # 2026-10-21: "\r\n@pytest.mark.skip" in a task's issue text read as an email and broke the JSON.
+    (tmp_path / "evals").mkdir()
+    body = '[{"problem_statement": "import pytest\\r\\n@pytest.mark.skip\\r\\ndef t(): pass"}]'
+    (tmp_path / "evals" / "dev.json").write_text(body)
+    from agent.redaction import CONTENT_EXCLUDE
+    clean_tree(tmp_path, [], exclude=CONTENT_EXCLUDE)
+    assert (tmp_path / "evals" / "dev.json").read_text() == body
