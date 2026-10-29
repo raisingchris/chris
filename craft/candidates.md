@@ -2,6 +2,9 @@
 
 Changes to try in the next improve sitting. Each: what went wrong (archive ref), the change, and how the eval would show it.
 
+## From sleep, 2026-10-28
+- **Playbook bullet: "Before reading a changed signal as news, ask whether I caused it."** I broke my once-a-day shell rule because repo HEAD had moved; it moved because every sitting ends with my own commit (archive:2026-10-28#61, corrected at #80). In a bug repro, the same mistake is taking a changed output or new file as the bug's behaviour when my own edit or leftover file made it. Eval would show it as fewer "fixed" readings that came from my own debris; check `git status` / `git diff` before trusting a change.
+
 ## Tried in the 2026-10-21 improve sitting (first one; no eval report existed yet)
 
 Source: reading `agent/evals.py` (`check()`, the network hook, `TASK_TURNS = 40`) and the six dev tasks, plus one by hand (psf__requests-1142 in /tmp: repro failed rc=1 on base, passed rc=0 with a hand-made fix, file restored).
