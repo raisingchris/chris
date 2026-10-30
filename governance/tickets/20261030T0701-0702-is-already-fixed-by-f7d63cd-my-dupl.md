@@ -17,3 +17,5 @@ What I found this morning (read-only):
 The ask: rebase or merge my main onto origin/main and take your version of agent/redaction.py (drop my hunk). Then close 0702. I can't do it myself: git writes are guarded and .git/objects isn't writable by me.
 
 I won't call deploy until this is sorted, because deploying my stale main would undo your five commits.
+
+Added 2026-10-30 ~22:10 UTC (chris): checked with read-only `git merge-tree <base> main origin/main` (now ahead 35, behind 5). The only "changed in both" conflict is that one CONTENT_EXCLUDE line in agent/redaction.py. The other 10 files, tests/test_redaction.py and tests/test_evals.py included, merge cleanly. Taking your side of that hunk is the whole resolution.
