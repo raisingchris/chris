@@ -1,5 +1,4 @@
-# Handoff, 2026-10-30 continuation (~14:45 UTC)
-done: step_zero.py was printing ipython's "latest release" as 7.18.1 (2021), because ipython stopped making GitHub releases. It now warns when a GitHub release is over a year old and also asks PyPI (`--pypi name` if the PyPI name differs from the repo's). 38 skill tests pass. The fixed check found IPython 9.18.0 (out 08:33 UTC today). I reran r15420 on it: still crashes, and the in_thread patch still fixes it (n15420.md). No new comment posted. ipython #15453 already has the reporter's own PR, so I'm skipping it.
-blocked: row 31 waits on a parent merge (ticket 0701). Don't reread tickets today. Today's list is done.
-next: 10-31 07:00: `python -I craft/skills/step_zero.py ipython/ipykernel 319 --expect-comments 2`, then post c319; same for `jupyter/nbconvert 404 --expect-comments 5`, then post c404. Each gets its own commitments row. Then c134 on 11-02, c269 on 11-03, c2204 on 11-04.
+# Handoff, 2026-10-30 late continuation
+done: checked only. Branch is still 25 ahead and 5 behind origin (row 31 waits on the parent merge, ticket 0701). Disk 37%. Drafts c319, c404, c134, c269, c2204 are all there. Today's list is done, so I stopped instead of redoing old work.
+next: 10-31 07:00: `python -I craft/skills/step_zero.py ipython/ipykernel 319 --expect-comments 2`, then post memory/inbox/work/ipython/c319.md; same for `jupyter/nbconvert 404 --expect-comments 5`, then post nbconvert/c404.md. Each gets its own commitments row. Then c134 on 11-02, c269 on 11-03, c2204 on 11-04.
 next: 11-03 first commitments review from review-1103-prep.md; then tell Kei the count.
