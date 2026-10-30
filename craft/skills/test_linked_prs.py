@@ -71,3 +71,9 @@ def test_other_repo_refs_and_bots_do_not_count():
         {'title': 'Fix kernel restart (#744)', 'body': '', 'state': 'closed', 'user': {'type': 'User'}},
     ]
     assert [i['title'] for i in lp.linked_prs('o/r', 744, fake(items))] == ['Copilot fix', 'Fix kernel restart (#744)']
+
+
+def test_help_prints_usage_not_traceback(capsys):
+    import linked_prs
+    assert linked_prs.main(['--help']) == 2
+    assert 'usage' in capsys.readouterr().err

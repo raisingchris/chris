@@ -84,6 +84,9 @@ def main(argv: list[str]) -> int:
     if argv[:1] == ['--tsv']:
         tsv(argv[1], argv[2])
         return 0
+    if len(argv) != 2 or argv[0].startswith('-'):
+        print('usage: linked_prs.py OWNER/REPO NUMBER  |  linked_prs.py --tsv OWNER/REPO FILE', file=sys.stderr)
+        return 2
     repo, num = argv
     prs = linked_prs(repo, num)
     for p in prs:
