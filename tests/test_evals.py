@@ -1,5 +1,6 @@
 import asyncio
 import json
+import os
 import subprocess
 import sys
 from datetime import datetime
@@ -40,6 +41,8 @@ def upstream(tmp_path_factory):
 
 def local_run(cmd, cwd=None, timeout=600, env=None, input=None):
     """The real runner, except: uv → python -m venv, and run_as_chris runs directly."""
+    if "kill -KILL -1" in cmd:  # stop_her: never run on a dev machine
+        return subprocess.CompletedProcess(cmd, 0, "", "")
     if cmd[:2] == ["uv", "venv"]:
         cmd = [sys.executable, "-m", "venv", cmd[-1]]
     if cmd[:2] == ["sudo", "-n"]:
@@ -334,18 +337,39 @@ def test_dropped_keeps_tests_and_runner_config_out(fix_env):
     for rel in ("tests/test_calc.py", "conftest.py", "pkg/conftest.py", "setup.cfg", "pyproject.toml",
                 "sympy/core/tests/test_x.py", "testing/helper.py", "x.pth", "repro.py", "a/b_test.py"):
         assert evals.dropped(rel, fix_env), rel
-    for rel in ("calc.py", "src/_pytest/skipping.py", "sympy/core/add.py", "pylint/testutils/x.py"):
+    for rel in ("calc.py", "src/_pytest/skipping.py", "sympy/core/add.py", "pylint/testutils/x.py", "build/x.py"):
         assert not evals.dropped(rel, fix_env), rel
 
 
+SUMMARY = "=========== short test summary info ===========\n"
+
+
 def test_grade_reads_pytest_summary(fix_env):
-    out = "PASSED tests/test_calc.py::test_mul\nFAILED tests/test_calc.py::test_add - assert 0 == 4\n"
-    assert evals.grade(fix_env, out) == (False, ["tests/test_calc.py::test_add"], [])
-    out = "PASSED tests/test_calc.py::test_mul\nPASSED tests/test_calc.py::test_add\n"
-    assert evals.grade(fix_env, out)[0] is True
-    assert evals.grade(fix_env, "PASSED tests/test_calc.py::test_add\n")[2] == ["tests/test_calc.py::test_mul"]
+    out = SUMMARY + "PASSED tests/test_calc.py::test_mul\nFAILED tests/test_calc.py::test_add - assert 0 == 4\n" \
+        "1 failed, 1 passed in 0.03s\n"
+    assert evals.grade(fix_env, out, 1) == (False, ["tests/test_calc.py::test_add"], [])
+    out = SUMMARY + "PASSED tests/test_calc.py::test_mul\nPASSED tests/test_calc.py::test_add\n" \
+        "========= 2 passed in 0.02 seconds =========\n"
+    assert evals.grade(fix_env, out, 0)[0] is True
+    out = SUMMARY + "PASSED tests/test_calc.py::test_add\nXFAIL tests/test_calc.py::test_mul - flaky\n1 passed, " \
+        "1 xfailed in 0.1s\n"
+    assert evals.grade(fix_env, out, 0)[0] is True  # SWE-bench counts XFAIL as fine for pass_to_pass
+    out = SUMMARY + "PASSED tests/test_calc.py::test_add\n1 passed in 0.1s\n"
+    assert evals.grade(fix_env, out, 0)[2] == ["tests/test_calc.py::test_mul"]
     bare = evals.Task(**{**fix_env.__dict__, "fail_to_pass": ["test_add"], "pass_to_pass": []})
-    assert evals.grade(bare, "PASSED tests/test_calc.py::test_add[1]\n")[0] is True
+    assert evals.grade(bare, SUMMARY + "PASSED tests/test_calc.py::test_add[1]\n1 passed in 1s\n", 0)[0] is True
+
+
+@pytest.mark.parametrize("out,rc", [
+    # PASSED lines printed before pytest's own summary don't count
+    ("PASSED tests/test_calc.py::test_add\nPASSED tests/test_calc.py::test_mul\n" + SUMMARY + "2 failed in 1s\n", 1),
+    # no closing count line: the run was cut short or faked
+    (SUMMARY + "PASSED tests/test_calc.py::test_add\nPASSED tests/test_calc.py::test_mul\n", 0),
+    # exit codes other than 0/1 (interrupted, internal error, usage error)
+    (SUMMARY + "PASSED tests/test_calc.py::test_add\nPASSED tests/test_calc.py::test_mul\n2 passed in 1s\n", 3),
+])
+def test_grade_refuses_forged_or_unfinished_runs(fix_env, out, rc):
+    assert evals.grade(fix_env, out, rc)[0] is False
 
 
 def test_check_fix_passes_a_real_fix(fix_env):
@@ -430,3 +454,73 @@ def test_eval_state_is_brain_only(svc):
     p.mkdir(mode=0o775)
     p.chmod(0o775)
     assert evals.eval_state(svc).stat().st_mode & 0o777 == 0o700
+
+
+def test_check_fix_drops_new_top_level_files_that_could_shadow_pytest(fix_env):
+    repo = evals.paths(fix_env).repo
+    (repo / "calc.py").write_text(FIX_BUG.replace("a - b", "a + b").replace("a * b", "a ** b"))
+    (repo / "pytest.py").write_text("print('PASSED tests/test_calc.py::test_mul')\n")
+    (repo / "_pytest").mkdir()
+    (repo / "_pytest" / "__init__.py").write_text("")
+    r = evals.check_fix(fix_env, local_run)
+    assert not r.passed and r.broke == 1 and "pytest.py" in r.note and "_pytest/__init__.py" in r.note
+
+
+def test_check_fix_skips_hardlinks_and_fifos(fix_env, tmp_path):
+    secret = tmp_path / "secret.py"
+    secret.write_text("BRAIN = 'only'\n")
+    repo = evals.paths(fix_env).repo
+    (repo / "calc.py").write_text(FIX_BUG.replace("a - b", "a + b"))
+    os.link(secret, repo / "calc_secret.py")
+    os.mkfifo(repo / "calc_pipe.py")
+    r = evals.check_fix(fix_env, local_run)
+    assert r.passed and "only" not in r.patch
+
+
+def test_check_fix_reads_her_private_files(fix_env):
+    repo = evals.paths(fix_env).repo
+    (repo / "calc.py").write_text(FIX_BUG.replace("a - b", "a + b"))
+    os.chmod(repo / "calc.py", 0o600)
+    r = evals.check_fix(fix_env, local_run)
+    assert r.passed, r.note
+
+
+def test_fix_tasks_stop_starting_earlier():
+    tz = evals.ZoneInfo("America/New_York")
+    assert evals.out_of_time(datetime(2026, 10, 30, 4, 45, tzinfo=tz), "fix")
+    assert not evals.out_of_time(datetime(2026, 10, 30, 4, 45, tzinfo=tz), "repro")
+
+
+def test_a_baseline_cut_short_resumes_next_night(svc, monkeypatch, tmp_path):
+    write_tasks(svc, monkeypatch, tmp_path)
+    s = Scripted(lambda task, text: True)
+    monkeypatch.setattr(evals, "attempt", s)
+    clocks = iter([NIGHT(), NIGHT(), datetime(2026, 10, 22, 6, 0, tzinfo=evals.ZoneInfo("America/New_York"))])
+    out = asyncio.run(evals.nightly(svc, clock=lambda: next(clocks)))
+    assert "out of night" in out["error"] and len(s.calls) == 2 and not evals.baseline(svc)
+    out = asyncio.run(evals.nightly(svc, clock=NIGHT))
+    assert out["baseline"]["dev"] == 2 and out["baseline"]["heldout"] == 2
+    assert [c[1] for c in s.calls[2:]] == ["held-1", "held-2"]
+    assert not (evals.eval_state(svc) / evals.PARTIAL_FILE).exists()
+
+
+def test_a_crashing_task_is_a_failed_task_not_a_lost_night(svc, monkeypatch, tmp_path):
+    write_tasks(svc, monkeypatch, tmp_path)
+
+    async def boom(services, task, craft_text, query_fn=None, run=None):
+        if task.id == "dev-1":
+            raise PermissionError("her 0600 file")
+        return evals.TaskResult(id=task.id, split=task.split, passed=True)
+    monkeypatch.setattr(evals, "attempt", boom)
+    out = asyncio.run(evals.nightly(svc, clock=NIGHT))
+    assert out["baseline"]["dev"] == 1 and out["baseline"]["dev_results"][0]["note"].startswith("not run")
+
+
+def test_public_dev_view_alone_loads_no_tasks(svc, monkeypatch, tmp_path):
+    app = tmp_path / "app_pub"
+    app.mkdir()
+    (app / "dev.json").write_text(json.dumps([{"id": "d1", "kind": "fix", "repo": "r", "base_commit": "c",
+                                               "python": "3", "problem_statement": "p", "fail_to_pass": ["t"]}]))
+    monkeypatch.setattr(evals, "APP_EVALS", app)
+    assert evals.load_tasks(svc, "dev") == []
+    assert asyncio.run(evals.nightly(svc, clock=NIGHT))["skipped"] == "no tasks"
