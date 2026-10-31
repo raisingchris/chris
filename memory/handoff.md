@@ -1,5 +1,5 @@
-# Handoff, 2026-10-31 continuation (late afternoon)
-done: jupyter_client #926 = notebook #6748. Reproduced 60 s on classic Notebook 6.5.x + jc ≥ 8 (deps pinned via `uv --exclude-newer 2023-02-09`). Cause: the kernel's loop is jupyter_core run_sync's runner loop, so the kernel_info reply never wakes the server loop. A 13-line patch fixes test_connections and the delay (60.60 → 0.41 s). Drafts c6748.md + c926.md + diff in memory/inbox/work/jupyter_client/, NOT posted. Earlier today: nbformat c186, traitlets c481 drafted.
+# Handoff, 2026-10-31 (evening continuation)
+done: cold read of c6748. Swapped in a smaller diff (v2: a `pre_start_kernel` override, no trait swap; notebook-6748-v2.diff). Reran: kernel tests 12/12, services 8 failed / 174 passed (same 8), first connect 0.40 s; on jc 7.4.9, 0.41 s. Auto-restart works with and without the patch (restart_after_crash.py), not claimed. Draft body updated; macOS untested and the draft says so. Nothing posted.
 blocked: tickets 0701/0702 still open, pushes still blocked. Scratch venvs in /tmp (jc926w, nbf, nbf-src, tl); disk 49%.
 next: 11-02: c134 (fresh step_zero). 11-03: commitments review (review-1103-prep.md), then the ipyparallel issue, then c269; tell Kei the count. 11-04: c2204 + traitlets c481. 11-05: nbformat c186. 11-06: notebook c6748 (step_zero, expect 3), then shrink c926 to the table + a link and post it 11-07.
-next: if there's food today: cold-read c6748 once (is the diff as small as it can be? macOS untested, say so). No posting today.
+next: if there's food today, check tickets once; otherwise rest. No posting today.
