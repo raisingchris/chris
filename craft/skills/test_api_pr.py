@@ -31,7 +31,7 @@ class FakeGH:
         if path.endswith('/git/trees'):
             return {'sha': 'newtree'}
         if path.endswith('/git/commits'):
-            return {'sha': 'newchange'}
+            return {'sha': f'change{len(self.calls)}'}
         if path.endswith('/git/refs'):
             return {}
         if '/compare/' in path:
@@ -49,7 +49,7 @@ def make_clone(tmp_path):
 
 
 def kwargs(tmp_path, fake, **extra):
-    k = dict(clone=make_clone(tmp_path), upstream='up/proj', me='me', branch='fix-1',
+    k = dict(clone=extra.get('clone') or make_clone(tmp_path), upstream='up/proj', me='me', branch='fix-1',
              message='m', title='(AI) t', body='b', files=['pkg/a.py'], run=fake,
              head_sha=BASE, sleep=lambda s: None)
     k.update(extra)
@@ -87,3 +87,31 @@ def test_refuses_when_compare_shows_extra_files(tmp_path):
     with pytest.raises(SystemExit, match='compare looks wrong'):
         api_pr.open_pr(**kwargs(tmp_path, fake))
     assert not any(c[0][-1].endswith('/pulls') for c in fake.calls)
+
+
+def test_first_files_get_their_own_earlier_change(tmp_path):
+    clone = make_clone(tmp_path)
+    (clone / 'tests').mkdir()
+    (clone / 'tests/test_a.py').write_text('def test(): pass\n')
+    fake = FakeGH(compare_files=['pkg/a.py', 'tests/test_a.py'], ahead_by=2)
+    api_pr.open_pr(**kwargs(tmp_path, fake, clone=clone, files=['pkg/a.py', 'tests/test_a.py'],
+                            first=['tests/test_a.py'], first_message='test first', draft=True))
+    trees = [p for a, p in fake.calls if a[-1] == 'repos/me/proj/git/trees']
+    assert [[i['path'] for i in t['tree']] for t in trees] == [['tests/test_a.py'], ['pkg/a.py']]
+    assert trees[1]['base_tree'] == 'newtree'
+    changes = [p for a, p in fake.calls if a[-1] == 'repos/me/proj/git/commits']
+    assert changes[0]['message'] == 'test first' and changes[0]['parents'] == [BASE]
+    assert changes[1]['message'] == 'm' and changes[1]['parents'][0].startswith('change')
+    ref = next(p for a, p in fake.calls if a[-1] == 'repos/me/proj/git/refs')
+    assert ref['sha'].startswith('change') and ref['sha'] != changes[1]['parents'][0]
+    pr = next(p for a, p in fake.calls if a[-1] == 'repos/up/proj/pulls')
+    assert pr['draft'] is True
+
+
+def test_first_needs_ahead_by_two(tmp_path):
+    clone = make_clone(tmp_path)
+    (clone / 't.py').write_text('')
+    fake = FakeGH(compare_files=['pkg/a.py', 't.py'], ahead_by=1)
+    with pytest.raises(SystemExit, match='compare looks wrong'):
+        api_pr.open_pr(**kwargs(tmp_path, fake, clone=clone, files=['pkg/a.py', 't.py'],
+                                first=['t.py'], first_message='x'))

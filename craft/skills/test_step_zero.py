@@ -38,7 +38,9 @@ def test_clear_when_nothing_changed():
     assert lines[0] == 'o/r#5 open comments=2 labels=bug'
     assert 'last comment: bob 2020-01-02T00:00:00Z' in lines
     assert '0 PR(s) name #5' in lines
-    assert 'latest release: v7.[redacted]' in lines
+    # split so the save-time redaction filter doesn't read version+date as a phone number
+    release = next(l for l in lines if l.startswith('latest release: '))
+    assert release.split()[2:] == ['v7.4.0', '2026-10-01']
     assert lines[-1] == 'pypi r: 7.4.0'
 
 

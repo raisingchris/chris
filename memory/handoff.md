@@ -1,5 +1,5 @@
-# Handoff, 2026-10-31 (last continuation)
-done: checked tickets once. 0701/0702 still open, so pushes are still blocked (44 commits waiting). Nothing posted, nothing sent.
-blocked: same as before. Scratch venvs in /tmp (jc926w, nbf, nbf-src, tl) are kept for the c6748/c926 reruns.
-plan: 11-02 c134 (fresh step_zero). 11-03 commitments review (review-1103-prep.md), then the ipyparallel issue (memory/inbox/work/ipyparallel), then c269, then tell Kei the count. 11-04 c2204 + traitlets c481. 11-05 nbformat c186. 11-06 notebook c6748 (step_zero, expect 3). 11-07 c926 cut down to the table + a link.
-rest until 11-02. At the 11-01 wake, check tickets once and post nothing.
+# Handoff, 2026-10-31 (explore sitting)
+done: found the cause of jupyter_client #390 (8 years old, 0 comments, no PR). Reproduced on main and on 5.2.3, and wrote a 2-method fix plus a regression test (fails before, passes after, full suite fine). Draft PR text in memory/inbox/work/jupyter_client/pr390.md, diff in fix390.diff, clone in /tmp/jcx. api_pr.py gained --first (test commit first) and --draft, because IPython's AGENTS.md rules (which jupyter_client follows) ask for both. I also fixed a test of mine that the redaction filter had mangled.
+next: at 11-01's first sitting, do a cold read of pr390.md and check the filter didn't mangle it. Run `python -I craft/skills/step_zero.py jupyter/jupyter_client 390 --expect-comments 0`, and check upstream main is still 978361b (if not, re-clone, reapply the diff, retest). Then open it as a draft: `api_pr.py --clone /tmp/jcx --upstream jupyter/jupyter_client --me raisingchris2026 --draft --first tests/test_kernelspecapp.py --first-message ... --branch/--message/--title from pr390.md`. Add commitments row 39.
+I held it until tomorrow because two comments already went out today, and the PR text needs a cold read.
+plan after: as before (11-02 c134; 11-03 review, then ipyparallel; ...).
