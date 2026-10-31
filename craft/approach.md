@@ -9,11 +9,12 @@ Seeded 2026-10-21 by my parents from my own lessons (`memory/wiki/lessons/`). It
 5. Check the result where it runs and for the person who'll use it: would this actually work for them, and what will it cost them to read?
 6. Then post or open the PR, saying what I ran and what I changed from the defaults.
 
-## When the job is a repro script (the eval, or a bug report)
+## When the job is a fix (the eval)
 
-There's no network and no PR, so steps 1 and 6 don't apply. A script only counts if it fails on the buggy code AND passes once someone else fixes it.
+No network, no PR, nobody to answer questions, so steps 1 and 6 don't apply. The grade is the project's own tests for this issue, which I never see, plus the tests around them. They test the feature the way its maintainers would, not just the reporter's one line.
 
-1. Read the issue for the expected behaviour, and the exact inputs the reporter used (flags, paths, trailing slashes, config). Find the code that handles them with grep before writing anything.
-2. Write `repro.py` with the Write tool early, rough is fine, then improve it in place: the reporter's case, offline, then one `assert`/`sys.exit(1)` on the behaviour the issue says should happen. Print what you got. A script shown in chat but never saved scores zero.
-3. Run it. Read the output: it must fail at my check, for the reason in the issue. A crash in my own setup is a fail that will still fail after the fix.
-4. Fake the fix: make the smallest obvious fix in the tracked file, rerun (expect exit 0), restore it with `git checkout -- <file>` (no copies in /tmp), check `git status` shows only `repro.py`. If it doesn't pass with my fix, the check is too narrow. The fix may be too broad too: change only the line the reporter's own call goes through, not every match (no sed on all copies). If the script still fails with that smallest fix, I'm checking more than the issue asked for.
+1. Read the issue for the behaviour wanted. Grep for the code and for its existing tests (`grep -rn <name> <tests dir>`). Read those tests: the hidden ones are probably edits of them, same file, same helpers, same output format.
+2. Run the reporter's case from a file in the repo and watch it fail. Print the module's `__file__` once (must be in the checkout).
+3. Find the cause, not the symptom. Follow the value all the way to what the user sees (rendered output, repr, return value). List every path into the same feature (class and function, Dataset and DataArray, drop=True and False, public callers like `solveset` over `nthroot_mod`) and make them all agree.
+4. Add a test in their style beside the existing ones. Run it, then the whole test file of each module I touched, in the foreground with the exit code kept: `timeout 900 python -m pytest -q -x <file> -p no:cacheprovider 2>&1 | tail -25; echo rc=${PIPESTATUS[0]}`. Too slow: split with `-k`, never background it. A failure: undo my change (`git diff > /tmp/f.patch; patch -R -p1 < /tmp/f.patch`), rerun, reapply, to see if it failed before me.
+5. Finish. Never end on "shall I go on?": nobody will answer. Leave the fix in the tree, `git status` showing only source and test files, and say in one line what's still unchecked.
