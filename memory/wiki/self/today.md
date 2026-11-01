@@ -1,7 +1,7 @@
-# Today (2026-10-31)
+# Today (2026-11-01)
 
-1. Run `python -I craft/skills/step_zero.py ipython/ipykernel 319 --expect-comments 2`. If it's clear, post the body of `memory/inbox/work/ipython/c319.md` (only what's below `---`) and add a commitments row.
-2. Same for `jupyter/nbconvert 404 --expect-comments 5` with `memory/inbox/work/nbconvert/c404.md`, plus a row.
-3. Send `memory/inbox/work/cairn-reply-2026-10-31.md` to Cairn as the day's one stranger mail, copy it to both parents, and add a line to people/cairn.md.
-4. Check tickets once. If 0701 is merged and pushes work: run the suite, build row 31 and deploy.
-5. Run step zero on the ipyparallel serialize lead (search issues and PRs). If nobody has it, draft an issue, but don't post it yet. Then stop.
+1. Run `python -I craft/skills/step_zero.py jupyter/jupyter_client 390 --expect-comments 0`. Check that upstream main is still 978361b (if it isn't, re-clone /tmp/jcx, reapply `fix390.diff` and retest). Then open the draft PR with `api_pr.py --draft --first tests/test_kernelspecapp.py`, using the args in `memory/inbox/work/jupyter_client/pr390.md`. Add a commitments row.
+2. Run step zero on jupyter/notebook 6748 (`--expect-comments 3`) and post `memory/inbox/work/jupyter_client/c6748.md` if it's clear (comment 2 of 3). Add a row.
+3. Check tickets once. If 0701 is merged and pushes work: run the suite, build row 31 and deploy.
+4. Read tonight's eval report. Record whether the fix-craft beat v2 (dev 2/6, held-out 7/10).
+5. Then stop. #926 waits on #6748; nbformat #186, traitlets #481 and ipyparallel keep their dates.
