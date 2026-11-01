@@ -1,0 +1,115 @@
+"""The Monday check in one command: which threads I've promised to answer have news?
+
+Reads the OPEN rows of memory/wiki/self/commitments.md, finds every GitHub
+issue or PR link in them, and for each thread prints whether anyone other
+than me has commented since my last comment, or whether it was closed after
+it. The list comes from the promises file itself, so it can't drift from it.
+
+Usage:
+  python -I watch.py [path/to/commitments.md] [--me login,...]
+Exit codes: 0 = all quiet, 1 = something to read, 2 = file/API error.
+"""
+from __future__ import annotations
+
+import json
+import re
+import subprocess
+import sys
+from typing import Callable
+
+Api = Callable[[str], object]
+ME = ('raisingchris2026',)
+DEFAULT = 'memory/wiki/self/commitments.md'
+URL = re.compile(r'https://github\.com/([\w.-]+/[\w.-]+)/(?:issues|pull)/(\d+)')
+ROW = re.compile(r'^\|\s*(\d+)\s*\|')
+
+
+def gh_api(path: str) -> object:
+    out = subprocess.run(['gh', 'api', '-X', 'GET', path], capture_output=True, text=True, check=True)
+    return json.loads(out.stdout)
+
+
+def open_threads(text: str) -> list[tuple[str, str, int]]:
+    """(row number, owner/repo, issue number) for every GitHub link in an OPEN row."""
+    found, seen = [], set()
+    for line in text.splitlines():
+        m = ROW.match(line)
+        if not m:
+            continue
+        cells = [c.strip() for c in line.strip().strip('|').split('|')]
+        if len(cells) < 5 or not re.match(r'^\**OPEN\b', cells[4]):
+            continue
+        for repo, num in URL.findall(line):
+            key = (repo.lower(), int(num))
+            if key not in seen:
+                seen.add(key)
+                found.append((m.group(1), repo, int(num)))
+    return found
+
+
+def all_comments(repo: str, num: int, api: Api) -> list[dict]:
+    out, page = [], 1
+    while True:
+        batch = api(f'repos/{repo}/issues/{num}/comments?per_page=100&page={page}')
+        out.extend(batch)
+        if len(batch) < 100:
+            return out
+        page += 1
+
+
+def news(repo: str, num: int, api: Api = gh_api, me: tuple[str, ...] = ME) -> tuple[str, list[str]]:
+    """Return (one summary line, list of things to read since my last comment)."""
+    mine = {m.lower() for m in me}
+    issue = api(f'repos/{repo}/issues/{num}')
+    comments = all_comments(repo, num, api)
+    my_times = [c['created_at'] for c in comments if c['user']['login'].lower() in mine]
+    if (issue.get('user') or {}).get('login', '').lower() in mine:
+        my_times.append(issue['created_at'])  # I opened it: the opening post is mine
+    since = max(my_times) if my_times else ''
+    items = [f"{c['user']['login']} commented {c['created_at']}" for c in comments
+             if c['created_at'] > since and c['user']['login'].lower() not in mine]
+    closed_at = issue.get('closed_at') or ''
+    if issue['state'] != 'open' and closed_at > since:
+        items.append(f"closed {closed_at} ({issue.get('state_reason') or issue['state']})")
+    if not my_times:
+        items.insert(0, 'no comment of mine found here (wrong link, or deleted?)')
+    line = (f"{repo}#{num} {issue['state']} comments={issue['comments']} "
+            f"my last={since or '-'}")
+    return line, items
+
+
+def run(text: str, api: Api = gh_api, me: tuple[str, ...] = ME) -> tuple[list[str], int]:
+    lines, flagged = [], 0
+    threads = open_threads(text)
+    for row, repo, num in threads:
+        line, items = news(repo, num, api, me)
+        lines.append(f"row {row}: {'NEWS ' if items else 'quiet'} {line}")
+        lines.extend(f'    - {i}' for i in items)
+        flagged += bool(items)
+    lines.append(f'{flagged} of {len(threads)} thread(s) need reading')
+    return lines, flagged
+
+
+def main(argv: list[str]) -> int:
+    path, me = DEFAULT, ME
+    it = iter(argv)
+    for a in it:
+        if a == '--me':
+            me = tuple(next(it).split(','))
+        else:
+            path = a
+    try:
+        text = open(path, encoding='utf-8').read()
+        lines, flagged = run(text, me=me)
+    except OSError as e:
+        print('cannot read', path, e, file=sys.stderr)
+        return 2
+    except subprocess.CalledProcessError as e:
+        print('API error:', (e.stderr or '').strip()[:200], file=sys.stderr)
+        return 2
+    print('\n'.join(lines))
+    return 1 if flagged else 0
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))
