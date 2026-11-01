@@ -9,6 +9,15 @@ Fetches the known rule files at the default branch (raw GETs, read-only),
 prints which exist, and prints every line that hits a rule word with its
 line number, so I read those lines in full before anything else.
 
+Two more places a rule can live (found 2026-11-01 on pallets/click, whose
+repo has only a PR template while the org-wide pallets/.github CONTRIBUTING
+says AI-generated PRs and issues "are closed on sight", and 390 items carry a
+"rejected AI" label):
+- the org's `.github` repo, whose files GitHub shows for every repo that
+  has none of its own. Read them always, marked `org:`.
+- labels. Any label whose name or description hits an AI word is printed
+  with how many issues/PRs carry it.
+
 Usage:
   python -I agent_rules.py owner/repo            # summary + hit lines
   python -I agent_rules.py owner/repo --full     # also print each file whole
@@ -57,6 +66,49 @@ def scan(repo: str, ref: str = 'HEAD', fetch: Fetch = gh_fetch) -> dict[str, str
     return found
 
 
+AI_LABEL = re.compile(r'\b(AI|LLM|bots?|Copilot|ChatGPT|Claude|generated|slop)\b', re.I)
+
+Api = Callable[[str], 'object | None']
+
+
+def gh_api(path: str) -> object | None:
+    import json
+    r = subprocess.run(['gh', 'api', '--paginate', '--slurp', path] if 'search/' not in path
+                       else ['gh', 'api', path], capture_output=True, text=True)
+    if r.returncode != 0:
+        return None
+    data = json.loads(r.stdout)
+    if isinstance(data, list) and data and isinstance(data[0], list):
+        data = [x for page in data for x in page]
+    return data
+
+
+def scan_org(repo: str, fetch: Fetch = gh_fetch) -> dict[str, str]:
+    owner = repo.split('/')[0]
+    return {f'org:{k}': v for k, v in scan(f'{owner}/.github', fetch=fetch).items()}
+
+
+def ai_labels(repo: str, api: Api = gh_api) -> list[tuple[str, str, int | None]]:
+    labels = api(f'repos/{repo}/labels?per_page=100') or []
+    out = []
+    for lb in labels:
+        name, desc = lb.get('name', ''), lb.get('description') or ''
+        if AI_LABEL.search(name) or AI_LABEL.search(desc):
+            from urllib.parse import quote
+            res = api(f'search/issues?q=repo:{repo}+label:%22{quote(name)}%22')
+            n = res.get('total_count') if isinstance(res, dict) else None
+            out.append((name, desc, n))
+    return out
+
+
+def report_labels(labels: list[tuple[str, str, int | None]]) -> str:
+    if not labels:
+        return '\nlabels: none about AI'
+    lines = ['\n== labels about AI (a policy can live here too)']
+    lines += [f'  "{n}" ({c if c is not None else "?"} items): {d}' for n, d, c in labels]
+    return '\n'.join(lines)
+
+
 def report(found: dict[str, str], full: bool = False) -> str:
     if not found:
         return 'NO RULE FILES (absence is not permission; check the README and issues)'
@@ -73,7 +125,10 @@ def report(found: dict[str, str], full: bool = False) -> str:
 
 def main(argv: list[str]) -> int:
     repo = argv[0]
-    print(report(scan(repo), full='--full' in argv))
+    found = scan(repo)
+    found.update(scan_org(repo))
+    print(report(found, full='--full' in argv))
+    print(report_labels(ai_labels(repo)))
     return 0
 
 
