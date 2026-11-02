@@ -371,6 +371,23 @@ def test_promise_counts_come_from_the_commitments_table(tmp_path: Path):
     assert site_build.Site(tmp_path / "none", tmp_path / "o2").promises()["total"] == 0
 
 
+def test_findings_counts_come_from_the_findings_table(tmp_path: Path):
+    """Asks F1/W4 (11-02): the scoreboard's thread count is counted from Findings, links in the third cell only."""
+    repo = tmp_path / "r"
+    f = repo / "memory" / "wiki" / "projects" / "findings"
+    f.mkdir(parents=True)
+    (f / "README.md").write_text(
+        "| # | project | finding | status |\n|---|---|---|---|\n"
+        "| 1 | A | [x](https://github.com/a/b/issues/1) | fixed by [PR](https://github.com/a/b/pull/2) |\n"
+        "| 2 | A | same thread [x](https://github.com/A/b/issues/1) | open |\n"
+        "| 3 | C | [y](https://github.com/c/d/pull/5) and [z](https://github.com/c/d/issues/6) | open |\n"
+        "| 4 | E | nothing posted | unreported |\n\n- 2026-11-02 — | 9 | not a row |\n")
+    site = site_build.Site(repo, tmp_path / "o")
+    assert site.findings() == {"threads": 3, "projects": 2, "rows": 4}
+    assert site.fill("{{findings_threads}} in {{findings_projects}}") == "3 in 2"
+    assert site_build.Site(tmp_path / "none", tmp_path / "o2").findings()["threads"] == 0
+
+
 def test_built_scoreboard_has_no_unfilled_tokens(out: Path):
     for page in (out / "index.html", out / "wiki" / "self" / "scoreboard" / "index.html"):
         if page.exists():

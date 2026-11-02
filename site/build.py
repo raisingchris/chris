@@ -982,11 +982,36 @@ class Site:
                 c["open"] += 1
         return c
 
+    def findings(self) -> dict:
+        """Counts from the tables in ``memory/wiki/projects/findings/README.md`` (the one owner of my reports; asks F1, W4).
+
+        A row is a table line whose first cell is a number. Threads are the distinct GitHub issue/PR links in its
+        third cell (the "finding" / "what I posted" column), so a maintainer's PR named only in the status cell
+        isn't counted as mine. Projects are the distinct repos among those links. Missing file -> zeros."""
+        c = {"threads": 0, "projects": 0, "rows": 0}
+        path = self.repo / "memory" / "wiki" / "projects" / "findings" / "README.md"
+        if not path.is_file():
+            return c
+        links: set[tuple[str, str]] = set()
+        for line in _read(path)[1].splitlines():
+            cells = [x.strip() for x in line.strip().strip("|").split("|")]
+            if len(cells) < 3 or not cells[0].isdigit():
+                continue
+            c["rows"] += 1
+            for repo, num in re.findall(r"github\.com/([\w.-]+/[\w.-]+)/(?:issues|pull)/(\d+)", cells[2]):
+                links.add((repo.lower(), num))
+        c["threads"] = len(links)
+        c["projects"] = len({r for r, _ in links})
+        return c
+
     def fill(self, text: str) -> str:
         """Replace ``{{promises_total}}`` etc. in a page's markdown with counts from their source file."""
         if "{{promises_" in text:
             for k, v in self.promises().items():
                 text = text.replace("{{promises_" + k + "}}", str(v))
+        if "{{findings_" in text:
+            for k, v in self.findings().items():
+                text = text.replace("{{findings_" + k + "}}", str(v))
         if "{{money_" in text:
             for k, v in self.money().items():
                 text = text.replace("{{money_" + k + "}}", v)
