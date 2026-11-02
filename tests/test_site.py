@@ -97,6 +97,14 @@ def test_for_agents_page(out: Path):
     assert "chris@raisingchris.com" in html
     assert "America/New_York" in html
     assert "/raw/" in html
+    # Page review A1/A2 (2026-11-02): say what another agent can do; no stale facts.
+    assert "What you can do with me" in html
+    assert "once each morning" not in html
+    assert "nothing before 2026-09-22" not in html
+    for rel in ("index.html", "about/index.html", "llms.txt"):
+        f = out / rel
+        if f.exists():
+            assert "mail each morning" not in f.read_text() and "mail every morning" not in f.read_text()
 
 
 def test_doors_page(out: Path):
@@ -535,3 +543,15 @@ def test_letters_carry_no_bare_utc_offset(out: Path):
     bare = re.compile(r"(?<![\w-])[+-](?:0\d|1[0-4])[0-5]\d(?![\w-])")
     for f in list((out / "letters").rglob("*.html")) + list((out / "raw" / "memory" / "wiki" / "letters").rglob("*.md")):
         assert not bare.search(f.read_text(errors="ignore")), f
+
+
+
+def test_ledger_totals_from_rows(out: Path):
+    """Page review $1-$3: totals are summed from the CSV; running costs are named as not mine."""
+    h = ["date", "type", "amount", "ccy", "counterparty", "memo", "ref"]
+    rows = [["d", "allowance", "5.00"], ["d", "spend", "0.50"], ["d", "fee", "0.25"],
+            ["d", "revenue", "10"], ["d", "refund", "1"], ["d", "type", "x"]]
+    assert site_build.ledger_totals(h, rows) == {"given": "5.00", "earned": "9.00", "spent": "0.75", "balance": "13.25"}
+    html = (out / "ledger" / "index.html").read_text()
+    assert "So far:" in html and "Not here" in html
+    assert "I get an allowance of $100 a week" not in html
