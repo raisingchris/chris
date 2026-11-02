@@ -95,8 +95,18 @@ def open_pr(*, clone: pathlib.Path, upstream: str, me: str, branch: str, message
                    {'base_tree': tree, 'tree': blob_items(paths)})['sha']
         parent = run(['-X', 'POST', f'repos/{fork}/git/commits'],
                      {'message': msg, 'tree': tree, 'parents': [parent]})['sha']
-    run(['-X', 'POST', f'repos/{fork}/git/refs'],
-        {'ref': f'refs/heads/{branch}', 'sha': parent})
+    # A --dry-run leaves its branch behind. Reuse it only if it holds exactly this
+    # tree; otherwise stop (never force-move a branch).
+    try:
+        existing = run([f'repos/{fork}/git/ref/heads/{branch}'], None)['object']['sha']
+    except subprocess.CalledProcessError:
+        existing = None
+    if existing is None:
+        run(['-X', 'POST', f'repos/{fork}/git/refs'],
+            {'ref': f'refs/heads/{branch}', 'sha': parent})
+    elif run([f'repos/{fork}/git/commits/{existing}'], None)['tree']['sha'] != tree:
+        raise SystemExit(f'branch {branch} already exists on {fork} with other content; '
+                         'pick a new --branch')
     want_ahead = sum(1 for paths, _ in steps if paths)
 
     cmp = run([f'repos/{upstream}/compare/{base_branch}...{me}:{repo}:{branch}'], None)

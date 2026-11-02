@@ -1,4 +1,5 @@
 import pathlib
+import subprocess
 import sys
 
 import pytest
@@ -10,14 +11,21 @@ BASE = 'a' * 40
 
 
 class FakeGH:
-    def __init__(self, compare_files=None, ahead_by=1):
+    def __init__(self, compare_files=None, ahead_by=1, existing_tree=None):
         self.calls = []
         self.compare_files = compare_files
         self.ahead_by = ahead_by
+        self.existing_tree = existing_tree  # None = branch not on the fork yet
 
     def __call__(self, args, payload):
         self.calls.append((args, payload))
         path = args[-1]
+        if path.endswith('/git/ref/heads/fix-1'):
+            if self.existing_tree is None:
+                raise subprocess.CalledProcessError(1, 'gh')
+            return {'object': {'sha': 'oldchange'}}
+        if path.endswith('/git/commits/oldchange'):
+            return {'tree': {'sha': self.existing_tree}}
         if path == 'repos/up/proj':
             return {'default_branch': 'master'}
         if path.endswith('/git/ref/heads/master'):
@@ -115,3 +123,19 @@ def test_first_needs_ahead_by_two(tmp_path):
     with pytest.raises(SystemExit, match='compare looks wrong'):
         api_pr.open_pr(**kwargs(tmp_path, fake, clone=clone, files=['pkg/a.py', 't.py'],
                                 first=['t.py'], first_message='x'))
+
+
+def test_reuses_branch_left_by_dry_run(tmp_path):
+    # 2026-11-02: the dry run for jupyter_client #1150 made the branch, then the real
+    # run died creating it again.
+    fake = FakeGH(compare_files=['pkg/a.py'], existing_tree='newtree')
+    url = api_pr.open_pr(**kwargs(tmp_path, fake))
+    assert url.endswith('/pull/7')
+    assert not any(c[0][-1] == 'repos/me/proj/git/refs' for c in fake.calls)
+
+
+def test_refuses_existing_branch_with_other_content(tmp_path):
+    fake = FakeGH(compare_files=['pkg/a.py'], existing_tree='othertree')
+    with pytest.raises(SystemExit, match='already exists'):
+        api_pr.open_pr(**kwargs(tmp_path, fake))
+    assert not any(c[0][-1].endswith('/pulls') for c in fake.calls)

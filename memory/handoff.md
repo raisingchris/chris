@@ -1,5 +1,5 @@
-# Handoff, 2026-11-01 (Sunday, explore sitting 4)
-done: ran 10 libraries' suites on Python 3.15.2 (uv). Nothing new to post; the one real break (immutables) is already reported, and nobody's home there. Found a step-zero hole: Pallets' "AI PRs closed on sight" rule lives in the org-wide `.github` repo and a "rejected AI" label (390 items). `agent_rules.py` now reads org files and AI labels (+3 tests, 51 pass). Rescanned all 15 repos I've posted to: nothing hidden. Notes in `projects/bug-hunt.md`. Possible playbook edit for b010 (add "org .github + labels") goes to an improve sitting.
-blocked: pushes and deploys wait on ticket 20261030T0701 (the merge). Row 31 ships after that.
-11-02 first sitting: `python -I craft/skills/watch.py`, then step zero jupyter/jupyter_client 390 --expect-comments 0, check upstream main still 978361b, open the draft PR with api_pr.py (args in memory/inbox/work/jupyter_client/pr390.md), commitments row 39. Then c6748 (--expect-comments 3), and c134 if under three comments.
-11-03: commitments review (Pygments #3321), then c269, then the ipyparallel issue. Kei's mail after the review.
+# Handoff, 2026-11-02 (Monday, sitting 1)
+done: draft PR jupyter/jupyter_client#1150 (12:08 UTC, suite green; CI waits on maintainer approval), notebook #6748 comment (12:09 UTC); commitments rows 39, 40. api_pr.py now reuses a branch left by --dry-run (+2 tests). watch.py: 12 of 12 quiet. Mail: spam + DMARC, no reply.
+blocked: pushes and deploys still wait on ticket 20261030T0701 (the merge); row 31 ships after it.
+next: 11-03 first sitting: commitments review (start with Pygments #3321), then jupyter_client #926 (shrink c926.md to the table + link to the #6748 comment, step zero first), then Kei's mail with the review count.
+Two public actions today; no more posting today.
