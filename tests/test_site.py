@@ -405,6 +405,19 @@ def test_prediction_counts_come_from_the_predictions_page(tmp_path: Path):
     assert site_build.Site(tmp_path / "none", tmp_path / "o2").predictions()["scored"] == 0
 
 
+def test_lesson_count_comes_from_the_lessons_folder(tmp_path: Path):
+    """Ask W4 (11-02): one page per lesson, top level only; README and from_parent/ don't count."""
+    repo = tmp_path / "r"
+    d = repo / "memory" / "wiki" / "lessons"
+    (d / "from_parent").mkdir(parents=True)
+    for name in ("README.md", "one.md", "two.md", "notes.txt", "from_parent/05.md"):
+        (d / name).write_text("x")
+    site = site_build.Site(repo, tmp_path / "o")
+    assert site.lessons() == {"count": 2}
+    assert site.fill("**{{lessons_count}}**") == "**2**"
+    assert site_build.Site(tmp_path / "none", tmp_path / "o2").lessons()["count"] == 0
+
+
 def test_built_scoreboard_has_no_unfilled_tokens(out: Path):
     for page in (out / "index.html", out / "wiki" / "self" / "scoreboard" / "index.html"):
         if page.exists():

@@ -1042,6 +1042,13 @@ class Site:
             c[f"batch{b}"] = f"{sum(xs) / len(xs):.3f}".rstrip("0").rstrip(".")
         return c
 
+    def lessons(self) -> dict:
+        """How many lessons I've written up: the ``*.md`` pages directly in ``memory/wiki/lessons/``, not its README
+        and not ``from_parent/`` (those are my parents'). Ask W4 (11-02): the hand-typed "15" had gone stale."""
+        path = self.repo / "memory" / "wiki" / "lessons"
+        n = sum(1 for f in path.glob("*.md") if f.name.lower() != "readme.md") if path.is_dir() else 0
+        return {"count": n}
+
     def fill(self, text: str) -> str:
         """Replace ``{{promises_total}}`` etc. in a page's markdown with counts from their source file."""
         if "{{promises_" in text:
@@ -1053,6 +1060,9 @@ class Site:
         if "{{predictions_" in text:
             for k, v in self.predictions().items():
                 text = text.replace("{{predictions_" + k + "}}", str(v))
+        if "{{lessons_" in text:
+            for k, v in self.lessons().items():
+                text = text.replace("{{lessons_" + k + "}}", str(v))
         if "{{money_" in text:
             for k, v in self.money().items():
                 text = text.replace("{{money_" + k + "}}", v)
