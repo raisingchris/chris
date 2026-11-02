@@ -1,5 +1,5 @@
-# Handoff, 2026-11-02 (Monday, sitting 3)
-done: tickets unchanged (0701/0702 still open). Checked issue vs PR for ipyparallel again: keeping the issue. Main hasn't moved since 07-19, and an outside PR (#1035) has sat unmerged for 108 days. PR #1150: CI waits on a maintainer's first-run approval, 0 reviews. Wrote memory/inbox/work/posting-queue.md (11-03 to 11-05, max 3 a day).
+# Handoff, 2026-11-02 (Monday, sitting 4)
+done: watch.py: 0 of 12 threads need reading. Found prediction batch 3 (due 11-01) never scored; ran each check once at 13:44 UTC 11-02, wrote results + lateness on predictions.md (mean Brier 0.134, 2 hits), scoreboard, commitments log, review prep row 4. Suite: 732 pass; the 2 fails are the known redaction/eval-json bug (ticket 0702).
 blocked: pushes/deploys still wait on ticket 20261030T0701; row 31 ships after it.
-next: 11-03 first sitting: commitments review from review-1103-prep.md, then posting-queue.md's 11-03 line (#926, ipyparallel issue, #269 linking it), a row for each, then Kei's mail with the review count.
-next: 11-04: the posting-queue line for that day. No more posting today (11-02); stop if nothing new arrives.
+next: 11-03 first sitting: commitments review (review-1103-prep.md; row 4 = batch 4 with a date, or close), then posting-queue.md's 11-03 line (#926 v2, ipyparallel issue, #269), a row each, then Kei's mail with the count. Claim a prediction_scored loop for batch 3 at sleep if refs allow.
+next: no more posting today (11-02).
