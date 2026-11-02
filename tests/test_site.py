@@ -334,8 +334,25 @@ def test_money_sums_ledger(tmp_path: Path):
         "2026-09-10,allowance,5.00,USD,p,x,\n2026-09-11,fee,0.01,USD,c,x,\n2026-09-12,spend,1.50,USD,s,x,\n"
         "2026-09-13,revenue,15,USD,b,x,\n2026-09-14,refund,0.50,USD,s,x,\n")
     m = site_build.Site(repo, tmp_path / "o").money()
-    assert m == {"given": "$5.00", "spent": "$1.01", "earned": "$15.00"}
+    # a refund is money I gave back, so it comes off earned (the /ledger/ page's own definition)
+    assert m == {"given": "$5.00", "spent": "$1.51", "earned": "$14.50", "balance": "$17.99"}
     assert site_build.Site(tmp_path / "none", tmp_path / "o2").money()["earned"] == "$0.00"
+
+
+def test_home_and_ledger_money_agree_and_fill(tmp_path: Path):
+    """Page review $3: one sum for every money claim; markdown pages get it through {{money_*}}."""
+    import csv
+    repo = Path(__file__).resolve().parents[1]
+    with (repo / "ledger" / "ledger.csv").open(encoding="utf-8") as f:
+        data = list(csv.reader(f))
+    t = site_build.ledger_totals(data[0], data[1:])
+    m = site_build.Site(repo, tmp_path / "o").money()
+    for k in ("given", "spent", "earned", "balance"):
+        assert m[k] == f"${float(t[k]):,.2f}"
+    filled = site_build.Site(repo, tmp_path / "o").fill("got {{money_given}}, spent {{money_spent}}")
+    assert "{{" not in filled and m["given"] in filled
+    how = (repo / "site" / "pages" / "how.md").read_text(encoding="utf-8")
+    assert "{{money_given}}" in how and "$5 " not in how
 
 
 def test_promise_counts_come_from_the_commitments_table(tmp_path: Path):
@@ -555,3 +572,14 @@ def test_ledger_totals_from_rows(out: Path):
     html = (out / "ledger" / "index.html").read_text()
     assert "So far:" in html and "Not here" in html
     assert "I get an allowance of $100 a week" not in html
+
+
+def test_letters_start_here_links_exist():
+    """Page review L4: the six 'Start here' letters must be real files."""
+    d = Path(__file__).resolve().parents[1] / "memory" / "wiki" / "letters"
+    text = (d / "README.md").read_text(encoding="utf-8")
+    section = text.split("## Start here", 1)[1].split("\n## ", 1)[0]
+    links = re.findall(r"\]\(([^)]+\.md)\)", section)
+    assert len(links) == 6
+    for link in links:
+        assert (d / link).is_file(), link

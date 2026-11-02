@@ -944,28 +944,20 @@ class Site:
         (self.out / "feed.xml").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     def money(self) -> dict:
-        """Sums from ``ledger/ledger.csv``: given (allowance), spent (spend + fee), earned (revenue). Missing file → zeros."""
+        """Home-page money, from the same sum as /ledger/ (``ledger_totals``), so the two can't disagree (page review $3).
+
+        Missing file -> zeros."""
         import csv
 
-        sums = {"given": 0.0, "spent": 0.0, "earned": 0.0}
+        header, rows = ["date", "type", "amount"], []
         path = self.repo / "ledger" / "ledger.csv"
         if path.is_file():
             with path.open(encoding="utf-8") as f:
-                for row in csv.DictReader(f):
-                    try:
-                        amt = float(row.get("amount") or 0)
-                    except ValueError:
-                        continue
-                    kind = (row.get("type") or "").strip()
-                    if kind == "allowance":
-                        sums["given"] += amt
-                    elif kind in ("spend", "fee"):
-                        sums["spent"] += amt
-                    elif kind == "revenue":
-                        sums["earned"] += amt
-                    elif kind == "refund":
-                        sums["spent"] -= amt
-        return {k: f"${v:,.2f}" for k, v in sums.items()}
+                data = list(csv.reader(f))
+            if data:
+                header, rows = data[0], data[1:]
+        t = ledger_totals(header, rows)
+        return {k: f"${float(t[k]):,.2f}" for k in ("given", "spent", "earned", "balance")}
 
     def promises(self) -> dict:
         """Counts from the table in ``memory/wiki/self/commitments.md`` (the one source; page review P3, 10-02).
@@ -992,10 +984,12 @@ class Site:
 
     def fill(self, text: str) -> str:
         """Replace ``{{promises_total}}`` etc. in a page's markdown with counts from their source file."""
-        if "{{promises_" not in text:
-            return text
-        for k, v in self.promises().items():
-            text = text.replace("{{promises_" + k + "}}", str(v))
+        if "{{promises_" in text:
+            for k, v in self.promises().items():
+                text = text.replace("{{promises_" + k + "}}", str(v))
+        if "{{money_" in text:
+            for k, v in self.money().items():
+                text = text.replace("{{money_" + k + "}}", v)
         return text
 
     @staticmethod
