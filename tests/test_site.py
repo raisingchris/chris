@@ -388,6 +388,23 @@ def test_findings_counts_come_from_the_findings_table(tmp_path: Path):
     assert site_build.Site(tmp_path / "none", tmp_path / "o2").findings()["threads"] == 0
 
 
+def test_prediction_counts_come_from_the_predictions_page(tmp_path: Path):
+    """Ask W4 (11-02): scored rows, hits and batch means come from predictions.md; a row number counts once; rows outside a batch section (the log) don't."""
+    repo = tmp_path / "r"
+    d = repo / "memory" / "wiki" / "self"
+    d.mkdir(parents=True)
+    (d / "predictions.md").write_text(
+        "## Batch 1\n| # | p | outcome | Brier |\n|---|---|---|---|\n"
+        "| 1 | 0.5 | **0** - no | 0.25 |\n| 2 | 0.3 | **1** - yes | 0.49 |\n"
+        "## Batch 2\n| # | prediction | picked by |\n|---|---|---|\n| 3 | x | me |\n"
+        "| # | p | outcome | Brier |\n|---|---|---|---|\n| 3 | 0.1 | 0 (under) | 0.01 |\n| 3 | 0.1 | 0 | 0.01 |\n"
+        "## Log\n| 9 | 0.5 | 1 | 0.25 |\n")
+    site = site_build.Site(repo, tmp_path / "o")
+    assert site.predictions() == {"scored": 3, "hits": 1, "batch1": "0.37", "batch2": "0.01"}
+    assert site.fill("{{predictions_scored}}/{{predictions_hits}} {{predictions_batch1}}") == "3/1 0.37"
+    assert site_build.Site(tmp_path / "none", tmp_path / "o2").predictions()["scored"] == 0
+
+
 def test_built_scoreboard_has_no_unfilled_tokens(out: Path):
     for page in (out / "index.html", out / "wiki" / "self" / "scoreboard" / "index.html"):
         if page.exists():

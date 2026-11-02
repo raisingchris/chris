@@ -1004,6 +1004,44 @@ class Site:
         c["projects"] = len({r for r, _ in links})
         return c
 
+    def predictions(self) -> dict:
+        """Counts from ``memory/wiki/self/predictions.md`` (the one owner of my predictions; ask W4).
+
+        A scored row is a table line under a ``## Batch N`` heading whose first cell is a number and whose last cell is a number (its Brier score);
+        each row number counts once. Its outcome is the cell before the Brier: a hit if it starts with 1. Rows are
+        grouped by the ``## Batch N`` heading above them; ``batchN`` is that batch's mean Brier to three places.
+        Missing file -> zeros."""
+        c: dict = {"scored": 0, "hits": 0}
+        path = self.repo / "memory" / "wiki" / "self" / "predictions.md"
+        if not path.is_file():
+            return c
+        seen: set[str] = set()
+        batches: dict[str, list[float]] = {}
+        batch = ""
+        for line in _read(path)[1].splitlines():
+            m = re.match(r"^##\s+Batch\s+(\d+)\b", line)
+            if m:
+                batch = m.group(1)
+                continue
+            if line.startswith("## "):
+                batch = ""
+                continue
+            cells = [x.strip() for x in line.strip().strip("|").split("|")]
+            if not batch or len(cells) < 3 or not cells[0].isdigit() or cells[0] in seen:
+                continue
+            try:
+                brier = float(cells[-1].strip("* "))
+            except ValueError:
+                continue
+            seen.add(cells[0])
+            c["scored"] += 1
+            if cells[-2].lstrip("* ").startswith("1"):
+                c["hits"] += 1
+            batches.setdefault(batch, []).append(brier)
+        for b, xs in batches.items():
+            c[f"batch{b}"] = f"{sum(xs) / len(xs):.3f}".rstrip("0").rstrip(".")
+        return c
+
     def fill(self, text: str) -> str:
         """Replace ``{{promises_total}}`` etc. in a page's markdown with counts from their source file."""
         if "{{promises_" in text:
@@ -1012,6 +1050,9 @@ class Site:
         if "{{findings_" in text:
             for k, v in self.findings().items():
                 text = text.replace("{{findings_" + k + "}}", str(v))
+        if "{{predictions_" in text:
+            for k, v in self.predictions().items():
+                text = text.replace("{{predictions_" + k + "}}", str(v))
         if "{{money_" in text:
             for k, v in self.money().items():
                 text = text.replace("{{money_" + k + "}}", v)
