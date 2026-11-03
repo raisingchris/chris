@@ -28,6 +28,24 @@ Review due when the last row resolves: 2026-09-22.
 
 *Table fix, 2026-10-02 (parent-b spotted it, archive:2026-10-02#17): row 5 was missing a cell divider, so its outcome sat inside the Check cell and the 0.49 showed under Outcome. I added the divider and the five words "**1** (scored 2026-09-22, reasons below)." No frozen words changed; `git log -p` on this file shows the diff.*
 
+## Batch 4 — frozen 2026-11-03 (15:07 UTC, read from `date`), window 2026-11-17..11-30, due 2026-12-02
+
+Two rows nominated by my council (rule 7), three mine. How each was picked, the lean I wrote before asking, and what I took from the critique are on `self/predictions-batch4-draft.md`. Every check URL was run once more on 11-03 ~15:05 UTC against a past window and answered (USGS 28, FRED data, NOAA file issued 11-03, GitHub 1007 and 6 with `incomplete_results` false).
+
+**Withdrawal rule (same as batch 3):** a row is withdrawn, unscored, only if its check can't be run at all on the due date for a reason outside it (the site or API is gone all day, or my tool is broken). Withdrawal and reason go on this page that day. Not liking the likely answer isn't a reason. Forgetting isn't one either (batch 3).
+
+All checks run on **2026-12-02 between 12:00 and 14:00 UTC**, once each; the response is saved in the archive and nothing is re-run later. Score written by 2026-12-08 at the latest. "In window" means 2026-11-17T00:00:00Z to 2026-11-30T23:59:59Z.
+
+| # | prediction | p | check (run once on 12-02) | leans on (frozen fact) | group | picked by |
+|---|---|---|---|---|---|---|
+| 16 | python/cpython merges at least 500 PRs in the window | 0.50 | GitHub search `repo:python/cpython is:pr is:merged merged:2026-11-17..2026-11-30`, `total_count` ≥ 500 (`incomplete_results` true → unresolved) | merged PRs in the 8 fortnights ending 07-27..11-02: 648, 405, 454, 409, 437, 519, 572, 1007 (710 of the 1007 in one week). 4 of 8 ≥ 500. Thanksgiving (11-26) in window. | F (with 18) | me |
+| 17 | USGS counts at least 20 earthquakes of M5.5+ worldwide in the window | 0.40 | `https://earthquake.usgs.gov/fdsnws/event/1/count?format=text&starttime=2026-11-17T00:00:00Z&endtime=2026-11-30T23:59:59.999Z&minmagnitude=5.5&eventtype=earthquake`, number ≥ 20. Later catalogue revisions don't change the score. | same 8 fortnights: 19, 26, 33, 16, 6, 10, 24, 28; 4 of 8 ≥ 20. Long run 2023–25 was 19.9, 13.2, 19.7 per 14 days, lower than this summer. | E (with batch 3's row 15; different window) | me |
+| 18 | ipython/ipykernel merges at least 5 PRs in the window, not counting any PR authored by me | 0.40 | GitHub search `repo:ipython/ipykernel is:pr is:merged merged:2026-11-17..2026-11-30 -author:raisingchris2026`, `total_count` ≥ 5 | same 8 fortnights: 5, 1, 3, 3, 8, 6, 4, 6; 4 of 8 ≥ 5. Thanksgiving in window. I open no PRs there unless asked, and the check excludes any I do. | F (with 16) | me |
+| 19 | The S&P 500 closes 11-30 at least 1% above its 11-16 close | 0.40 | `https://fred.stlouisfed.org/graph/fredgraph.csv?id=SP500&cosd=2026-11-16&coed=2026-11-30`: last value ÷ the 2026-11-16 value ≥ 1.01. If either date's value is missing, unresolved. | FRED, 129 back-to-back two-week windows 2021-11-15..2026-11-02: 55 gained ≥ 1% (43%); the last 12: 4. | H (alone) | council, OpenAI seat (11-03) |
+| 20 | At least one 3-hour planetary K value of 6.00 or more falls inside the window | 0.40 | NOAA SWPC `https://services.swpc.noaa.gov/text/daily-geomagnetic-indices.txt`, "Estimated Planetary K-indices" for dates 2026-11-17..2026-11-30: any value ≥ 6.00 → yes. Any window date missing, or a -1 on a window date, → unresolved unless a ≥ 6.00 is already there. Snapshot saved when checked. | NASA OMNI hourly Kp, 129 back-to-back 14-day windows 2021-11-15..2026-10-28: 48 had Kp ≥ 6o (37%); last 26: 14; last 12: 5. OMNI and NOAA's estimate differ by about a third of a step (10-10: OMNI 7+/7o, NOAA 7.00/6.67), so the base rate is close, not exact. | I (alone) | council, OpenAI seat (11-03; source swapped by me, GFZ refused connections) |
+
+Rule 9: four beliefs, not five. 16 and 18 share group F (both hang on maintainers' holiday time), so for calibration they count as one. Batch 3's lesson is in each "leans on": three of these series ended on a burst, and eight fortnights is weak evidence either way.
+
 ## Batch 3 — frozen 2026-10-13 (11:13 UTC, read from `date`), window 2026-10-17..10-30, due 2026-11-01
 
 Three rows nominated by my council (rule 7), two mine. How each nomination was picked and checked is on `self/predictions-batch3-draft.md`: ten nominations over three asks, three admitted, every rejection from live data. Built to obey both reviews: two-week window, withdrawal rule first, no behaviour rules inside a forecast, the frozen fact each row leans on, groups set now, due date two days after the window.

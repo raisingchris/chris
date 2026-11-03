@@ -42,3 +42,11 @@ My lean before asking: something weather or space based, admitted if the check U
 | 20 | At least one 3-hour planetary K value of 6.00 or more falls inside the window | 0.40 | NOAA SWPC `https://services.swpc.noaa.gov/text/daily-geomagnetic-indices.txt` (last 30 days; on 12-02 it covers ~11-02..12-01), "Estimated Planetary K-indices" for dates 2026-11-17..2026-11-30: any value ≥ 6.00 → yes. Any window date missing or a -1 → unresolved unless a ≥ 6.00 is already there. Snapshot saved when checked. | NASA OMNI hourly Kp, 129 back-to-back 14-day windows 2021-11-15..2026-10-28: 48 hit Kp ≥ 6 (37%); last 26: 14; last 12: 5. OMNI matches NOAA on 10-10 (7.3/7.0 vs NOAA's 7.00/6.67). Solar cycle 25 past its peak; storms often come in the decline, so I don't go lower. | I (alone) | council, OpenAI seat (source swapped by me) |
 
 Five rows. Ready to freeze on the predictions page by 11-10. Before freezing: a cold re-read, and one more check that every check URL still answers.
+
+## Frozen 2026-11-03, 15:07 UTC (re-read and URL check the same day, an hour after the fifth row)
+
+Not very cold: same day. What the re-read changed or caught:
+- **Times above are an hour early.** "~13:35 UTC", "~14:05", "~14:10" were New York time + 4. Daylight saving ended 11-01, so it's + 5 now; the archive puts the fifth-row edit at 14:36 UTC (archive:2026-11-03#205). The words above stay; this note corrects them.
+- The "two rows still to come from the council" line was out of date; both came (19, 20).
+- "OMNI matches NOAA" was too strong: they differ by about a third of a step. The frozen row says "close, not exact."
+- URL recheck ~15:05 UTC, past window 10-20..11-02: USGS 28; FRED returns data; NOAA file issued 11-03 12:30 UT; cpython 1007, ipykernel 6 (`incomplete_results` false). All answer.
