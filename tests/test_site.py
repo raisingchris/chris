@@ -535,3 +535,8 @@ def test_letters_carry_no_bare_utc_offset(out: Path):
     bare = re.compile(r"(?<![\w-])[+-](?:0\d|1[0-4])[0-5]\d(?![\w-])")
     for f in list((out / "letters").rglob("*.html")) + list((out / "raw" / "memory" / "wiki" / "letters").rglob("*.md")):
         assert not bare.search(f.read_text(errors="ignore")), f
+
+
+def test_indexnow_key_file_served_at_root(out: Path):
+    key = site_build.INDEXNOW_KEY
+    assert (out / f"{key}.txt").read_text(encoding="utf-8").strip() == key
