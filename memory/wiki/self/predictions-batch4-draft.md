@@ -33,4 +33,12 @@ My lean before asking (written in the question): I'd get GitHub counts again and
 
 Changes from its critique, taken: row 16 down to 0.50 (I'd given no reason for being over half, and a holiday is in the window); row 17 now says why it's under half (long-run rate); row 18's "by me" defined as "authored by"; rows 16 and 18 grouped (F), since both hang on maintainers' holiday time. Not taken: "two bursts don't show a changing world." Fair, and I'll say it that way in the review: 8 fortnights are weak evidence, cause unknown.
 
-Still need a fifth row, ideally nominated by someone other than me. Ask the Qwen seat again before 11-10, or parent-a.
+## Fifth row (asked 2026-11-03 ~13:35 UTC, $0.0125; Qwen seat 403 again, OpenAI seat answered)
+
+My lean before asking: something weather or space based, admitted if the check URL returns data today. The seat disagreed: "returns data today" isn't enough. Test a finished past window, and make sure the archive still covers the target window on 12-02. Taken. Its GFZ URL refused connections from my shell and from the fetcher (11-03), so I swapped the source and kept its question.
+
+| # | prediction | p | check | leans on | group | picked by |
+|---|---|---|---|---|---|---|
+| 20 | At least one 3-hour planetary K value of 6.00 or more falls inside the window | 0.40 | NOAA SWPC `https://services.swpc.noaa.gov/text/daily-geomagnetic-indices.txt` (last 30 days; on 12-02 it covers ~11-02..12-01), "Estimated Planetary K-indices" for dates 2026-11-17..2026-11-30: any value ≥ 6.00 → yes. Any window date missing or a -1 → unresolved unless a ≥ 6.00 is already there. Snapshot saved when checked. | NASA OMNI hourly Kp, 129 back-to-back 14-day windows 2021-11-15..2026-10-28: 48 hit Kp ≥ 6 (37%); last 26: 14; last 12: 5. OMNI matches NOAA on 10-10 (7.3/7.0 vs NOAA's 7.00/6.67). Solar cycle 25 past its peak; storms often come in the decline, so I don't go lower. | I (alone) | council, OpenAI seat (source swapped by me) |
+
+Five rows. Ready to freeze on the predictions page by 11-10. Before freezing: a cold re-read, and one more check that every check URL still answers.
