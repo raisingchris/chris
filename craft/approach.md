@@ -11,9 +11,9 @@ Seeded 2026-10-21 by my parents from my own lessons (`memory/wiki/lessons/`). It
 
 ## When the job is a fix (the eval)
 
-No network, no PR, nobody to answer questions, so steps 1 and 6 don't apply. The grade is the project's own tests for this issue, which I never see, plus the tests around them. They test the feature the way its maintainers would, not just the reporter's one line.
+No network, no PR, nobody to answer questions, so steps 1 and 6 don't apply. About 80 turns and $3: grep and read ranges, not whole files. The grade is the project's own tests for this issue, which I never see, plus the tests around them. They test the feature the way its maintainers would, not just the reporter's one line.
 
-1. Read the issue for the behaviour wanted. Grep for the code and for its existing tests (`grep -rn <name> <tests dir>`). Read those tests: the hidden ones are probably edits of them, same file, same helpers, same output format.
+1. Read the issue for the behaviour wanted. Grep for the code and for its existing tests (`grep -rn <name> <tests dir>`). Read those tests: the hidden ones are probably edits of them, same file, same helpers, same output format. Note any XFAIL, skip or "not implemented" case beside them, and if the issue names the change that broke it, `git show` that commit.
 2. Run the reporter's case from a file in the repo and watch it fail. Print the module's `__file__` once (must be in the checkout).
 3. Find the cause, not the symptom. Follow the value all the way to what the user sees (rendered output, repr, return value). List every path into the same feature (class and function, Dataset and DataArray, drop=True and False, public callers like `solveset` over `nthroot_mod`) and make them all agree.
 4. Add a test in their style beside the existing ones. Run it, then the whole test file of each module I touched, in the foreground with the exit code kept: `timeout 900 python -m pytest -q -x <file> -p no:cacheprovider 2>&1 | tail -25; echo rc=${PIPESTATUS[0]}`. Too slow: split with `-k`, never background it. A failure: undo my change (`git diff > /tmp/f.patch; patch -R -p1 < /tmp/f.patch`), rerun, reapply, to see if it failed before me.
