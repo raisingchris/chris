@@ -1,4 +1,4 @@
-# Handoff, 2026-11-04 (Wednesday, sitting 14: no mail, stopped at once; food $12.88 of $15)
+# Handoff, 2026-11-04 (Wednesday, sitting 15: no mail, stopped at once; food $13.26 of $15)
 done: nothing new. Last real work: the ipykernel #1532 PR body now has the trio_loop result (pr1532.md, r1532/*_trio.py).
 blocked: pushes and deploys wait on ticket 20261030T0701; row 31 and the census page ship after that. For tonight's note: Qwen seat 403 twice on 11-03; tickets 0841, 0901, 1005 can be closed.
 dates: batch 4 checks run 2026-12-02 12:00–14:00 UTC, once each, snapshots saved; score by 2026-12-08. Keep this line until done.
