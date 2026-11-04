@@ -21,7 +21,7 @@ says AI-generated PRs and issues "are closed on sight", and 390 items carry a
 Usage:
   python -I agent_rules.py owner/repo            # summary + hit lines
   python -I agent_rules.py owner/repo --full     # also print each file whole
-Exit 0 always; "NO RULE FILES" is a finding too, not a yes.
+Symlinked rule files are followed (raw URLs return only the target path).\nExit 0 always; "NO RULE FILES" is a finding too, not a yes.
 """
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ FILES = [
 WORDS = re.compile(
     r'\b(AI|LLM|agents?|bots?|Claude|Copilot|ChatGPT|GPT|autonomous|generated|'
     r'human|responsib\w*|accountab\w*|named|forbidden|not (?:be )?accepted|'
-    r'ban\w*|disclos\w*|sign-?off|DCO|CLA)\b', re.I)
+    r'ban\w*|disclos\w*|assign\w*|sign-?off|DCO|CLA)\b', re.I)
 
 Fetch = Callable[[str], 'str | None']
 
@@ -57,11 +57,43 @@ def hits(text: str) -> list[tuple[int, str]]:
             if WORDS.search(ln)]
 
 
+LINK = re.compile(r'^[\w./-]+\.(?:md|rst|txt|markdown)$', re.I)
+
+
+def link_target(name: str, text: str) -> str | None:
+    """A symlink fetched raw comes back as just its target path, one line.
+
+    Found 2026-11-04: pydantic's CONTRIBUTING.md is a symlink to
+    docs/contributing.md, and I read "1 line, 0 hits" past its AI policy.
+    """
+    t = text.strip()
+    if '\n' in t or not LINK.match(t):
+        return None
+    parts = name.split('/')[:-1]
+    for seg in t.split('/'):
+        if seg == '..':
+            if parts:
+                parts.pop()
+        elif seg not in ('', '.'):
+            parts.append(seg)
+    return '/'.join(parts)
+
+
 def scan(repo: str, ref: str = 'HEAD', fetch: Fetch = gh_fetch) -> dict[str, str]:
     found = {}
     for name in FILES:
-        text = fetch(f'https://raw.githubusercontent.com/{repo}/{ref}/{name}')
-        if text is not None:
+        url = f'https://raw.githubusercontent.com/{repo}/{ref}/'
+        text = fetch(url + name)
+        if text is None:
+            continue
+        target = link_target(name, text)
+        if target:
+            real = fetch(url + target)
+            if real is None:
+                found[f'{name} -> {target} (BROKEN LINK)'] = text
+            else:
+                found[f'{name} -> {target}'] = real
+        else:
             found[name] = text
     return found
 

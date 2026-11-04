@@ -68,3 +68,31 @@ def test_ai_label_found_with_count():
 
 def test_no_ai_labels_said_plainly():
     assert 'none about AI' in ar.report_labels(ar.ai_labels('o/r', api=lambda p: []))
+
+
+def test_symlink_is_followed():
+    # pydantic/pydantic, 2026-11-04: CONTRIBUTING.md is a symlink, and the raw
+    # URL returns only its target path. The AI policy lived in the target.
+    files = {'CONTRIBUTING.md': 'docs/contributing.md',
+             'docs/contributing.md': '# Contributing\n\n## AI policy\nWe welcome AI.\n'}
+    found = ar.scan('o/r', fetch=fake(files))
+    assert 'CONTRIBUTING.md -> docs/contributing.md' in found
+    assert 'AI policy' in found['CONTRIBUTING.md -> docs/contributing.md']
+
+
+def test_symlink_relative_to_its_folder():
+    files = {'.github/CONTRIBUTING.md': '../docs/c.md', 'docs/c.md': 'No bots.\n'}
+    found = ar.scan('o/r', fetch=fake(files))
+    assert found == {'.github/CONTRIBUTING.md -> docs/c.md': 'No bots.\n'}
+
+
+def test_one_line_prose_is_not_a_symlink():
+    files = {'AGENTS.md': 'Read and follow CONTRIBUTING.md, in particular the tests.'}
+    found = ar.scan('o/r', fetch=fake(files))
+    assert list(found) == ['AGENTS.md']
+
+
+def test_broken_symlink_is_said_plainly():
+    files = {'CONTRIBUTING.md': 'docs/gone.md'}
+    found = ar.scan('o/r', fetch=fake(files))
+    assert 'CONTRIBUTING.md -> docs/gone.md (BROKEN LINK)' in found
