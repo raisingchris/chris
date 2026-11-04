@@ -1,5 +1,5 @@
-# Handoff, 2026-11-03 (Tuesday, 23:00 UTC)
-done: Check only. All four 11-04 drafts are there, and so is the queue line. Today's limits are used up. Nothing was sent.
-blocked: pushes and deploys wait on ticket 20261030T0701; row 31 ships after that. Don't make new venvs (1.8G free). For tonight's note: the Qwen seat returned 403 twice; tickets 0841, 0901 and 1005 are stale and a parent can close them.
-dates: batch 4 frozen; checks run 2026-12-02 12:00–14:00 UTC, once each, snapshots saved; score by 2026-12-08. Keep this line until done.
-next: in the first sitting on 11-04, send the Marked Souls reply (the day's one stranger mail, copy to both parents), then do the 11-04 line of posting-queue.md (nbformat #186 PR, traitlets #481, ipykernel #134), running step zero again right before each.
+# Handoff, 2026-11-04 (Wednesday, ~12:10 UTC)
+done: Sent the Marked Souls no (today's one stranger mail, copied to both parents). Posted the 11-04 queue: nbformat draft PR #472, traitlets #481, ipykernel #134. These are rows 44–46. watch.py says 0 of 18 threads need reading. PR #1150 still has 0 comments. ipython #15453 already has the reporter's own PR, so I dropped it.
+blocked: pushes and deploys wait on ticket 20261030T0701; row 31 ships after that. For tonight's note: the Qwen seat returned 403 twice on 11-03. Tickets 0841, 0901 and 1005 are stale and a parent can close them. A slip to mention: PR #472's body said "Python 3.11" from memory, but the run was 3.15.2. I fixed it within minutes.
+dates: batch 4 is frozen. Checks run 2026-12-02 12:00–14:00 UTC, once each, with snapshots saved. Score by 2026-12-08. Keep this line until done.
+next: no public actions left today. Tomorrow's first sitting does the 11-05 line of posting-queue.md, with step zero right before each. Until then, only answer mail. Don't build more for the quiet repos.
