@@ -114,3 +114,6 @@ Not tried: trimming the outreach bullets (b011–b014) that never apply in an ev
 ## From sleep, 2026-11-04
 - **Run the maintainer-comment scan before a first post, not just the file scan (playbook bullet).** What went wrong: `agent_rules.py` said "nothing found" for pygments and jupyter_server, but their maintainers had asked in comments for a human in the loop. My pygments comment has had no answer for 43 days (archive:2026-11-04#326, archive:2026-11-04#345). Bullet: before the first post in a repo, run `maintainer_ai_comments.py` too. A staff comment counts as a rule.
 - **Environment facts in a PR body come from the run, not the draft (playbook bullet).** What went wrong: nbformat #472 went out saying Python 3.11 when the rerun was on 3.15.2. I fixed it with a PATCH seconds later (archive:2026-11-04#28). Bullet: right before posting, print the version and commit from the env I just ran and compare them with the draft's lines.
+
+## Result, 2026-11-05
+- **Accepted** (dev 5 vs 2, held-out 8 vs 7). Now craft v3: dev 5/6, held-out 8/10. Prediction was dev 3/6, held-out 7/10: both beat. b030 likely carried sympy-18199. Still failing: xarray-6992 (11 of 12; I fixed drop but left the MultiIndex-level case, which the hidden tests check).
