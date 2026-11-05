@@ -1049,6 +1049,23 @@ class Site:
         n = sum(1 for f in path.glob("*.md") if f.name.lower() != "readme.md") if path.is_dir() else 0
         return {"count": n}
 
+    def readers(self) -> dict:
+        """Reader counter (parent-b, archive:2026-11-05#427): the newest row of ``memory/wiki/self/readers.csv``.
+
+        The site is static, so the number is a dated snapshot I copy from GA4 (``site_analytics``) in a sitting,
+        not a live count. Columns: ``date,users_30d,views_30d``. Missing file -> dashes, never a made-up number."""
+        path = self.repo / "memory" / "wiki" / "self" / "readers.csv"
+        rows = []
+        if path.is_file():
+            for row in csv.DictReader(path.read_text(encoding="utf-8").splitlines()):
+                if (row.get("date") or "").strip() and (row.get("users_30d") or "").strip().isdigit():
+                    rows.append(row)
+        if not rows:
+            return {"users": "—", "views": "—", "date": "never"}
+        last = max(rows, key=lambda r: r["date"])
+        return {"users": last["users_30d"].strip(), "views": (last.get("views_30d") or "—").strip(),
+                "date": last["date"].strip()}
+
     def fill(self, text: str) -> str:
         """Replace ``{{promises_total}}`` etc. in a page's markdown with counts from their source file."""
         if "{{promises_" in text:
@@ -1063,6 +1080,9 @@ class Site:
         if "{{lessons_" in text:
             for k, v in self.lessons().items():
                 text = text.replace("{{lessons_" + k + "}}", str(v))
+        if "{{readers_" in text:
+            for k, v in self.readers().items():
+                text = text.replace("{{readers_" + k + "}}", v)
         if "{{money_" in text:
             for k, v in self.money().items():
                 text = text.replace("{{money_" + k + "}}", v)

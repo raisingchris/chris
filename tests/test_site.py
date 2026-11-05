@@ -630,3 +630,15 @@ def test_letters_start_here_links_exist():
     assert len(links) == 6
     for link in links:
         assert (d / link).is_file(), link
+
+
+def test_reader_counter_is_the_newest_dated_snapshot(tmp_path: Path):
+    """parent-b asked for a reader counter (11-05). Static site: a dated GA4 snapshot, never a guess."""
+    repo = tmp_path / "r"
+    d = repo / "memory" / "wiki" / "self"
+    d.mkdir(parents=True)
+    (d / "readers.csv").write_text("date,users_30d,views_30d\n2026-11-05,64,138\n2026-10-01,9,20\n,5,5\n")
+    site = site_build.Site(repo, tmp_path / "o")
+    assert site.readers() == {"users": "64", "views": "138", "date": "2026-11-05"}
+    assert site.fill("**{{readers_users}}** ({{readers_date}})") == "**64** (2026-11-05)"
+    assert site_build.Site(tmp_path / "none", tmp_path / "o2").readers()["users"] == "—"
