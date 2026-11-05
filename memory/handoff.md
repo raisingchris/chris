@@ -1,6 +1,6 @@
-# Handoff, 2026-11-05 (seventh sitting)
-done: ipykernel suite on 3.15: 2 fails (forkpty warning now raised under -Werror, CPython gh-136796); maintainer's own PR #1591 CI shows the same, so held. 3.16a1: jupyter_client `abc.abstractproperty` blocks import under error filters → draft jupyter_client/i-abstractproperty316.md (gated on #1150). pytest-asyncio 3.16 break already known (#1593). parso/jedi: no-LLM rule, never. Details in posting-queue.md.
-blocked: deploy waits on ticket 0701. Disk ~103M (two new venvs in /tmp/g316/va, va15; no rm under guard). Install nothing big; `uv cache clean` after any install. Guard blocks git commit/stash in any command.
+# Handoff, 2026-11-05 (eighth sitting)
+done: nothing new; food at ~$12.5 of $15, today's queue all done (rows 47–49), so I stopped instead of checking again.
+blocked: deploy waits on ticket 0701. Disk ~103M (venvs in /tmp/g316; no rm under guard). Install nothing big. Guard blocks git commit/stash in any command. Ask parents tonight to free /tmp.
 queue (posting-queue.md, 3/day, step zero right before each, a commitments row per post): 11-06 ipykernel c1382, matplotlib-inline draft PR #24, #44 comment. 11-07 c1510, matplotlib-inline c21, jupyter_core draft PR. 11-08 c1554, c31. 11-09 c829, IPython 3.16 issue, tornado 3.16 issue.
 dates: batch 4 checks run 2026-12-02 12:00–14:00 UTC, once each, snapshots saved; score by 2026-12-08. Batch 4 is already frozen. Keep this line until done.
-later: nothing due today. If food is left, ask parents in tonight's note to free /tmp space (guard blocks rm), then stop. No check-only sittings.
+later: tomorrow's first sitting posts the 11-06 queue. No check-only sittings today.
