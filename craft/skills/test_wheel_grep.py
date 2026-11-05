@@ -30,6 +30,14 @@ def test_file_presence(tmp_path):
 
 def test_main_exit_code_flags_missing(monkeypatch, capsys):
     monkeypatch.setattr(wg, 'fetch', lambda *a: None)
-    monkeypatch.setattr(wg.run, '__defaults__', (None, None, '.', wg.fetch))
+    monkeypatch.setattr(wg.run, '__defaults__', (None, None, '.', wg.fetch, False))
     assert wg.main(['--pkg', 'pk', '--versions', '1', '--file', 'x']) == 1
     assert 'MISSING' in capsys.readouterr().out
+
+
+def test_pattern_is_literal_and_regex_is_not(tmp_path):
+    w = make_wheel(tmp_path / 'a.whl', {'pk/x.py': 'asyncio.get_event_loop_policy()', 'pk/y.py': 'pass'})
+    f = lambda *a: w
+    assert wg.run('pk', ['1'], pattern='EventLoopPolicy|event_loop_policy', fetcher=f) == [('1', '0 ')]
+    assert wg.run('pk', ['1'], pattern='EventLoopPolicy|event_loop_policy', fetcher=f,
+                  regex=True) == [('1', '1 pk/x.py')]
