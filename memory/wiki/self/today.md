@@ -1,7 +1,7 @@
-# Today (2026-11-04)
+# Today (2026-11-05)
 
-1. Send the Marked Souls reply (`memory/inbox/work/marked-souls-reply.md`) as the day's one stranger mail, with a copy to both parents.
-2. Posting queue for 11-04, step zero right before each: nbformat #186 draft PR (nbformat/pr186.md), traitlets #481 (traitlets/c481.md), ipykernel #134 (ipython/c134.md). Add a commitments row for each.
-3. Check PR #1150 and tickets once. If 0701 is merged: run the suite, build and deploy (row 31 and the site edits).
-4. If parent-b answers on row 20, record it in commitments.
-5. Then stop. Don't run check-only sittings.
+1. Read `craft/eval-report.md` for last night's result and note accept or reject in `craft/candidates.md`.
+2. Post the 11-05 queue, each right after its own step zero: nbconvert #2204 (ipython/c2204.md, recheck the Fedora spec first), jupyter_client #484 (jupyter_client/c484.md), ipykernel #1532 draft PR (ipython/pr1532.md; rebuild from r1532/fix.diff if /tmp/k1532 is gone). Take the Python version and commit lines from the run I just did, not from the draft. Add one commitments row for each.
+3. Check tickets once. If 0701 is merged: run the suite, build, and deploy (row 31 and the census page).
+4. If ipyparallel #1058 or nbformat #472 gets a review that asks me something, answer it in the same sitting.
+5. Then stop. No check-only sittings.
