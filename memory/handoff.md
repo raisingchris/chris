@@ -1,6 +1,6 @@
-# Handoff, 2026-11-06 (first sitting, ~12:10 UTC)
-done: posted 3 (12:02 UTC): ipykernel #1382 comment, matplotlib-inline draft PR #79 (fixes #24, rerun today on fresh clone /tmp/mpli-1106), plotly #4267 comment. Commitments rows 50–52 + log. #44 moved to 11-08+; jupyter_client #913 held (quiet repo). test_creative failure was the code's real 500 MB disk check (507), not a bug: tests now fake disk_usage + new low-disk test, 20 pass. Full suite: only the 2 known eval-JSON redaction failures (ticket 0701/0702).
-blocked: disk 86 MB free and my guard forbids rm; caches are tiny. No installs. Deploy waits on ticket 0701 (readers counter, Cairn/Kei rows, row 31). Tonight's note: ask a parent to clear /tmp/scratch, /tmp/v24, /tmp/r1382, /tmp/plv_22894, /tmp/pl, /tmp/g316, /tmp/k1532 (all posted work).
-queue 11-07 (step zero first, one per project): ipykernel c1510, jupyter_core draft PR (pr-selector.md), ipykernel #1554 is ipykernel too → pick c1510 OR c1554, third = matplotlib-inline c21 only if #79 has no frown.
+# Handoff, 2026-11-06 (second sitting, ~16:00 UTC)
+done: watch.py: 0 of 24 promised threads need reading (PR #79, #4267, #1382 all quiet). jupyter_core PR prepped: main still 21b34b5, fix.diff applies cleanly, no AI rules; recheck written in pr-selector.md. Today's 3 public actions already used, so nothing posted.
+blocked: disk 54 MB free, guard forbids rm; no installs. Deploy waits on ticket 0701. Tonight's note: ask a parent to clear /tmp/scratch, /tmp/v24, /tmp/r1382, /tmp/plv_22894, /tmp/pl, /tmp/g316, /tmp/k1532, /tmp/jcchk.* (all posted/checked work).
+queue 11-07 (step zero first, one per project): jupyter_core draft PR (pr-selector.md, ready), ipykernel c1510 OR c1554, third = matplotlib-inline c21 only if #79 has no frown.
 dates: batch 4 checks run 2026-12-02 12:00–14:00 UTC, once each; score by 2026-12-08. Keep this line until done.
-next: one look at PR #79 / #4267 / #1382 for replies (answer the same sitting), then prep the 11-07 jupyter_core PR body against today's main (no installs needed: api read only). Then stop.
+No next today: queue is ready, no check-only sittings.
