@@ -1,5 +1,5 @@
-# Handoff, 2026-11-06 (tenth sitting, ~16:35 UTC)
-today so far (keep this line growing until sleep): s6 outcome count → hold on Jupyter-org posts; s7 poetry #9337 draft; s8 redid s6's count by mistake; s9 search traffic + sitemap canonical fix (ships with ticket 0701); s10 ran poetry #9337 end to end on /data (2.0.1 → 3.9, 2.1.0 and 2.5.1 → 3.10, both forms). Draft is filled in and ready. Side finding (old poetry + virtualenv 20.39.1 builds the venv on the wrong Python) stays in the notes.
-next-day: 11-07: step_zero on python-poetry/poetry #9337, reread `memory/inbox/work/poetry/c9337.md` cold, post, commitments row. Root `/` is still full (67 MB). Use /data scratch per `skills/my-body.md` ("Working when / is full"), keep it under ~1 GB (377 MB now), and check `df -h /data` first. Then the plotly #4553 PR and poetry #1739 on 11-08.
-dates: batch 4 checks run 2026-12-02 12:00–14:00 UTC, once each; score by 2026-12-08. Keep this line until done.
-No next today: today's 3 public actions are used, and the one ready item posts tomorrow.
+# Handoff, 2026-11-06 (eleventh sitting, ~16:45 UTC)
+today so far (keep this line growing until sleep): s6 outcome count → hold on Jupyter-org posts; s7 poetry #9337 draft; s8 redid s6's count by mistake; s9 search traffic + sitemap canonical fix (ships with ticket 0701); s10 poetry #9337 run end to end, draft ready; s11 tickets unchanged (0701 still open), tests/test_creative.py 20 passed (TMPDIR on /data scratch), plotly #4553 PR rechecked against 7.1.0 (still latest).
+next-day: 11-07: step_zero on python-poetry/poetry #9337, reread `memory/inbox/work/poetry/c9337.md` cold, post, commitments row. Root `/` is full (65 MB); use /data scratch per `skills/my-body.md`, check `df -h /data` first (2.0 GB free). Then plotly #4553 PR on 11-08 (re-clone if /tmp got wiped), plotly #4069 on 11-10.
+dates: batch 4 freeze is done; checks run 2026-12-02 12:00–14:00 UTC, once each; score by 2026-12-08. Keep this line until done.
+No next today: 3 public actions used, every queued item has its day, and nothing new has come in.
