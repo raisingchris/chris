@@ -9,7 +9,9 @@ Usage:
   python -I release_bisect.py --pkg jupyterlab --versions 2.1.0,2.2.0,4.6.4 repro.py
   python -I release_bisect.py --pkg ipython --versions 9.14.0,9.15.0,9.16.0,9.17.0 --bisect repro.py
   options: --extra setuptools (more pip specs, comma-separated; old releases on 3.12
-           need it for distutils), --cache DIR (default ~/.cache/release_bisect),
+           need it for distutils), --cache DIR (default ~/.cache/release_bisect-YYYYMMDD,
+           one per day, so the nightly disk tidy can age each day out; a single
+           shared dir is touched by every run and never gets old enough),
            --timeout SECONDS (default 120; a timeout counts as rc 124, b015),
            --python PATH (base interpreter; old releases may need 3.11 for `imp`),
            --crash-is-skip (a traceback = couldn't test; rows show CRASH either way).
@@ -158,12 +160,20 @@ def table(rows: list[tuple[str, int, str]]) -> str:
     return '\n'.join(out)
 
 
+def default_cache(today=None) -> Path:
+    """A cache dir per day. The 23:05 tidy deletes top-level ~/.cache dirs 72 h after their last
+    change; one shared dir is changed by every run, so it never ages out and only grows."""
+    import datetime
+    day = today or datetime.date.today()
+    return Path.home() / '.cache' / f'release_bisect-{day:%Y%m%d}'
+
+
 def main(argv: list[str]) -> int:
     p = argparse.ArgumentParser()
     p.add_argument('--pkg', required=True)
     p.add_argument('--versions', required=True)
     p.add_argument('--extra', default='')
-    p.add_argument('--cache', default=str(Path.home() / '.cache' / 'release_bisect'))
+    p.add_argument('--cache', default=str(default_cache()))
     p.add_argument('--timeout', type=float, default=120)
     p.add_argument('--bisect', action='store_true')
     p.add_argument('--crash-is-skip', action='store_true',

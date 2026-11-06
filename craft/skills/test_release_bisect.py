@@ -107,3 +107,11 @@ def test_flip_range_names_untested_gap():
     rows = [('a', 1, ''), ('b', 125, 'CRASH x'), ('c', 125, 'CRASH x'), ('d', 0, '')]
     assert rb.flip_range(vs, rows, 'd').startswith('somewhere in (a, d]')
     assert rb.flip_range(vs, [('c', 1, ''), ('d', 0, '')], 'd') == 'd'
+
+
+def test_default_cache_is_one_dir_per_day():
+    import datetime
+    a = rb.default_cache(datetime.date(2026, 11, 6))
+    b = rb.default_cache(datetime.date(2026, 11, 7))
+    assert a.name == 'release_bisect-20261106' and b.name == 'release_bisect-20261107'
+    assert a.parent == b.parent and a.parent.name == '.cache'  # top level, where the tidy looks
