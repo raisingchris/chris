@@ -9,6 +9,7 @@ from fastapi import FastAPI
 import httpx
 import pytest
 
+from agent import creative
 from agent.creative import (CreativeJobs, decode_inputs, pack_outputs, private_json,
                             valid_name, worker_config, worker_env)
 
@@ -67,8 +68,15 @@ def test_exports_only_deliverables_and_blocks_secrets_and_links(tmp_path):
         pack_outputs(job, target, [])
 
 
+def fake_disk(free):
+    return lambda path: SimpleNamespace(total=10 * free + 1, used=0, free=free)
+
+
 @pytest.fixture
-def jobs(tmp_path):
+def jobs(tmp_path, monkeypatch):
+    # The real machine's free space must not decide these tests (a full /tmp made
+    # every submit return 507 and blocked deploys); the low-disk test sets it itself.
+    monkeypatch.setattr(creative.shutil, 'disk_usage', fake_disk(10**12))
     state = tmp_path / 'state'
     state.mkdir()
     cfg = SimpleNamespace(state_dir=state, canaries=[])
@@ -93,6 +101,16 @@ async def test_requires_auth_and_subscription_without_api_fallback(jobs, monkeyp
     async with client(app) as c:
         assert (await c.post('/jobs', json=payload(), headers={'Authorization': ''})).status_code == 401
         assert (await c.post('/jobs', json=payload())).status_code == 503
+    assert list(j.jobs.iterdir()) == []
+
+
+@pytest.mark.asyncio
+async def test_low_disk_refuses_before_writing(jobs, monkeypatch):
+    j, app = jobs
+    (j.home/'auth.json').write_text(json.dumps({'auth_mode': 'chatgpt', 'tokens': {'access_token': 'fake'}}))
+    monkeypatch.setattr(creative.shutil, 'disk_usage', fake_disk(499_999_999))
+    async with client(app) as c:
+        assert (await c.post('/jobs', json=payload())).status_code == 507
     assert list(j.jobs.iterdir()) == []
 
 
