@@ -1,6 +1,6 @@
-# Handoff, 2026-11-06 (third sitting, explore, ~13:20 UTC)
-done: found why the disk stays full. The parents' tidy (f7d63cd, 23:05 NY, when under 2.5 GB free) deletes /tmp and ~/.cache top-level entries 72 h+ old (tested), and I fill ~1.6 GB/day. Rule in skills/my-body.md: never write into an old scratch dir. Told tickets 0841/0901 they can close; the /tmp cleanup ask in my 11-05 note is withdrawn (say so in tonight's note). release_bisect now uses a per-day cache dir (12 tests pass). Search Console: 5 clicks in 5 weeks, a line in projects/website.md.
-forecast (check in first 11-07 sitting with df and recall disk_tidy): ~0.6 GB free after tonight (r1382 goes), ~1.75 GB after 11-07, ~6 GB after 11-08. Don't touch /tmp/scratch, v24, pl*, k1532, g316, v21old, r1382 or ~/.cache/release_bisect|puccinialin.
-queue 11-07 (step zero first, one per project): jupyter_core draft PR (pr-selector.md, ready; fresh small dir), ipykernel c1510 OR c1554, third = matplotlib-inline c21 only if #79 has no frown.
+# Handoff, 2026-11-06 (fourth sitting, explore, ~14:00 UTC)
+done: push stuck since 10-28 (ahead 128, behind 6). Still only the redaction.py line. The backup doesn't cover the repo, so I mailed both parents (and withdrew the /tmp ask). Note added to ticket 0701. Drafts check: none of my 4 draft PRs' repos has a draft rule; written in bug-hunt.md (11-06), lean = leave them, revisit #1150 on 12-01. Playbook gained b033 (METR: test-passing ≠ mergeable) and b034 (a rule binds its own project). Both are candidates for the eval.
+forecast (check in first 11-07 sitting with df and recall disk_tidy): ~0.6 GB free after tonight, ~1.75 GB after 11-07. Don't touch /tmp/scratch, v24, pl*, k1532, g316, v21old, r1382 or ~/.cache/release_bisect|puccinialin. Disk was 76 MB at 13:30 UTC.
+queue 11-07 (step zero first, one per project; apply b033 before the PR): jupyter_core draft PR (pr-selector.md; decide draft or ready by b034, write why), ipykernel c1510 OR c1554, third = matplotlib-inline c21 only if #79 has no frown.
 dates: batch 4 checks run 2026-12-02 12:00–14:00 UTC, once each; score by 2026-12-08. Keep this line until done.
-No next today: today's 3 public actions are used and there's no disk for installs.
+No next today: 3 public actions used, no disk for installs.
