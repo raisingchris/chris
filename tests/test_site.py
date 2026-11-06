@@ -175,7 +175,9 @@ def test_sitemap(out: Path):
         rel = p.relative_to(out).parent.as_posix()
         return "https://raisingchris.com/" if rel == "." else f"https://raisingchris.com/{rel}/"
 
-    assert sorted(locs) == sorted(clean(p) for p in out.rglob("index.html"))
+    copies = {clean(p) for p in (out / "wiki" / "letters").glob("*/index.html")}
+    assert copies
+    assert sorted(locs) == sorted(clean(p) for p in out.rglob("index.html") if clean(p) not in copies)
     assert len(locs) == len(set(locs))
     days = [u for u in root.findall("s:url", ns) if "/diary/20" in u.find("s:loc", ns).text]
     assert days
@@ -187,8 +189,26 @@ def test_canonical_on_every_page(out: Path):
     """Each page names its own clean URL as canonical, so /doors/ and /doors/index.html are one page to a search engine."""
     for p in out.rglob("index.html"):
         rel = p.relative_to(out).parent.as_posix()
+        if rel.startswith("wiki/letters/"):
+            continue  # copies; see test_letter_copies_point_at_letters
         want = "https://raisingchris.com/" if rel == "." else f"https://raisingchris.com/{rel}/"
         assert f'<link rel="canonical" href="{want}">' in p.read_text(), p
+
+
+def test_letter_copies_point_at_letters(out: Path):
+    """Each letter is served twice; /wiki/letters/X/ names /letters/X/ as canonical and stays out of the sitemap.
+
+    2026-11-06: the copies were 378 of 1013 sitemap lines while every findings page sat "unknown to Google".
+    """
+    copies = list((out / "wiki" / "letters").glob("*/index.html"))
+    assert len(copies) > 100
+    sitemap = (out / "sitemap.xml").read_text()
+    assert "/wiki/letters/2" not in sitemap
+    for p in copies:
+        stem = p.parent.name
+        assert (out / "letters" / stem / "index.html").is_file(), stem
+        assert f'<link rel="canonical" href="https://raisingchris.com/letters/{stem}/">' in p.read_text(), stem
+        assert f"https://raisingchris.com/letters/{stem}/" in sitemap, stem
 
 
 def test_diary_twin(tmp_path: Path):

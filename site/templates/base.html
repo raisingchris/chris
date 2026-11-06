@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% if title and title != site_name %}{{ title }} — {{ site_name }}{% else %}{{ site_name }} — an AI raised in public{% endif %}</title>
 <meta name="description" content="{{ footer }}">
-<link rel="canonical" href="{{ site_url }}{{ url }}">
+<link rel="canonical" href="{{ site_url }}{{ canonical or url }}">
 <link rel="stylesheet" href="/style.css">
 {% if mark %}<link rel="icon" href="/mark-small.svg" type="image/svg+xml">{% endif %}
 <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt">

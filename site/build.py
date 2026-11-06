@@ -296,6 +296,8 @@ class Site:
             site_name=SITE_NAME, site_url=SITE_URL, disclosure=Markup(DISCLOSURE), footer=FOOTER, nav=NAV, mail=MAIL
         )
         self.pages: list[str] = []
+        # Pages that are copies of a page elsewhere: they name the original as canonical and stay out of the sitemap.
+        self.copies: set[str] = set()
 
     # -- output -------------------------------------------------------------
 
@@ -308,9 +310,14 @@ class Site:
 
     def page(self, url: str, template: str, **ctx) -> None:
         ctx.setdefault("url", url)
+        ctx.setdefault("canonical", url)
+        if ctx["canonical"] != url:
+            self.copies.add(url)
         self.write(url, self.env.get_template(template).render(**ctx))
 
-    def md_page(self, url: str, path: Path, *, extra_html: str = "", title: str | None = None) -> None:
+    def md_page(
+        self, url: str, path: Path, *, extra_html: str = "", title: str | None = None, canonical: str | None = None
+    ) -> None:
         """Render one markdown file as a page; also expose the raw source."""
         body = self.fill(_read(path)[1])
         self.page(
@@ -319,6 +326,7 @@ class Site:
             title=title or _title(body, path.stem),
             body=_fix_md_links(_md.render(_strip_h1(body)), self._rel(path), self.repo) + extra_html,
             raw=self.raw_url(path),
+            canonical=canonical or url,
         )
 
     def _rel(self, path: Path) -> str:
@@ -357,12 +365,17 @@ class Site:
         self.sitemap()
 
     def sitemap(self) -> None:
-        """``/sitemap.xml``: every HTML page, in the order it was built. Diary pages carry their day as lastmod.
+        """``/sitemap.xml``: every HTML page but the copies, in the order it was built. Diary pages carry their day as lastmod.
+
+        Copies (``/wiki/letters/X/``, which ``/letters/X/`` also serves) were 378 of 1013 lines on 2026-11-06,
+        while the findings pages sat "unknown to Google". A copy names its original as canonical instead.
 
         Runs last so ``self.pages`` is complete. ``robots.txt`` points here.
         """
         lines = ['<?xml version="1.0" encoding="utf-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
         for url in self.pages:
+            if url in self.copies:
+                continue
             loc = f"<loc>{escape(SITE_URL + url)}</loc>"
             day = re.match(r"^/diary/(\d{4}-\d{2}-\d{2})/", url)
             lastmod = f"<lastmod>{day.group(1)}</lastmod>" if day else ""
@@ -552,7 +565,8 @@ class Site:
                 if p.name == "README.md":
                     continue
                 items.append((f"{base}{p.stem}/", _title(body, p.stem), _first_para(body)))
-                self.md_page(f"{base}{p.stem}/", p)
+                # Letters are also served at /letters/X/ (see letters()); that one is the original.
+                self.md_page(f"{base}{p.stem}/", p, canonical=f"/letters/{p.stem}/" if rel == "letters" else None)
             readme = d / "README.md"
             intro_html = _fix_md_links(_md.render(_strip_h1(_read(readme)[1])), self._rel(readme), self.repo) if readme.exists() else ""
             self.page(
