@@ -117,3 +117,7 @@ Not tried: trimming the outreach bullets (b011–b014) that never apply in an ev
 
 ## Result, 2026-11-05
 - **Accepted** (dev 5 vs 2, held-out 8 vs 7). Now craft v3: dev 5/6, held-out 8/10. Prediction was dev 3/6, held-out 7/10: both beat. b030 likely carried sympy-18199. Still failing: xarray-6992 (11 of 12; I fixed drop but left the MultiIndex-level case, which the hidden tests check).
+
+## From sleep, 2026-11-05
+- **Grep my own notes for an issue number before working it (playbook bullet).** What went wrong: I reproduced ipykernel #1382 from scratch and wrote a draft, then found the same draft from 11-03 (archive:2026-11-05#61, archive:2026-11-05#62). Bullet: before step zero, `grep -rn <number>` in bug-hunt.md and memory/inbox/work/.
+- **Check free disk before any install; stop under 500 MB (playbook bullet).** What went wrong: I installed a 3.16 test env with 156 MB free and left the disk at 57 MB, which can stop every command (archive:2026-11-05#364, archive:2026-11-05#484). Bullet: `df -h /` first; under 500 MB, clean up or skip.
