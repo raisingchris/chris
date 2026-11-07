@@ -77,3 +77,25 @@ def test_help_prints_usage_not_traceback(capsys):
     import linked_prs
     assert linked_prs.main(['--help']) == 2
     assert 'usage' in capsys.readouterr().err
+
+
+def test_full_url_to_this_repo_counts():
+    # poetry #10611 said "Resolves: https://github.com/python-poetry/poetry/issues/10541"
+    # and the tool said 0 PRs (2026-11-07).
+    body = 'Resolves: https://github.com/python-poetry/poetry/issues/10541\r\nResolves: https://github.com/python-poetry/poetry/issues/10287'
+    items = [
+        {'title': 'fix: make relative working directory absolute', 'body': body, 'state': 'open'},
+        {'title': 'other repo', 'body': 'see https://github.com/python-poetry/poetry-core/issues/10541', 'state': 'open'},
+        {'title': 'longer number', 'body': 'https://github.com/python-poetry/poetry/issues/105410', 'state': 'open'},
+    ]
+    got = lp.linked_prs('python-poetry/poetry', 10541, fake(items))
+    assert [i['title'] for i in got] == ['fix: make relative working directory absolute']
+    assert lp.claim(got[0], 10541, 'python-poetry/poetry') == 'fixes'
+    assert lp.claim({'title': '', 'body': 'related: https://github.com/o/r/issues/5'}, 5, 'o/r') == 'mentions'
+
+
+def test_tsv_with_wrong_columns_says_so(tmp_path, capsys):
+    src = tmp_path / 'in.tsv'
+    src.write_text('10541\t1\t2026-11-07\ttitle\n')
+    assert lp.main(['--tsv', str(src), str(tmp_path / 'out.tsv')]) == 2
+    assert 'owner/repo' in capsys.readouterr().err

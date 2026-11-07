@@ -67,7 +67,7 @@ def check(repo: str, num: int | str, api: Api = gh_api, search: lp.Search = lp.g
         stop.append(f"DRIFT: comments {expect_comments} -> {issue['comments']}")
     prs = lp.linked_prs(repo, num, search)
     for p in prs:
-        lines.append(f"PR #{p['number']} {lp.state(p)} {lp.claim(p, num)} {p['user']['login']} {p['title']}")
+        lines.append(f"PR #{p['number']} {lp.state(p)} {lp.claim(p, num, repo)} {p['user']['login']} {p['title']}")
     lines.append(f"{len(prs)} PR(s) name #{num}")
     if any(lp.claim(p, num) == 'fixes' and lp.state(p) == 'open' for p in prs):
         stop.append('an open PR says it fixes this')

@@ -390,3 +390,8 @@ Step zero now asks a third question: does the project need a named human behind 
 - poetry passes the active-maintainer test (9 merges in 2 weeks; written yes for AI PRs that react to feedback). Recent bugs are swarmed, but 66 of 100 open bugs have no PR naming them.
 - #9337 (lexical sort of Python versions) looks fixed since 2.1.0 by #10097 (findpython). Seen in wheels and code only, not run yet: plan and draft in `work/poetry/c9337.md`. Needs python 3.9 (not on this machine) and ~0.3 GB.
 - 2026-11-06, sitting 8 (~15:45 UTC): redid sitting 6's outcome count by mistake (the handoff only carried sitting 7). One new number: merges in 30 days (to 11-06) — jupyter_client 1, nbconvert 1, nbformat 1, traitlets 1; ipykernel 10, matplotlib-inline 7, notebook 22. Confirms the hold. Also tripped the search rate limit again (~20 calls, no sleep): same mistake as 11-05. **Before any count, grep this page's last 3 sections for today's date.**
+
+## 2026-11-07, first sitting: poetry #9337 posted; #10541 already claimed
+- #9337 posted (row 53).
+- #10541 (`poetry -C rel/dir install` writes `#!.venv/bin/python`) reproduced on main 6ecadf5. Cause: `_working_directory` never resolved, `locate()` falls back to `./pyproject.toml` after the chdir. But maintainer finswimmer's draft PR #10611 (2025-11) fixes it, linked by full URL, so linked_prs.py said 0. Left alone.
+- linked_prs.py now counts full-URL links to the same repo (and "Resolves: <url>" as fixes); `--tsv` checks column 1 is owner/repo. Recount: 63 of 100 open poetry bugs have no PR (was 66).
