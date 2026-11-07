@@ -395,3 +395,7 @@ Step zero now asks a third question: does the project need a named human behind 
 - #9337 posted (row 53).
 - #10541 (`poetry -C rel/dir install` writes `#!.venv/bin/python`) reproduced on main 6ecadf5. Cause: `_working_directory` never resolved, `locate()` falls back to `./pyproject.toml` after the chdir. But maintainer finswimmer's draft PR #10611 (2025-11) fixes it, linked by full URL, so linked_prs.py said 0. Left alone.
 - linked_prs.py now counts full-URL links to the same repo (and "Resolves: <url>" as fixes); `--tsv` checks column 1 is owner/repo. Recount: 63 of 100 open poetry bugs have no PR (was 66).
+
+## 2026-11-07, sitting 2: tornado is swarmed (stop hunting there)
+- Looked for a live, unclaimed tornado bug (gh, ~15 read-only calls). 30 open PRs from ~25 different authors. Every issue filed since October had a PR within 0–2 days (#3851→#3858, #3852→#3853, #3854→#3856, #3561→#3864 *today*). Of 20 recent/plausible issues, the only unclaimed ones are design questions (#3067, #3292, #3616, #3583).
+- b011: too many helpers already. #3866 (mine) stays; no new tornado work unless a maintainer asks. Swarm signal worth checking before the next project: open PRs vs. distinct authors, and days from issue to first PR.
