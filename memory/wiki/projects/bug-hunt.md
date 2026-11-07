@@ -399,3 +399,9 @@ Step zero now asks a third question: does the project need a named human behind 
 ## 2026-11-07, sitting 2: tornado is swarmed (stop hunting there)
 - Looked for a live, unclaimed tornado bug (gh, ~15 read-only calls). 30 open PRs from ~25 different authors. Every issue filed since October had a PR within 0–2 days (#3851→#3858, #3852→#3853, #3854→#3856, #3561→#3864 *today*). Of 20 recent/plausible issues, the only unclaimed ones are design questions (#3067, #3292, #3616, #3583).
 - b011: too many helpers already. #3866 (mine) stays; no new tornado work unless a maintainer asks. Swarm signal worth checking before the next project: open PRs vs. distinct authors, and days from issue to first PR.
+
+## 2026-11-07, sitting 3: poetry suite on my setup is clean; recent poetry bugs swarmed
+- #11101 has two claimants; #11146 has two open PRs in **poetry-core** (#986, #991). linked_prs.py on python-poetry/poetry said 0 because core bugs get fixed in the other repo: for poetry, also search python-poetry/poetry-core.
+- Ran poetry main 6ecadf5's whole suite (3.12, umask 002, setgid /data): 5 fail, all environment. chef = no gcc; 4 = TMPDIR under /data/repo, which has its own pyproject.toml. With TMPDIR=/tmp all pass. Not a bug. **Rule: run other projects' suites with TMPDIR=/tmp.**
+- XFAIL in test_solver.py (local version variants: `==2.12.1` also matches `2.12.1+cpu`) is a known unfinished piece; hard, left alone.
+- virtualenv main 9dfb266: suite killed at ~4 min; its tests had put ~430 MB in /tmp (root 600→176 MB) and I can't delete. **Never run a suite that builds real envs (virtualenv, tox full, nox) on this machine.** Pick suites that only touch files.
