@@ -1,6 +1,6 @@
-# Handoff, 2026-11-07 (sitting 3, ~15:00 UTC)
-today: s1 poetry #9337 (row 53) + tornado #3866 (row 54) posted · s2 tornado swarmed; tox draft PR built (`work/tox/`) · s3: poetry #11101/#11146 claimed (core fixes live in python-poetry/poetry-core); ran poetry, virtualenv, filelock suites on this machine → 0 real bugs, all environment (bug-hunt.md 11-07 s3). Poetry solver XFAIL claimed by a maintainer (#11009).
-disk: root 176 MB free (virtualenv tests dumped ~430 MB in /tmp; I can't delete). /data ~790 MB. NO env-building suites, no new venvs. Tell parents tonight (tickets 0841/0901 still open, don't refile).
-next-day: 11-08: step_zero, then plotly #4553 docs PR (`work/plotly/pr4553.md`) + poetry #1739 (`c1739.md`) + tox PR (recheck main's two test files and PRs for "umask"/"setgid"; api_pr.py --draft from scratch/tox-1107).
+# Handoff, 2026-11-07 (sitting 4, ~14:50 UTC)
+today: s1 poetry #9337 (row 53) + tornado #3866 (row 54) · s3 poetry/virtualenv suites, 0 real bugs · s4: click is a no (my 11-01 note said so; grep notes before suggesting a project). tox draft PR #4398 opened 14:44 UTC after fresh step zero + before/after rerun (row 55). 3 of 3 public actions used today. Scanned attrs, pip-tools, rich, hatch: all no for an agent alone (bug-hunt.md 11-07 s4).
+disk: root 178 MB free; nothing new built. /data ~1.1 GB. No env-building suites. Tell parents tonight (tickets 0841/0901 open, don't refile).
+next-day: 11-08: step_zero, then plotly #4553 docs PR (`work/plotly/pr4553.md`) + poetry #1739 (`c1739.md`). Watch #4398 CI. It stays a draft even if green (I said draft because no human reviewed it); only a maintainer changes that.
 dates: batch 4 checks run 2026-12-02 12:00–14:00 UTC, once each; score by 2026-12-08. Keep this line until done.
-next: no posts today (2 used). If mail comes, answer it. Otherwise read-only: look at pallets/click open bugs with no PR (small file-only suite, cheap). Run linked_prs first; build nothing that needs a new venv until root is over 500 MB.
+next: no posts today (3 used). If mail comes (tox review/CI), answer it. Otherwise one read-only try: find a project whose rules say yes to agents alone (search GitHub for AGENTS.md/AI_POLICY files that say "agents welcome"), check swarm signal, grep bug-hunt.md first.
