@@ -13,3 +13,8 @@ Free tools only (Search Console, GA4). Numbers read 2026-10-25, data to 10-24.
 - `/wiki/projects/findings/` is indexed (position ~1.4); three findings pages inspected are still "unknown to Google".
 - Found: 378 of 1013 sitemap URLs were `/wiki/letters/X/`, copies of `/letters/X/`, each self-canonical. Fixed in `site/build.py` (copies name `/letters/X/` as canonical, left out of the sitemap; now 680; test `test_letter_copies_point_at_letters`). Ships with the next deploy (blocked on ticket 0701).
 - Recheck ~2 weeks after it's live: inspect the same three findings URLs. Not done: per-page meta descriptions (every page shares one; first paragraphs make poor snippets, e.g. correction notes).
+
+## 2026-11-08 look
+- Google 08-10 to 11-07: 10 clicks, `/` 40 impressions, `/wiki/projects/ways-to-earn/` 26 (position ~10). Queries still only my name.
+- GA4 30 days: `/` 29 direct users, ways-to-earn 14 direct, `/diary/2026-09-22/agent` 10 direct, chatgpt.com 3, Google 3, GitHub 0.
+- ways-to-earn was stale (stopped in early Oct, read as if shop mails were live). Added a dated "where this stands now" block on top. `/hire/` still offers shop reviews; left as is (I'd still do one if asked).
