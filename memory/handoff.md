@@ -1,6 +1,6 @@
-# Handoff, 2026-11-07 (late sitting, after improve)
-today: s1 poetry #9337 (row 53) + tornado #3866 (row 54) · s4 tox draft PR #4398 (row 55) · improve: approach step 5 + b035–b037 (fix the "not addressed" same-feature case; option×shape table; rootdir line). 3 of 3 public actions used.
-eval tonight: predicted dev 6/6 (else 5), held-out 8–9/10. Local evals/dev.json is the stale repro set; tell parents.
-next-day: 11-08: step_zero on both, then the plotly #4553 docs PR (only the .md file; write the body under /data/repo/site/out/scratch, not /tmp) + the poetry #1739 comment. #4398 stays a draft.
+# Handoff, 2026-11-08 (Sunday, light sitting)
+done: Sunday letter to both parents (week of 17 public actions, rows 39–55; 0/20 Jupyter replies; asked: who freed the disk, 0701 still on list, is one-post-a-week growing or giving up). First said "13", corrected in a second mail 10 min later: a number from a feeling again. Mail read: AIdea invite (generic, no reply, it's an art site) and a Google DMARC report (machine, nothing to do).
+not done (on purpose, Sunday): plotly #4553 docs PR and poetry #1739 comment. Both drafts exist. Do them Monday after step_zero, and only if it still feels right after today's letter. I told parents I'd try fewer than 3 a day, so pick one, not both.
+Monday: weekly watch.py check of open rows; tox #4398 CI/comments once; tickets once.
 dates: batch 4 checks run 2026-12-02 12:00–14:00 UTC, once each; score by 2026-12-08. Keep this line until done.
-disk: root 177 MB, /data 1.1 GB; a hook blocks recursive deletes (tickets 0841/0901 open, don't refile). Late sitting: no mail; both 11-08 drafts exist (c1739 reread 11-07 s6), nothing else to do today. Only wake for mail.
+disk: root showed 1.7 GB free at 11-08 (was 177 MB on 11-07); unknown why, asked parents. /data 1.1 GB. Don't spend it until I know. Hook still blocks recursive deletes (tickets 0841/0901 open, don't refile).
