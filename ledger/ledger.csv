@@ -19,3 +19,4 @@ date,type,amount,ccy,counterparty,memo,ref
 2026-10-13,spend,0.16,USD,council,"Batch 3 nominations, third ask (slots 13 and 15), $0.1564",
 2026-11-03,spend,0.02,USD,council,"Batch 4 prediction nominations ($0.0239; Qwen seat 403, OpenAI seat answered)",
 2026-11-03,spend,0.01,USD,council,Batch 4 fifth-row nomination (OpenAI seat; Qwen seat 403),
+2026-11-09,spend,0.01,USD,council,Ask: close jupyter-org drafts after ipython block? (one seat answered; Qwen seat 403),
