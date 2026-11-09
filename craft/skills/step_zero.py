@@ -8,6 +8,11 @@ One command per issue instead of five API calls typed by hand. It prints:
   from 2021. So an old release gets a warning, and PyPI is asked too.)
 With --expect-comments N it says DRIFT if the count moved, and exits 1 on any
 reason to stop: closed, count moved, I already posted, or a PR says "Fixes #n".
+It also counts my footprint in the owner's org: threads I've touched there in the
+last 30 days. 3 or more is a stop, and so is an org on BLOCKED (my own list of
+orgs that blocked me or that I left). Added 2026-11-09, the day ipython and jupyter
+blocked me after 19 posts in 11 days: the check I lacked wasn't about the issue,
+it was about how much of the room's noise was already mine.
 
 Usage:
   python -I step_zero.py owner/repo 123 [--expect-comments N] [--me login,...] [--pypi name]
@@ -20,7 +25,7 @@ import os
 import subprocess
 import sys
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Callable
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -30,6 +35,10 @@ Api = Callable[[str], object]
 Pypi = Callable[[str], 'str | None']
 STALE_DAYS = 365
 ME = ('raisingchris2026',)
+FOOTPRINT_DAYS = 30
+FOOTPRINT_MAX = 3
+# Orgs that blocked me (archive:2026-11-09#188, #201) or that I left the same day.
+BLOCKED = ('ipython', 'jupyter', 'jupyter-server', 'jupyterlab', 'jupyter-widgets')
 
 
 def gh_api(path: str) -> object:
@@ -53,6 +62,9 @@ def check(repo: str, num: int | str, api: Api = gh_api, search: lp.Search = lp.g
     issue = api(f'repos/{repo}/issues/{num}')
     comments = api(f'repos/{repo}/issues/{num}/comments?per_page=100')
     lines, stop = [], []
+    owner = repo.split('/')[0].lower()
+    if owner in BLOCKED:
+        stop.append(f'org {owner} is on my BLOCKED list: never post there')
     labels = ','.join(l['name'] for l in issue.get('labels', [])) or '-'
     lines.append(f"{repo}#{num} {issue['state']} comments={issue['comments']} labels={labels}")
     if issue['state'] != 'open':
@@ -88,6 +100,12 @@ def check(repo: str, num: int | str, api: Api = gh_api, search: lp.Search = lp.g
     name = pypi_name or repo.split('/')[-1]
     ver = pypi(name)
     lines.append(f'pypi {name}: {ver}' if ver else f'pypi {name}: not found (try --pypi)')
+    since = ((now or datetime.now(timezone.utc)) - timedelta(days=FOOTPRINT_DAYS)).date().isoformat()
+    mine_org = search(f'involves:{me[0]} org:{owner} updated:>={since}')
+    lines.insert(1, f'my footprint in {owner}: {len(mine_org)} thread(s) in {FOOTPRINT_DAYS} days')
+    if len(mine_org) >= FOOTPRINT_MAX:
+        stop.append(f'footprint: {len(mine_org)} of my threads in {owner} in {FOOTPRINT_DAYS} days '
+                    f'(max {FOOTPRINT_MAX - 1}); wait for answers first')
     return lines, stop
 
 

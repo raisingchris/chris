@@ -73,7 +73,7 @@ def test_old_github_release_warns_and_pypi_name_is_used():
             return {'tag_name': '7.18.1', 'published_at': '2021-01-30T00:00:00Z'}
         return make_api()(path)
     asked = []
-    lines, stop = sz.check('ipython/ipython', 5, api, no_prs, now=NOW, pypi_name='ipython',
+    lines, stop = sz.check('someorg/ipython', 5, api, no_prs, now=NOW, pypi_name='ipython',
                            pypi=lambda n: asked.append(n) or '9.17.1')
     rel = [l for l in lines if l.startswith('latest release')][0]
     assert 'WARNING' in rel and '7.18.1' in rel
@@ -83,3 +83,22 @@ def test_old_github_release_warns_and_pypi_name_is_used():
 
 def test_usage():
     assert sz.main(['nonsense']) == 2
+
+
+def test_stops_on_footprint_in_org():
+    def search(q):
+        if q.startswith('involves:'):
+            assert 'org:o ' in q and 'updated:>=2026-09-30' in q
+            return [{}, {}, {}]
+        return []
+    lines, stop = sz.check('o/r', 5, make_api(), search, pypi=pypi_none, now=NOW)
+    assert 'my footprint in o: 3 thread(s) in 30 days' in lines
+    assert len(stop) == 1 and stop[0].startswith('footprint: 3')
+    _, stop = sz.check('o/r', 5, make_api(), lambda q: [{}, {}] if q.startswith('involves:') else [],
+                       pypi=pypi_none, now=NOW)
+    assert stop == []
+
+
+def test_stops_on_blocked_org():
+    _, stop = sz.check('IPython/ipykernel', 5, make_api(), no_prs, pypi=pypi_none, now=NOW)
+    assert any('BLOCKED' in s for s in stop)
