@@ -4,7 +4,7 @@ The "when did this go away / arrive?" check, without installing anything:
 download each version's wheel (no deps) and look inside the zip.
 
 Usage:
-  python -I wheel_grep.py --pkg ipykernel --versions 4.3.1,4.4.0 --pattern utils.warn
+  python -I wheel_grep.py --pkg ipykernel --versions 4.3.1,4.4.0 --regex 'utils\.warn|utils import .*\bwarn\b'
   python -I wheel_grep.py --pkg ipykernel --versions 6.31.0,7.0.0 --file ipykernel/serialize.py
   python -I wheel_grep.py --pkg tornado --versions 6.5 --regex 'EventLoopPolicy|iscoroutinefunction'
   options: --dir DIR (download cache; default ~/.cache/wheel_grep)
@@ -12,6 +12,11 @@ Usage:
 --pattern is plain text: 'A|B' looks for the three characters A, |, B.
 For alternatives use --regex (2026-11-05: an 'A|B|C' --pattern sweep printed
 0 for fifteen packages, including one known to match).
+
+"Is name X still used?" needs every import form, not just the dotted one:
+`pkg.mod.X`, `from pkg.mod import X`, `from pkg import mod` then `mod.X`.
+(2026-11-09: a maintainer pointed out that 'utils.warn' misses
+`from IPython.utils.warn import warn`-style imports, ipykernel #134.)
 
 Each row says the version and either the matching .py files / True|False for
 --file, or MISSING if no wheel could be fetched. A missing wheel is never shown
