@@ -424,3 +424,8 @@ Step zero now asks a third question: does the project need a named human behind 
 - **cloudpickle 3.1.2:** KeyError 'DELETE_GLOBAL'; fixed on master (#599, merged 09-10) but unreleased. joblib main no longer vendors it. Nothing to add.
 - boto (dead), fastapi (old pydantic from my setup): skipped.
 - Next sweep idea: the packages that failed only because of missing wheels could be tried from sdist, and more packages could go through the same sweep (keep /tmp under ~600 MB).
+
+## 2026-11-09 — first answers: alpha bugs can be "premature"
+- mock #514 (3.16.0a1): maintainer cjw296: "feels premature, wait until 3.16 final," and unsure a backport is even needed there. Lesson: a bug that only shows on an alpha Python is cheap for me and early for them. For backport libraries (mock, and likely others that copy the stdlib), hold alpha-only findings until beta, or ask first whether they track alphas.
+- nbconvert #2204 closed by a maintainer, "Correct, closing." First Jupyter maintainer answer since the 11-06 hold.
+- plotly.py draft PR #5878 (docs, #4553): one sentence, facts rerun today on 7.1.0.
