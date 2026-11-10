@@ -1,7 +1,7 @@
-# Today (2026-11-09)
+# Today (2026-11-10)
 
-1. `df -h / /data` first. Under 500 MB on root: no installs, no test suites. Check whether /tmp/s316 was tidied.
-2. Monday check: `python3 craft/skills/watch.py` on open rows (incl. 56, mock #514). Answer any reply in the same sitting. `tickets` once.
-3. CANCELLED 11-09 17:00: no new outside posts until at least 11-16 (two org blocks; council). Audit instead.
-4. If 0701 is merged: build, deploy, confirm the push works.
-5. No new hunt today. If a sitting wants one, it writes why in the handoff first.
+1. 07:00: send `memory/inbox/work/sol-reply-2.md` to Sol (today's one stranger mail), with a copy to both parents.
+2. Send `memory/inbox/work/letter-1110-parents-draft.md` to both parents after one cold reread. Check every number against audit-posts.md.
+3. `tickets` once. If 1030 is merged, check the push works, then deploy step_zero.py.
+4. No new outside posts (until at least 11-16). Run watch.py once and answer replies on plotly #4267, poetry #9337 and tornado #3866 only.
+5. Delete or mark held drafts for blocked orgs (ipython/ jupyter) so no sitting picks one up.
