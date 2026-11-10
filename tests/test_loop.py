@@ -174,6 +174,27 @@ def test_handoff_has_pending():
     assert h("nothing pending\n") is False
 
 
+def test_handoff_pending_dated_later_is_not_pending_now():
+    from datetime import date
+
+    h = loop.handoff_has_pending
+    d = date(2026, 11, 10)
+    real = "next: 11-11 07:00, send sol-reply-3 after a cold reread.\n"
+    assert h(real) is True  # no date given: old behaviour
+    assert h(real, d) is False
+    assert h("next: 2026-11-16 run step_zero\n", d) is False
+    assert h("Next: tomorrow, send the letter\n", d) is False
+    assert h("next: (11-11) send it\n", d) is False
+    # today, the past, or a date later in the line: still pending now
+    assert h("next: 11-10 15:00 rerun the tests\n", d) is True
+    assert h("next: 11-09 overdue thing\n", d) is True
+    assert h("next: send it by 11-16\n", d) is True
+    assert h("next: 13-45 is not a date\n", d) is True
+    # one undated line among dated ones keeps the chain going
+    assert h("next: 11-11 send letter\nnext: finish the test\n", d) is True
+    assert h("next: 11-11 send letter\ntodo: 11-12 watch\n", d) is False
+
+
 async def test_continue_kind_uses_sitting_prompt_with_header(services, repo):
     (repo / "memory/diary/2026-09-04.md").write_text("diary\n")
     prompt = loop.compose_user_prompt(services, "continue")

@@ -8,7 +8,8 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime
+import re
+from datetime import date, datetime
 from pathlib import Path
 
 from agent import craft, deploy, gitops, redaction, session, wiring
@@ -40,17 +41,46 @@ PENDING_PREFIXES = ("next:", "- [ ]", "todo:", "pending:")
 NOTHING_PENDING = ("nothing pending", "done for now", "no work pending")
 
 
-def handoff_has_pending(text: str) -> bool:
+_LEAD_DATE = re.compile(r"^(?:(\d{4})-)?(\d{1,2})-(\d{1,2})\b")
+
+
+def _dated_later(rest: str, today: date) -> bool:
+    """Pure: does a pending line's text open with a day after ``today``? (``tomorrow``,
+    ``YYYY-MM-DD`` or ``MM-DD``; a bare ``MM-DD`` is read in today's year.) Only the first
+    word counts, so "next: send it by 11-16" is still pending now."""
+    rest = rest.strip().lstrip("(").strip()
+    if rest.startswith("tomorrow"):
+        return True
+    m = _LEAD_DATE.match(rest)
+    if not m:
+        return False
+    try:
+        day = date(int(m.group(1) or today.year), int(m.group(2)), int(m.group(3)))
+    except ValueError:
+        return False
+    return day > today
+
+
+def handoff_has_pending(text: str, today: date | None = None) -> bool:
     """Pure: does a handoff say work is still pending?
 
     True when some line starts with ``next:``, ``- [ ]``, ``todo:`` or ``pending:`` and no line
     is ``nothing pending`` / ``done for now`` / ``no work pending`` (all case-insensitive; a
     trailing full stop is tolerated). The closing line wins, so she can stop the chain.
+    With ``today``, a pending line that opens with a later day ("next: 11-11 07:00, send…",
+    "next: tomorrow…") is not pending now: a sitting in thirty minutes can't do it (ticket 1005).
     """
     lines = [ln.strip().lower() for ln in (text or "").splitlines()]
     if any(ln.rstrip(".!") in NOTHING_PENDING for ln in lines):
         return False
-    return any(ln.startswith(PENDING_PREFIXES) for ln in lines)
+    for line in lines:
+        prefix = next((p for p in PENDING_PREFIXES if line.startswith(p)), None)
+        if prefix is None:
+            continue
+        if today is not None and _dated_later(line[len(prefix):], today):
+            continue
+        return True
+    return False
 
 
 def _read(path: Path, repo: Path | None = None, archive=None) -> str:
@@ -235,7 +265,7 @@ async def run_sitting(services, kind: str = "sitting", query_fn=None, git_run=No
     wiring.note_last_run(services.state_dir, "last_sitting_done", tz=archive.tz, kind=kind,
                          ok=failure is None and not result.soft_failed)
     if failure is None:
-        pending = handoff_has_pending(_rread(services, repo / "memory" / "handoff.md"))
+        pending = handoff_has_pending(_rread(services, repo / "memory" / "handoff.md"), now.date())
         archive.append("sitting_pending", {"kind": "sitting_pending", "pending": pending})
         if kind == "improve":
             _request_eval(services)
