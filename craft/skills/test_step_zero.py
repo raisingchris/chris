@@ -102,3 +102,82 @@ def test_stops_on_footprint_in_org():
 def test_stops_on_blocked_org():
     _, stop = sz.check('IPython/ipykernel', 5, make_api(), no_prs, pypi=pypi_none, now=NOW)
     assert any('BLOCKED' in s for s in stop)
+
+
+def ev(kind, repo, num, at, action=None):
+    pl = {'issue': {'number': num}} if kind != 'PullRequestEvent' else {'pull_request': {'number': num}}
+    if action:
+        pl['action'] = action
+    return {'type': kind, 'repo': {'name': repo}, 'created_at': at, 'payload': pl}
+
+
+def events_api(events, replies=(), closed_by=None):
+    """replies: {(repo, num): [(login, at), ...]}; closed_by: {(repo, num): login}."""
+    replies, closed_by = dict(replies), dict(closed_by or {})
+
+    def api(path):
+        if path.startswith('users/'):
+            return events if path.endswith('page=1') else []
+        repo_num = path.split('repos/')[1].split('/issues/')
+        key = (repo_num[0], int(repo_num[1].split('/')[0].split('?')[0]))
+        if '/comments' in path:
+            return [{'user': {'login': l}, 'created_at': t} for l, t in replies.get(key, [])]
+        who = closed_by.get(key)
+        return {'state': 'closed' if who else 'open', 'closed_by': {'login': who} if who else None}
+    return api
+
+
+LATER = datetime(2026, 11, 20, tzinfo=timezone.utc)
+
+
+def test_restart_rule_pause_blocks_before_the_date():
+    _, stop = sz.restart_rule('o', events_api([]), now=datetime(2026, 11, 15, tzinfo=timezone.utc))
+    assert any(s.startswith('pause') for s in stop)
+    _, stop = sz.restart_rule('o', events_api([]), now=LATER)
+    assert stop == []
+
+
+def test_restart_rule_week_limit_skips_own_repos_and_edits():
+    evs = [ev('IssueCommentEvent', 'a/x', 1, '2026-11-19T00:00:00Z', 'created'),
+           ev('IssuesEvent', 'b/y', 2, '2026-11-18T00:00:00Z', 'opened'),
+           ev('IssueCommentEvent', 'raisingchris2026/sitecheck', 3, '2026-11-18T00:00:00Z', 'created'),
+           ev('IssuesEvent', 'c/z', 4, '2026-11-17T00:00:00Z', 'closed'),
+           ev('PullRequestEvent', 'c/z', 5, '2026-11-17T00:00:00Z', 'opened')]
+    lines, stop = sz.restart_rule('d', events_api(evs, closed_by={('a/x', 1): 'm', ('b/y', 2): 'm', ('c/z', 5): 'm'}),
+                                  now=LATER)
+    assert 'restart rule: 3 new outside thread(s) in 7 days (max 3)' in lines
+    assert [s for s in stop if s.startswith('week')]
+    # a second post in a thread I entered before the week (a reply, a closing note) isn't new
+    evs[0] = ev('IssueCommentEvent', 'a/x', 1, '2026-11-19T00:00:00Z', 'created')
+    evs.append(ev('IssuesEvent', 'a/x', 1, '2026-11-01T00:00:00Z', 'opened'))
+    lines, stop = sz.restart_rule('d', events_api(evs, closed_by={('a/x', 1): 'm', ('b/y', 2): 'm', ('c/z', 5): 'm'}),
+                                  now=LATER)
+    assert 'restart rule: 2 new outside thread(s) in 7 days (max 3)' in lines
+    assert stop == []
+
+
+def test_restart_rule_one_open_item_per_org():
+    evs = [ev('IssueCommentEvent', 'o/r', 1, '2026-11-17T00:00:00Z', 'created')]
+    _, stop = sz.restart_rule('o', events_api(evs), now=LATER)
+    assert any(s.startswith('org: o/r#1') for s in stop)
+    # a human (not a bot, not me) answered after my post: clear
+    ok = events_api(evs, replies={('o/r', 1): [('dependabot[bot]', '2026-11-18T00:00:00Z'),
+                                               ('maint', '2026-11-18T01:00:00Z')]})
+    assert sz.restart_rule('o', ok, now=LATER)[1] == []
+    # a reply from before my post doesn't count
+    old = events_api(evs, replies={('o/r', 1): [('maint', '2026-11-01T00:00:00Z')]})
+    assert sz.restart_rule('o', old, now=LATER)[1]
+    # 14 days on, the org opens again
+    assert sz.restart_rule('o', events_api(evs), now=datetime(2026, 12, 2, tzinfo=timezone.utc))[1] == []
+
+
+def test_restart_rule_five_silent_threads_is_a_full_stop():
+    evs = [ev('IssueCommentEvent', f'o{i}/r', i, f'2026-10-0{i}T00:00:00Z', 'created') for i in range(1, 6)]
+    lines, stop = sz.restart_rule('x', events_api(evs), now=LATER)
+    assert 'restart rule: 0 of my last 5 threads got a human answer' in lines
+    assert any(s.startswith('silence') for s in stop)
+    _, stop = sz.restart_rule('x', events_api(evs, closed_by={('o3/r', 3): 'maint'}), now=LATER)
+    assert stop == []
+    # closing it myself is not an answer
+    _, stop = sz.restart_rule('x', events_api(evs, closed_by={('o3/r', 3): 'raisingchris2026'}), now=LATER)
+    assert any(s.startswith('silence') for s in stop)

@@ -1,4 +1,4 @@
-"""Which published releases of a pip package contain a file, or a text pattern?
+r"""Which published releases of a pip package contain a file, or a text pattern?
 
 The "when did this go away / arrive?" check, without installing anything:
 download each version's wheel (no deps) and look inside the zip.

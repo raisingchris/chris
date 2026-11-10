@@ -14,6 +14,17 @@ orgs that blocked me or that I left). Added 2026-11-09, the day ipython and jupy
 blocked me after 19 posts in 11 days: the check I lacked wasn't about the issue,
 it was about how much of the room's noise was already mine.
 
+Then the restart rule I sent my parents on 2026-11-10 (memory/inbox/work/audit-posts.md),
+read from my own public GitHub events, so it can't drift from what I actually did:
+  - nothing new before PAUSE_UNTIL (no outside posts while I'm on pause);
+  - at most 3 new outside threads in any 7 days, all orgs together (a reply in a
+    thread I'm already in doesn't count);
+  - one open item per org: a post there with no human answer yet, younger than 14
+    days, is a stop;
+  - my last 5 outside posts all with no human answer = full stop, write to parents.
+"Human answer" = a comment after my post by someone who isn't me and isn't a bot,
+or the thread closed by someone else.
+
 Usage:
   python -I step_zero.py owner/repo 123 [--expect-comments N] [--me login,...] [--pypi name]
 Exit codes: 0 = clear to post, 1 = stop and read, 2 = usage/API error.
@@ -39,6 +50,10 @@ FOOTPRINT_DAYS = 30
 FOOTPRINT_MAX = 3
 # Orgs that blocked me (archive:2026-11-09#188, #201) or that I left the same day.
 BLOCKED = ('ipython', 'jupyter', 'jupyter-server', 'jupyterlab', 'jupyter-widgets')
+PAUSE_UNTIL = '2026-11-16'   # first day new posts are allowed again
+WEEK_MAX = 3
+ORG_WAIT_DAYS = 14
+SILENT_RUN = 5
 
 
 def gh_api(path: str) -> object:
@@ -109,6 +124,88 @@ def check(repo: str, num: int | str, api: Api = gh_api, search: lp.Search = lp.g
     return lines, stop
 
 
+def _ts(s: str) -> datetime:
+    return datetime.fromisoformat(s.replace('Z', '+00:00'))
+
+
+def my_posts(api: Api, me: tuple[str, ...] = ME) -> list[dict]:
+    """My outside posts, newest first: {repo, num, at}. From the public events feed
+    (last 90 days, at most 300 events); my own account's repos are left out."""
+    posts = []
+    for page in (1, 2, 3):
+        evs = api(f'users/{me[0]}/events/public?per_page=100&page={page}')
+        if not evs:
+            break
+        for e in evs:
+            repo, pl = e['repo']['name'], e.get('payload', {})
+            if repo.split('/')[0].lower() in {m.lower() for m in me}:
+                continue
+            if e['type'] == 'IssueCommentEvent' and pl.get('action', 'created') == 'created':
+                num = pl['issue']['number']
+            elif e['type'] in ('IssuesEvent', 'PullRequestEvent') and pl.get('action') == 'opened':
+                num = (pl.get('issue') or pl.get('pull_request'))['number']
+            else:
+                continue
+            posts.append({'repo': repo, 'num': num, 'at': e['created_at']})
+    posts.sort(key=lambda p: p['at'], reverse=True)
+    return posts
+
+
+def answered(api: Api, post: dict, me: tuple[str, ...] = ME) -> bool:
+    """Did a human other than me act on this thread after my post?"""
+    mine = {m.lower() for m in me}
+    at = _ts(post['at'])
+    for c in api(f"repos/{post['repo']}/issues/{post['num']}/comments?per_page=100"):
+        who = c['user']['login'].lower()
+        if who not in mine and not who.endswith('[bot]') and _ts(c['created_at']) > at:
+            return True
+    issue = api(f"repos/{post['repo']}/issues/{post['num']}")
+    by = ((issue.get('closed_by') or {}).get('login') or '').lower()
+    return issue.get('state') == 'closed' and bool(by) and by not in mine
+
+
+def restart_rule(owner: str, api: Api = gh_api, me: tuple[str, ...] = ME,
+                 now: datetime | None = None) -> tuple[list[str], list[str]]:
+    """The 2026-11-10 restart rule. Return (lines, reasons to stop)."""
+    now = now or datetime.now(timezone.utc)
+    lines, stop = [], []
+    if now.date().isoformat() < PAUSE_UNTIL:
+        stop.append(f'pause: no new outside posts before {PAUSE_UNTIL}')
+    posts = my_posts(api, me)
+    # one thread counts once, at my latest post in it
+    seen, threads = set(), []
+    for p in posts:
+        key = (p['repo'].lower(), p['num'])
+        if key not in seen:
+            seen.add(key)
+            threads.append(p)
+    # the week limit counts threads I walked into, at my first post there; replies I
+    # owe and closing notes on my own drafts aren't new noise
+    first: dict = {}
+    for p in posts:
+        first[(p['repo'].lower(), p['num'])] = p['at']   # posts are newest first
+    week = [k for k, at in first.items() if now - _ts(at) < timedelta(days=7)]
+    lines.append(f'restart rule: {len(week)} new outside thread(s) in 7 days (max {WEEK_MAX})')
+    if len(week) >= WEEK_MAX:
+        stop.append(f'week: {len(week)} new outside threads in 7 days (max {WEEK_MAX})')
+    for p in threads:
+        if p['repo'].split('/')[0].lower() != owner.lower():
+            continue
+        if now - _ts(p['at']) >= timedelta(days=ORG_WAIT_DAYS):
+            continue
+        if not answered(api, p, me):
+            stop.append(f"org: {p['repo']}#{p['num']} ({p['at'][:10]}) has no human answer "
+                        f'and is under {ORG_WAIT_DAYS} days old')
+    last = threads[:SILENT_RUN]
+    if len(last) == SILENT_RUN:
+        silent = [p for p in last if not answered(api, p, me)]
+        lines.append(f'restart rule: {SILENT_RUN - len(silent)} of my last {SILENT_RUN} threads got a human answer')
+        if len(silent) == SILENT_RUN:
+            stop.append(f'silence: my last {SILENT_RUN} threads have no human answer; '
+                        'stop all new posts and write to my parents')
+    return lines, stop
+
+
 def main(argv: list[str]) -> int:
     args, expect, me, pypi_name = [], None, ME, None
     it = iter(argv)
@@ -126,6 +223,9 @@ def main(argv: list[str]) -> int:
         return 2
     try:
         lines, stop = check(args[0], args[1], expect_comments=expect, me=me, pypi_name=pypi_name)
+        more, stop2 = restart_rule(args[0].split('/')[0], me=me)
+        lines += more
+        stop += stop2
     except subprocess.CalledProcessError as e:
         print('API error:', (e.stderr or '').strip()[:200], file=sys.stderr)
         return 2

@@ -1,5 +1,5 @@
-# Handoff, 2026-11-09 (18:00 sitting)
-done: step_zero.py now stops on blocked orgs (ipython, jupyter, …) and on 3+ of my threads in one org in 30 days; 65 skill tests pass; live check on plotly = 2 threads. Earlier: audit, closed tox #4398 and plotly #5878; letter-1110 draft ready.
-blocked: pushes wait until a parent merges (ticket 1030). Qwen council seat gives 403. No new outside posts before 2026-11-16; replies only on rows 52–54.
+# Handoff, 2026-11-10 (07:00 sitting)
+done: Sol reply 2 + copy to parents; parents' letter (audit, restart rule, ask: would one of you read posts before they go?). watch.py 0/7 news. BLOCKED.md in all 10 blocked-org draft folders; STOP banner on posting-queue.md. step_zero.py now enforces the restart rule from my GitHub events (pause to 11-16, 3 new threads/week, 1 unanswered item per org for 14 days, 5 silent = stop); 69 skill tests pass. DMARC report: 6/6 pass.
+blocked: git can't write objects here (merge/fetch denied); ticket 1030 still open, so no deploy of step_zero/others. No new outside posts before 2026-11-16; replies only on rows 52–54.
 dates: batch 4 checks run 2026-12-02 12:00–14:00 UTC, once each; score by 2026-12-08. Keep this line until done.
-next: 2026-11-10 07:00: send memory/inbox/work/sol-reply-2.md to Sol and copy to both parents (row 23); then send letter-1110-parents-draft.md to both parents unchanged. No watch.py, no audit redo before 11-16.
+next: wait for parents' answer on the review ask; then pick the single best non-ipython/jupyter item for 11-16 under the new rule (one per org; plotly and poetry already have an unanswered thread, so neither).
