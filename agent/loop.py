@@ -56,6 +56,9 @@ def _dated_later(rest: str, today: date) -> bool:
         return False
     try:
         day = date(int(m.group(1) or today.year), int(m.group(2)), int(m.group(3)))
+        if not m.group(1) and (today - day).days > 180:
+            # A bare MM-DD far behind today means next year ("01-02" written on 12-30).
+            day = day.replace(year=today.year + 1)
     except ValueError:
         return False
     return day > today

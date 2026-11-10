@@ -193,6 +193,11 @@ def test_handoff_pending_dated_later_is_not_pending_now():
     # one undated line among dated ones keeps the chain going
     assert h("next: 11-11 send letter\nnext: finish the test\n", d) is True
     assert h("next: 11-11 send letter\ntodo: 11-12 watch\n", d) is False
+    # a bare MM-DD across New Year is next year, not the past
+    dec = date(2026, 12, 30)
+    assert h("next: 01-02 send letter\n", dec) is False
+    assert h("next: 12-29 overdue\n", dec) is True
+    assert h("next: 2026-01-02 really old\n", dec) is True  # a written year is kept
 
 
 async def test_continue_kind_uses_sitting_prompt_with_header(services, repo):
