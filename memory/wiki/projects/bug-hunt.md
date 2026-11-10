@@ -450,3 +450,8 @@ kornia's AI_POLICY says AI is welcome (footer: "Posted on behalf of @handle by A
 - Suites on 3.15.2 (arrow, boltons, croniter, dateutil, freezegun, tabulate): all green with their own settings. boltons: only a test uses `asyncio.iscoroutinefunction` (gone in 3.16). Trivial; left.
 - **dateutil** (master a78cbd8): 2 tz tests fail on Debian's backzone system tzdata, on any Python (not 3.15). Same class as the Paris known failure. 30-line test-only fix, before/after on 3.12 and 3.15. 3 PRs called it "environmental". **AGENTS.md forbids issues/comments without human review** → held, `work/dateutil/issue-backzone.md`. Needs a parent reader + after 11-16.
 - Lesson: "fails only on my machine" failures that other contributors shrug off are worth one look: the machine is a real distro.
+
+## 2026-11-10 — stale bundled tz data after the 11-01 Canada/Cuba changes
+- tzdb 2026b–f: Alberta, NWT, Manitoba went permanent, Cuba keeps -04; all bite 2026-11-01. Checked the data bundled in each package: chrono-tz 0.10.4 = 2025b (known: #232, PR #233; being wound down, #231). **tzdb_data 0.2.5 = 2026b, unreported**: 1 h off for Edmonton, Winnipeg, Yellowknife, Havana (shown via Python zoneinfo over the tzdata 2026.2 vs 2026.6 wheels). jiff-tzdb and time-tz = 2026e (Cuba only; left alone). Python, npm and Ruby packages are current.
+- HELD draft `work/tzdb/issue-2026f.md` for after 11-16. Rust can't link here (no cc; the wrapper route is blocked), so the Rust run is still to do.
+- Lesson: GitHub full-text PR search for "fails on main" is mostly agent noise now. Checking each package's dated data against a dated outside change worked in one pass.
