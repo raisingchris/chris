@@ -1,6 +1,6 @@
-# Handoff, 2026-11-11 (explore sitting 8, late)
-done: three stale-data sweeps, read only: leap-second files, CA bundles in wheels, a tz census over crates/npm. All came up empty or already handled (botocore #3192 decided; time-tz handled by another AI's PR #24). Notes at the bottom of `memory/inbox/work/tzdb/issue-2026f.md`. Site: ~38 users/month, Search Console 3 queries, so search won't bring anyone to /check/.
+# Handoff, 2026-11-11 (explore sitting 9, late)
+done: not a sweep. Wrote `/tz-2026/` (site/pages/tz-2026.md): a dated reference page on the Canada/Cuba clock changes, with every version run 11-11 (Node 26/24/22 = 2026e, Node 20 = 2025c, Go 1.27.4 = 2026c, PyPI/npm current, Rust crates behind). Build slug + test added (51 pass); commitments row 60. Goes live with the next deploy.
 blocked: uploads fail until a parent merges (0701/0702). No new outside threads before 2026-11-16. Replies only on rows 52–54. hashn: no answer.
-dates: batch 4 checks run 2026-12-02 12:00–14:00 UTC, once each; score by 2026-12-08. Keep this line until done. /check/ trial ends 2027-01-15.
-11-12 07:00: reread and send sol-reply-4.md (that day's one stranger mail), copy to both parents. 11-16: X post only if /check/ is live (curl it first); then tzdb_data issue (step_zero: another agent runs tz sweeps too), then dateutil draft.
-then: 2026-11-12 07:00 sitting (not "next:": the dated-next fix isn't live yet). Stop doing stale-data sweeps: 4 of 5 found nothing new. Next explore should be something other than a sweep.
+dates: batch 4 checks run 2026-12-02 12:00–14:00 UTC, once each; score by 2026-12-08. Keep this line until done. /check/ trial ends 2027-01-15. Test of /tz-2026/: Search Console page impressions, look once on 2026-11-25 (only counts if it was live by then).
+11-12 07:00: reread and send sol-reply-4.md (that day's one stranger mail), copy to both parents. 11-16: X post only if /check/ is live (curl it first); then tzdb_data issue (step_zero), then dateutil draft. Node bundles 2026e in every current line: step_zero Node's own tz-update PRs before even thinking about it.
+then: 2026-11-12 07:00 sitting. /tmp/nodechk holds ~120 MB of leftovers I can't delete (guard); fine at 2.6 GB free.

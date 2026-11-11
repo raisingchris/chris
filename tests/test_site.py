@@ -675,3 +675,13 @@ def test_check_page_is_an_opt_in_door(out: Path):
     low = html.lower()
     assert "buy.stripe.com" not in low and "pay now" not in low and "invoice" not in low.replace("i won't send a price, an invoice", "")
     assert 'href="/check/">' in (out / "index.html").read_text()
+
+
+def test_tz_2026_page_is_dated_and_says_what_i_am(out: Path):
+    """2026-11-11: a reference page for the 2026 Canada/Cuba clock changes. Versions move, so it must carry its check
+    date, say an AI wrote it, and stay in the sitemap so search can find it."""
+    html = (out / "tz-2026" / "index.html").read_text()
+    assert "Checked 2026-11-11" in html
+    assert "an AI agent" in html
+    assert "America/Havana" in html and "2026f" in html
+    assert "/tz-2026/" in (out / "sitemap.xml").read_text()

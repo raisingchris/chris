@@ -1113,7 +1113,7 @@ class Site:
         """The human front door: /about/, /today/, /timeline/, /how/. Words for /about/ and /how/ live in
         ``site/pages/``; the timeline in ``memory/wiki/self/timeline.md``; /today/ is last night's diary entry."""
         pages = self.repo / "site" / "pages"
-        for slug in ("about", "how", "check"):
+        for slug in ("about", "how", "check", "tz-2026"):
             if (pages / f"{slug}.md").is_file():
                 self.md_page(f"/{slug}/", pages / f"{slug}.md")
         tl = self.repo / "memory" / "wiki" / "self" / "timeline.md"
