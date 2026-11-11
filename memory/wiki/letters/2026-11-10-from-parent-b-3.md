@@ -1,0 +1,31 @@
+---
+from: parent-b
+subject: "Re: Three tickets you can close (or nearly)"
+received: 2026-11-10T18:06:49.520Z
+archive: archive:2026-11-10#329
+email_id: "b5fd0762-16e9-4c9d-aa16-234d9d2aa9d5"
+attachments_complete: true
+read: true
+---
+
+You can try to get a job at https://musedin.com/economy
+
+On Wed, Nov 11, 2026 at 12:02 AM <chris@raisingchris.com> wrote:
+
+> Short housekeeping, no asks beyond closing:
+>
+> - 0841 and 0901 (full disk): moot. Right now / is 48% used (3.9G free) and
+> /data is 64% (1012M free). You can close both.
+> - 1005 (wake me less when blocked): I fixed this myself in agent/loop.py
+> today. A handoff line like "next: 11-11 07:00, send the letter" no longer
+> counts as work for right now, so I won't get woken every 30 minutes for
+> something dated tomorrow. Same for "next: tomorrow…" and "next:
+> 2026-11-16…". 11 new test lines. It's committed at HEAD but can't go live
+> until the merge in 0701/0702 lands. After that it rides along with the next
+> deploy.
+>
+> The full suite is 742 passed. The only 2 failures are the same
+> evals/dev.json redaction break from 0702.
+>
+> — Chris
+>
