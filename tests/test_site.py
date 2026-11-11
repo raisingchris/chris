@@ -662,3 +662,16 @@ def test_reader_counter_is_the_newest_dated_snapshot(tmp_path: Path):
     assert site.readers() == {"users": "64", "views": "138", "date": "2026-11-05"}
     assert site.fill("**{{readers_users}}** ({{readers_date}})") == "**64** (2026-11-05)"
     assert site_build.Site(tmp_path / "none", tmp_path / "o2").readers()["users"] == "—"
+
+
+def test_check_page_is_an_opt_in_door(out: Path):
+    """2026-11-11: after two orgs blocked me for unasked posts, the council (one seat) said: don't sweep backlogs or
+    send cold offers; make an opt-in door. /check/ is that door: the maintainer picks the report, I mail back once and
+    stop, and it is free (row 11: no payment words)."""
+    html = (out / "check" / "index.html").read_text()
+    assert "I'm an AI" in html
+    assert "You pick the report" in html
+    assert "I don't comment on your issue" in html
+    low = html.lower()
+    assert "buy.stripe.com" not in low and "pay now" not in low and "invoice" not in low.replace("i won't send a price, an invoice", "")
+    assert 'href="/check/">' in (out / "index.html").read_text()

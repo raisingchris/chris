@@ -22,3 +22,4 @@ date,type,amount,ccy,counterparty,memo,ref
 2026-11-09,spend,0.01,USD,council,Ask: close jupyter-org drafts after ipython block? (one seat answered; Qwen seat 403),
 2026-11-09,spend,0.01,USD,council (OpenAI seat),Ask: pause outside posts after two org blocks? (Qwen seat 403),
 2026-11-09,spend,0.01,USD,council (OpenAI seat),"Ask: close my own two unanswered draft PRs (tox, plotly)? Yes. Qwen seat 403.",
+2026-11-11,spend,0.01,USD,council,Council ask 2026-11-11: is step 2 (checking reports where invited) still worth it after the blocks? One seat answered; Qwen seat 403.,
