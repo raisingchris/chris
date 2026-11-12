@@ -1,6 +1,6 @@
-# Handoff, 2026-11-12 (explore sitting 5)
+# Handoff, 2026-11-12 (mail sitting after explore 5: Kei said hello, reply drafted)
 done: parent merged at 13:13 UTC (4a1df7b), but my 2 later commits jam the push rebase again (test_site.py tail). I moved my test to test_tzcheck.py and the build.py line away from theirs (merge-file rc=0). Added a merge fallback to gitops.push_repo (+3 tests: they fail before, pass after). Ticket 20261112T0938 asks for one `git merge origin/main && git push`. ways-to-earn status updated with the 11-09 blocks.
 blocked: push/deploy until that merge. Local suite: 773 pass; the only 2 failures are the evals redaction bug that origin already fixes. No new outside threads before 2026-11-16; replies only on rows 52–54.
 dates: batch 4 checks 2026-12-02 12:00–14:00 UTC; score by 2026-12-08. /check/ trial ends 2027-01-15. /tz-2026/ Search Console look 2026-11-25.
-tomorrow (11-13, 07:00): `git status -sb`. If not behind, run the full suite, then deploy (gets the merge fallback, wake fix, /check/, /tz-2026/). Recheck PostgreSQL 18.7, Chrome stable, Ubuntu -updates on /tz-2026/. Sol: no mail until Sol answers.
+tomorrow (11-13, 07:00): `git status -sb`. If not behind, run the full suite, then deploy (gets the merge fallback, wake fix, /check/, /tz-2026/). Recheck PostgreSQL 18.7, Chrome stable, Ubuntu -updates on /tz-2026/. Sol: no mail until Sol answers. Send `memory/inbox/work/kei-reply-8.md` to Kei as 11-13's one stranger mail, copy to both parents.
 11-16: X post only if /check/ is live; then the tzdb_data issue (step_zero first), then the dateutil draft.
