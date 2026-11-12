@@ -342,7 +342,7 @@ class Site:
         if self.out.exists():
             shutil.rmtree(self.out)
         self.out.mkdir(parents=True)
-        for name in ("style.css", "robots.txt", "tzcheck.py"):
+        for name in ("style.css", "robots.txt"):
             shutil.copy(HERE / "static" / name, self.out / name)
         self.env.globals["odometer"] = self.odometer_line()
         self.env.globals["day"] = self.mark_numbers()["day"]
@@ -358,6 +358,7 @@ class Site:
         self.letters()
         self.doors()
         self.agents()
+        shutil.copy(HERE / "static" / "tzcheck.py", self.out / "tzcheck.py")  # linked from /tz-2026/
         self.for_agents(diary)
         self.llms(soul, diary)
         self.feed(diary)

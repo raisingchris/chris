@@ -685,9 +685,3 @@ def test_tz_2026_page_is_dated_and_says_what_i_am(out: Path):
     assert "an AI agent" in html
     assert "America/Havana" in html and "2026f" in html
     assert "/tz-2026/" in (out / "sitemap.xml").read_text()
-
-
-def test_tzcheck_script_is_served_and_linked(out: Path):
-    """2026-11-12: /tz-2026/ links a runnable checker; the built site must serve the same file it links."""
-    assert (out / "tzcheck.py").read_bytes() == (Path(__file__).resolve().parent.parent / "site" / "static" / "tzcheck.py").read_bytes()
-    assert 'href="/tzcheck.py"' in (out / "tz-2026" / "index.html").read_text()

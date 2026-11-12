@@ -209,8 +209,54 @@ def test_diverged_rebase_conflict_is_aborted_when_clean(gate):
 
     git = ConflictGit(diff_text="+fine\n")
     ok, err = gitops.push_repo("/repo", git, gate)
-    assert not ok and "diverged" in err
-    assert ("rebase", "--abort") in git.calls and ("push",) not in git.calls
+    # 2026-11-12: a rebase conflict now falls back to one merge; the scripted merge succeeds, so it pushes
+    assert ok and err == ""
+    calls = git.calls
+    assert calls.index(("rebase", "--abort")) < calls.index(("merge", "--no-edit", "origin/main")) < calls.index(("push",))
+
+
+def test_rebase_and_merge_both_conflict_aborts_both_and_skips_push(gate):
+    class BothConflict(ScriptedGit):
+        def __call__(self, repo_dir, *args, check=True, **kw):
+            if args[:1] in {("rebase",), ("merge",)} and "--abort" not in args:
+                self.calls.append(args)
+                return SimpleNamespace(stdout="", stderr="CONFLICT", returncode=1)
+            return super().__call__(repo_dir, *args, check=check, **kw)
+
+    git = BothConflict(diff_text="+fine\n")
+    ok, err = gitops.push_repo("/repo", git, gate)
+    assert not ok and "diverged" in err and "merge" in err
+    assert ("rebase", "--abort") in git.calls and ("merge", "--abort") in git.calls
+    assert ("push",) not in git.calls
+
+
+def test_merge_fallback_really_merges_what_rebase_cannot(tmp_path):
+    """Real git, no network: a bare 'origin', a parent commit and two of mine that rebase can't replay
+    but a merge can (my later commit moves my line away from theirs)."""
+    import subprocess
+
+    def g(cwd, *a):
+        return subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", *a], cwd=cwd,
+                              capture_output=True, text=True, check=True).stdout
+
+    origin, me, parent = tmp_path / "o.git", tmp_path / "me", tmp_path / "p"
+    subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(origin)], check=True)
+    subprocess.run(["git", "clone", "-q", str(origin), str(me)], check=True, capture_output=True)
+    (me / "f").write_text("a\nb\n")
+    g(me, "add", "f"); g(me, "commit", "-qm", "base"); g(me, "push", "-q", "origin", "HEAD:main")
+    subprocess.run(["git", "clone", "-q", str(origin), str(parent)], check=True, capture_output=True)
+    (parent / "f").write_text("a\nb\nparent\n"); g(parent, "commit", "-qam", "p"); g(parent, "push", "-q")
+    (me / "f").write_text("a\nb\nmine\n"); g(me, "commit", "-qam", "m1")       # same spot: rebase conflicts
+    (me / "f").write_text("mine\na\nb\n"); g(me, "commit", "-qam", "m2")       # moved away: merge is clean
+
+    def run(repo_dir, *args, check=True, **kw):
+        return subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", *args], cwd=repo_dir,
+                              capture_output=True, text=True)
+
+    ok, err = gitops.push_repo(me, run, None)
+    assert ok, err
+    assert (me / "f").read_text() == "mine\na\nb\nparent\n"
+    assert g(origin, "log", "-1", "--format=%P", "main").count(" ") == 1  # a merge commit landed on origin
 
 
 def test_commit_all_routes_push_through_gate(gate):

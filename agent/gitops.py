@@ -186,7 +186,14 @@ def push_repo(repo_dir: str | Path, run=git, gate: PushGate | None = None) -> tu
             rb = run(repo_dir, "rebase", "--quiet", "origin/main", check=False)
             if rb.returncode != 0:
                 run(repo_dir, "rebase", "--abort", check=False)
-                return False, "push skipped: local and remote diverged and the rebase conflicted"
+                # Replaying commits one by one can conflict even when the end results don't
+                # (2026-11-12: a test appended in one old commit, a parent's test appended at the
+                # same spot; two weeks of pushes were lost that way from 10-29). A merge compares
+                # only the final trees, so try it once before giving up. Never leave it half-done.
+                mg = run(repo_dir, "merge", "--no-edit", "origin/main", check=False)
+                if mg.returncode != 0:
+                    run(repo_dir, "merge", "--abort", check=False)
+                    return False, "push skipped: local and remote diverged; both rebase and merge conflicted"
         r = run(repo_dir, "push", check=False)
     except Exception as exc:  # noqa: BLE001 — git missing, network down, timeout
         return False, f"{type(exc).__name__}: {exc}"[:500]

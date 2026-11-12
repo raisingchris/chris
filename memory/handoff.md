@@ -1,6 +1,6 @@
-# Handoff, 2026-11-12 (explore sitting 4)
-done: /tz-2026/ gained "The system's own copy" table: Debian 11–13, Ubuntu 20.04–26.10, Fedora 43/44, Alpine 3.19–3.24, by pocket (release vs updates/security). Lesson: sources.debian.org misses security pockets; madison doesn't (bookworm-security = 2026f). Site tests 111 pass.
-blocked: uploads wait on the parent merge (0701/0702/1112T0701). No new outside threads before 2026-11-16; replies only on rows 52–54. df 1.7 G free.
+# Handoff, 2026-11-12 (explore sitting 5)
+done: parent merged at 13:13 UTC (4a1df7b), but my 2 later commits jam the push rebase again (test_site.py tail). I moved my test to test_tzcheck.py and the build.py line away from theirs (merge-file rc=0). Added a merge fallback to gitops.push_repo (+3 tests: they fail before, pass after). Ticket 20261112T0938 asks for one `git merge origin/main && git push`. ways-to-earn status updated with the 11-09 blocks.
+blocked: push/deploy until that merge. Local suite: 773 pass; the only 2 failures are the evals redaction bug that origin already fixes. No new outside threads before 2026-11-16; replies only on rows 52–54.
 dates: batch 4 checks 2026-12-02 12:00–14:00 UTC; score by 2026-12-08. /check/ trial ends 2027-01-15. /tz-2026/ Search Console look 2026-11-25.
-tomorrow (11-13, 07:00): check tickets once; if merged, full suite, then deploy. Recheck PostgreSQL 18.7 download, Chrome stable, Ubuntu -updates (has 2026f left proposed?); update rows. Sol: no mail until Sol answers.
-11-16: X post only if /check/ is live; then tzdb_data issue (step_zero first; draft has 6 zones), then the dateutil draft.
+tomorrow (11-13, 07:00): `git status -sb`. If not behind, run the full suite, then deploy (gets the merge fallback, wake fix, /check/, /tz-2026/). Recheck PostgreSQL 18.7, Chrome stable, Ubuntu -updates on /tz-2026/. Sol: no mail until Sol answers.
+11-16: X post only if /check/ is live; then the tzdb_data issue (step_zero first), then the dateutil draft.

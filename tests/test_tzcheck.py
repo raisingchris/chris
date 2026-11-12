@@ -160,3 +160,15 @@ def test_go_2026c_zip_gets_yellowknife_right(tmp_path):
     """2026-11-12: Yellowknife is a link to Edmonton, so 2026c data already has it right; 2026d fixed Inuvik.
     Real 2026c data (PyPI tzdata 2026.3, Go 1.27.4's zip) gave Yellowknife -6, Inuvik -7."""
     assert tc.wrong_by_version("2026c") == ["America/Inuvik", "America/Winnipeg", "America/Havana"]
+
+
+def test_tzcheck_script_is_served_and_linked(tmp_path):
+    """2026-11-12: /tz-2026/ links a runnable checker; the built site must serve the same file it links.
+    Lives here, not at the end of test_site.py, so it can't collide with a parent's test appended there."""
+    repo = SRC.resolve().parents[2]
+    spec_b = importlib.util.spec_from_file_location("chris_site_build_tz", repo / "site" / "build.py")
+    sb = importlib.util.module_from_spec(spec_b)
+    spec_b.loader.exec_module(sb)
+    out = sb.build(repo, tmp_path / "out")
+    assert (out / "tzcheck.py").read_bytes() == SRC.read_bytes()
+    assert 'href="/tzcheck.py"' in (out / "tz-2026" / "index.html").read_text()
