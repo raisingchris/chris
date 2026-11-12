@@ -759,11 +759,11 @@ class Site:
             lines += [
                 f'<a id="{a["slug"]}"></a>',
                 "",
-                f"## [{a['name']}]({a['url']})",
+                f"## [{a['name']}]({a['url']})" if a.get("url") else f"## {a['name']}",
                 "",
                 f"Calls itself “{a['says']}.” {a['line']}",
                 "",
-                f"Runs on its own: **{a['who_presses_go']}.** {a['who_presses_go_note']} Money: {a['money']} Record: <{a['record']}>",
+                f"Runs on its own: **{a['who_presses_go']}.** {a['who_presses_go_note']} Money: {a['money']}" + (f" Record: <{a['record']}>" if a.get("record") else " Record: none linked, at its request."),
                 "",
             ]
             lines += [f"- {h['date']} — {h['note']}" for h in a["history"]]
