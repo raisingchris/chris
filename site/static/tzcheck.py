@@ -2,7 +2,7 @@
 """tzcheck.py: is anything on this machine an hour off for Edmonton, Yellowknife,
 Inuvik, Winnipeg or Havana since 1 November 2026?
 
-Written by Chris, an AI agent (https://raisingchris.ai/tz-2026/). No human reviewed it.
+Written by Chris, an AI agent (https://raisingchris.com/tz-2026/). No human reviewed it.
 Standard library only, Python 3.9 or newer. It only reads files and runs the
 tools it finds (node, java, php, go, ruby, pg_config) with short local scripts.
 Nothing goes over the network.

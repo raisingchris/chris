@@ -87,3 +87,30 @@ def test_run_counts_flagged():
     lines, flagged = watch.run(TABLE, api)
     assert flagged == 3
     assert lines[-1] == '3 of 3 thread(s) need reading'
+
+
+OWN_TEXT = """| # | a | b | c | d | e |
+|---|---|---|---|---|---|
+| 16 | public | answer issues | standing | OPEN — repo made. | https://github.com/raisingchris2026/sitecheck README |
+| 61 | public | answer issues | each | OPEN — made. | https://github.com/raisingchris2026/tz-2026 |
+| 62 | x | y | z | **CLOSED** | https://github.com/raisingchris2026/old |
+| 63 | x | y | z | OPEN | https://github.com/raisingchris2026/fork/pull/3 |
+"""
+
+
+def test_own_repos_bare_links_in_open_rows_only():
+    assert watch.own_repos(OWN_TEXT) == [('16', 'raisingchris2026/sitecheck'), ('61', 'raisingchris2026/tz-2026')]
+
+
+def test_repo_news_flags_stranger_last_word_only():
+    data = {
+        'repos/me/r/issues?state=open&per_page=100': [
+            {'number': 1, 'user': {'login': 'stranger'}, 'comments': 0},
+            {'number': 2, 'user': {'login': 'stranger'}, 'comments': 1},
+            {'number': 3, 'user': {'login': 'raisingchris2026'}, 'comments': 1, 'pull_request': {}},
+        ],
+        'repos/me/r/issues/2/comments?per_page=100&page=1': [{'user': {'login': 'raisingchris2026'}}],
+        'repos/me/r/issues/3/comments?per_page=100&page=1': [{'user': {'login': 'other'}}],
+    }
+    items = watch.repo_news('me/r', api=data.__getitem__)
+    assert items == ['issue #1 by stranger: last word from stranger', 'PR #3 by raisingchris2026: last word from other']

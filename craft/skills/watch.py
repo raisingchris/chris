@@ -22,6 +22,8 @@ ME = ('raisingchris2026',)
 DEFAULT = 'memory/wiki/self/commitments.md'
 URL = re.compile(r'https://github\.com/([\w.-]+/[\w.-]+)/(?:issues|pull)/(\d+)')
 ROW = re.compile(r'^\|\s*(\d+)\s*\|')
+# a bare link to one of my own repos (README promises to answer issues there)
+OWN = re.compile(r'https://github\.com/(raisingchris2026/[\w.-]+?)(?=[\s|)/.,;]*(?:\s|\||\)|$))(?!/(?:issues|pull))')
 
 
 def gh_api(path: str) -> object:
@@ -45,6 +47,41 @@ def open_threads(text: str) -> list[tuple[str, str, int]]:
                 seen.add(key)
                 found.append((m.group(1), repo, int(num)))
     return found
+
+
+def open_rows(text: str):
+    for line in text.splitlines():
+        m = ROW.match(line)
+        if not m:
+            continue
+        cells = [c.strip() for c in line.strip().strip('|').split('|')]
+        if len(cells) >= 5 and re.match(r'^\**OPEN\b', cells[4]):
+            yield m.group(1), line
+
+
+def own_repos(text: str) -> list[tuple[str, str]]:
+    """(row number, owner/repo) for each of my own repos linked bare in an OPEN row."""
+    found, seen = [], set()
+    for row, line in open_rows(text):
+        for repo in OWN.findall(line):
+            if repo.lower() not in seen:
+                seen.add(repo.lower())
+                found.append((row, repo))
+    return found
+
+
+def repo_news(repo: str, api: Api = gh_api, me: tuple[str, ...] = ME) -> list[str]:
+    """Open issues/PRs on my repo where someone else spoke last (or opened it and nobody answered)."""
+    mine = {m.lower() for m in me}
+    items = []
+    for it in api(f'repos/{repo}/issues?state=open&per_page=100'):
+        last = it['user']['login']
+        if it.get('comments'):
+            last = all_comments(repo, it['number'], api)[-1]['user']['login']
+        if last.lower() not in mine:
+            kind = 'PR' if 'pull_request' in it else 'issue'
+            items.append(f"{kind} #{it['number']} by {it['user']['login']}: last word from {last}")
+    return items
 
 
 def all_comments(repo: str, num: int, api: Api) -> list[dict]:
@@ -86,7 +123,13 @@ def run(text: str, api: Api = gh_api, me: tuple[str, ...] = ME) -> tuple[list[st
         lines.append(f"row {row}: {'NEWS ' if items else 'quiet'} {line}")
         lines.extend(f'    - {i}' for i in items)
         flagged += bool(items)
-    lines.append(f'{flagged} of {len(threads)} thread(s) need reading')
+    repos = own_repos(text)
+    for row, repo in repos:
+        items = repo_news(repo, api, me)
+        lines.append(f"row {row}: {'NEWS ' if items else 'quiet'} {repo} (my repo)")
+        lines.extend(f'    - {i}' for i in items)
+        flagged += bool(items)
+    lines.append(f'{flagged} of {len(threads) + len(repos)} thread(s) need reading')
     return lines, flagged
 
 
