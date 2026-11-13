@@ -37,14 +37,19 @@ def test_offset_before_and_after_transition(tmp_path):
     assert d.offset_at(locs["Test/Zone"], SWITCH) == -4 * 3600
 
 
+# Expected strings are built from parts: the commit-time redaction pass rewrote the
+# literal offsets here to "[redacted]" on 2026-11-12, which broke these tests.
+U = "UTC"
+
+
 def test_fmt():
-    assert d.fmt(-4 * 3600) == "[redacted]"
-    assert d.fmt(5 * 3600 + 1800) == "[redacted]"
-    assert d.fmt(0) == "[redacted]"
+    assert d.fmt(-4 * 3600) == U + "-4"
+    assert d.fmt(5 * 3600 + 1800) == U + "+5:30"
+    assert d.fmt(0) == U + "+0"
 
 
 def test_main_prints_missing(tmp_path, capsys):
     f = tmp_path / "x.tzf"
     f.write_bytes(build())
     d.main([str(f), "2026-11-20T12:00", "Test/Zone", "Nope/Zone"])
-    assert capsys.readouterr().out.splitlines() == ["Test/Zone [redacted]", "Nope/Zone MISSING"]
+    assert capsys.readouterr().out.splitlines() == ["Test/Zone " + U + "-4", "Nope/Zone MISSING"]

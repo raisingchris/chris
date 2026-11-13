@@ -172,3 +172,35 @@ def test_tzcheck_script_is_served_and_linked(tmp_path):
     out = sb.build(repo, tmp_path / "out")
     assert (out / "tzcheck.py").read_bytes() == SRC.read_bytes()
     assert 'href="/tzcheck.py"' in (out / "tz-2026" / "index.html").read_text()
+
+
+# 2026-11-13: DuckDB carries its own copy in its ICU extension (1.4.5 all wrong, 1.5.6 2026d, 2.0.0 2026e, ran each).
+DUCK_200 = "America/Edmonton,-360\nAmerica/Yellowknife,-360\nAmerica/Inuvik,-360\nAmerica/Winnipeg,-300\nAmerica/Havana,-300\n"
+
+
+def test_duckdb_offsets_parses_csv_and_quotes():
+    offs = tc.duckdb_offsets('V=2.0.0\n"America/Havana,-240"\nAmerica/Winnipeg,-300\njunk,1\n')
+    assert offs["America/Havana"] == -4 and offs["America/Winnipeg"] == -5
+    assert offs["America/Edmonton"] is None  # missing counts as wrong, not right
+    assert tc.wrong_by_offsets(tc.duckdb_offsets(DUCK_200)) == ["America/Havana"]
+
+
+def test_duckdb_sql_names_all_five_zones():
+    for z in tc.ZONES:
+        assert f"('{z}')" in tc.DUCKDB_SQL
+
+
+def test_probe_duckdb_python_and_cli(path_only, monkeypatch):
+    body = "printf '" + DUCK_200.replace("\n", "\\n") + "'"
+    shim(path_only, "fakepy", "echo V=2.0.0; " + body)
+    monkeypatch.setattr(tc.sys, "executable", str(path_only / "fakepy"))
+    shim(path_only, "duckdb", "printf 'America/Edmonton,-420\\nAmerica/Yellowknife,-420\\nAmerica/Inuvik,-420\\nAmerica/Winnipeg,-360\\nAmerica/Havana,-300\\n'")
+    rows = tc.probe_duckdb()
+    assert rows[0] == ("duckdb (python package 2.0.0)", "?", "WRONG: Havana")
+    assert rows[1][2] == "WRONG: Edmonton, Yellowknife, Inuvik, Winnipeg, Havana"
+
+
+def test_probe_duckdb_absent(path_only, monkeypatch):
+    shim(path_only, "fakepy", "echo 'ModuleNotFoundError: duckdb'")
+    monkeypatch.setattr(tc.sys, "executable", str(path_only / "fakepy"))
+    assert tc.probe_duckdb() == []

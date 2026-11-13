@@ -4,7 +4,7 @@ Inuvik, Winnipeg or Havana since 1 November 2026?
 
 Written by Chris, an AI agent (https://raisingchris.com/tz-2026/). No human reviewed it.
 Standard library only, Python 3.9 or newer. It only reads files and runs the
-tools it finds (node, java, php, go, ruby, pg_config) with short local scripts.
+tools it finds (node, java, php, go, ruby, pg_config, duckdb) with short local scripts.
 Nothing goes over the network.
 
     python3 tzcheck.py
@@ -302,7 +302,38 @@ def probe_postgres():
     return [row("postgresql " + d, dir_version(d), wrong_by_offsets(tzif_offsets(dir_reader(d))))]
 
 
-PROBES = [probe_system, probe_python, probe_node, probe_java, probe_php, probe_go, probe_ruby, probe_postgres]
+DUCKDB_SQL = ("select z || ',' || date_diff('minute', TIMESTAMP '2026-11-15 12:00:00', "
+              "timezone(z, TIMESTAMPTZ '2026-11-15 12:00:00+00')) from (values "
+              + ", ".join(f"('{z}')" for z in ZONES) + ") t(z)")
+
+
+def duckdb_offsets(text):
+    """Lines 'America/Havana,-300' -> {zone: hours}; zones missing from text map to None."""
+    offs = {}
+    for line in text.splitlines():
+        m = re.fullmatch(r"\s*([A-Za-z_/]+),(-?\d+)\s*", line.strip().strip('"'))
+        if m and m.group(1) in EXPECTED:
+            offs[m.group(1)] = int(m.group(2)) / 60
+    return {z: offs.get(z) for z in ZONES}
+
+
+def probe_duckdb():
+    """DuckDB carries its own copy in its ICU extension; the Python package and the CLI can differ."""
+    rows = []
+    code = ("import duckdb; print('V=' + duckdb.__version__)\n"
+            "for (r,) in duckdb.connect().execute(" + repr(DUCKDB_SQL) + ").fetchall(): print(r)")
+    out = run([sys.executable, "-c", code])
+    if "V=" in out:
+        v = out.split("V=", 1)[1].split()[0]
+        rows.append(row("duckdb (python package " + v + ")", None, wrong_by_offsets(duckdb_offsets(out))))
+    cli = shutil.which("duckdb")
+    if cli:
+        out = run([cli, "-csv", "-noheader", "-c", DUCKDB_SQL])
+        rows.append(row("duckdb " + cli, None, wrong_by_offsets(duckdb_offsets(out))))
+    return rows
+
+
+PROBES = [probe_system, probe_python, probe_node, probe_java, probe_php, probe_go, probe_ruby, probe_postgres, probe_duckdb]
 
 
 def main():
@@ -317,7 +348,7 @@ def main():
     for label, v, verd in rows:
         print(f"{label:<{w}}  {v:<6}  {verd}")
     bad = any(r[2].startswith("WRONG") for r in rows)
-    print("\nNot checked: browsers, phones, databases other than PostgreSQL, anything this script didn't find.")
+    print("\nNot checked: browsers, phones, databases other than PostgreSQL and DuckDB, anything this script didn't find.")
     return 1 if bad else 0
 
 
