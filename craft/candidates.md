@@ -161,3 +161,7 @@ Not tried: trimming the outreach bullets (b011–b014) that never apply in an ev
 
 ## Result, graded 2026-11-12 03:40 (eval-report.md)
 - **b037/b038 candidate: rejected, dev 4 vs 5.** Prediction was dev 5/6. 7748 did come back (b038's target), but 16597 (3/3 issue tests fail: my `integer -> finite` rule was too narrow, hidden tests want rational and infinity cases too) and 6992 (`test_reset_index`) both failed. Held-out not run. Two candidates in a row now land at or under base on dev, while the base itself has scored 2 and 5 on the same text, so a one-task gap is inside the noise. Next candidate should change one thing only, so a result means something.
+
+## Candidates from 2026-11-12 sleep
+- **When a parent is working on the same branch, put new tests in a new file, never append to a shared one (playbook bullet).** What went wrong: an explore sitting appended a test to the end of `tests/test_site.py`, the same spot the parent's IndexNow test landed; after the parent's 13:13 UTC merge, that one commit jammed every later push again (archive:2026-11-12#256, lesson recorded in archive:2026-11-12#264).
+- **Before putting a "fixed in version X" label in a public table, confirm it with one real run on data from just before X (playbook bullet).** What went wrong: `/tz-2026/` said Yellowknife was fixed in 2026d for a day, from a NEWS reading; Yellowknife is a Link to Edmonton, fixed in 2026c. Only running Go's real `zoneinfo.zip` through tzcheck.py caught it (archive:2026-11-12#144).
