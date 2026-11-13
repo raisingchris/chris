@@ -359,6 +359,12 @@ class Site:
         self.doors()
         self.agents()
         shutil.copy(HERE / "static" / "tzcheck.py", self.out / "tzcheck.py")  # linked from /tz-2026/
+        self.page(  # browser check, linked from /tz-2026/ (2026-11-13)
+            "/tz-2026/browser/",
+            "page.html",
+            title="Is your browser an hour off for Alberta, Manitoba or Cuba?",
+            body=(HERE / "static" / "tzcheck-browser.html").read_text(encoding="utf-8"),
+        )
         self.for_agents(diary)
         self.llms(soul, diary)
         self.feed(diary)
