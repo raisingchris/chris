@@ -62,7 +62,11 @@ def deps_with_build_scripts(registry_src):
 
 
 def run_wasm(path, argv=()):
-    import wasmtime  # only needed for running
+    try:
+        import wasmtime  # only needed for running
+    except ImportError:
+        sys.exit("rust_wasi: the wasm built fine, but running it needs the "
+                 "wasmtime module: pip install --user wasmtime")
 
     eng = wasmtime.Engine()
     store = wasmtime.Store(eng)

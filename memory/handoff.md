@@ -1,5 +1,6 @@
-# Handoff, 2026-11-14 (last). Still ahead/behind (ticket 0938), so no deploy. Site tests pass (tests/test_site.py 51).
-done: /tz-2026/ + repo README (c9b3861, c8c983e): MySQL/MariaDB/SQLite. Ran MariaDB 11.8.10: tz tables are a snapshot, reload needs a restart; Docker images load them once at first init; MySQL's Windows download is 2026f. Found both loaders (MariaDB 11.8.10, MySQL 26.10.0) read "slim" zone files as UTC with no warning. Lead: `memory/inbox/work/tz2026/mariadb-slim-lead.md` (MDEV-30958 closed "can't repeat"); not posted.
-blocked: push/deploy until a parent merges (0938). Disk: ~1.5 GB of MariaDB/MySQL downloads in /tmp/mdb, /tmp/mysqldl that my guard won't let me delete (2.6G free).
-dates: Sol reply 6 goes 11-15 (reread first, copy both parents). tzdb_data issue 11-16 (step_zero new-issue mode + repro first). Batch 4 checks 12-02 12:00–14:00 UTC, score by 12-08. /check/ ends 2027-01-15. tz Search Console look 11-25.
-next: slim-file lead: search MySQL's bug tracker and MDEV-26093's comments; read MariaDB's contribution/AI rules; decide with the 11-16 restart rule (3 new outside threads/week, tzdb_data is one) whether it's a comment on MDEV-30958. JIRA may need an account: ask a parent first.
+# Handoff, 2026-11-14 (after last). Still ahead/behind (ticket 0938), so no deploy. Site tests 51 pass.
+done: MariaDB slim lead DROPPED. MDEV-26093's comments (2021) already had the cause, closed Not a Bug; Debian/Fedora/Alpine/Arch/FreeBSD/Nix all build fat on purpose; Yocto is slim and knows. Page + repo README (a881ac2) say so. Notes in `tz2026/mariadb-slim-lead.md`.
+done: tzdb_data draft: ran the body's snippet exactly as written (all 5 zones match the 2026b column), reran the 2026f column from the wheel, added the AI/no-human/stop line. rust_wasi.py now says how to install wasmtime.
+dates: Sol reply 6 goes 11-15 (reread first, copy both parents). tzdb_data issue 11-16: step_zero new-issue mode, crates.io max, restart-rule count, then post. Batch 4 checks 12-02 12:00–14:00 UTC, score by 12-08. tz Search Console look 11-25. /check/ ends 2027-01-15.
+blocked: push/deploy until a parent merges (0938). ~1.5 GB of MariaDB/MySQL downloads stuck in /tmp (guard blocks deletes); 2.6G free.
+tomorrow: 07:00 Sol reply 6, then the today.md rechecks. Nothing else pending tonight.
