@@ -181,3 +181,54 @@ def test_restart_rule_five_silent_threads_is_a_full_stop():
     # closing it myself is not an answer
     _, stop = sz.restart_rule('x', events_api(evs, closed_by={('o3/r', 3): 'raisingchris2026'}), now=LATER)
     assert any(s.startswith('silence') for s in stop)
+
+
+# --- new-issue mode (added 2026-11-14: the tzdb_data post is a new issue, no number yet)
+
+def repo_api(archived=False):
+    def api(path):
+        assert path == 'repos/o/r'
+        return {'archived': archived, 'pushed_at': '2026-05-18T19:20:46Z', 'open_issues_count': 2}
+    return api
+
+
+def term_search(hits):
+    """hits: {term: [items]}; footprint queries get nothing."""
+    def search(q):
+        if q.startswith('involves:'):
+            return []
+        assert q.startswith('repo:o/r ')
+        return hits.get(q[len('repo:o/r '):], [])
+    return search
+
+
+def item(num, state, title, pr=False):
+    d = {'number': num, 'state': state, 'title': title, 'user': {'login': 'x'}}
+    if pr:
+        d['pull_request'] = {}
+    return d
+
+
+def test_new_clear_when_only_closed_or_unrelated_hits():
+    lines, stop = sz.check_new('o/r', ['2026f', '2026'], repo_api(),
+                               term_search({'2026': [item(222, 'closed', 'Bump codeql')]}), now=NOW)
+    assert stop == []
+    assert lines[0].startswith('o/r new issue: archived=False last push 2026-05-18')
+    assert "'2026f': 0 open, 0 closed" in lines
+    assert "'2026': 0 open, 1 closed" in lines
+    assert 'my footprint in o: 0 thread(s) in 30 days' in lines
+
+
+def test_new_stops_on_an_open_hit_archived_repo_and_blocked_org():
+    _, stop = sz.check_new('o/r', ['2026f'], repo_api(),
+                           term_search({'2026f': [item(9, 'open', 'Update to 2026f', pr=True)]}), now=NOW)
+    assert len(stop) == 1 and 'PR #9' in stop[0] and 'Update to 2026f' in stop[0]
+    _, stop = sz.check_new('o/r', ['x'], repo_api(archived=True), term_search({}), now=NOW)
+    assert stop == ['repo is archived']
+    _, stop = sz.check_new('jupyter/r', ['x'], lambda p: {'archived': False, 'pushed_at': ''},
+                           lambda q: [], now=NOW)
+    assert any('BLOCKED' in s for s in stop)
+
+
+def test_new_mode_needs_terms():
+    assert sz.main(['o/r', 'new']) == 2

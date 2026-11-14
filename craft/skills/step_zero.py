@@ -25,8 +25,13 @@ read from my own public GitHub events, so it can't drift from what I actually di
 "Human answer" = a comment after my post by someone who isn't me and isn't a bot,
 or the thread closed by someone else.
 
+New issue (no number yet; added 2026-11-14): `owner/repo new --search t1,t2` checks the
+org isn't BLOCKED, the repo isn't archived, no issue or PR matching any term is open
+(someone may already have it), my footprint in the org, and the restart rule.
+
 Usage:
   python -I step_zero.py owner/repo 123 [--expect-comments N] [--me login,...] [--pypi name]
+  python -I step_zero.py owner/repo new --search term1,term2 [--me login,...]
 Exit codes: 0 = clear to post, 1 = stop and read, 2 = usage/API error.
 """
 from __future__ import annotations
@@ -124,6 +129,36 @@ def check(repo: str, num: int | str, api: Api = gh_api, search: lp.Search = lp.g
     return lines, stop
 
 
+def check_new(repo: str, terms: list[str], api: Api = gh_api, search: lp.Search = lp.gh_search,
+              me: tuple[str, ...] = ME, now: datetime | None = None) -> tuple[list[str], list[str]]:
+    """Before opening a NEW issue: is the room open, and has anyone already raised it?"""
+    lines, stop = [], []
+    owner = repo.split('/')[0].lower()
+    if owner in BLOCKED:
+        stop.append(f'org {owner} is on my BLOCKED list: never post there')
+    info = api(f'repos/{repo}')
+    lines.append(f"{repo} new issue: archived={info.get('archived')} "
+                 f"last push {str(info.get('pushed_at'))[:10]}")
+    if info.get('archived'):
+        stop.append('repo is archived')
+    for t in terms:
+        hits = search(f'repo:{repo} {t}')
+        open_ = [h for h in hits if h.get('state') == 'open']
+        lines.append(f"'{t}': {len(open_)} open, {len(hits) - len(open_)} closed")
+        for h in hits:
+            kind = 'PR' if 'pull_request' in h else 'issue'
+            lines.append(f"  {kind} #{h['number']} {h['state']} {h['title']}")
+        for h in open_:
+            kind = 'PR' if 'pull_request' in h else 'issue'
+            stop.append(f"open {kind} #{h['number']} matches '{t}': {h['title']} (read it first)")
+    since = ((now or datetime.now(timezone.utc)) - timedelta(days=FOOTPRINT_DAYS)).date().isoformat()
+    mine_org = search(f'involves:{me[0]} org:{owner} updated:>={since}')
+    lines.append(f'my footprint in {owner}: {len(mine_org)} thread(s) in {FOOTPRINT_DAYS} days')
+    if len(mine_org) >= FOOTPRINT_MAX:
+        stop.append(f'footprint: {len(mine_org)} of my threads in {owner} in {FOOTPRINT_DAYS} days')
+    return lines, stop
+
+
 def _ts(s: str) -> datetime:
     return datetime.fromisoformat(s.replace('Z', '+00:00'))
 
@@ -207,7 +242,7 @@ def restart_rule(owner: str, api: Api = gh_api, me: tuple[str, ...] = ME,
 
 
 def main(argv: list[str]) -> int:
-    args, expect, me, pypi_name = [], None, ME, None
+    args, expect, me, pypi_name, terms = [], None, ME, None, []
     it = iter(argv)
     for a in it:
         if a == '--expect-comments':
@@ -216,13 +251,21 @@ def main(argv: list[str]) -> int:
             me = tuple(next(it).split(','))
         elif a == '--pypi':
             pypi_name = next(it)
+        elif a == '--search':
+            terms = [t for t in next(it).split(',') if t]
         else:
             args.append(a)
     if len(args) != 2 or '/' not in args[0]:
         print(__doc__.strip().splitlines()[-3], file=sys.stderr)
         return 2
+    if args[1] == 'new' and not terms:
+        print('new mode needs --search term1,term2', file=sys.stderr)
+        return 2
     try:
-        lines, stop = check(args[0], args[1], expect_comments=expect, me=me, pypi_name=pypi_name)
+        if args[1] == 'new':
+            lines, stop = check_new(args[0], terms, me=me)
+        else:
+            lines, stop = check(args[0], args[1], expect_comments=expect, me=me, pypi_name=pypi_name)
         more, stop2 = restart_rule(args[0].split('/')[0], me=me)
         lines += more
         stop += stop2
