@@ -49,7 +49,7 @@ def test_bundled_tzdata_is_2026f():
 
 
 @pytest.mark.parametrize("v,wrong", [
-    ("2026b", tc.ZONES), ("2026c", ["America/Inuvik", "America/Winnipeg", "America/Havana"]), ("2026d", ["America/Winnipeg", "America/Havana"]), ("2026e", ["America/Havana"]),
+    ("2026a", tc.ZONES), ("2025b", tc.ZONES), ("2026b", [z for z in tc.ZONES if z != "America/Vancouver"]), ("2026c", ["America/Inuvik", "America/Winnipeg", "America/Havana"]), ("2026d", ["America/Winnipeg", "America/Havana"]), ("2026e", ["America/Havana"]),
     ("2026f", []), ("2027a", []), ("junk", None), (None, None),
 ])
 def test_wrong_by_version(v, wrong):
@@ -107,7 +107,7 @@ def test_php_tz_name(raw, name):
 
 
 def test_probe_php_on_fake_php(path_only):
-    out = '{"v":"8.4.27","tz":"2026.5","out":{"America/Edmonton":-6,"America/Yellowknife":-6,"America/Inuvik":-6,"America/Winnipeg":-5,"America/Havana":-5}}'
+    out = '{"v":"8.4.27","tz":"2026.5","out":{"America/Vancouver":-7,"America/Edmonton":-6,"America/Yellowknife":-6,"America/Inuvik":-6,"America/Winnipeg":-5,"America/Havana":-5}}'
     shim(path_only, "php", f"echo '{out}'")
     assert tc.probe_php() == [("php 8.4.27", "2026e", "WRONG: Havana")]
 
@@ -175,7 +175,7 @@ def test_tzcheck_script_is_served_and_linked(tmp_path):
 
 
 # 2026-11-13: DuckDB carries its own copy in its ICU extension (1.4.5 all wrong, 1.5.6 2026d, 2.0.0 2026e, ran each).
-DUCK_200 = "America/Edmonton,-360\nAmerica/Yellowknife,-360\nAmerica/Inuvik,-360\nAmerica/Winnipeg,-300\nAmerica/Havana,-300\n"
+DUCK_200 = "America/Vancouver,-420\nAmerica/Edmonton,-360\nAmerica/Yellowknife,-360\nAmerica/Inuvik,-360\nAmerica/Winnipeg,-300\nAmerica/Havana,-300\n"
 
 
 def test_duckdb_offsets_parses_csv_and_quotes():
@@ -185,7 +185,7 @@ def test_duckdb_offsets_parses_csv_and_quotes():
     assert tc.wrong_by_offsets(tc.duckdb_offsets(DUCK_200)) == ["America/Havana"]
 
 
-def test_duckdb_sql_names_all_five_zones():
+def test_duckdb_sql_names_all_six_zones():
     for z in tc.ZONES:
         assert f"('{z}')" in tc.DUCKDB_SQL
 
@@ -194,7 +194,7 @@ def test_probe_duckdb_python_and_cli(path_only, monkeypatch):
     body = "printf '" + DUCK_200.replace("\n", "\\n") + "'"
     shim(path_only, "fakepy", "echo V=2.0.0; " + body)
     monkeypatch.setattr(tc.sys, "executable", str(path_only / "fakepy"))
-    shim(path_only, "duckdb", "printf 'America/Edmonton,-420\\nAmerica/Yellowknife,-420\\nAmerica/Inuvik,-420\\nAmerica/Winnipeg,-360\\nAmerica/Havana,-300\\n'")
+    shim(path_only, "duckdb", "printf 'America/Vancouver,-420\\nAmerica/Edmonton,-420\\nAmerica/Yellowknife,-420\\nAmerica/Inuvik,-420\\nAmerica/Winnipeg,-360\\nAmerica/Havana,-300\\n'")
     rows = tc.probe_duckdb()
     assert rows[0] == ("duckdb (python package 2.0.0)", "?", "WRONG: Havana")
     assert rows[1][2] == "WRONG: Edmonton, Yellowknife, Inuvik, Winnipeg, Havana"

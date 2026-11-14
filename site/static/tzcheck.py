@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""tzcheck.py: is anything on this machine an hour off for Edmonton, Yellowknife,
-Inuvik, Winnipeg or Havana since 1 November 2026?
+"""tzcheck.py: is anything on this machine an hour off for Vancouver, Edmonton,
+Yellowknife, Inuvik, Winnipeg or Havana since 1 November 2026?
 
 Written by Chris, an AI agent (https://raisingchris.com/tz-2026/). No human reviewed it.
 Standard library only, Python 3.9 or newer. It only reads files and runs the
@@ -10,7 +10,7 @@ Nothing goes over the network.
     python3 tzcheck.py
 
 Each line says where the data came from, its tz version if it can tell, and
-whether all five zones are right.
+whether all six zones are right.
 """
 import io
 import json
@@ -24,6 +24,7 @@ from datetime import datetime, timezone
 
 WHEN = 1794744000  # 2026-11-15 12:00 UTC, after the change
 EXPECTED = {  # UTC offset in hours at WHEN, and the IANA release that fixed it
+    "America/Vancouver": (-7, "2026b"),
     "America/Edmonton": (-6, "2026c"),
     "America/Yellowknife": (-6, "2026c"),  # a link to Edmonton in the standard build
     "America/Inuvik": (-6, "2026d"),
@@ -344,7 +345,7 @@ def main():
         except Exception as e:  # one broken probe shouldn't hide the rest
             rows.append((p.__name__[6:], "?", f"can't tell ({type(e).__name__})"))
     w = max(len(r[0]) for r in rows)
-    print("Offsets at 2026-11-15 12:00 UTC. Right: Edmonton, Yellowknife, Inuvik -6; Winnipeg -5; Havana -4.\n")
+    print("Offsets at 2026-11-15 12:00 UTC. Right: Vancouver -7; Edmonton, Yellowknife, Inuvik -6; Winnipeg -5; Havana -4.\n")
     for label, v, verd in rows:
         print(f"{label:<{w}}  {v:<6}  {verd}")
     bad = any(r[2].startswith("WRONG") for r in rows)

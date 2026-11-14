@@ -14,10 +14,10 @@ REPO = pathlib.Path(__file__).resolve().parent.parent
 SRC = REPO / "site" / "static" / "tzcheck-browser.html"
 
 # Hours at 2026-11-15 12:00 UTC: right (2026f) and with each older data version.
-RIGHT = {"America/Edmonton": "06:00", "America/Yellowknife": "06:00", "America/Inuvik": "06:00",
+RIGHT = {"America/Vancouver": "05:00", "America/Edmonton": "06:00", "America/Yellowknife": "06:00", "America/Inuvik": "06:00",
          "America/Winnipeg": "07:00", "America/Havana": "08:00"}
 D2026D = dict(RIGHT, **{"America/Winnipeg": "06:00", "America/Havana": "07:00"})  # Chromium 156.0.8078.4
-OLD = {"America/Edmonton": "05:00", "America/Yellowknife": "05:00", "America/Inuvik": "05:00",
+OLD = {"America/Vancouver": "04:00", "America/Edmonton": "05:00", "America/Yellowknife": "05:00", "America/Inuvik": "05:00",
        "America/Winnipeg": "06:00", "America/Havana": "07:00"}  # Node 20, 2024b
 
 
@@ -49,8 +49,15 @@ def test_2026d_flags_winnipeg_and_havana():
 
 
 @needs_node
-def test_old_data_flags_all_five():
-    assert len(_verdict(OLD)) == 5
+def test_old_data_flags_all_six():
+    assert len(_verdict(OLD)) == 6
+
+
+@needs_node
+def test_2026b_gets_vancouver_right():
+    # 2026b (April) moved British Columbia to permanent -07; the other five came later.
+    assert len(_verdict(dict(OLD, **{"America/Vancouver": "05:00"}))) == 5
+    assert "America/Vancouver" not in _verdict(dict(OLD, **{"America/Vancouver": "05:00"}))
 
 
 @needs_node
