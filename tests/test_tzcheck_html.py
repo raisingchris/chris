@@ -15,10 +15,12 @@ SRC = REPO / "site" / "static" / "tzcheck-browser.html"
 
 # Hours at 2026-11-15 12:00 UTC: right (2026f) and with each older data version.
 RIGHT = {"America/Vancouver": "05:00", "America/Edmonton": "06:00", "America/Yellowknife": "06:00", "America/Inuvik": "06:00",
-         "America/Winnipeg": "07:00", "America/Havana": "08:00"}
+         "America/Winnipeg": "07:00", "America/Havana": "08:00",
+         "Africa/Casablanca": "12:00", "Africa/El_Aaiun": "12:00"}
 D2026D = dict(RIGHT, **{"America/Winnipeg": "06:00", "America/Havana": "07:00"})  # Chromium 156.0.8078.4
 OLD = {"America/Vancouver": "04:00", "America/Edmonton": "05:00", "America/Yellowknife": "05:00", "America/Inuvik": "05:00",
-       "America/Winnipeg": "06:00", "America/Havana": "07:00"}  # Node 20, 2024b
+       "America/Winnipeg": "06:00", "America/Havana": "07:00",
+       "Africa/Casablanca": "13:00", "Africa/El_Aaiun": "13:00"}  # Node 20, 2024b (run 2026-11-15)
 
 
 def _verdict(hours):
@@ -49,15 +51,23 @@ def test_2026d_flags_winnipeg_and_havana():
 
 
 @needs_node
-def test_old_data_flags_all_six():
-    assert len(_verdict(OLD)) == 6
+def test_old_data_flags_all_eight():
+    assert len(_verdict(OLD)) == 8
 
 
 @needs_node
 def test_2026b_gets_vancouver_right():
-    # 2026b (April) moved British Columbia to permanent -07; the other five came later.
-    assert len(_verdict(dict(OLD, **{"America/Vancouver": "05:00"}))) == 5
+    # 2026b (April) moved British Columbia to permanent -07; the other seven came later.
+    assert len(_verdict(dict(OLD, **{"America/Vancouver": "05:00"}))) == 7
     assert "America/Vancouver" not in _verdict(dict(OLD, **{"America/Vancouver": "05:00"}))
+
+
+@needs_node
+def test_2026c_gets_morocco_right():
+    # 2026c fixed Alberta and Morocco together (Go 1.27.4's zip, run 2026-11-15).
+    c = dict(OLD, **{z: RIGHT[z] for z in ("America/Vancouver", "America/Edmonton", "America/Yellowknife",
+                                           "Africa/Casablanca", "Africa/El_Aaiun")})
+    assert _verdict(c) == ["America/Inuvik", "America/Winnipeg", "America/Havana"]
 
 
 @needs_node

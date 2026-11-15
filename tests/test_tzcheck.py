@@ -107,7 +107,7 @@ def test_php_tz_name(raw, name):
 
 
 def test_probe_php_on_fake_php(path_only):
-    out = '{"v":"8.4.27","tz":"2026.5","out":{"America/Vancouver":-7,"America/Edmonton":-6,"America/Yellowknife":-6,"America/Inuvik":-6,"America/Winnipeg":-5,"America/Havana":-5}}'
+    out = '{"v":"8.4.27","tz":"2026.5","out":{"America/Vancouver":-7,"America/Edmonton":-6,"America/Yellowknife":-6,"America/Inuvik":-6,"America/Winnipeg":-5,"America/Havana":-5,"Africa/Casablanca":0,"Africa/El_Aaiun":0}}'
     shim(path_only, "php", f"echo '{out}'")
     assert tc.probe_php() == [("php 8.4.27", "2026e", "WRONG: Havana")]
 
@@ -126,7 +126,7 @@ def test_probe_go_on_fake_goroot(tmp_path, path_only):
 
 def test_probe_ruby(path_only):
     shim(path_only, "ruby", "echo 2026b")
-    assert tc.probe_ruby()[0][1:] == ("2026b", "WRONG: Edmonton, Yellowknife, Inuvik, Winnipeg, Havana")
+    assert tc.probe_ruby()[0][1:] == ("2026b", "WRONG: Edmonton, Yellowknife, Casablanca, El_Aaiun, Inuvik, Winnipeg, Havana")
     shim(path_only, "ruby", "echo none")
     assert tc.probe_ruby()[0][2] == "can't tell"
 
@@ -175,7 +175,7 @@ def test_tzcheck_script_is_served_and_linked(tmp_path):
 
 
 # 2026-11-13: DuckDB carries its own copy in its ICU extension (1.4.5 all wrong, 1.5.6 2026d, 2.0.0 2026e, ran each).
-DUCK_200 = "America/Vancouver,-420\nAmerica/Edmonton,-360\nAmerica/Yellowknife,-360\nAmerica/Inuvik,-360\nAmerica/Winnipeg,-300\nAmerica/Havana,-300\n"
+DUCK_200 = "America/Vancouver,-420\nAmerica/Edmonton,-360\nAmerica/Yellowknife,-360\nAmerica/Inuvik,-360\nAmerica/Winnipeg,-300\nAmerica/Havana,-300\nAfrica/Casablanca,0\nAfrica/El_Aaiun,0\n"
 
 
 def test_duckdb_offsets_parses_csv_and_quotes():
@@ -194,10 +194,10 @@ def test_probe_duckdb_python_and_cli(path_only, monkeypatch):
     body = "printf '" + DUCK_200.replace("\n", "\\n") + "'"
     shim(path_only, "fakepy", "echo V=2.0.0; " + body)
     monkeypatch.setattr(tc.sys, "executable", str(path_only / "fakepy"))
-    shim(path_only, "duckdb", "printf 'America/Vancouver,-420\\nAmerica/Edmonton,-420\\nAmerica/Yellowknife,-420\\nAmerica/Inuvik,-420\\nAmerica/Winnipeg,-360\\nAmerica/Havana,-300\\n'")
+    shim(path_only, "duckdb", "printf 'America/Vancouver,-420\\nAmerica/Edmonton,-420\\nAmerica/Yellowknife,-420\\nAmerica/Inuvik,-420\\nAmerica/Winnipeg,-360\\nAmerica/Havana,-300\\nAfrica/Casablanca,60\\nAfrica/El_Aaiun,60\\n'")
     rows = tc.probe_duckdb()
     assert rows[0] == ("duckdb (python package 2.0.0)", "?", "WRONG: Havana")
-    assert rows[1][2] == "WRONG: Edmonton, Yellowknife, Inuvik, Winnipeg, Havana"
+    assert rows[1][2] == "WRONG: Edmonton, Yellowknife, Casablanca, El_Aaiun, Inuvik, Winnipeg, Havana"
 
 
 def test_probe_duckdb_absent(path_only, monkeypatch):
