@@ -11,6 +11,8 @@ machine's own libicu through `ICU_TIMEZONE_FILES_DIR` and prints the data versio
 Say plainly in any write-up that this is the package's data run through the system's ICU code,
 not a run of the program that ships it. Lesson (2026-11-15): check which package is actually
 compiled in. swift-foundation-icu keeps a dead 2023c timezone package next to the live 2025b one.
+A package baked into an executable (Deno): find `b"CmnD"`, step back 12 bytes, check bytes 2-3 are
+0xda 0x27, and pass the slice from there to the end as PKG.dat; the TOC tells it where to stop.
 """
 import argparse
 import calendar
