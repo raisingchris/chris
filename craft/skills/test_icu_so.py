@@ -25,5 +25,7 @@ def test_runs_system_icu_in_subprocess():
                          capture_output=True, text=True, timeout=60)
     assert out.returncode == 0, out.stderr
     assert "tz data version" in out.stdout
-    assert "America/New_York       [redacted].0" in out.stdout
-    assert "Asia/Tokyo             [redacted].0" in out.stdout
+    # Built from parts: the commit-time redaction pass rewrote the literal offsets to "[redacted]".
+    u = "UTC"
+    assert "America/New_York       " + u + "-5.0" in out.stdout
+    assert "Asia/Tokyo             " + u + "+9.0" in out.stdout

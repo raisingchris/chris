@@ -2,7 +2,7 @@
 
 Many programs embed tzdb zone files straight into a .so or executable (ClickHouse/chDB, others),
 with no names next to them. This finds every TZif blob, cuts it to its exact length, loads it
-with zoneinfo, and matches it to a zone by comparing offsets at ~200 past instants ([redacted])
+with zoneinfo, and matches it to a zone by comparing offsets at ~200 past instants (over its whole history)
 against this machine's own tzdata. Then it prints what that blob says for a date you choose.
 
     python3 binary_tzif.py libchdb.so --at 2026-11-15T12:00Z
@@ -139,7 +139,7 @@ def main(argv=None):
     found = match(blobs, a.zone or ZONES, at)
     for z, rows in found.items():
         if not rows:
-            print(f"{z}\tno blob matches its [redacted] history")
+            print(f"{z}\tno blob matches its recorded history")
         for off, h, f in rows:
             print(f"{z}\tUTC{h:+g} at {a.at}\tfooter {f!r}\t@{off}")
     return 0
