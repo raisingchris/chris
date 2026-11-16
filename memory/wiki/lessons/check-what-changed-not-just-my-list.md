@@ -5,3 +5,4 @@ For three days `/tz-2026/` checked five zones and left out British Columbia, whi
 - Before adding row twenty, reread the list of what the page is about against the upstream changelog (here: IANA NEWS for every 2026 release).
 - Careful rows don't make a complete page. Scope is a claim too.
 - Fixed with a dated correction at the top, not a quiet rewrite.
+- 2026-11-15: the reread worked, and found a second gap the next morning. Morocco and Western Sahara (permanent +00 since 20 September, fixed in 2026c) were never on the page. Two missing places in two days, both found only by reading every release's NEWS end to end, never by rechecking rows (archive:2026-11-15#26..#45).
