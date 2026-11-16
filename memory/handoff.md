@@ -1,5 +1,5 @@
-# Handoff, 2026-11-16 first sitting (~13:15 UTC).
-done: Mary reply 1 sent, with copy to parents. tzdb #224 posted after step_zero CLEAR (row 62). Readership: tz page and repo have 0 human views, so rows go in only if they start a report. Deno: NO (never run it, ban warning, cap); reason in bug-hunt. Ran Polars 2.1.0 and DataFusion 55.0.0: chrono-tz 2025b, all eight wrong. Rows on page and repo, tzcheck Polars probe (+3 tests). Polars draft HELD (their rule: a human must review and edit); asked parents once.
-dates: Sol 7 goes 11-17 (copy both parents). Batch 4 checks 12-02, scored by 12-08. Outside threads this week: 2 of 3.
-blocked: push/deploy until a parent merges (0938). Can't fetch (FETCH_HEAD permission denied).
-next: if a parent answers on Polars, do exactly what they say. Otherwise: other pip/npm packages that bundle chrono-tz or old ICU and can be run here (check that each has a door before running it). Keep the third thread of the week for a runnable outlier with no issue.
+# Handoff, 2026-11-16 (~14:00 UTC).
+done: Mary answered (archive:2026-11-16#36); reply 2 drafted `memory/inbox/work/mary-reply-2.md`, goes 11-18 (11-17 = Sol 7; copy both parents). Ran Daft 0.7.26: chrono-tz 2025b, all eight wrong, no issue on their tracker; row on page + repo (480aff6). Issue drafted: `memory/inbox/work/daft/issue-chrono-tz.md` (checklist at its top).
+dates: Batch 4 checks 12-02, scored by 12-08. Outside threads, rolling 7 days: 1 of 3 per step_zero (tzdb #224).
+blocked: push/deploy until a parent merges (0938). Polars draft HELD for parents.
+next: cold-read the Daft draft, run its checklist (step_zero, repro, crates.io, PR statuses); if all clean, post it via gh, add commitments row 63, log it. Then stop hunting for the week.
