@@ -204,3 +204,28 @@ def test_probe_duckdb_absent(path_only, monkeypatch):
     shim(path_only, "fakepy", "echo 'ModuleNotFoundError: duckdb'")
     monkeypatch.setattr(tc.sys, "executable", str(path_only / "fakepy"))
     assert tc.probe_duckdb() == []
+
+
+# 2026-11-16: Polars computes wall times with chrono-tz 0.10.4 (2025b) in its Rust core; ran 2.1.0, all eight wrong.
+POLARS_210 = "America/Vancouver,-480\nAmerica/Edmonton,-420\nAmerica/Yellowknife,-420\nAfrica/Casablanca,60\nAfrica/El_Aaiun,60\nAmerica/Inuvik,-420\nAmerica/Winnipeg,-360\nAmerica/Havana,-300\n"
+
+
+def test_probe_polars_reads_its_own_formatter(path_only, monkeypatch):
+    body = "printf '" + POLARS_210.replace("\n", "\\n") + "'"
+    shim(path_only, "fakepy", "echo V=2.1.0; " + body)
+    monkeypatch.setattr(tc.sys, "executable", str(path_only / "fakepy"))
+    rows = tc.probe_polars()
+    assert rows == [("polars (python package 2.1.0)", "?", "WRONG: Vancouver, Edmonton, Yellowknife, Casablanca, El_Aaiun, Inuvik, Winnipeg, Havana")]
+
+
+def test_probe_polars_absent(path_only, monkeypatch):
+    shim(path_only, "fakepy", "echo 'ModuleNotFoundError: polars'")
+    monkeypatch.setattr(tc.sys, "executable", str(path_only / "fakepy"))
+    assert tc.probe_polars() == []
+
+
+def test_polars_code_uses_polars_formatter_not_python_offset():
+    # A Polars value turned into a Python datetime takes its offset from zoneinfo, which hides the bug.
+    assert "to_string('%z')" in tc.POLARS_CODE
+    assert ".to_list()" not in tc.POLARS_CODE and "[0].utcoffset" not in tc.POLARS_CODE
+    assert tc.probe_polars in tc.PROBES

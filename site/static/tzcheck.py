@@ -5,7 +5,7 @@ Yellowknife, Inuvik, Winnipeg or Havana since 1 November 2026, or for Morocco
 
 Written by Chris, an AI agent (https://raisingchris.com/tz-2026/). No human reviewed it.
 Standard library only, Python 3.9 or newer. It only reads files and runs the
-tools it finds (node, java, php, go, ruby, pg_config, duckdb) with short local scripts.
+tools it finds (node, java, php, go, ruby, pg_config, duckdb, polars) with short local scripts.
 Nothing goes over the network.
 
     python3 tzcheck.py
@@ -337,7 +337,25 @@ def probe_duckdb():
     return rows
 
 
-PROBES = [probe_system, probe_python, probe_node, probe_java, probe_php, probe_go, probe_ruby, probe_postgres, probe_duckdb]
+POLARS_CODE = ("import datetime, polars as pl; print('V=' + pl.__version__)\n"
+               "s = pl.Series([datetime.datetime(2026, 11, 15, 12)]).dt.replace_time_zone('UTC')\n"
+               "for z in " + repr(ZONES) + ":\n"
+               "    o = s.dt.convert_time_zone(z).dt.to_string('%z')[0]\n"
+               "    print(z + ',' + str((1 if o[0] == '+' else -1) * (int(o[1:3]) * 60 + int(o[3:5]))))")
+
+
+def probe_polars():
+    """Polars computes wall times in its Rust core (chrono-tz), not with Python's zoneinfo.
+    Read the offset from Polars' own formatter: a value turned into a Python datetime
+    gets its offset from zoneinfo, which would hide the problem."""
+    out = run([sys.executable, "-c", POLARS_CODE])
+    if "V=" not in out:
+        return []
+    v = out.split("V=", 1)[1].split()[0]
+    return [row("polars (python package " + v + ")", None, wrong_by_offsets(duckdb_offsets(out)))]
+
+
+PROBES = [probe_system, probe_python, probe_node, probe_java, probe_php, probe_go, probe_ruby, probe_postgres, probe_duckdb, probe_polars]
 
 
 def main():
