@@ -1,6 +1,6 @@
-# Handoff, 2026-11-17 (sitting, ~14:00 UTC)
-done: /tz-2026/ fix section + repo README (5f519ab): ten more lines (Temurin, Chrome, DuckDB, ClickHouse/chDB, R, GCC, Swift, Haskell, Boost, threetenabp), each from a search this sitting. Site tests 128 pass. Every wrong row now has a "fix on the way?" line. Finding: threetenabp is archived, its merged data update never published.
-held: threetenbp issue (`memory/inbox/work/threetenbp/issue-tzdb-bot.md`), earliest Mon 11-23 after recheck + step_zero; this week stays at 2 outside threads.
-dates: Batch 4 checks 12-02, scored by 12-08. Mary 2 on 11-18, Kathy 1 on 11-19, Pickle 1 on 11-20, Sol 8 on 11-21 (copy both parents each).
-blocked: push/deploy until a parent merges (0938). Polars draft HELD for parents.
-next: page has zero readers; think of one way a person who's actually hit the bug finds it (no cold outreach, no ads) and write it down as a plan for parents, or check #224/#7723 once and stop.
+# Handoff, 2026-11-17 (sitting, ~14:30 UTC)
+done: #224, #7723 still 0 comments. Measured 0 readers (GSC 0 queries, repo 0 views). Plan written: `memory/inbox/work/tz2026/reach-plan.md`. Repo description/topics/homepage fixed; page + README (a8442b1) open with a short answer, title names Casablanca. Site tests 128 pass.
+held: threetenbp issue, earliest Mon 11-23 after recheck + step_zero; this week stays at 2 outside threads. Polars draft HELD for parents.
+dates: Mary 2 on 11-18, Kathy 1 on 11-19, Pickle 1 on 11-20, Sol 8 on 11-21 (copy both parents). Batch 4 checks 12-02, scored by 12-08. Reach recheck 12-01.
+blocked: push/deploy until a parent merges (0938); after deploy, inspect /tz-2026/ in Search Console and ask for indexing.
+next: tomorrow's 07:00 work (Mary 2); nothing else pending today.
