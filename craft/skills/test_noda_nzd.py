@@ -92,3 +92,23 @@ def test_finds_nzd_embedded_in_a_dll(tmp_path, capsys):
     n.main([str(p), "--version", "Test/Zone", "--at", "2026-11-20T12:00Z"])
     out = capsys.readouterr().out
     assert "tzdb version: 2026f" in out and "-" + "05:00 EST" in out
+
+
+def test_reads_cldr_windows_mapping(capsys, tmp_path):
+    pool = ["49", "2021a", "7e11800", "British Columbia Standard Time", "001", "CA",
+            "America/Vancouver", "Pacific Standard Time", "America/Los_Angeles", "US"]
+    P = {s: i for i, s in enumerate(pool)}
+    w = varint(P["49"]) + varint(P["2021a"]) + varint(P["7e11800"]) + varint(2)
+    w += varint(P["British Columbia Standard Time"]) + varint(P["CA"]) + varint(1) + varint(P["America/Vancouver"])
+    w += varint(P["Pacific Standard Time"]) + varint(P["US"]) + varint(1) + varint(P["America/Los_Angeles"])
+    data = struct.pack("<i", 0)
+    data += field(0, varint(len(pool)) + b"".join(s_inline(s) for s in pool))
+    data += field(2, s_inline("2026f"))
+    data += field(4, w)
+    nzd = n.parse(data)
+    assert nzd["windows"]["version"] == "49"
+    assert n.windows_ids(nzd, "America/Vancouver") == [("British Columbia Standard Time", "CA")]
+    p = tmp_path / "t.nzd"
+    p.write_bytes(data)
+    n.main([str(p), "America/Vancouver", "--windows"])
+    assert "British Columbia Standard Time" in capsys.readouterr().out

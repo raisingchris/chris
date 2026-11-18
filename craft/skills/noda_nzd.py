@@ -7,6 +7,7 @@ way NodaTime's `TzdbStreamData` / `DateTimeZoneReader` / `PrecalculatedDateTimeZ
 
     python3 -I noda_nzd.py NodaTime.dll America/Havana America/Edmonton --at 2026-11-20T12:00Z
     python3 -I noda_nzd.py tzdb2026f.nzd --version
+    python3 -I noda_nzd.py NodaTime.dll America/Vancouver --windows   # CLDR Windows id it maps to
 
 Put downloads in their own empty folder. Use controls (America/New_York, Europe/London).
 Say plainly in any write-up that this is NodaTime's data decoded in Python, not NodaTime run.
@@ -111,7 +112,7 @@ def read_fields(data):
 
 def parse(data):
     version, fields = read_fields(data)
-    pool, zones, tzver, idmap = None, {}, None, {}
+    pool, zones, tzver, idmap, windows = None, {}, None, {}, None
     for fid, body in fields:
         if fid == 0:
             r = Reader(body)
@@ -124,7 +125,20 @@ def parse(data):
         elif fid == 3:
             r = Reader(body, pool)
             idmap = {r.string(): r.string() for _ in range(r.count())}
-    return dict(format=version, version=tzver, pool=pool, zones=zones, idmap=idmap)
+        elif fid == 4:  # CLDR windowsZones (WindowsZones.Read / MapZone.Read)
+            r = Reader(body, pool)
+            hdr = [r.string(), r.string(), r.string()]
+            maps = []
+            for _ in range(r.count()):
+                wid, terr = r.string(), r.string()
+                maps.append((wid, terr, [r.string() for _ in range(r.count())]))
+            windows = dict(version=hdr[0], tzdb=hdr[1], windows=hdr[2], maps=maps)
+    return dict(format=version, version=tzver, pool=pool, zones=zones, idmap=idmap, windows=windows)
+
+
+def windows_ids(nzd, iana):
+    """Every (windowsId, territory) whose CLDR row lists this IANA id, in file order."""
+    return [(w, t) for w, t, ids in nzd["windows"]["maps"] if iana in ids]
 
 
 def read_year_offset(r):
@@ -241,12 +255,19 @@ def main(argv=None):
     ap.add_argument("zones", nargs="*")
     ap.add_argument("--at", default="2026-11-20T12:00Z")
     ap.add_argument("--version", action="store_true")
+    ap.add_argument("--windows", action="store_true", help="print the CLDR Windows ids each zone maps to")
     a = ap.parse_args(argv)
     nzd = load(a.path)
     if a.version:
         print(f"tzdb version: {nzd['version']} ({len(nzd['zones'])} zones, format {nzd['format']})")
     when = dt.datetime.fromisoformat(a.at.replace("Z", "+00:00"))
     t_ms = (when - EPOCH) // dt.timedelta(milliseconds=1)
+    if a.windows:
+        w = nzd["windows"]
+        print(f"CLDR windowsZones {w['version']} (tzdb {w['tzdb']}, windows {w['windows']}, {len(w['maps'])} rows)")
+        for key in a.zones:
+            print(f"{key:24s} -> {windows_ids(nzd, key)}")
+        return 0
     for key in a.zones:
         off, name = offset_at(zone(nzd, key), t_ms)
         print(f"{key:24s} {fmt(off)} {name}  (at {a.at})")
