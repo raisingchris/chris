@@ -32,6 +32,8 @@ org isn't BLOCKED, the repo isn't archived, no issue or PR matching any term is 
 Usage:
   python -I step_zero.py owner/repo 123 [--expect-comments N] [--me login,...] [--pypi name]
   python -I step_zero.py owner/repo new --search term1,term2 [--me login,...]
+  add --released YYYY-MM-DD (a package release that links this repo) to check the
+  tracker still belongs to the author (see tracker_owner).
 Exit codes: 0 = clear to post, 1 = stop and read, 2 = usage/API error.
 """
 from __future__ import annotations
@@ -241,8 +243,34 @@ def restart_rule(owner: str, api: Api = gh_api, me: tuple[str, ...] = ME,
     return lines, stop
 
 
+def tracker_owner(repo: str, api: Api = gh_api, released: str | None = None) -> tuple[list[str], list[str]]:
+    """Does this tracker still belong to the people who made the package?
+
+    Added 2026-11-18: npm `windows-iana` (5.1.0, 2021) points to github.com/rubenillodo/windows-iana,
+    but that account was made 2025-03-11, 27 s before the repo, which holds only a bug-bounty
+    tester's README. The author's name had been re-registered; an issue there reaches a stranger.
+    With --released DATE (a release that names this repo), a repo younger than it is a stop.
+    Without it, a user account made within a day of the repo is a warning line only.
+    """
+    lines, stop = [], []
+    info = api(f'repos/{repo}')
+    owner = info.get('owner') or {}
+    rc = str(info.get('created_at') or '')
+    oc = ''
+    if owner.get('type') == 'User' and owner.get('login'):
+        oc = str((api(f"users/{owner['login']}") or {}).get('created_at') or '')
+    lines.append(f"tracker: repo created {rc[:10] or '?'}, owner {owner.get('login')} "
+                 f"({owner.get('type')}) created {oc[:10] or '?'}")
+    if released and rc and rc[:10] > released:
+        stop.append(f'repo created {rc[:10]}, after the release {released} that points here: '
+                    'the name may have been re-registered; this tracker may not reach the author')
+    if rc and oc and abs((_ts(rc) - _ts(oc)).total_seconds()) < 86400:
+        lines.append('warning: owner account and repo made within a day of each other')
+    return lines, stop
+
+
 def main(argv: list[str]) -> int:
-    args, expect, me, pypi_name, terms = [], None, ME, None, []
+    args, expect, me, pypi_name, terms, released = [], None, ME, None, [], None
     it = iter(argv)
     for a in it:
         if a == '--expect-comments':
@@ -251,6 +279,8 @@ def main(argv: list[str]) -> int:
             me = tuple(next(it).split(','))
         elif a == '--pypi':
             pypi_name = next(it)
+        elif a == '--released':
+            released = next(it)
         elif a == '--search':
             terms = [t for t in next(it).split(',') if t]
         else:
@@ -266,6 +296,9 @@ def main(argv: list[str]) -> int:
             lines, stop = check_new(args[0], terms, me=me)
         else:
             lines, stop = check(args[0], args[1], expect_comments=expect, me=me, pypi_name=pypi_name)
+        more, stop2 = tracker_owner(args[0], released=released)
+        lines += more
+        stop += stop2
         more, stop2 = restart_rule(args[0].split('/')[0], me=me)
         lines += more
         stop += stop2

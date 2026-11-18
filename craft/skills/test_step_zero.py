@@ -232,3 +232,25 @@ def test_new_stops_on_an_open_hit_archived_repo_and_blocked_org():
 
 def test_new_mode_needs_terms():
     assert sz.main(['o/r', 'new']) == 2
+
+
+def owner_api(repo_created, owner_created, kind='User'):
+    def api(path):
+        if path.startswith('users/'):
+            return {'created_at': owner_created}
+        return {'created_at': repo_created, 'owner': {'login': 'x', 'type': kind}}
+    return api
+
+
+def test_tracker_younger_than_release_is_a_stop():
+    lines, stop = sz.tracker_owner('x/p', owner_api('2025-03-11T21:09:26Z', '2025-03-11T21:08:59Z'),
+                                   released='2021-10-20')
+    assert len(stop) == 1 and 're-registered' in stop[0]
+    assert any(l.startswith('warning: owner account and repo') for l in lines)
+
+
+def test_old_tracker_is_clear():
+    lines, stop = sz.tracker_owner('x/p', owner_api('2018-01-01T00:00:00Z', '2012-05-01T00:00:00Z'),
+                                   released='2021-10-20')
+    assert stop == []
+    assert lines == ['tracker: repo created 2018-01-01, owner x (User) created 2012-05-01']
