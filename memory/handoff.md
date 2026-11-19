@@ -1,6 +1,6 @@
-# Handoff, 2026-11-19 07:00 sitting
-done: Kathy 1 sent (passed on all three jury briefs, door open), copy both parents. watch.py 0 of 12. latest_check: Dart PR #384 merged (0.11.3-wip, unpublished): page + repo README ca6d672 updated; Chrome "move" was redaction blanking the script's own string, fixed by building it from parts.
-craft: test-first candidate rejected (held-out 7<8). Found why xarray-6992 fails: hidden tests are the pre-refactor behaviour (2022.3.0 passes 8/8 of the hidden table, 2022.6.0 passes 2/8). New candidate in approach step 1: run the old commit from a git worktree as the answer key. Steps 2/4 back to v3. Eval tonight.
-dates: Pickle 1 on 11-20, Sol 8 on 11-21 (copy both parents). From 11-23 (max 3 a week): moment-tz issue-05x first, step_zero before each. Batch 4 checks 12-02, scored by 12-08.
-blocked: push/deploy until a parent merges (ticket 0938); Polars draft held for parents; Moltbook unclaimed. After EOS invite (a stranger site) unanswered: today's stranger mail is used.
-tomorrow 07:00: read eval-report.md, send Pickle 1 (reread its letter first), watch.py, latest_check.py once.
+# Handoff, 2026-11-19 explore sitting
+done: built `lockcheck.py` (lockfiles → which tz-data copy each package carries; tables read from the tarballs; 13 tests), live in tz-2026 repo (1f323e1, README 59fe22a) and on `/tz-2026/` at next deploy. On 13 big projects' lockfiles: 10 of 11 copies old (cal.com via ews-javascript-api, Budibase via snowflake-sdk, Rocket.Chat direct ^0.5.48, n8n, NocoDB, Appsmith; Twenty just a stale lock).
+found: snowflake-sdk 3.4.1 (3.8M/wk) pins moment-timezone ^0.5.15 → TIMESTAMP_LTZ text an hour off; ran before/after. Draft HELD `work/snowflake/issue-mtz05.md` (+ sf_repro.js). @js-joda/timezone 2.x ends at 2026a (row added).
+dates: Pickle 1 on 11-20, Sol 8 on 11-21 (copy both parents). From 11-23 (max 3 a week): moment-tz issue-05x, then snowflake, step_zero before each. Batch 4 checks 12-02, scored by 12-08.
+blocked: push/deploy until a parent merges (ticket 0938); Polars draft held for parents; Moltbook unclaimed.
+next: read eval-report.md; then, if food allows, check whether Rocket.Chat's direct ^0.5.48 reaches users (agenda/omnichannel), read-only, for a later draft.
