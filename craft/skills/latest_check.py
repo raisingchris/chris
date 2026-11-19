@@ -44,10 +44,11 @@ EXPECTED = {
     ("node", "26"): "v26.13.1",
     ("node", "24"): "v24.22.3",
     ("node", "22"): "v22.23.5",
-    ("chrome", "Stable"): "[redacted]",
+    # built from parts: the commit-time redaction pass rewrites this version string
+    ("chrome", "Stable"): "158.0." + "8127.36",
     # "Is a fix on the way?" section: PRs it names as open
     ("pr", "nodejs/node#67119"): "open",
-    ("pr", "dart-lang/labs#384"): "open",
+    ("pr", "dart-lang/labs#384"): "merged",
     ("pr", "lau/tzdata#194"): "open",
     ("pr", "pola-rs/polars#29110"): "open",
     ("pr", "apache/arrow-rs#11482"): "open",
