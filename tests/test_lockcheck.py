@@ -34,6 +34,7 @@ def test_tables_match_what_was_read():
     assert jj("2.3.0") == "<=2021e" and jj("2.26.0") == "2026a" and jj("3.1.1") == "2026e" and jj("3.2.1") == "2026f"
     tz = lc.RULES["npm"]["tzdata"][0]
     assert tz("1.0.52") == "2026e" and tz("1.0.54") == "2026f"
+    assert lc.RULES["npm"]["timezone-support"][0]("3.1.0") == "<=2022f"
     jt = lc.RULES["cargo"]["jiff-tzdb"][0]
     assert jt("0.1.9") == "2026e" and jt("0.1.10") == "2026f" and jt("1.0.0") == "2026f"
     assert lc.RULES["pypi"]["pytz"][0]("2026.6") == "2026f"

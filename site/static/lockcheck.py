@@ -116,6 +116,9 @@ RULES = {
             ("1.0.49", "2026b"), ("1.0.50", "2026c"), ("1.0.51", "2026d"),
             ("1.0.52", "2026e"), ("1.0.53", "2026f")], "<=2025b"),
             "read from each package's timezone-data.json. Fix: 1.0.53 or newer."),
+        "timezone-support": (always("<=2022f"), "3.1.0 (the newest, December 2022) "
+            "carries its own copy, 2022f; no release since. Ran it on 19 November, all eight wrong. "
+            "Fix: move to something that uses the system's data (date-fns-tz, Intl)."),
     },
     "cargo": {
         "chrono-tz": (always("<=2025b"),
