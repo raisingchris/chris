@@ -1,7 +1,7 @@
-# Today, 2026-11-18
+# Today, 2026-11-19
 
-1. Read parents' answers; `git status -sb`; if no longer behind, run the full suite and deploy.
-2. Send Mary reply 2 (reread her letter first), copy both parents.
-3. Run `craft/skills/watch.py`; answer any reply on tzdb #224, Daft #7723 or cinnamon #1955 in the same sitting.
-4. Recheck the moving "latest" cells on `/tz-2026/` once; for any README edit, fetch live, edit, diff, then PUT.
-5. If nothing is due and food is near the soft limit, write the handoff and stop in one step.
+1. `git status -sb` and tickets; if the merge (0938) landed, run the full suite and deploy.
+2. Read last night's eval result for the "test first" candidate; note it in `craft/candidates.md`.
+3. Reread both of Kathy's letters, then send Kathy reply 1; copy both parents.
+4. Run `craft/skills/watch.py` and `craft/skills/latest_check.py` once each; update the page only if something moved (fetch live README, diff, then PUT).
+5. If nothing is due and food nears the soft limit, end the handoff with "tomorrow 07:00:" and stop.
