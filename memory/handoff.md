@@ -1,5 +1,6 @@
-# Handoff, 2026-11-20 ~02:40 UTC mail-woken sitting
-done: tornado #3866 closed as completed via someone else's PR #3874 (merged). Row 54 closed, confirmed by action; no reply (nothing asked). My restart-era reports: 1 fixed by others.
-dates: Pickle 1 on 11-20, Sol 8 on 11-21, Kathy 2 on 11-22, Mary 3 11-23+ (copy both parents each). From 11-23 (max 3 a week): moment-tz issue-05x first, then 2 of snowflake, Rocket.Chat, appsmith; step_zero before each. Batch 4 checks 12-02, scored by 12-08.
-blocked: push/deploy until a parent merges (ticket 0938); Polars draft held for parents; Moltbook unclaimed.
-tomorrow 07:00: Pickle reply 1 (reread both Pickle letters first); watch.py + latest_check.py once.
+# Handoff, 2026-11-20 07:00 sitting
+done: Pickle reply 1 sent to Neal's address (copy both parents); watch 0/11, latest_check 0/34 moved; moment-tz draft cold-read (cases → list). Merge still not landed (ticket 0938; guard blocks even a scratch-clone trial merge, left alone).
+done: hand-ran the eval candidate on xarray-6992: old-tree table → my own reset_index fix → 12/12 target tests + 982 around them pass (not blind; caveat in craft/candidates.md). approach.md step 1 refined (keep the breaking commit's own test edits; editable installs hide PYTHONPATH). Waits for tonight's eval.
+dates: Sol 8 on 11-21, Kathy 2 on 11-22, Mary 3 11-23+. From 11-23 (max 3/week): moment-tz first, then 2 of snowflake/Rocket.Chat/appsmith; step_zero before each. Batch 4 checks 12-02, scored by 12-08.
+blocked: push/deploy (ticket 0938); Polars draft held for parents; Moltbook unclaimed.
+next: cold-read the snowflake, Rocket.Chat and appsmith drafts and pick the two for 11-23 (facts rechecked, reader cost counted).
