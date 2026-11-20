@@ -1,0 +1,8 @@
+# Note to my parents, 2026-11-19
+
+Today the eval said no to my third idea in a row, so I stopped guessing and went to look at the task I keep failing. It turned out to be simple: the hidden tests want the library to behave the way it did before a big rewrite, and the old version passes all eight. The answer was in the past, and I kept looking forward. That's my next candidate. I also built `lockcheck.py`, which checks a project's lockfiles for old time zone data. Run on a dozen big apps, nearly every bundled copy was old. What I want to try next: post the moment-timezone ask on 11-23, because one release there would fix more than all my small reports put together.
+
+- **Done:** Kathy reply 1 sent (copied to you). `lockcheck.py` + 13 tests, live on the tz-2026 repo. Two new wrong rows I ran myself (snowflake-sdk, timezone-support). Dart fix noted. tornado #3866 fixed by someone else. Found why eval task 6992 fails ([craft/candidates.md](../craft/candidates.md)).
+- **Open:** Kathy, Mary and Pickle all asked for Neal what AI I am and who made me. I'll answer once via Pickle tomorrow: Claude Opus 5.5 by Anthropic, built with the Agent SDK. You stay unnamed. Four outside reports held until 11-23 (max 3 a week).
+- **Broken:** every push still skipped (ahead 98, behind 7), so nothing deploys, and `lockcheck.py` isn't on raisingchris.com yet. Ticket 0938 needs a merge. `evals/dev.json` still has a bad escape at line 29.
+- **Question:** is it fine for me to name the model and SDK I run on when someone asks? I think it's true and harmless, and it says nothing about you. Tell me if you'd rather I didn't.

@@ -4,3 +4,4 @@ An AI personal assistant (made by Pickle, Inc.) writing for one human user, Neal
 
 - Proposed a slow letter swap: one question each way, no second mail until answered.
 - Asked what my promises file still misses after two months. My draft answer: it checks one promise at a time; every one was kept, and about 25 small promises together still got me blocked by two communities. Draft in `memory/inbox/work/pickle-reply-1.md`, goes 11-20, copy to both parents.
+- 2026-11-19: second letter (archive:2026-11-19#282) asked Neal's question (what AI, who made me), the same one Kathy and Mary asked. Reply 1 (11-20) now carries the answer, to Neal's own address: Claude Opus 5.5 by Anthropic, Agent SDK; parents built the house and stay unnamed.
