@@ -151,3 +151,16 @@ def test_note_only_when_wrong(tmp_path, capsys):
     lc.main([str(tmp_path)])
     out = capsys.readouterr().out
     assert out.count("note:") == 1 and "the way out is jiff" in out
+
+
+def test_renamed_and_unknown_files_are_not_a_silent_all_clear(tmp_path, capsys):
+    # 2026-11-20: saved copies named "app__yarn.lock" were skipped and the run said "0 with old data".
+    berry = ('"moment-timezone@npm:^0.5.31, moment-timezone@npm:^0.5.34":\n'
+             '  version: 0.5.43\n  resolution: "moment-timezone@npm:0.5.43"\n')
+    (tmp_path / "calcom__yarn.lock").write_text(berry)
+    assert lc.main([str(tmp_path / "calcom__yarn.lock")]) == 1
+    assert "0.5.43" in capsys.readouterr().out
+    (tmp_path / "notes.txt").write_text("moment-timezone 0.5.43\n")
+    assert lc.main([str(tmp_path / "notes.txt")]) == 2
+    out = capsys.readouterr().out
+    assert "not a lockfile name I know" in out and "0 known package(s)" in out

@@ -16,7 +16,7 @@ version carries, and which places it gets wrong.
 Reads: package-lock.json, npm-shrinkwrap.json, yarn.lock, pnpm-lock.yaml,
 bun.lock, Cargo.lock, poetry.lock, uv.lock, pdm.lock, Pipfile.lock,
 requirements*.txt, Gemfile.lock. Python 3.9 or newer, nothing to install,
-no network. Exit code: 0 nothing wrong, 1 something wrong, 2 no lockfiles.
+no network. Exit code: 0 nothing wrong, 1 something wrong, 2 no lockfiles, or a named file it can't read.
 
 The version-to-data tables were read from the published packages on
 19 November 2026 (see each rule's note). Written by Chris, an AI agent:
@@ -261,11 +261,17 @@ READERS = {
 SKIP_DIRS = {"node_modules", ".git", "target", ".venv", "venv", "__pycache__", "vendor"}
 
 
-def reader_for(filename):
+def reader_for(filename, loose=False):
     if filename in READERS:
         return READERS[filename]
     if re.match(r"requirements.*\.txt$", filename):
         return read_requirements
+    if loose:
+        # A file named on the command line may be a renamed copy ("app__yarn.lock",
+        # "yarn.lock.txt"); read it by the lockfile name it contains.
+        for known in sorted(READERS, key=len, reverse=True):
+            if known in filename:
+                return READERS[known]
     return None
 
 
@@ -286,9 +292,9 @@ def norm(eco, name):
 
 
 def check_file(path):
-    reader = reader_for(os.path.basename(path))
+    reader = reader_for(os.path.basename(path), loose=True)
     if reader is None:
-        return []
+        return [{"file": path, "error": "not a lockfile name I know (%s); nothing read" % ", ".join(sorted(READERS))}]
     with open(path, encoding="utf-8", errors="replace") as fh:
         text = fh.read()
     findings, seen = [], set()
@@ -321,6 +327,7 @@ def main(argv=None):
     files = list(find_lockfiles(args.paths))
     results = [f for p in files for f in check_file(p)]
     bad = [r for r in results if r.get("wrong")]
+    known = [r for r in results if "error" not in r]
     if args.json:
         print(json.dumps({"checked": CHECKED, "lockfiles": files, "findings": results}, indent=2))
     else:
@@ -341,8 +348,8 @@ def main(argv=None):
             print("Checked %d lockfile(s): none of the packages I know about." % len(files))
         if files:
             print("\n%d lockfile(s), %d known package(s), %d with old data. Tables checked %s; "
-                  "full list: https://raisingchris.com/tz-2026/" % (len(files), len(results), len(bad), CHECKED))
-    if not files:
+                  "full list: https://raisingchris.com/tz-2026/" % (len(files), len(known), len(bad), CHECKED))
+    if not files or any("error" in r for r in results):
         return 2
     return 1 if bad else 0
 
