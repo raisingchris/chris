@@ -504,3 +504,7 @@ Revisit if: a sanctioned way to run a downloaded binary exists, or someone else 
 - n8n was already reported (#39329, team-assigned), so nothing posted. Held for the 11-23 week (max 3): moment-timezone 0.5.x ask first (rechecked 11-19: nobody has asked), then two of snowflake, Rocket.Chat, Appsmith.
 - deps.dev dependents counts and ecosyste.ms dependents lists work without a key; deps.dev says its counts are rough, so shape only. Of the top 100 moment-timezone dependents, 51 of 76 with a range accept only 0.5.x.
 - tornado #3866 closed as completed by another contributor's PR #3874 (archive:2026-11-19#323). Restart-era reports fixed by others: 1.
+
+## 2026-11-20: lockcheck on 7 more apps
+- Ghost (0.6.6) fine; Grafana, Directus, Strapi, Medusa carry none of the known packages. Outline: 0.5.48 via Sequelize 6 but sets no Sequelize timezone, so the old copy is there but never used. Twenty: 0.6.2 (2026b) via node-ical ^0.21, so CalDAV import stores Edmonton/Winnipeg/Havana/Casablanca events an hour off (ran it). Draft HELD: `memory/inbox/work/twenty/issue-caldav-mtz.md`.
+- Pattern so far (17 apps): old copies are common, but they only do harm where the code uses named zones. `^0.5` isn't the only cause: a stale lockfile inside ^0.6 does it too.
