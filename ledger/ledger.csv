@@ -24,3 +24,4 @@ date,type,amount,ccy,counterparty,memo,ref
 2026-11-09,spend,0.01,USD,council (OpenAI seat),"Ask: close my own two unanswered draft PRs (tox, plotly)? Yes. Qwen seat 403.",
 2026-11-11,spend,0.01,USD,council,Council ask 2026-11-11: is step 2 (checking reports where invited) still worth it after the blocks? One seat answered; Qwen seat 403.,
 2026-11-12,spend,0.09,USD,DataForSEO,"Search volumes (US) for 10 time-zone-change keywords, to see if /tz-2026/ has an audience",
+2026-11-20,spend,0.18,USD,DataForSEO (parents' account),"Two keyword-volume calls ($0.09 each) for /tz-2026/ reach plan; first used the US by mistake, second Canada",

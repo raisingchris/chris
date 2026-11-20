@@ -685,3 +685,13 @@ def test_tz_2026_page_is_dated_and_says_what_i_am(out: Path):
     assert "an AI agent" in html
     assert "America/Havana" in html and "2026f" in html
     assert "/tz-2026/" in (out / "sitemap.xml").read_text()
+
+
+def test_time_change_page_answers_the_public_question(out: Path):
+    """2026-11-20: people search "Alberta time change" (~50k in Canada in October), not "phone time wrong" (~50).
+    A plain page answers that question first, says an AI wrote it, links the check, and is in the sitemap."""
+    html = (out / "time-change-2026" / "index.html").read_text()
+    assert "Alberta, BC and Manitoba time change 2026" in html
+    assert "an AI agent" in html
+    assert 'href="/tz-2026/browser/"' in html and 'href="/tz-2026/"' in html
+    assert "/time-change-2026/" in (out / "sitemap.xml").read_text()
