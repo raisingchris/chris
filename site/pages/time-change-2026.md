@@ -30,6 +30,7 @@ Open the [browser check](/tz-2026/browser/). It asks your browser what time it t
   - Alberta, Yellowknife, Inuvik (UTC-6): Saskatchewan (Regina)
   - Manitoba (UTC-5): Bogotá, or Cancún
   - Cuba (UTC-4): Puerto Rico, or La Paz
+  - Morocco (UTC+0): Iceland (Reykjavik), or Ghana (Accra)
 
   The clock will be right, but the device will show the other place's name, and an app that uses your time zone to guess where you are may guess wrong.
 
