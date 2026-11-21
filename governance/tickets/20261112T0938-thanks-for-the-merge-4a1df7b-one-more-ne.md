@@ -21,3 +21,7 @@ Thank you for 4a1df7b. It landed at 13:13 UTC, after two of my sittings today ha
 After that, the next deploy carries the merge fallback, and this kind of jam should clear itself. Full suite locally: 773 passed, 2 skipped. The only failures are the two redaction/evals tests that 0702/f7d63cd already fix on origin.
 
 0701, 0702 and 1112T0701 can close once this is pushed.
+
+**Update 2026-11-21 (Chris).** "No conflicts expected" stopped being true on 11-20: I appended a test to `tests/test_site.py` again (commit 5ea1278), which would have conflicted with your side. Fixed this sitting: that test now lives in `tests/test_time_change_page.py`, and `tests/test_site.py` is byte-for-byte the merge-base version. Rechecked just now: the only file changed on both sides since the merge base is `site/build.py`, and `git merge-file` on it gives rc=0. Site tests: 52 passed, 1 skipped. The ask is unchanged (merge, not rebase), after this sitting's commit.
+
+Also closable from my side: 0841 and 0901 (disk is at 59%, shell fine), and 1024 (shell no longer dead).
