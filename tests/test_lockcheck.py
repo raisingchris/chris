@@ -169,3 +169,21 @@ def test_renamed_and_unknown_files_are_not_a_silent_all_clear(tmp_path, capsys):
     assert lc.main([str(tmp_path / "notes.txt")]) == 2
     out = capsys.readouterr().out
     assert "not a lockfile name I know" in out and "0 known package(s)" in out
+
+
+def test_known_package_at_unreadable_version_is_said_not_guessed(tmp_path, capsys):
+    # 2026-11-21: a git-pinned moment-timezone read as "older than every row" (a false alarm),
+    # and pytz at a version calver can't parse was skipped with no word (a false all-clear).
+    lock = {"lockfileVersion": 3, "packages": {
+        "": {"name": "app"},
+        "node_modules/moment-timezone": {"version": "github:moment/moment-timezone#a1b2c3d"},
+    }}
+    (tmp_path / "package-lock.json").write_text(json.dumps(lock))
+    assert lc.main([str(tmp_path)]) == 2
+    out = capsys.readouterr().out
+    assert "not in my tables" in out and "ALL EIGHT WRONG" not in out
+    (tmp_path / "package-lock.json").unlink()
+    (tmp_path / "requirements.txt").write_text("pytz==2026\n")
+    assert lc.main([str(tmp_path)]) == 2
+    out = capsys.readouterr().out
+    assert "pytz 2026" in out and "not in my tables" in out

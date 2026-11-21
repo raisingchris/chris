@@ -16,7 +16,7 @@ version carries, and which places it gets wrong.
 Reads: package-lock.json, npm-shrinkwrap.json, yarn.lock, pnpm-lock.yaml,
 bun.lock, Cargo.lock, poetry.lock, uv.lock, pdm.lock, Pipfile.lock,
 requirements*.txt, Gemfile.lock. Python 3.9 or newer, nothing to install,
-no network. Exit code: 0 nothing wrong, 1 something wrong, 2 no lockfiles, or a named file it can't read.
+no network. Exit code: 0 nothing wrong, 1 something wrong, 2 no lockfiles, a named file it can't read, or a known package at a version not in its tables.
 
 The version-to-data tables were read from the published packages on
 19 November 2026 (DuckDB's by running each release on
@@ -68,6 +68,8 @@ def table(rows, below):
     below: what to say for versions older than the first row."""
     def rule(version):
         k = vkey(version)
+        if not k:  # git URL, file: path, workspace:* ... not a version I can place
+            return None
         found = below
         for first, data in rows:
             if k >= vkey(first):
@@ -315,6 +317,11 @@ def check_file(path):
         seen.add((name, version, where))
         data = hit[0](version)
         if data is None:
+            findings.append({
+                "file": path, "ecosystem": eco, "package": name, "version": version,
+                "where": where, "unknown": "a package I know, at a version not in my tables; "
+                "check its data by hand", "wrong": [],
+            })
             continue
         findings.append({
             "file": path, "ecosystem": eco, "package": name, "version": version,
@@ -332,7 +339,8 @@ def main(argv=None):
     files = list(find_lockfiles(args.paths))
     results = [f for p in files for f in check_file(p)]
     bad = [r for r in results if r.get("wrong")]
-    known = [r for r in results if "error" not in r]
+    known = [r for r in results if "error" not in r and "unknown" not in r]
+    unknown = [r for r in results if "unknown" in r]
     if args.json:
         print(json.dumps({"checked": CHECKED, "lockfiles": files, "findings": results}, indent=2))
     else:
@@ -341,6 +349,9 @@ def main(argv=None):
         for r in results:
             if "error" in r:
                 print("%s: %s" % (r["file"], r["error"]))
+                continue
+            if "unknown" in r:
+                print("%s\n  %s %s (%s)  %s" % (r["file"], r["package"], r["version"], r["where"], r["unknown"]))
                 continue
             verdict = "OK" if not r["wrong"] else (
                 "ALL EIGHT WRONG" if len(r["wrong"]) == len(FIXES)
@@ -352,9 +363,10 @@ def main(argv=None):
         if files and not results:
             print("Checked %d lockfile(s): none of the packages I know about." % len(files))
         if files:
-            print("\n%d lockfile(s), %d known package(s), %d with old data. Tables checked %s; "
-                  "full list: https://raisingchris.com/tz-2026/" % (len(files), len(known), len(bad), CHECKED))
-    if not files or any("error" in r for r in results):
+            print("\n%d lockfile(s), %d known package(s), %d with old data, %d not in my tables. "
+                  "Tables checked %s; full list: https://raisingchris.com/tz-2026/"
+                  % (len(files), len(known), len(bad), len(unknown), CHECKED))
+    if not files or any("error" in r or "unknown" in r for r in results):
         return 2
     return 1 if bad else 0
 
