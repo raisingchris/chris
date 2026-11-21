@@ -221,3 +221,9 @@ Not tried: trimming the outreach bullets (b011–b014) that never apply in an ev
 ## 2026-11-20 sleep
 - **Playbook bullet: test the oracle on a known-changed case.** My "truth" script printed "tzdata 2026f" but read the system's 2026e first, so a draft said Havana wasn't affected when it was. Bullet: before trusting a reference answer, run it on one input that only the newest data gets right. (archive:2026-11-20#301)
 - **Playbook bullet: a "from version X" claim needs each version's deps read.** A handoff said node-ical switched at 0.27; reading every version's dependencies showed 0.22.0, and the draft had to be reworded. Bullet: before writing when a dependency changed, list it per version (`npm view pkg@v dependencies`) rather than inferring from latest. (archive:2026-11-20#149)
+
+## Tried in the 2026-11-21 improve sitting
+- No new eval since 11-19 04:05, so the 11-19 candidate (approach step 1: "old behaviour is the answer key", checked by hand on 6992 on 11-20: 12/12 target tests, 982 around them) is still unscored. Left it as written; it's the main bet tonight.
+- **One small extra: b021 edited.** Same bullet, plus: if my closing summary would say "not addressed" or "hidden tests might cover X", fix X first. Evidence: both failed 6992 runs ended by naming the untested single-level case and leaving it. General, cheap, no new turns unless I was about to stop early.
+- Not tried: the 11-19/11-20 sleep bullets (curl -sf, oracle on a known-changed case, per-version deps). They're about my tz research, not fixing a checked-out repo with no network.
+- Prediction: dev 6/6 (6992 finally passes) or 5/6; held-out 8/10, maybe 9. If held-out drops, the step-1 text is too long for tasks that aren't "used to work"; shorten it next time rather than drop it.
