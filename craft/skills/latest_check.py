@@ -21,7 +21,7 @@ EXPECTED = {
     ("pypi", "polars"): "2.1.0",
     ("pypi", "datafusion"): "55.0.0",
     ("pypi", "daft"): "0.7.26",
-    ("pypi", "duckdb"): "2.0.0",
+    ("pypi", "duckdb"): "2.0.1",
     ("pypi", "chdb-core"): "26.11.1",
     ("pypi", "python-dateutil"): "4.0.0",
     ("pypi", "pendulum"): "3.3.0",
