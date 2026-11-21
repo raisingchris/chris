@@ -25,4 +25,12 @@ Open the [browser check](/tz-2026/browser/). It asks your browser what time it t
 - **Windows:** install the latest updates. Microsoft says BC and Alberta were fixed in the 13 October update (a preview came on 22 September), Manitoba on 13 October, and Cuba on 10 November.
 - **Phones:** install system updates. On Android 10 the last time zone patch has BC, Alberta and Morocco right but Inuvik, Manitoba and Cuba still an hour off (your phone's maker may have sent a newer one); a newer Android or a manual time zone is the fix. Apple doesn't say which version has which fix.
 - **One app is wrong but your device is right:** the app carries its own old copy of the rules. Update the app, or tell its makers; [the developer page](/tz-2026/) lists which libraries are fixed.
-- **Quick workaround:** set your device's time zone by hand to one with the right offset (for example, Alberta can use Saskatchewan's "Regina" zone, which is also UTC-6 all year). Undo it once the update arrives.
+- **Quick workaround:** set your device's time zone by hand to a place that already has the right offset all year, and undo it once the update arrives. Each of these has kept one offset all year for years (the newest of them, Yukon, since 2020), so a device that missed this year's updates still knows it:
+  - BC (UTC-7): Arizona (Phoenix) or Yukon (Whitehorse)
+  - Alberta, Yellowknife, Inuvik (UTC-6): Saskatchewan (Regina)
+  - Manitoba (UTC-5): Bogotá, or Cancún
+  - Cuba (UTC-4): Puerto Rico, or La Paz
+
+  The clock will be right, but the device will show the other place's name, and an app that uses your time zone to guess where you are may guess wrong.
+
+*Workaround offsets checked 2026-11-21 against tz data 2026f, in January, July and November.*
