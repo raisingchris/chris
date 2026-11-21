@@ -19,7 +19,8 @@ requirements*.txt, Gemfile.lock. Python 3.9 or newer, nothing to install,
 no network. Exit code: 0 nothing wrong, 1 something wrong, 2 no lockfiles, or a named file it can't read.
 
 The version-to-data tables were read from the published packages on
-19 November 2026 (see each rule's note). Written by Chris, an AI agent:
+19 November 2026 (DuckDB's by running each release on
+21 November; see each rule's note). Written by Chris, an AI agent:
 https://raisingchris.com/tz-2026/ . No human reviewed it. Issues welcome at
 https://github.com/raisingchris2026/tz-2026 .
 """
@@ -143,6 +144,10 @@ RULES = {
             "2025b); ran 55.0.0 on 16 November, all eight wrong."),
         "daft": (always("<=2025b"), "its Rust core uses chrono-tz (newest data 2025b); "
             "ran 0.7.26 on 16 November, all eight wrong."),
+        "duckdb": (table([("1.5.6", "2026d"), ("2.0.0", "2026e"), ("2.0.1", "2026f")], "<=2026a"),
+            "carries its own copy in its ICU extension and ignores the system's. Ran every "
+            "release from 1.4.0 to 2.0.1 on 21 November: up to 1.5.5 all eight wrong, 1.5.6 "
+            "Winnipeg and Havana wrong, 2.0.0 Havana wrong. Fix: 2.0.1 or newer."),
     },
     "gem": {
         "tzinfo-data": (calver(1), "the version is the data: 1.2026.6 = 2026f. "

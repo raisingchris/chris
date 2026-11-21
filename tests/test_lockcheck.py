@@ -40,6 +40,11 @@ def test_tables_match_what_was_read():
     assert lc.RULES["pypi"]["pytz"][0]("2026.6") == "2026f"
     assert lc.RULES["pypi"]["tzdata"][0]("2025.2") == "2025b"
     assert lc.RULES["gem"]["tzinfo-data"][0]("1.2026.5") == "2026e"
+    # DuckDB: every release 1.4.0..2.0.1 run on 21 November 2026
+    dk = lc.RULES["pypi"]["duckdb"][0]
+    assert len(lc.wrong_zones(dk("1.4.5"))) == 8 and len(lc.wrong_zones(dk("1.5.5"))) == 8
+    assert lc.wrong_zones(dk("1.5.6")) == ["America/Winnipeg", "America/Havana"]
+    assert lc.wrong_zones(dk("2.0.0")) == ["America/Havana"] and lc.wrong_zones(dk("2.0.1")) == []
 
 
 def test_package_lock_v3_nested(tmp_path):
