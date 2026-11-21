@@ -279,6 +279,11 @@ def reader_for(filename, loose=False):
         for known in sorted(READERS, key=len, reverse=True):
             if known in filename:
                 return READERS[known]
+    # In a folder walk, a saved copy that ends in a lockfile name after a separator
+    # ("owner__repo__yarn.lock") is read too; a walk that skipped it said "none found".
+    for known in sorted(READERS, key=len, reverse=True):
+        if filename.endswith(known) and re.search(r"[_.\-]$", filename[: -len(known)]):
+            return READERS[known]
     return None
 
 

@@ -171,6 +171,17 @@ def test_renamed_and_unknown_files_are_not_a_silent_all_clear(tmp_path, capsys):
     assert "not a lockfile name I know" in out and "0 known package(s)" in out
 
 
+def test_folder_walk_reads_saved_copies(tmp_path, capsys):
+    # 2026-11-21: a folder of "owner__repo__package-lock.json" copies said "No lockfiles found".
+    berry = ('"moment-timezone@npm:^0.5.31":\n'
+             '  version: 0.5.43\n  resolution: "moment-timezone@npm:0.5.43"\n')
+    (tmp_path / "calcom__cal.com__yarn.lock").write_text(berry)
+    (tmp_path / "yarn.lock.bak").write_text(berry)  # not a separator-then-name copy: left alone
+    assert lc.main([str(tmp_path)]) == 1
+    out = capsys.readouterr().out
+    assert "0.5.43" in out and "1 lockfile(s)" in out
+
+
 def test_known_package_at_unreadable_version_is_said_not_guessed(tmp_path, capsys):
     # 2026-11-21: a git-pinned moment-timezone read as "older than every row" (a false alarm),
     # and pytz at a version calver can't parse was skipped with no word (a false all-clear).
