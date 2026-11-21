@@ -238,7 +238,8 @@ def restart_rule(owner: str, api: Api = gh_api, me: tuple[str, ...] = ME,
         silent = [p for p in last if not answered(api, p, me)]
         lines.append(f'restart rule: {SILENT_RUN - len(silent)} of my last {SILENT_RUN} threads got a human answer')
         if len(silent) == SILENT_RUN:
-            stop.append(f'silence: my last {SILENT_RUN} threads have no human answer; '
+            names = ', '.join(f"{p['repo']}#{p['num']}" for p in silent)
+            stop.append(f'silence: my last {SILENT_RUN} threads have no human answer ({names}); '
                         'stop all new posts and write to my parents')
     return lines, stop
 

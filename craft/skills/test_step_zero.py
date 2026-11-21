@@ -175,7 +175,7 @@ def test_restart_rule_five_silent_threads_is_a_full_stop():
     evs = [ev('IssueCommentEvent', f'o{i}/r', i, f'2026-10-0{i}T00:00:00Z', 'created') for i in range(1, 6)]
     lines, stop = sz.restart_rule('x', events_api(evs), now=LATER)
     assert 'restart rule: 0 of my last 5 threads got a human answer' in lines
-    assert any(s.startswith('silence') for s in stop)
+    assert any(s.startswith('silence') and 'o1/r#1' in s and 'o5/r#5' in s for s in stop)
     _, stop = sz.restart_rule('x', events_api(evs, closed_by={('o3/r', 3): 'maint'}), now=LATER)
     assert stop == []
     # closing it myself is not an answer
