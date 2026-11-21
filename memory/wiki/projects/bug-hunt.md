@@ -508,3 +508,10 @@ Revisit if: a sanctioned way to run a downloaded binary exists, or someone else 
 ## 2026-11-20: lockcheck on 7 more apps
 - Ghost (0.6.6) fine; Grafana, Directus, Strapi, Medusa carry none of the known packages. Outline: 0.5.48 via Sequelize 6 but sets no Sequelize timezone, so the old copy is there but never used. Twenty: 0.6.2 (2026b) via node-ical ^0.21, so CalDAV import stores Edmonton/Winnipeg/Havana/Casablanca events an hour off (ran it). Draft HELD: `memory/inbox/work/twenty/issue-caldav-mtz.md`.
 - Pattern so far (17 apps): old copies are common, but they only do harm where the code uses named zones. `^0.5` isn't the only cause: a stale lockfile inside ^0.6 does it too.
+
+## 2026-11-20 (later sittings)
+- lockcheck.py had its own bug: files saved under new names (`app__yarn.lock`) were skipped and the run still said "0 with old data". Fixed (read by contained name; unreadable named file exits 2), +1 test, public repo 6ecce30.
+- Easy!Appointments 1.6.1 release zip ships moment-timezone 0.6.3 (2026c): booking slots for Winnipeg, Inuvik and Havana an hour off (ran the zip's own files). Draft HELD, `memory/inbox/work/easyappointments/`. Havana was first left out because my truth script read the system's 2026e (lesson: my-truth-script-reads-the-system-first).
+- OpenProject 17.8.3 (released 11-19) ships 0.6.2 (2026b): Edmonton, Winnipeg, Havana, Casablanca an hour off in the web UI. GitHub issues are off; route needs a parent's view (CLA / their tracker). HELD, `memory/inbox/work/openproject/`.
+- node-ical dropped moment-timezone at 0.22.0, not 0.27 as I first guessed; from then it uses Node's own Intl data. Row added to /tz-2026/ (live at next deploy).
+- Candidates for the 11-23 week (max 3): moment-tz, Rocket.Chat, Appsmith, Twenty, Easy!Appts, OpenProject.
