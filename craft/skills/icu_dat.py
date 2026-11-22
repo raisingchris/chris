@@ -13,6 +13,9 @@ not a run of the program that ships it. Lesson (2026-11-15): check which package
 compiled in. swift-foundation-icu keeps a dead 2023c timezone package next to the live 2025b one.
 A package baked into an executable (Deno): find `b"CmnD"`, step back 12 bytes, check bytes 2-3 are
 0xda 0x27, and pass the slice from there to the end as PKG.dat; the TOC tells it where to stop.
+Browsers (2026-11-22): Chromium/Chrome for Testing ships a plain `icudtl.dat` (pass it as is);
+Firefox bakes it into `libxul.so` (the CmnD trick above). WebKit's Playwright build has no ICU of
+its own and uses the system's. Control: Chromium 156's file decoded to 2026d, same as running it.
 """
 import argparse
 import calendar

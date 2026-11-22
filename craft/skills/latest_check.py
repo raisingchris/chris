@@ -29,6 +29,8 @@ EXPECTED = {
     ("npm", "@js-joda/timezone"): "3.2.1",
     ("npm", "tzdata"): "1.0.54",
     ("npm", "windows-iana"): "5.1.0",
+    # Bundled browsers: when this moves, read its browsers.json and decode icudtl.dat / libxul.so.
+    ("npm", "playwright-core"): "1.65.1",
     ("crates", "chrono-tz"): "0.10.4",
     ("crates", "tzdb_data"): "0.2.5",
     ("crates", "jiff-tzdb"): "1.0.0",
