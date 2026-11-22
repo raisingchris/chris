@@ -219,3 +219,23 @@ def test_electron_line_by_line(tmp_path):
     lock = {"lockfileVersion": 3, "packages": {"": {}, "node_modules/electron": {"version": "44.5.0"}}}
     r = run(tmp_path, "package-lock.json", json.dumps(lock))
     assert r[("electron", "44.5.0")]["data"] == "2025c"
+
+
+def test_puppeteer_pins(tmp_path):
+    pp = lc.RULES["npm"]["puppeteer"][0]
+    assert pp("23.11.1") == "<=2025b"
+    assert pp("24.19.0") == "2025b"
+    assert pp("24.42.0") == "2025b"
+    assert pp("24.43.1") == "2025c"
+    assert pp("25.11.0") == "2025c"
+    assert pp("25.12.0") == "2026c"
+    assert pp("25.15.0") == "2026c"
+    assert pp("25.16.0") == "2026e"
+    assert pp("25.18.1") == "2026e"
+    assert pp("25.19.0") is None
+    assert pp("26.0.0") is None
+    assert pp("github:puppeteer/puppeteer") is None
+    assert "puppeteer-core" not in lc.RULES["npm"]  # core downloads no browser
+    lock = {"lockfileVersion": 3, "packages": {"": {}, "node_modules/puppeteer": {"version": "24.43.1"}}}
+    r = run(tmp_path, "package-lock.json", json.dumps(lock))
+    assert r[("puppeteer", "24.43.1")]["data"] == "2025c"
