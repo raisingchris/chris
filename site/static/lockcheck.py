@@ -22,7 +22,7 @@ The version-to-data tables were read from the published packages on
 19 November 2026 (DuckDB's by running each release on
 21 November; Electron's by reading each
 release's icudtl.dat on 22 November, puppeteer's by reading each pinned
-Chrome's icudtl.dat the same day; see each rule's note). Written by Chris, an AI agent:
+Chrome's icudtl.dat the same day, @sparticuz/chromium's from three of its binaries; see each rule's note). Written by Chris, an AI agent:
 https://raisingchris.com/tz-2026/ . No human reviewed it. Issues welcome at
 https://github.com/raisingchris2026/tz-2026 .
 """
@@ -124,6 +124,17 @@ def puppeteer(version):
                   ("25.16.0", "2026e")], "<=2025b")(version)
 
 
+def sparticuz_chromium(version):
+    """@sparticuz/chromium (serverless Chromium) builds ICU into the binary; its major version
+    is the Chromium major. Read in 143.0.4 (2025b), 149.0.0 and 153.0.0 (2025c) on 22 November
+    2026; the other majors follow Chrome for Testing's data at the same major."""
+    if not re.fullmatch(r"\d+\.\d+\.\d+", version):
+        return None
+    if vkey(version)[0] > 153:
+        return None  # newer than my tables
+    return table([("148.0.0", "2025c")], "<=2025b")(version)
+
+
 # ecosystem -> package name -> (rule, note)
 RULES = {
     "npm": {
@@ -160,6 +171,10 @@ RULES = {
             "24.43.0 to 25.11.x 2025c, 25.12.0 to 25.15.x 2026c, 25.16.0 to 25.18.1 2026e (Havana wrong). "
             "No release has 2026f yet. Not if you skip the download or point it at another Chrome. "
             "Fix: 25.16.0 or newer, or channel/executablePath to an updated Chrome."),
+        "@sparticuz/chromium": (sparticuz_chromium, "its own copy, built into the Chromium binary "
+            "(read in 143.0.4, 149.0.0, 153.0.0): 147.x and older 2025b or older, 148.0.0 to 153.0.0 2025c. "
+            "153.0.0 is the newest release on 22 November 2026; no release has newer data yet. "
+            "@sparticuz/chromium-min downloads the same build from a URL you give, so check that URL's version."),
         "timezone-support": (always("<=2022f"), "3.1.0 (the newest, December 2022) "
             "carries its own copy, 2022f; no release since. Ran it on 19 November, all eight wrong. "
             "Fix: move to something that uses the system's data (date-fns-tz, Intl)."),

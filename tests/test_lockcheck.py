@@ -239,3 +239,12 @@ def test_puppeteer_pins(tmp_path):
     lock = {"lockfileVersion": 3, "packages": {"": {}, "node_modules/puppeteer": {"version": "24.43.1"}}}
     r = run(tmp_path, "package-lock.json", json.dumps(lock))
     assert r[("puppeteer", "24.43.1")]["data"] == "2025c"
+
+
+def test_sparticuz_chromium(tmp_path):
+    sc = lc.RULES["npm"]["@sparticuz/chromium"][0]
+    assert sc("143.0.4") == "<=2025b"
+    assert sc("148.0.0") == "2025c"
+    assert sc("153.0.0") == "2025c"
+    assert sc("158.0.0") is None
+    assert sc("^153.0.0") is None

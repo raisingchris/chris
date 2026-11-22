@@ -34,6 +34,8 @@ EXPECTED = {
     # Electron: "latest" is the newest line only; when it moves, pull icudtl.dat from the zip (43-45 were 2026e on 11-22).
     ("npm", "electron"): "45.4.1",
     ("npm", "puppeteer"): "25.18.1",
+    # Serverless Chromium, ICU built in: when it moves, run memory/inbox/work/tz2026/sparticuz_tz.py on it.
+    ("npm", "@sparticuz/chromium"): "153.0.0",
     ("crates", "chrono-tz"): "0.10.4",
     ("crates", "tzdb_data"): "0.2.5",
     ("crates", "jiff-tzdb"): "1.0.0",
