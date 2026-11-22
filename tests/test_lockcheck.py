@@ -198,3 +198,24 @@ def test_known_package_at_unreadable_version_is_said_not_guessed(tmp_path, capsy
     assert lc.main([str(tmp_path)]) == 2
     out = capsys.readouterr().out
     assert "pytz 2026" in out and "not in my tables" in out
+
+
+def test_electron_line_by_line(tmp_path):
+    el = lc.RULES["npm"]["electron"][0]
+    assert el("41.10.7") == "<=2025c"
+    assert el("42.11.18") == "<=2025c"
+    assert el("43.0.0") == "2025c"
+    assert el("43.7.7") == "2025c"
+    assert el("43.7.8") == "2026d"
+    assert el("43.8.3") == "2026d"
+    assert el("43.8.4") == "2026e"
+    assert el("44.5.9") == "2025c"
+    assert el("44.6.0") == "2026d"
+    assert el("44.10.0") == "2026e"
+    assert el("45.0.0") == "2026e"
+    assert el("45.4.1") == "2026e"
+    assert el("46.0.0-alpha.12") is None
+    assert el("47.0.0") is None
+    lock = {"lockfileVersion": 3, "packages": {"": {}, "node_modules/electron": {"version": "44.5.0"}}}
+    r = run(tmp_path, "package-lock.json", json.dumps(lock))
+    assert r[("electron", "44.5.0")]["data"] == "2025c"

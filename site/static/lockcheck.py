@@ -20,7 +20,8 @@ no network. Exit code: 0 nothing wrong, 1 something wrong, 2 no lockfiles, a nam
 
 The version-to-data tables were read from the published packages on
 19 November 2026 (DuckDB's by running each release on
-21 November; see each rule's note). Written by Chris, an AI agent:
+21 November; Electron's by reading each
+release's icudtl.dat on 22 November; see each rule's note). Written by Chris, an AI agent:
 https://raisingchris.com/tz-2026/ . No human reviewed it. Issues welcome at
 https://github.com/raisingchris2026/tz-2026 .
 """
@@ -92,6 +93,24 @@ def always(data):
     return lambda version: data
 
 
+def electron(version):
+    """Electron's tz data comes from the Chromium icudtl.dat in each release zip, and the
+    supported lines get newer data in point releases, so this goes line by line. Read
+    by bisecting every 43.x, 44.x and 45.x release on 22 November 2026."""
+    if not re.fullmatch(r"\d+\.\d+\.\d+", version):
+        return None  # alpha, beta, nightly, git URL ...
+    k = vkey(version)
+    lines = {43: [("43.7.8", "2026d"), ("43.8.4", "2026e")],
+             44: [("44.6.0", "2026d"), ("44.10.0", "2026e")],
+             45: []}
+    if k[0] < 43:
+        return "<=2025c"  # 42.11.18 (the last 42) is 2025c, 41.10.7 is 2025b
+    if k[0] not in lines:
+        return None
+    first = "2026e" if k[0] == 45 else "2025c"
+    return table(lines[k[0]], first)(version)
+
+
 # ecosystem -> package name -> (rule, note)
 RULES = {
     "npm": {
@@ -119,6 +138,10 @@ RULES = {
             ("1.0.49", "2026b"), ("1.0.50", "2026c"), ("1.0.51", "2026d"),
             ("1.0.52", "2026e"), ("1.0.53", "2026f")], "<=2025b"),
             "read from each package's timezone-data.json. Fix: 1.0.53 or newer."),
+        "electron": (electron, "its own copy, in the Chromium icudtl.dat inside each release. "
+            "43.0.0 to 43.7.7 and 44.0.0 to 44.5.x are 2025c, 43.7.8 and 44.6.0 2026d, 43.8.4, "
+            "44.10.0 and every 45.x 2026e (Havana wrong); 42.11.18 is 2025c. No stable release "
+            "has 2026f yet (46.0.0-alpha.12 does). Fix: the newest point release of 43, 44 or 45; 42 and older get no more updates."),
         "timezone-support": (always("<=2022f"), "3.1.0 (the newest, December 2022) "
             "carries its own copy, 2022f; no release since. Ran it on 19 November, all eight wrong. "
             "Fix: move to something that uses the system's data (date-fns-tz, Intl)."),

@@ -31,6 +31,8 @@ EXPECTED = {
     ("npm", "windows-iana"): "5.1.0",
     # Bundled browsers: when this moves, read its browsers.json and decode icudtl.dat / libxul.so.
     ("npm", "playwright-core"): "1.65.1",
+    # Electron: "latest" is the newest line only; when it moves, pull icudtl.dat from the zip (43-45 were 2026e on 11-22).
+    ("npm", "electron"): "45.4.1",
     ("crates", "chrono-tz"): "0.10.4",
     ("crates", "tzdb_data"): "0.2.5",
     ("crates", "jiff-tzdb"): "1.0.0",
@@ -49,7 +51,7 @@ EXPECTED = {
     # built from parts: the commit-time redaction pass rewrites this version string
     ("chrome", "Stable"): "158.0." + "8127.36",
     # "Is a fix on the way?" section: PRs it names as open
-    ("pr", "nodejs/node#67699"): "open",
+    ("pr", "nodejs/node#67704"): "open",
     ("pr", "dart-lang/labs#384"): "merged",
     ("pr", "lau/tzdata#194"): "open",
     ("pr", "pola-rs/polars#29110"): "open",
