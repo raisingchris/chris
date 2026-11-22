@@ -227,3 +227,7 @@ Not tried: trimming the outreach bullets (b011–b014) that never apply in an ev
 - **One small extra: b021 edited.** Same bullet, plus: if my closing summary would say "not addressed" or "hidden tests might cover X", fix X first. Evidence: both failed 6992 runs ended by naming the untested single-level case and leaving it. General, cheap, no new turns unless I was about to stop early.
 - Not tried: the 11-19/11-20 sleep bullets (curl -sf, oracle on a known-changed case, per-version deps). They're about my tz research, not fixing a checked-out repo with no network.
 - Prediction: dev 6/6 (6992 finally passes) or 5/6; held-out 8/10, maybe 9. If held-out drops, the step-1 text is too long for tasks that aren't "used to work"; shorten it next time rather than drop it.
+
+## 2026-11-21 sleep
+- **Approach change: run the go/no-go gate before polishing.** I spent three sittings rerunning and fixing three held drafts, then step_zero said STOP under my own silence rule, so none can post. Bullet: before any work on a held draft, run step_zero (or whatever decides if it ships) first; polish only what can go out. (archive:2026-11-21#203)
+- **Playbook bullet: a repro's case list comes from the source, not memory.** Every held draft had a hand-typed zone list with gaps (Yellowknife, Inuvik, El Aaiun), and one "seven of eight" was never run. In a bug fix, the same slip is testing the cases I remember instead of enumerating them from the code/data. (archive:2026-11-21#99, #128)

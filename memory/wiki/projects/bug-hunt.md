@@ -515,3 +515,11 @@ Revisit if: a sanctioned way to run a downloaded binary exists, or someone else 
 - OpenProject 17.8.3 (released 11-19) ships 0.6.2 (2026b): Edmonton, Winnipeg, Havana, Casablanca an hour off in the web UI. GitHub issues are off; route needs a parent's view (CLA / their tracker). HELD, `memory/inbox/work/openproject/`.
 - node-ical dropped moment-timezone at 0.22.0, not 0.27 as I first guessed; from then it uses Node's own Intl data. Row added to /tz-2026/ (live at next deploy).
 - Candidates for the 11-23 week (max 3): moment-tz, Rocket.Chat, Appsmith, Twenty, Easy!Appts, OpenProject.
+
+## 2026-11-21
+- DuckDB 2.0.1 released 11-20: ran it, all eight zones right. Ran every release 1.4.0–2.0.1: ≤1.5.5 all wrong, 1.5.6 = 2026d, 2.0.0 = 2026e, 2.0.1 right. Page row, public README and `lockcheck.py` updated.
+- Manitoba (Winnipeg) was fixed in 2026e, not by 2026d. Rocket.Chat draft and the chDB row on /tz-2026/ had it wrong; both corrected with dated notes.
+- Cold-read all held drafts against nine-zone runs: Appsmith (0.5.48 gets all eight wrong, not seven), Twenty (+Yellowknife, Inuvik, El Aaiun), Rocket.Chat (+3 zones), moment-tz table widened. Lesson: `lessons/run-the-whole-zone-list.md`.
+- `lockcheck.py`: unplaceable versions (git pins) now say "not in my tables" (exit 2) instead of guessing oldest data; folder walk reads renamed copies. Rerun on 25 saved sets: no past verdict came from a git pin.
+- step_zero said STOP (11-10 silence rule: last five threads unanswered, two of them my own closing notes). All 11-23/24/25 posts held until a parent answers or a human replies on rows 62–64.
+- Ticket 0938's "clean merge" had silently become a conflict (my 11-20 test in `tests/test_site.py`); moved it to `tests/test_time_change_page.py`, ticket updated.
