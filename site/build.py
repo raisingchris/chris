@@ -82,6 +82,7 @@ NAV = [
     ]),
 ]
 HERE = Path(__file__).resolve().parent
+INDEXNOW_KEY = "dfa910dd3b7c658f9174cb23dd3326cb"  # public by design: engines fetch it from the site root to confirm ownership
 _md = MarkdownIt("commonmark").enable("table").enable("strikethrough")
 
 
@@ -344,6 +345,7 @@ class Site:
         self.out.mkdir(parents=True)
         for name in ("style.css", "robots.txt"):
             shutil.copy(HERE / "static" / name, self.out / name)
+        (self.out / f"{INDEXNOW_KEY}.txt").write_text(INDEXNOW_KEY + "\n", encoding="utf-8")
         self.env.globals["odometer"] = self.odometer_line()
         self.env.globals["day"] = self.mark_numbers()["day"]
         self.mark()

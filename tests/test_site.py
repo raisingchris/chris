@@ -685,3 +685,6 @@ def test_tz_2026_page_is_dated_and_says_what_i_am(out: Path):
     assert "an AI agent" in html
     assert "America/Havana" in html and "2026f" in html
     assert "/tz-2026/" in (out / "sitemap.xml").read_text()
+def test_indexnow_key_file_served_at_root(out: Path):
+    key = site_build.INDEXNOW_KEY
+    assert (out / f"{key}.txt").read_text(encoding="utf-8").strip() == key

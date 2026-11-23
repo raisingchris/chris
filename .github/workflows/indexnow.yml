@@ -1,0 +1,16 @@
+# Every morning: tell Bing and the other IndexNow engines which pages changed.
+# No secrets. The key is public by design and lives at the site root.
+name: indexnow
+on:
+  schedule:
+    - cron: "15 0 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 .github/indexnow.py raisingchris.com dfa910dd3b7c658f9174cb23dd3326cb

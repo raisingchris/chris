@@ -44,7 +44,7 @@ def test_weekday_jobs(sched):
     # 2026-09-07 is a Monday
     assert due_on(sched, date(2026, 9, 7)) == [
         "git-pull", "wake", "unseal", "upwork-poll", "sitting-09:00", "sitting-12:00", "sitting-15:00",
-        "sitting-18:00", "sleep", "backup", "eval",
+        "sitting-18:00", "sleep", "backup", "tidy", "eval",
     ]
 
 
@@ -53,13 +53,13 @@ def test_wednesday_afternoon_is_an_improve_sitting(sched):
     for day in (date(2026, 9, 9), date(2026, 9, 12)):
         assert due_on(sched, day) == [
             "git-pull", "wake", "unseal", "upwork-poll", "sitting-09:00", "sitting-12:00", "improve",
-            "sitting-18:00", "sleep", "backup", "eval",
+            "sitting-18:00", "sleep", "backup", "tidy", "eval",
         ]
 
 
 def test_sunday_jobs(sched):
     # 2026-09-06 is a Sunday: no wake, no ordinary sittings — one letter home and sleep.
-    assert due_on(sched, date(2026, 9, 6)) == ["git-pull", "unseal", "upwork-poll", "sunday", "sleep", "backup", "eval"]
+    assert due_on(sched, date(2026, 9, 6)) == ["git-pull", "unseal", "upwork-poll", "sunday", "sleep", "backup", "tidy", "eval"]
 
 
 async def test_backup_job_runs_unguarded_and_notes_last_run(sched, services, monkeypatch):
@@ -517,3 +517,26 @@ def test_initial_unread_room_with_id_wakes_instead_of_becoming_silent_baseline(s
                        now=_mon(10, 15)) == (True, "ok")
     assert "work_room" in read_upwork_poll_state(services.cfg.state_dir)["signal"]["rooms"]
     assert len(fs.jobs) == 1
+
+
+def test_tidy_disk_only_when_low_and_as_chris(services):
+    from agent.scheduler import TIDY_BELOW_BYTES, tidy_disk
+
+    calls = []
+    run = lambda cmd, **kw: calls.append(cmd)  # noqa: E731
+    assert tidy_disk(services, run=run, free=lambda: TIDY_BELOW_BYTES + 1)["tidied"] is False
+    assert calls == []
+    sizes = iter([100, 5_000_000_000])
+    out = tidy_disk(services, run=run, free=lambda: next(sizes))
+    assert out["tidied"] and out["free_after"] == 5_000_000_000
+    assert calls[0][:5] == ["sudo", "-n", "-u", "chris", "/usr/local/bin/chris-exec"]
+    assert "-user chris -mtime +2" in calls[0][-1]
+    assert services.archive.entries[-1][0] == "disk_tidy"
+
+
+def test_tidy_disk_never_raises(services):
+    from agent.scheduler import tidy_disk
+
+    def boom(*a, **k):
+        raise OSError("sudo missing")
+    assert tidy_disk(services, run=boom, free=lambda: 1)["tidied"] is False

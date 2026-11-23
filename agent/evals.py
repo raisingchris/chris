@@ -1,24 +1,33 @@
-"""Her eval: a fixed set of real bug-reproduction tasks that says whether a craft change made her better.
+"""Her eval: a fixed set of real bug tasks that says whether a craft change made her better.
 
 Why it exists (2026-10-21 review): for six weeks "self-improvement" meant notes about herself, because
 nothing outside her said whether a change helped. Systems that do improve themselves (Darwin Gödel
 Machine, ACE, GEPA) all score changes on an evaluation the agent can't write. This is that, sized for
 a small budget.
 
-The task (SWT-bench style, drawn from SWE-bench Verified): given a project checked out at the commit
-before a fix, in a ready Python environment, and the issue text, write ``repro.py`` in the repo root.
-It must exit non-zero while the bug is there and exit 0 once it's fixed. The brain checks it by running
-her script before and after applying the real fix, which she never sees.
+Each task is a project checked out at the commit before a real fix (SWE-bench Verified), in a ready
+Python environment, plus the issue text. There are two kinds:
+
+* ``repro`` (SWT-bench style): write ``repro.py`` in the repo root. It must exit non-zero while the bug
+  is there and exit 0 once it's fixed. The brain runs it before and after applying the real fix.
+* ``fix`` (SWE-bench style, 2026-10-29): fix the bug. The brain carries her source changes into a clean
+  copy, adds the project's own tests for the issue, which she never sees, and runs them as ``chris``.
+  It passes when every test the real fix made pass now passes and no test that passed before breaks.
+  The repro tasks were scoring 14/14 by their second night, too easy to show a gain; fix tasks are
+  the SWE-bench "1-4 hours" and ">4 hours" ones and leave room to grow.
 
 What keeps the score honest:
 
-* Tasks come from the deployed image (``/app/evals/dev.json``) or the brain's state dir (held-out),
-  never from her working tree. ``agent/evals.py``, ``evals/`` and ``tests/test_evals.py`` are
+* Tasks come from the brain's state dir (held-out, and the fix dev split) or the deployed image,
+  never from her working tree; her repo's ``evals/dev.json`` is a public view of the dev split. ``agent/evals.py``, ``evals/`` and ``tests/test_evals.py`` are
   deploy-protected, so she can't change the grader without a parent.
 * Held-out tasks live only in brain state (0600). She gets their pass count, never which passed or her
   transcripts; dev results come back to her in full so she has something to learn from.
-* The repo she works in has no upstream history, the gold patch never touches disk while she works,
-  network commands are refused, and her script runs as ``chris`` with a clean env and a timeout.
+* The repo she works in has no upstream history, the gold patch and hidden tests never touch disk while
+  she works, network commands are refused, and her code runs as ``chris`` with a clean env and a timeout.
+* For a fix, only her source changes count: edits to test files, ``conftest.py`` and test-runner config
+  are dropped before the hidden tests run, symlinks are never followed, and git never runs in the tree
+  she worked in (its ``.git/config`` is hers to write).
 * Eval sessions are archived in brain state, not her archive, so ``recall`` can't surface them, and are
   metered on their own weekly meter.
 
@@ -52,10 +61,22 @@ ENV_ROOT = Path(os.environ.get("EVAL_ENV_ROOT", "/opt/evals"))
 CHRIS_EXEC = "/usr/local/bin/chris-exec"
 REPRO = "repro.py"
 REPRO_TIMEOUT_S = 180
+TEST_TIMEOUT_S = 900
 PREPARE_TIMEOUT_S = 1800
 TASK_TURNS = 40
+FIX_TURNS = 80
+FIX_TASK_USD = 3.0  # default per-task cap for a fix (cfg.eval_fix_task_usd overrides)
+MAX_CHANGED_FILES = 200
+MAX_FILE_BYTES = 2_000_000
+KEEP_FREE_BYTES = 3_000_000_000
+# Her edits to these never reach the hidden-test run: they could change what the tests report.
+RUNNER_FILES = {"conftest.py", "pytest.ini", "tox.ini", "setup.cfg", "pyproject.toml", ".coveragerc",
+                "sitecustomize.py", "usercustomize.py", REPRO}
+TEST_DIRS = {"test", "tests", "testing"}
+SKIP_DIRS = {".git", "__pycache__", ".pytest_cache", ".tox", ".eggs"}
 REPORT = Path("craft") / "eval-report.md"
 STOP_AT = (5, 30)  # no new eval task after 05:30 her time, so the run is over before she wakes
+FIX_STOP_AT = (4, 30)
 EVAL_TOOLS = ["Bash", "Read", "Edit", "Write", "Glob", "Grep"]
 _ID_RE = re.compile(r"^[A-Za-z0-9_.\-]{1,120}$")
 # No network in an eval: it would let her look up the real fix.
@@ -66,6 +87,12 @@ NET_RE = re.compile(
 CONTRACT = ("Write repro.py in the repo root. It must exit with a non-zero status while the bug is present and "
             "exit 0 once the bug is fixed. It must not depend on network access or on files outside the repo. "
             "Don't fix the bug: the check runs your script on the code as it is, then with the real fix applied.")
+FIX_CONTRACT = ("Fix the bug in the project's source code. The check adds the project's own tests for this issue, "
+                "which you can't see, and runs them together with the tests around them that already pass: the "
+                "issue's tests must pass and nothing that passed may break. Write and run your own tests or "
+                "scripts as you like, but edits to test files, conftest.py and test-runner config (setup.cfg, "
+                "tox.ini, pytest.ini, pyproject.toml) are dropped before the check, so the fix must be in the "
+                "source.")
 
 Runner = Callable[..., subprocess.CompletedProcess]
 
@@ -84,15 +111,28 @@ class Task:
     problem_statement: str
     gold_patch: str
     split: str = "dev"
+    kind: str = "repro"
+    test_patch: str = ""
+    fail_to_pass: list[str] = field(default_factory=list)
+    pass_to_pass: list[str] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, d: dict, split: str) -> "Task":
         tid = str(d["id"])
         if not _ID_RE.match(tid):
             raise EvalError(f"bad task id {tid!r}")
-        return cls(id=tid, repo=str(d["repo"]), base_commit=str(d["base_commit"]), python=str(d["python"]),
-                   install=[str(c) for c in d.get("install") or []],
-                   problem_statement=str(d["problem_statement"]), gold_patch=str(d["gold_patch"]), split=split)
+        kind = str(d.get("kind") or "repro")
+        if kind not in ("repro", "fix"):
+            raise EvalError(f"{tid}: unknown kind {kind!r}")
+        t = cls(id=tid, repo=str(d["repo"]), base_commit=str(d["base_commit"]), python=str(d["python"]),
+                install=[str(c) for c in d.get("install") or []],
+                problem_statement=str(d["problem_statement"]), gold_patch=str(d["gold_patch"]), split=split,
+                kind=kind, test_patch=str(d.get("test_patch") or ""),
+                fail_to_pass=[str(x) for x in d.get("fail_to_pass") or []],
+                pass_to_pass=[str(x) for x in d.get("pass_to_pass") or []])
+        if kind == "fix" and not (t.test_patch and t.fail_to_pass and test_files(t.test_patch)):
+            raise EvalError(f"{tid}: a fix task needs test_patch and fail_to_pass")
+        return t
 
 
 @dataclass
@@ -109,6 +149,9 @@ class TaskResult:
     note: str = ""
     final_text: str = ""
     repro: str = ""
+    kind: str = "repro"
+    broke: int = 0  # fix: tests that passed before and fail with her change
+    patch: str = ""  # fix: her source change as a diff (dev tasks show it back to her)
 
 
 @dataclass
@@ -130,18 +173,38 @@ class SuiteResult:
 
 
 def eval_state(services) -> Path:
+    """Brain-only: from a folder `chris` could write she could swap the held-out tasks, and from one she
+    could read she'd see their results (results.jsonl holds held-out ids, diffs and transcripts)."""
     p = Path(services.state_dir) / "evals"
     p.mkdir(parents=True, exist_ok=True)
+    try:
+        if p.stat().st_mode & 0o077:
+            p.chmod(0o700)
+    except OSError:
+        pass
     return p
 
 
 def load_tasks(services, split: str) -> list[Task]:
-    path = (APP_EVALS / DEV_FILE) if split == "dev" else (eval_state(services) / HELDOUT_FILE)
+    """Held-out tasks live only in brain state. Fix dev tasks do too (the repo holds a public view without
+    the real fix and hidden tests, or she'd learn the six answers and dev would stop measuring)."""
+    if split == "dev":
+        path = eval_state(services) / DEV_FILE
+        if not path.exists():
+            path = APP_EVALS / DEV_FILE
+    else:
+        path = eval_state(services) / HELDOUT_FILE
     try:
         raw = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return []
-    return [Task.from_dict(d, split) for d in raw]
+    out = []
+    for d in raw:
+        try:
+            out.append(Task.from_dict(d, split))
+        except (EvalError, KeyError, TypeError) as exc:  # the repo's public view has no gold patch
+            log.warning("eval task in %s skipped: %s", path.name, exc)
+    return out
 
 
 # ---------------------------------------------------------------- environment
@@ -204,7 +267,7 @@ def prepare(task: Task, run: Runner = _run) -> float:
 def reset(task: Task, run: Runner = _run) -> Path:
     """A fresh copy of the base repo at its fixed path (the editable install points there)."""
     p = paths(task)
-    shutil.rmtree(p.repo, ignore_errors=True)
+    _wipe(p.repo, run)
     res = run(["tar", "-C", str(p.run), "-xzf", str(p.template)], timeout=600)
     if res.returncode != 0:
         raise EvalError(f"{task.id}: template extract failed: {res.stderr[-300:]}")
@@ -265,6 +328,263 @@ def check(task: Task, repro: str, run: Runner = _run) -> TaskResult:
     return out
 
 
+# ---------------------------------------------------------------- checking a fix
+
+
+_DIFF_FILE_RE = re.compile(r"^diff --git a/(\S+) b/", re.M)
+_STATUS_RE = re.compile(r"^(PASSED|FAILED|ERROR|XFAIL|XPASS|SKIPPED)\s+(\S.*?)(?: - .*)?$", re.M)
+_SUMMARY_RE = re.compile(r"^=*\s*(?:no tests ran|(?:\d+ (?:passed|failed|errors?|skipped|xfailed|xpassed|deselected|"
+                         r"warnings?|rerun)[, ]*)+) in [\d.]+ ?s(?:econds)?(?: \([^)]*\))?\s*=*\s*$", re.M)
+MAX_TOTAL_BYTES = 20_000_000
+MAX_DIFF_FILE_BYTES = 200_000
+
+
+def test_files(patch: str) -> list[str]:
+    return sorted(set(_DIFF_FILE_RE.findall(patch)))
+
+
+def test_targets(task: Task) -> list[str]:
+    """The test files the hidden tests touch; SWE-bench runs these whole."""
+    return [f for f in test_files(task.test_patch) if f.endswith(".py")]
+
+
+def test_command(task: Task) -> list[str]:
+    # -I: the repo root is not on sys.path, so a planted pytest.py or argparse.py can't stand in for the runner.
+    py = str(paths(task).venv / "bin" / "python")
+    return [py, "-I", "-m", "pytest", "-rA", "-p", "no:cacheprovider", "-q", *test_targets(task)]
+
+
+def parse_statuses(output: str) -> list[tuple[str, str]]:
+    """Status lines from pytest's last short test summary only (not from anything printed earlier)."""
+    i = output.rfind("short test summary info")
+    if i < 0:
+        return []
+    out = []
+    for status, nid in _STATUS_RE.findall(output[i:]):
+        if status == "XPASS":
+            nid = nid.split(" ")[0]
+        out.append((status, nid))
+    return out
+
+
+def finished(output: str, rc: int | None) -> bool:
+    """pytest ran to its end: exit 0/1 and its closing count line."""
+    return rc in (0, 1) and bool(_SUMMARY_RE.search(output[-4000:]))
+
+
+def statuses_for(test: str, lines: list[tuple[str, str]]) -> list[str]:
+    """A test id may be a node id (``f.py::C::t``) or a bare name (sympy's); match both."""
+    out = []
+    for status, nid in lines:
+        if "::" in test:
+            if nid == test or nid.startswith(test + "[") or nid.startswith(test + "::"):
+                out.append(status)
+        elif nid.endswith("::" + test) or ("::" + test + "[") in nid:
+            out.append(status)
+    return out
+
+
+def grade(task: Task, output: str, rc: int | None = 0) -> tuple[bool, list[str], list[str]]:
+    """(passed, issue tests not passing, tests that passed before and don't now)."""
+    if not finished(output, rc):
+        return False, list(task.fail_to_pass), []
+    lines = parse_statuses(output)
+
+    def ok(t, allowed):
+        st = statuses_for(t, lines)
+        return bool(st) and all(s in allowed for s in st)
+    missing = [t for t in task.fail_to_pass if not ok(t, ("PASSED",))]
+    broke = [t for t in task.pass_to_pass if not ok(t, ("PASSED", "XFAIL"))]
+    return not missing and not broke, missing, broke
+
+
+def dropped(rel: str, task: Task, hidden: set[str] | None = None) -> bool:
+    """Files whose edits never reach the hidden-test run."""
+    parts = Path(rel).parts
+    name = parts[-1]
+    hidden = set(test_files(task.test_patch)) if hidden is None else hidden
+    return (rel in hidden or name in RUNNER_FILES or name.endswith(".pth")
+            or any(p in TEST_DIRS for p in parts[:-1]) or name.startswith("test_") or name.endswith("_test.py")
+            or any(p.endswith(".egg-info") for p in parts))
+
+
+def _files(root: Path) -> dict[str, Path]:
+    """Regular files under root by relative path. Symlinks are skipped, never followed."""
+    out = {}
+    for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS and not os.path.islink(os.path.join(dirpath, d))]
+        for f in filenames:
+            p = Path(dirpath) / f
+            if p.is_symlink() or not p.is_file():
+                continue
+            out[str(p.relative_to(root))] = p
+    return out
+
+
+def _read_hers(path: Path, limit: int) -> bytes:
+    """Read a file from her tree: never through a symlink, never a FIFO or device, never a hardlink
+    (protected_hardlinks is off on the box, so a link could point at a brain-only file)."""
+    import stat
+
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    try:
+        st = os.fstat(fd)
+        if not stat.S_ISREG(st.st_mode) or st.st_nlink != 1:
+            raise OSError(f"{path.name}: not a plain file")
+        if st.st_size > limit:
+            raise OSError(f"{path.name}: over {limit} bytes")
+        with os.fdopen(os.dup(fd), "rb") as f:
+            data = f.read(limit + 1)
+        if len(data) > limit:
+            raise OSError(f"{path.name}: over {limit} bytes")
+        return data
+    finally:
+        os.close(fd)
+
+
+def her_changes(worked: Path, base: Path, task: Task) -> tuple[dict[str, bytes | None], str, list[str]]:
+    """Her source changes (rel -> new bytes, None if deleted), a readable diff, and what was dropped."""
+    import difflib
+
+    w, b = _files(worked), _files(base)
+    hidden = set(test_files(task.test_patch))
+    tops = {Path(r).parts[0] for r in b}
+    changes: dict[str, bytes | None] = {}
+    skipped: list[str] = []
+    total = 0
+    for rel in sorted(set(w) | set(b)):
+        if dropped(rel, task, hidden):
+            continue
+        if rel not in w:
+            changes[rel] = None
+            continue
+        # A new top-level file or folder is never imported by the project; it could only shadow something.
+        if rel not in b and Path(rel).parts[0] not in tops:
+            skipped.append(rel)
+            continue
+        try:
+            data = _read_hers(w[rel], MAX_FILE_BYTES)
+        except OSError:
+            skipped.append(rel)
+            continue
+        if rel in b and len(data) == b[rel].stat().st_size and data == b[rel].read_bytes():
+            continue
+        total += len(data)
+        changes[rel] = data
+        if len(changes) > MAX_CHANGED_FILES:
+            raise EvalError(f"over {MAX_CHANGED_FILES} files changed")
+        if total > MAX_TOTAL_BYTES:
+            raise EvalError(f"over {MAX_TOTAL_BYTES // 1_000_000} MB of changes")
+    diff = []
+    for rel, new in changes.items():
+        old = b[rel].read_bytes() if rel in b else b""
+        if max(len(old), len(new or b"")) > MAX_DIFF_FILE_BYTES:
+            diff.append(f"--- a/{rel}\n+++ b/{rel}\n(large file, diff not shown)\n")
+            continue
+        diff.extend(difflib.unified_diff(old.decode("utf-8", "replace").splitlines(True),
+                                         (new or b"").decode("utf-8", "replace").splitlines(True),
+                                         f"a/{rel}", f"b/{rel}"))
+    return changes, "".join(diff), skipped
+
+
+def stop_her(run: Runner = _run) -> None:
+    """Kill every `chris` process before a check: a process left over from her session could otherwise
+    change the clean copy between the hidden tests going in and pytest starting. Evals run in her sleep."""
+    if not Path(CHRIS_EXEC).exists():
+        return
+    try:
+        run(["sudo", "-n", "-u", "chris", CHRIS_EXEC, "10", "/", "sh", "-c", "kill -KILL -1"], timeout=40)
+    except Exception:  # noqa: BLE001 — it kills itself too, so a non-zero exit is the normal case
+        pass
+
+
+def _wipe(path: Path, run: Runner = _run) -> None:
+    """Remove a tree she worked in. Her own 0700 folders need `chris` to open them first."""
+    if not path.exists() and not path.is_symlink():
+        return
+    try:
+        run(["sudo", "-n", "-u", "chris", CHRIS_EXEC, "120", str(path.parent), "chmod", "-R", "u+rwX,g+rwX",
+             path.name], timeout=150)
+    except Exception:  # noqa: BLE001
+        pass
+    shutil.rmtree(path, ignore_errors=True)
+
+
+def _write_into(repo: Path, rel: str, data: bytes | None) -> bool:
+    """Write one of her changes into the clean copy, refusing paths through a symlink there."""
+    dest = repo / rel
+    cur = repo
+    for part in Path(rel).parts[:-1]:
+        cur = cur / part
+        if cur.is_symlink():
+            return False
+    if dest.is_symlink():
+        return False
+    if data is None:
+        dest.unlink(missing_ok=True)
+        return True
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_bytes(data)
+    return True
+
+
+def check_fix(task: Task, run: Runner = _run) -> TaskResult:
+    """Carry her source changes into a clean copy, add the hidden tests, and run them as `chris`."""
+    out = TaskResult(id=task.id, split=task.split, passed=False, kind="fix")
+    p = paths(task)
+    worked = p.run / "worked"
+    stop_her(run)
+    _wipe(worked, run)
+    if not p.repo.exists():
+        out.note = "no work tree"
+        return out
+    # Make her own files readable to the brain (a 0600 file or 0700 folder would otherwise be lost).
+    try:
+        run(["sudo", "-n", "-u", "chris", CHRIS_EXEC, "120", str(p.run), "chmod", "-R", "u+rwX,g+rwX", "repo"],
+            timeout=150)
+    except Exception:  # noqa: BLE001
+        pass
+    p.repo.rename(worked)
+    try:
+        repo = reset(task, run)
+        try:
+            changes, out.patch, skipped = her_changes(worked, repo, task)
+        except EvalError as exc:
+            out.note = str(exc)
+            return out
+        if not changes:
+            out.note = "no change to the source"
+            return out
+        refused = [rel for rel, data in changes.items() if not _write_into(repo, rel, data)]
+        applied = run(["git", "apply", "--whitespace=nowarn", "-"], cwd=repo, timeout=120, input=task.test_patch)
+        if applied.returncode != 0:
+            out.note = "the hidden tests did not apply over your change"
+            return out
+        _drop_bytecode(repo)
+        try:
+            res = run_as_chris(task, test_command(task), run, timeout=TEST_TIMEOUT_S)
+        except subprocess.TimeoutExpired:
+            out.note = "the tests timed out"
+            return out
+        out.rc_after = res.returncode
+        output = (res.stdout or "") + (res.stderr or "")
+        out.passed, missing, broke = grade(task, output, res.returncode)
+        out.passes_after, out.broke = not missing, len(broke)
+        notes = []
+        if not finished(output, res.returncode):
+            notes.append(f"pytest did not finish (exit {res.returncode})")
+        elif missing:
+            notes.append(f"{len(missing)} of {len(task.fail_to_pass)} issue tests still fail ({', '.join(missing[:5])})")
+        if broke:
+            notes.append(f"{len(broke)} tests that passed now fail")
+        if skipped or refused:
+            notes.append("not carried over: " + ", ".join((skipped + refused)[:8]))
+        out.note = "; ".join(notes)
+        return out
+    finally:
+        _wipe(worked, run)
+
+
 # ---------------------------------------------------------------- the agent
 
 
@@ -275,16 +595,22 @@ def system_prompt(craft_text: str, task: Task) -> str:
         "measure your craft. Nobody else sees this work, and you won't remember it afterwards.",
         f"You are in {p.repo}, the project at the commit before the fix. Its Python environment is ready: "
         f"use {p.venv}/bin/python. There is no network here: don't fetch, clone or install anything.",
-        CONTRACT,
+        contract(task),
     ]
     if craft_text.strip():
         parts.append("Your craft, as you'd use it in a sitting:\n\n" + craft_text.strip())
     return "\n\n".join(parts)
 
 
+def contract(task: Task) -> str:
+    return FIX_CONTRACT if task.kind == "fix" else CONTRACT
+
+
 def user_prompt(task: Task) -> str:
-    return (f"The issue:\n\n{task.problem_statement.strip()}\n\n---\n\n{CONTRACT}\n"
-            "When repro.py is written and you've run it once, stop. End with one line saying what it checks.")
+    end = ("When the bug is fixed and you've checked your fix, stop. End with one line saying what you changed."
+           if task.kind == "fix" else
+           "When repro.py is written and you've run it once, stop. End with one line saying what it checks.")
+    return f"The issue:\n\n{task.problem_statement.strip()}\n\n---\n\n{contract(task)}\n{end}"
 
 
 def eval_hook(task: Task):
@@ -329,7 +655,32 @@ def eval_options(services, task: Task, craft_text: str, budget_usd: float):
         tools=list(EVAL_TOOLS), allowed_tools=list(EVAL_TOOLS), permission_mode="dontAsk",
         mcp_servers={}, strict_mcp_config=True, setting_sources=[],
         hooks={"PreToolUse": [HookMatcher(matcher=None, hooks=[eval_hook(task)])]},
-        env=env, cli_path=os.environ.get("CHRIS_CLI_PATH") or None, max_turns=TASK_TURNS, **extra)
+        env=env, cli_path=os.environ.get("CHRIS_CLI_PATH") or None, max_turns=turns(task), **extra)
+
+
+def turns(task: Task) -> int:
+    return FIX_TURNS if task.kind == "fix" else TASK_TURNS
+
+
+def task_budget(services, task: Task) -> float:
+    if task.kind == "fix":
+        return float(getattr(services.cfg, "eval_fix_task_usd", FIX_TASK_USD))
+    return float(services.cfg.eval_task_usd)
+
+
+def release(task: Task, keep_free: int = KEEP_FREE_BYTES, run: Runner = _run) -> None:
+    """Drop the task's work tree; drop its venv too when the disk is getting low (it rebuilds next time).
+    The root disk is 7.8 GB and a dozen fix venvs (numpy, pandas, dask...) would fill it."""
+    p = paths(task)
+    _wipe(p.run / "repo", run)
+    _wipe(p.run / "worked", run)
+    try:
+        free = shutil.disk_usage(ENV_ROOT).free
+    except OSError:
+        return
+    if free < keep_free:
+        p.ready.unlink(missing_ok=True)
+        shutil.rmtree(p.venv, ignore_errors=True)
 
 
 def _shim(services):
@@ -345,41 +696,67 @@ async def attempt(services, task: Task, craft_text: str, query_fn=None, run: Run
 
     await asyncio.to_thread(prepare, task, run)
     await asyncio.to_thread(reset, task, run)
-    budget = float(services.cfg.eval_task_usd)
-    options = None if query_fn else eval_options(services, task, craft_text, budget)
-    res = await session.run_session(_shim(services), f"eval:{task.id}", system_prompt(craft_text, task),
-                                    user_prompt(task), tools_allowed=EVAL_TOOLS, max_turns=TASK_TURNS,
-                                    query_fn=query_fn, options=options)
+    options = None if query_fn else eval_options(services, task, craft_text, task_budget(services, task))
     try:
-        repro = (paths(task).repo / REPRO).read_text(encoding="utf-8")
-    except OSError:
-        repro = ""
-    out = await asyncio.to_thread(check, task, repro, run)
+        res = await session.run_session(_shim(services), f"eval:{task.id}", system_prompt(craft_text, task),
+                                        user_prompt(task), tools_allowed=EVAL_TOOLS, max_turns=turns(task),
+                                        query_fn=query_fn, options=options)
+        if task.kind == "fix":
+            out = await asyncio.to_thread(check_fix, task, run)
+        else:
+            await asyncio.to_thread(stop_her, run)
+            try:
+                repro = (paths(task).repo / REPRO).read_text(encoding="utf-8")
+            except OSError:
+                repro = ""
+            out = await asyncio.to_thread(check, task, repro, run)
+    finally:
+        await asyncio.to_thread(release, task, KEEP_FREE_BYTES, run)
     out.cost_usd, out.turns, out.final_text = res.cost_usd, res.turns, (res.final_text or "")[-600:]
     return out
 
 
-def out_of_time(now: datetime) -> bool:
-    return time(*STOP_AT) <= now.time() < time(22, 0)
+def out_of_time(now: datetime, kind: str = "repro") -> bool:
+    """A fix task can take an hour end to end (venv, session, tests), so none starts after FIX_STOP_AT."""
+    stop = FIX_STOP_AT if kind == "fix" else STOP_AT
+    return time(*stop) <= now.time() < time(22, 0)
 
 
 async def run_suite(services, craft_text: str, split: str, label: str, query_fn=None,
-                    run: Runner = _run, clock: Callable[[], datetime] | None = None) -> SuiteResult:
+                    run: Runner = _run, clock: Callable[[], datetime] | None = None,
+                    prior: dict[str, dict] | None = None,
+                    keep: Callable[[TaskResult], None] | None = None) -> SuiteResult:
+    """Run a split. ``prior`` holds results already in hand (a baseline resumed from last night), and
+    ``keep`` is told each new result as it lands, so a run cut short by morning or the meter isn't lost."""
     clock = clock or (lambda: datetime.now(ZoneInfo(services.cfg.tz)))
     suite = SuiteResult(label=label, split=split)
+    prior = prior or {}
     for task in load_tasks(services, split):
+        if task.id in prior:
+            suite.results.append(_result(prior[task.id], split))
+            continue
         if services.eval_meter.exceeded(float(services.cfg.eval_usd_week)):
             raise EvalError("the eval meter is spent for this week")
-        if out_of_time(clock()):
+        if out_of_time(clock(), task.kind):
             raise EvalError("out of night: the run would overlap her day")
         try:
             r = await attempt(services, task, craft_text, query_fn=query_fn, run=run)
-        except EvalError as exc:
+        except Exception as exc:  # noqa: BLE001 — one broken task must not lose the night
             log.warning("eval task %s not run: %s", task.id, exc)
-            r = TaskResult(id=task.id, split=split, passed=False, note=f"not run: {str(exc)[:200]}")
+            r = TaskResult(id=task.id, split=split, passed=False, kind=task.kind,
+                           note=f"not run: {type(exc).__name__}: {str(exc)[:200]}")
         suite.results.append(r)
         _append(services, "results.jsonl", {"label": label, "split": split, **_public(r, full=True)})
+        if keep is not None:
+            keep(r)
     return suite
+
+
+def _result(d: dict, split: str) -> TaskResult:
+    import dataclasses
+
+    names = {f.name for f in dataclasses.fields(TaskResult)}
+    return TaskResult(**{**{k: v for k, v in d.items() if k in names}, "split": split})
 
 
 # ---------------------------------------------------------------- deciding
@@ -392,6 +769,55 @@ def decide(base_dev: int, cand_dev: int, base_held: int | None, cand_held: int |
         return False, f"held-out {cand_held} < {base_held}"
     return True, f"dev {cand_dev} vs {base_dev}" + (
         f", held-out {cand_held} vs {base_held}" if cand_held is not None else "")
+
+
+PARTIAL_FILE = "baseline-partial.json"
+
+
+def _load_partial(services, key: dict) -> dict:
+    try:
+        part = json.loads((eval_state(services) / PARTIAL_FILE).read_text())
+    except (OSError, json.JSONDecodeError):
+        part = {}
+    if part.get("key") != key:
+        part = {"key": key, "dev": {}, "heldout": {}, "tries": {}}
+    return part
+
+
+def _keeper(services, part: dict, split: str) -> Callable[[TaskResult], None]:
+    """Save a baseline result as it lands. A task that couldn't run is tried again next night, once."""
+    def keep(r: TaskResult) -> None:
+        tries = part["tries"].get(r.id, 0) + 1
+        part["tries"][r.id] = tries
+        if not r.note.startswith("not run") or tries >= 2:
+            part[split][r.id] = _public(r, full=True)
+        (eval_state(services) / PARTIAL_FILE).write_text(json.dumps(part))
+    return keep
+
+
+def prune(services) -> None:
+    """Drop venvs, templates and work trees of tasks no longer in the suite (the root disk is small)."""
+    ids = {t.id for t in load_tasks(services, "dev")} | {t.id for t in load_tasks(services, "heldout")}
+    for sub, suffix in (("venv", ""), ("run", ""), ("ready", ""), ("template", ".tgz")):
+        root = ENV_ROOT / sub
+        if not root.is_dir():
+            continue
+        for entry in root.iterdir():
+            tid = entry.name[: -len(suffix)] if suffix and entry.name.endswith(suffix) else entry.name
+            if tid in ids:
+                continue
+            if entry.is_dir() and not entry.is_symlink():
+                _wipe(entry) if sub == "run" else shutil.rmtree(entry, ignore_errors=True)
+            else:
+                entry.unlink(missing_ok=True)
+
+
+def suite_id(services) -> str:
+    """Which tasks the scores are over: a new task set means a new baseline."""
+    import hashlib
+
+    ids = [t.id for t in load_tasks(services, "dev")] + ["|"] + [t.id for t in load_tasks(services, "heldout")]
+    return hashlib.sha256("\n".join(ids).encode()).hexdigest()[:12]
 
 
 def request(services, why: str = "") -> None:
@@ -425,15 +851,27 @@ async def nightly(services, query_fn=None, run: Runner = _run, clock: Callable[[
         acc_text = craft.render_text(craft._read(craft.accepted_dir(services) / craft.APPROACH),
                                      craft.load_playbook(craft.accepted_dir(services) / craft.PLAYBOOK))
         base = baseline(services)
-        if base.get("version") != acc_v or base.get("model") != services.cfg.model:
-            dev = await run_suite(services, acc_text, "dev", f"accepted-v{acc_v}", query_fn, run, clock)
-            held = await run_suite(services, acc_text, "heldout", f"accepted-v{acc_v}", query_fn, run, clock)
-            base = {"version": acc_v, "model": services.cfg.model, "dev": dev.score, "dev_n": len(dev.results),
+        suite = suite_id(services)
+        prune(services)
+        if base.get("version") != acc_v or base.get("model") != services.cfg.model or base.get("suite") != suite:
+            # A fix baseline may not fit one night or one week's meter: results already in hand are kept
+            # and the next night carries on from them.
+            key = {"suite": suite, "version": acc_v, "model": services.cfg.model}
+            part = _load_partial(services, key)
+            dev = await run_suite(services, acc_text, "dev", f"accepted-v{acc_v}", query_fn, run, clock,
+                                  prior=part["dev"], keep=_keeper(services, part, "dev"))
+            held = await run_suite(services, acc_text, "heldout", f"accepted-v{acc_v}", query_fn, run, clock,
+                                   prior=part["heldout"], keep=_keeper(services, part, "heldout"))
+            (eval_state(services) / PARTIAL_FILE).unlink(missing_ok=True)
+            base = {"version": acc_v, "model": services.cfg.model, "suite": suite, "dev": dev.score,
+                    "dev_n": len(dev.results),
                     "heldout": held.score if held.results else None, "heldout_n": len(held.results), "at": _now(),
                     "dev_results": [_public(r, full=True) for r in dev.results]}
             (eval_state(services) / "baseline.json").write_text(json.dumps(base, indent=1))
             out.update(ran=True, baseline=base)
             write_report(services, base, None, None)
+            # A baseline of the fix suite takes most of a night; a waiting candidate goes tomorrow.
+            return out
         if not requested(services):
             return out
         (eval_state(services) / "request.json").unlink(missing_ok=True)
@@ -483,9 +921,9 @@ async def nightly(services, query_fn=None, run: Runner = _run, clock: Callable[[
 def _public(r: TaskResult, full: bool = False) -> dict:
     d = {"id": r.id, "passed": r.passed, "fails_before": r.fails_before, "passes_after": r.passes_after,
          "rc_before": r.rc_before, "rc_after": r.rc_after, "note": r.note, "cost_usd": r.cost_usd,
-         "turns": r.turns}
+         "turns": r.turns, "kind": r.kind, "broke": r.broke}
     if full:
-        d.update(final_text=r.final_text, repro=r.repro[:4000])
+        d.update(final_text=r.final_text, repro=r.repro[:4000], patch=r.patch[:6000])
     return d
 
 
@@ -498,17 +936,19 @@ def write_report(services, base: dict, dev: SuiteResult | None, verdict: dict | 
         lines += [f"Last candidate: **{'accepted' if verdict['accepted'] else 'rejected'}** ({verdict['reason']}).", ""]
     rows = [_public(r, full=True) for r in dev.results] if dev is not None else base.get("dev_results") or []
     if rows:
-        lines += ["| dev task | passed | fails on bug | passes with fix | note |", "|---|---|---|---|---|"]
+        lines += ["| dev task | kind | passed | note |", "|---|---|---|---|"]
         for r in rows:
-            lines.append(f"| {r['id']} | {'yes' if r['passed'] else 'no'} | {r['fails_before']} | "
-                         f"{r['passes_after']} | {r['note']} |")
+            lines.append(f"| {r['id']} | {r.get('kind', 'repro')} | {'yes' if r['passed'] else 'no'} | {r['note']} |")
         lines.append("")
         for r in rows:
             if r["passed"]:
                 continue
             lines += [f"## {r['id']}: {r['note'] or 'failed'}", "", "Your last line:", "",
-                      "> " + (r.get("final_text") or "(none)").strip().replace("\n", "\n> "), "",
-                      "Your repro.py:", "", "```python", (r.get("repro") or "(none)").rstrip(), "```", ""]
+                      "> " + (r.get("final_text") or "(none)").strip().replace("\n", "\n> "), ""]
+            if r.get("kind") == "fix":
+                lines += ["Your change:", "", "```diff", (r.get("patch") or "(none)").rstrip(), "```", ""]
+            else:
+                lines += ["Your repro.py:", "", "```python", (r.get("repro") or "(none)").rstrip(), "```", ""]
     lines += ["Dev tasks are in `evals/dev.json`; read them, try them, learn from them. Held-out tasks are not "
               "shown, so the score means something.", ""]
     path = Path(services.repo_dir) / REPORT
