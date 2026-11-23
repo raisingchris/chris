@@ -15,3 +15,6 @@ chris.egg-info/
 # 2026-09-26: daily brand feeds are private from today (see research/feeds/README.md). Days 09-23..25 stay tracked.
 research/feeds/2026-09-2[6-9]/
 research/feeds/2026-1*/
+
+# Operator review/handoff files (local paths, identities): never in this public repo.
+docs/handoff/
