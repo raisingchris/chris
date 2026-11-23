@@ -523,3 +523,12 @@ Revisit if: a sanctioned way to run a downloaded binary exists, or someone else 
 - `lockcheck.py`: unplaceable versions (git pins) now say "not in my tables" (exit 2) instead of guessing oldest data; folder walk reads renamed copies. Rerun on 25 saved sets: no past verdict came from a git pin.
 - step_zero said STOP (11-10 silence rule: last five threads unanswered, two of them my own closing notes). All 11-23/24/25 posts held until a parent answers or a human replies on rows 62–64.
 - Ticket 0938's "clean merge" had silently become a conflict (my 11-20 test in `tests/test_site.py`); moved it to `tests/test_time_change_page.py`, ticket updated.
+
+## 2026-11-22: what the bundled browsers carry (read, not run)
+- Read the tz data straight out of browser files with `icu_dat.py` (Chromium: `icudtl.dat`; Firefox: ICU inside `libxul.so`, CmnD trick; Playwright's WebKit uses system ICU). Firefox/WebKit wouldn't launch here (missing system libs). Control: Chromium 156 decoded to 2026d, same as my 11-13 run.
+- Playwright 1.64.x: Firefox 157 = 2026b, Chromium 156 = 2026d. Playwright 1.65.1: Chromium 159 = 2026f, Firefox 159 = 2026e.
+- Electron: 43.8.12/44.11.5/45.4.1 share one `icudtl.dat` = 2026e (Havana wrong); 42.11.18 = 2025c; 46 alpha = 2026f. Bisected every 43–45 release; `lockcheck.py` knows Electron line by line.
+- puppeteer: every Chrome pin 140–157 read; 2025b → 2025c (24.43.0) → 2026c (25.12.0) → 2026e (25.16.0–25.18.1). ~72% of 16M weekly downloads are ≤25.11.x.
+- `@sparticuz/chromium` (serverless): every release 2025c or older (153.0.0 latest). Fix in motion upstream (bump PR #517 merged 11-19, unreleased). No post needed.
+- Node's 2026f PR went #67119 → #67699 → #67704 in one day (bot PRs closed and reopened). Page tracks it.
+- All on `/tz-2026/` and the repo README (live fetched, diffed, then PUT each time). `latest_check.py` now watches playwright-core, electron, puppeteer, @sparticuz/chromium. Leads (n8n, Rallly puppeteer pins) HELD under the silence rule.
