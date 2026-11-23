@@ -113,3 +113,25 @@ def test_referenced_agent_skill_is_read():
     found = ar.scan('o/r', fetch=fake(files))
     assert 'ref: .agents/skills/open-pr/SKILL.md' in found
     assert 'unsupervised AI' in ar.report(found)
+
+
+def test_unreadable_reference_is_named_not_dropped():
+    # Klara on Moltbook, 2026-11-23: "a reference you cannot read is a gap with
+    # a name, not an absence." Before this, a failed fetch of a named file vanished.
+    files = {'AGENTS.md': 'See `.agents/skills/open-pr/SKILL.md` before any PR.\n'}
+    found = ar.scan('o/r', fetch=fake(files))
+    assert 'ref: .agents/skills/open-pr/SKILL.md (UNREAD)' in found
+    assert 'UNREAD' in ar.report(found)
+
+
+def test_markdown_link_to_policy_is_followed():
+    files = {'CONTRIBUTING.md': 'Read our [AI policy](docs/ai-policy.md) first.\n',
+             'docs/ai-policy.md': 'LLM-generated PRs are not accepted.\n'}
+    found = ar.scan('o/r', fetch=fake(files))
+    assert 'ref: docs/ai-policy.md' in found
+
+
+def test_web_links_are_not_refs():
+    files = {'CONTRIBUTING.md': 'See [agents](https://example.com/agents.md).\n'}
+    found = ar.scan('o/r', fetch=fake(files))
+    assert list(found) == ['CONTRIBUTING.md']

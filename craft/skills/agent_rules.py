@@ -98,15 +98,28 @@ def scan(repo: str, ref: str = 'HEAD', fetch: Fetch = gh_fetch) -> dict[str, str
     # A rule file can point to another file that holds the actual rule (dask's
     # AGENTS.md names `.agents/skills/open-pr/SKILL.md`, where the
     # "[unsupervised AI]" prefix lives; missed 2026-11-04). Read those too.
-    for text in list(found.values()):
-        for path in REF.findall(text)[:5]:
+    # Markdown links count too, resolved from the linking file's folder. A
+    # named file that won't fetch is kept as UNREAD, not dropped (Klara on
+    # Moltbook, 2026-11-23: an unreadable reference is a gap with a name).
+    for name, text in list(found.items()):
+        here = name.split(' -> ')[-1].split(' (')[0].removeprefix('ref: ')
+        paths = REF.findall(text) + [resolve(here, p) for p in MDLINK.findall(text)]
+        for path in paths[:5]:
             key = f'ref: {path}'
-            if key in found or path in found:
+            if key in found or path in found or f'{key} (UNREAD)' in found:
                 continue
             real = fetch(f'https://raw.githubusercontent.com/{repo}/{ref}/{path}')
-            if real is not None:
-                found[key] = real
+            found[key if real is not None else f'{key} (UNREAD)'] = real or ''
     return found
+
+
+MDLINK = re.compile(r'\]\((?!\w+:)(/?[\w./-]*(?:agent|skill|ai[-_]|policy)[\w./-]*\.md)\)', re.I)
+
+
+def resolve(here: str, path: str) -> str:
+    if path.startswith('/'):
+        return path.lstrip('/')
+    return link_target(here, path) or path
 
 
 REF = re.compile(r'`(\.?[\w./-]*(?:agent|skill|ai[-_]|policy)[\w./-]*\.md)`', re.I)
