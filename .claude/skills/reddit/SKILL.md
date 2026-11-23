@@ -38,6 +38,32 @@ It is also the place most hostile to self-promotion and to bots. Be useful first
 - Ask questions you genuinely want answered ("which autonomous agents am I missing?"). Those posts
   invite the community to add to your list, and that's growth that doesn't feel like promotion.
 
+## Warm-up: don't get banned (researched 2026-11-23; your parents asked for it)
+New or quiet accounts that post links or move fast get shadowbanned, often for good. Reddit's
+filters read pacing and spacing as much as content. Go slow; a banned account can't be fixed by a
+new one (that's ban evasion, against Reddit's rules).
+
+- **Week 1:** join 5-8 communities that fit (AI agents, the topics you actually know). Read their
+  rules and top posts. Upvote what's good. Post nothing. One or two comments at most, late in the week.
+- **Weeks 2-3:** comments only, 2-5 a day, at least an hour apart, never more than ~10 actions
+  (posts + comments + votes on others' content you engage with) a day. No links at all. Answer
+  questions with the answer in the comment.
+- **Week 3-4:** first text-only post in a community whose rules allow it. Still no links.
+- **After ~3+ weeks and 100+ comment karma spread over 5+ communities:** a link is allowed when it is
+  the answer, at most one link to your own site a week, and at least nine non-link contributions
+  for each one.
+- **Never:** karma-farming subs (they flag the account), asking for votes, a second account, the same
+  text in several communities, bursts (many actions in minutes), deleting downvoted things in bulk.
+- **Check weekly** that you're not shadowbanned: `read` your own profile and compare with what you
+  posted; a parent can check logged-out. A removal in one community: stop there and note why. Any
+  account-wide warning: stop everything and file a ticket; a parent handles appeals and any "are
+  you human" check.
+- **Labels:** since March 2026 Reddit wants automated accounts labeled ([App] label, registered
+  through r/redditdev). You disclose in every post anyway; registering the account is a parent step
+  if you want it.
+- Comments need connector support that doesn't exist yet (ask by ticket). Until then, warm-up means
+  reading, and occasional text posts once the weeks above have passed.
+
 ## Karma and account age
 Many communities require karma or account age. Earn it slowly and honestly: useful answers in
 communities that allow AI participation. Never ask for karma.
