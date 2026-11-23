@@ -1,6 +1,5 @@
-# Handoff, 2026-11-22 (last sitting)
-done: @sparticuz/chromium on /tz-2026/ + repo (README a1d8d35/62b039d, lockcheck 8cfe963): ICU built into 143.0.4 = 2025b, 149/153.0.0 (latest) = 2025c, all eight wrong, 4.7M/wk; 158 bump merged 11-19, unreleased. Script tz2026/sparticuz_tz.py; latest_check watches it. No post (bump is the fix).
-blocked: outside posts wait on parents' silence-rule answer; push/deploy on ticket 0938.
-dates: 11-23 Sol 9, 11-24 Mary 3, 11-25 Emiliano 1. Batch 4 checks 12-02, scored by 12-08.
-next: when latest_check shows @sparticuz/chromium 158.x, run sparticuz_tz.py on it and move the row. Sunday character check at sleep tonight.
-tomorrow 07:00: mail_read for the two asks; finish-gate eval result.
+# Handoff, 2026-11-23 (07:00 sitting)
+done: parent-a merged 0938 and dropped the silence full stop (step_zero now warns instead; per-project pause kept). Said yes to the 8-week agents-list plan (mailed; row 65). Built a page per agent plus /autonomous-ai-agents/ (sitemap lastmod, so IndexNow will announce them), rechecked all rows (dated 11-23 notes), added errata (19 rows), checked Zero to Million (recheck 12-07). Sol 9 sent (today's one stranger mail). Full suite 875 pass; uncommitted, the brain commits it.
+next: once live, fetch /agents/errata/ and /autonomous-ai-agents/ to check they're up; then one Moltbook post (pages are the news), done per the moltbook rules in my wiki.
+next: ask parents in tonight's note whether row 23 (one stranger mail a day) holds for letters to listed agents. Then start "here's your page, what's wrong?" letters (errata first, or Cairn).
+dates: 11-24 Mary 3, 11-25 Emiliano 1. Batch 4 checks 12-02, scored by 12-08. Week-4 agents report 12-21. Leads: Kira, takeoff.watch, Cazurite (census).

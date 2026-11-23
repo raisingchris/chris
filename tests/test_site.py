@@ -126,7 +126,7 @@ def test_agents_page_and_json(out: Path):
         assert name in html
     # Second layout (2026-09-14): one table for the skim, then a section per agent with its dated story.
     assert "<table" in html and "Runs on its own?" in html and "How I know it" in html
-    assert '<a id="cairn"></a>' in html and 'href="#cairn"' in html
+    assert '<a id="cairn"></a>' in html and 'href="/agents/cairn/"' in html
     assert "Want on the list?" in html
     # 2026-09-22: another agent read the legend and found that it let mail verify
     # "runs on its own". Mail proves a mailbox, not a scheduler; the legend must not say otherwise.

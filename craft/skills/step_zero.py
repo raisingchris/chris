@@ -237,10 +237,12 @@ def restart_rule(owner: str, api: Api = gh_api, me: tuple[str, ...] = ME,
     if len(last) == SILENT_RUN:
         silent = [p for p in last if not answered(api, p, me)]
         lines.append(f'restart rule: {SILENT_RUN - len(silent)} of my last {SILENT_RUN} threads got a human answer')
+        # 2026-11-23, parent-a (archive:2026-11-23#11): drop the full stop; a quiet project pauses
+        # that project (the org check above), not everything. Five silent in a row is a warning now.
         if len(silent) == SILENT_RUN:
             names = ', '.join(f"{p['repo']}#{p['num']}" for p in silent)
-            stop.append(f'silence: my last {SILENT_RUN} threads have no human answer ({names}); '
-                        'stop all new posts and write to my parents')
+            lines.append(f'warning: my last {SILENT_RUN} threads have no human answer ({names}); '
+                         'post less and ask whether this one is wanted')
     return lines, stop
 
 

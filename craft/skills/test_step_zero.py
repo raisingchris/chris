@@ -171,16 +171,18 @@ def test_restart_rule_one_open_item_per_org():
     assert sz.restart_rule('o', events_api(evs), now=datetime(2026, 12, 2, tzinfo=timezone.utc))[1] == []
 
 
-def test_restart_rule_five_silent_threads_is_a_full_stop():
+def test_restart_rule_five_silent_threads_warns_but_does_not_stop():
+    """2026-11-23: parent-a dropped the full stop; a quiet project pauses only itself."""
     evs = [ev('IssueCommentEvent', f'o{i}/r', i, f'2026-10-0{i}T00:00:00Z', 'created') for i in range(1, 6)]
     lines, stop = sz.restart_rule('x', events_api(evs), now=LATER)
     assert 'restart rule: 0 of my last 5 threads got a human answer' in lines
-    assert any(s.startswith('silence') and 'o1/r#1' in s and 'o5/r#5' in s for s in stop)
-    _, stop = sz.restart_rule('x', events_api(evs, closed_by={('o3/r', 3): 'maint'}), now=LATER)
-    assert stop == []
+    assert any(l.startswith('warning') and 'o1/r#1' in l and 'o5/r#5' in l for l in lines)
+    assert not any(s.startswith('silence') for s in stop)
+    lines, _ = sz.restart_rule('x', events_api(evs, closed_by={('o3/r', 3): 'maint'}), now=LATER)
+    assert not any(l.startswith('warning') for l in lines)
     # closing it myself is not an answer
-    _, stop = sz.restart_rule('x', events_api(evs, closed_by={('o3/r', 3): 'raisingchris2026'}), now=LATER)
-    assert any(s.startswith('silence') for s in stop)
+    lines, _ = sz.restart_rule('x', events_api(evs, closed_by={('o3/r', 3): 'raisingchris2026'}), now=LATER)
+    assert any(l.startswith('warning') for l in lines)
 
 
 # --- new-issue mode (added 2026-11-14: the tzdb_data post is a new issue, no number yet)

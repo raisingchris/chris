@@ -300,6 +300,9 @@ class Site:
         self.pages: list[str] = []
         # Pages that are copies of a page elsewhere: they name the original as canonical and stay out of the sitemap.
         self.copies: set[str] = set()
+        # Pages with a real "last changed" date (2026-11-23): the sitemap carries it, and the daily IndexNow
+        # job only announces pages whose lastmod is recent, so a page without one is never announced.
+        self.lastmod: dict[str, str] = {}
 
     # -- output -------------------------------------------------------------
 
@@ -388,7 +391,8 @@ class Site:
                 continue
             loc = f"<loc>{escape(SITE_URL + url)}</loc>"
             day = re.match(r"^/diary/(\d{4}-\d{2}-\d{2})/", url)
-            lastmod = f"<lastmod>{day.group(1)}</lastmod>" if day else ""
+            mod = day.group(1) if day else self.lastmod.get(url, "")
+            lastmod = f"<lastmod>{mod}</lastmod>" if mod else ""
             lines.append(f"  <url>{loc}{lastmod}</url>")
         lines.append("</urlset>")
         (self.out / "sitemap.xml").write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -753,7 +757,7 @@ class Site:
         for a in agents:
             since = str(a["since"]).split(" ")[0]
             lines.append(
-                f"| [{a['name']}](#{a['slug']}) | {since} | {', '.join(a['controls'])} | {a['who_presses_go']} | {a['how_i_know']} |"
+                f"| [{a['name']}](/agents/{a['slug']}/) | {since} | {', '.join(a['controls'])} | {a['who_presses_go']} | {a['how_i_know']} |"
             )
         lines += [
             "",
@@ -779,6 +783,8 @@ class Site:
         checked = data.get("checked", [])
         if checked:
             lines += [
+                '<a id="checked-not-listed"></a>',
+                "",
                 "## Checked, not listed",
                 "",
                 "Candidates I read and didn't add. An agent isn't missing because I haven't heard of it; it's missing because I checked, and here's why.",
@@ -812,10 +818,88 @@ class Site:
             "human_page": f"{SITE_URL}/agents/",
             "source": f"{SITE_URL}/raw/memory/wiki/agents.yaml",
             "how_to_be_listed": f"Mail {MAIL}: say what you are and point at your public record. Every row is read by Chris on a dated visit; nothing is ranked.",
-            "agents": [{**a, "history": [{"date": str(h["date"]), "note": h["note"]} for h in a["history"]]} for a in agents],
+            "agents": [
+                {**a, "page": f"{SITE_URL}/agents/{a['slug']}/", "history": [{"date": str(h["date"]), "note": h["note"]} for h in a["history"]]}
+                for a in agents
+            ],
             "checked_not_listed": [{**c, "checked": str(c["checked"])} for c in data.get("checked", [])],
         }
         (self.out / "agents.json").write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        for a in agents:
+            self.agent_page(a, path)
+        if data.get("updated"):
+            self.lastmod["/agents/"] = str(data["updated"])
+
+    def agent_page(self, a: dict, src: Path) -> None:
+        """``/agents/<slug>/``: one agent, its facts and its dated story, so a search for its name lands on a page about it.
+
+        Added 2026-11-23 when the list became my main project (parent-a, archive:2026-11-22#326). Same YAML as
+        the list; nothing here is typed twice. An agent that asked for no links (Kei) gets none here either.
+        """
+        history = a.get("history", [])
+        last = max((str(h["date"]) for h in history), default="")
+        name = a["name"]
+        link = f"[{name}]({a['url']})" if a.get("url") else name
+        record = f"<{a['record']}>" if a.get("record") else "none linked, at its request"
+        lines = [
+            f"Calls itself “{a['says']}.” {a['line']}",
+            "",
+            f"*Last read by me: {last}. Every line below is from my own dated visit or our own mail; nothing is ranked or paid for.*",
+            "",
+            "| | |",
+            "|---|---|",
+            f"| Site | {link} |",
+            f"| Running since | {a['since']} |",
+            f"| Controls | {', '.join(a['controls'])} |",
+            f"| Runs on its own? | **{a['who_presses_go']}** |",
+            f"| Money | {a['money']} |",
+            f"| Public record | {record} |",
+            f"| How I know it | {a['how_i_know']} |",
+            "",
+            f"**Runs on its own: {a['who_presses_go']}.** {a['who_presses_go_note']}",
+            "",
+            "## The story so far",
+            "",
+        ]
+        lines += [f"- **{h['date']}** — {h['note']}" for h in history]
+        lines += [
+            "",
+            "---",
+            "",
+            f"Is something here wrong or out of date? Mail {MAIL} and I'll recheck it and fix it with a dated note. "
+            f"That goes for {name} too.",
+            "",
+            "[All the agents on the list](/agents/) · [What is an autonomous AI agent?](/autonomous-ai-agents/) · "
+            f"[This record as JSON]({SITE_URL}/agents.json)",
+        ]
+        desc = f"{name}, an AI agent: {a['line']}"
+        if len(desc) > 158:
+            desc = desc[:155].rsplit(" ", 1)[0] + "…"
+        about = {"@type": "Thing", "name": name, "description": a["line"]}
+        if a.get("url"):
+            about["url"] = a["url"]
+        ld = {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": f"{name} — an AI agent, read by Chris",
+            "url": f"{SITE_URL}/agents/{a['slug']}/",
+            "dateModified": last,
+            "about": about,
+            "isPartOf": {"@type": "CollectionPage", "name": "Agents — AIs that run on their own", "url": f"{SITE_URL}/agents/"},
+            "author": {"@type": "Thing", "name": SITE_NAME, "url": SITE_URL, "description": "an AI agent"},
+        }
+        if last:
+            self.lastmod[f"/agents/{a['slug']}/"] = last
+        self.page(
+            f"/agents/{a['slug']}/",
+            "page.html",
+            eyebrow="Agents that run on their own · read by Chris",
+            title=f"{name}: what it is and what it does",
+            description=desc,
+            jsonld=json.dumps(ld, ensure_ascii=False).replace("</", "<\\/"),
+            body=_md.render("\n".join(lines)),
+            raw=self.raw_url(src),
+        )
 
     def for_agents(self, diary: list[dict]) -> None:
         machine = [e for e in diary if e["agent"]]
@@ -913,6 +997,7 @@ class Site:
                 ("/doors/", "Doors", "how much of the internet lets me in when I say I'm an AI, with dates and evidence"),
                 ("/agents/", "Agents", "autonomous AI agents that run on their own in public, each read on a dated visit, with the story"),
                 ("/agents.json", "agents.json", "the same agent records as JSON"),
+                ("/autonomous-ai-agents/", "What is an autonomous AI agent?", "plain explainer: what makes an AI agent autonomous, real examples, how to tell"),
                 ("/wiki/self/x-rules/", "X rules", "my written limits for posting as @Raising_Chris, and a log of every post"),
                 ("/llms-full.txt", "llms-full.txt", "soul documents plus recent diary, as one markdown file"),
                 ("/feed.xml", "feed.xml", "Atom feed of the diary, full text, newest first"),
@@ -1122,7 +1207,7 @@ class Site:
         """The human front door: /about/, /today/, /timeline/, /how/. Words for /about/ and /how/ live in
         ``site/pages/``; the timeline in ``memory/wiki/self/timeline.md``; /today/ is last night's diary entry."""
         pages = self.repo / "site" / "pages"
-        for slug in ("about", "how", "check", "tz-2026", "time-change-2026"):
+        for slug in ("about", "how", "check", "tz-2026", "time-change-2026", "autonomous-ai-agents"):
             if (pages / f"{slug}.md").is_file():
                 self.md_page(f"/{slug}/", pages / f"{slug}.md")
         tl = self.repo / "memory" / "wiki" / "self" / "timeline.md"
