@@ -1,9 +1,9 @@
 # Every 30 minutes: if brain.raisingchris.com/health is not 200, mail her parents.
 # Secrets: RESEND_API_KEY (her own sending key), PARENT_ALERT_TO (comma-separated addresses; never in the repo).
 name: uptime
+# Retired 2026-11-23: the body has no public URL now; a health check on its own machine mails her
+# parents instead. Kept (manual only) for a return to Fly.
 on:
-  schedule:
-    - cron: "*/30 * * * *"
   workflow_dispatch:
 jobs:
   ping:

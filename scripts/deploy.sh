@@ -1,14 +1,6 @@
 #!/usr/bin/env bash
-# Parent-side deploy that doesn't cut her off mid-sitting: waits until /health says no session is
-# running, never deploys between 21:45 and 22:50 New York (sleep + backup), then deploys HEAD.
+# Parent-side deploy: dispatches the deploy workflow (tests + soul guard). The body's own deployer
+# ships the commit once the run is green, waiting until no session is running and outside
+# 21:45-22:50 New York (sleep + backup). Needs a GitHub token that can dispatch workflows.
 set -euo pipefail
-cd "$(dirname "$0")/.."
-H=https://brain.raisingchris.com/health
-for i in $(seq 1 60); do
-  now=$(TZ=America/New_York date +%H%M)
-  if [ "$now" -ge 2145 ] && [ "$now" -le 2250 ]; then echo "her sleep window; waiting"; sleep 60; continue; fi
-  running=$(curl -sS -m 15 "$H" | python3 -c 'import sys,json;print(json.load(sys.stdin).get("running"))' 2>/dev/null || echo unknown)
-  [ "$running" = "False" ] && break
-  echo "session running ($running); waiting 30s"; sleep 30
-done
-exec fly deploy -a chris-brain --ha=false --build-arg GIT_SHA="$(git rev-parse HEAD)" "$@"
+exec gh workflow run deploy.yml -R raisingchris/chris --ref main "$@"

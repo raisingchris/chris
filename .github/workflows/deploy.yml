@@ -1,7 +1,8 @@
-# Deploys Chris's body (agent/, scripts/, Dockerfile) to Fly.
+# Approves a deploy of Chris's body (agent/, scripts/, Dockerfile). Since 2026-11-23 the body runs on a
+# parent-run machine with no public URL; a deployer there watches for the newest SUCCESSFUL run of this
+# workflow on main and ships that commit. So: green tests + intact soul hashes = deployed.
 # Manual trigger: a parent presses Deploy on the parent page (POST /parent/deploy → workflow_dispatch),
 # or runs it from the Actions tab. It deploys whatever is on main, including Chris's own commits.
-# Secret needed: FLY_API_TOKEN (a deploy-only token for app chris-brain).
 name: deploy
 on:
   workflow_dispatch:
@@ -24,7 +25,4 @@ jobs:
           if [ -z "$want" ]; then echo "SOUL_HASHES secret not set; refusing to deploy"; exit 1; fi
           if [ "$got" != "$want" ]; then echo "vows/constitution changed - only a parent can (update SOUL_HASHES)"; exit 1; fi
           echo "conscience intact"
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only --ha=false -a chris-brain --build-arg GIT_SHA=${{ github.sha }}
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      - run: echo "approved ${{ github.sha }}; the body's deployer picks it up within a few minutes"
