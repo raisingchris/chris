@@ -43,6 +43,7 @@ class Config:
     canaries: list[str] = field(default_factory=list)
     model: str = "claude-fable-5-1"
     stripe_webhook_secret: str = ""
+    inbound_poll: bool = False  # poll Resend/Stripe instead of waiting for webhooks (no public URL)
     birthday: str = ""  # ISO date of her first day, or empty to infer from the first diary
     max_turns: int = 150  # per sitting
     sleep_max_turns: int = 60
@@ -87,6 +88,7 @@ class Config:
             canaries=_csv(g("REDACT_CANARIES")),
             model=g("CHRIS_MODEL", "claude-fable-5-1"),
             stripe_webhook_secret=g("STRIPE_WEBHOOK_SECRET"),
+            inbound_poll=g("INBOUND_POLL").strip().lower() in _TRUE,
             birthday=g("CHRIS_BIRTHDAY").strip(),
             max_turns=int(g("MAX_TURNS", "150")),
             sleep_max_turns=int(g("SLEEP_MAX_TURNS", "60")),

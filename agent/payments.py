@@ -62,6 +62,19 @@ class Payments:
     def handle_webhook(self, payload_bytes: bytes, sig_header: str, webhook_secret: str) -> dict | None:
         """Verify signature; on checkout.session.completed record revenue. Raises on bad signature."""
         event = stripe.Webhook.construct_event(payload_bytes, sig_header, webhook_secret)
+        return self.handle_event(event)
+
+    def list_events(self, created_after: int, types) -> list:
+        """Checkout events newer than ``created_after`` (unix seconds), for the poller."""
+        stripe.api_key = self._key
+        out = []
+        for ev in stripe.Event.list(types=list(types), created={"gte": int(created_after)}, limit=100).auto_paging_iter():
+            # stripe-python objects aren't plain dicts (no .get); normalise for the poller.
+            out.append(ev.to_dict() if hasattr(ev, "to_dict") else dict(ev))
+        return out
+
+    def handle_event(self, event) -> dict | None:
+        """Record revenue for a verified checkout event (from a signed webhook or the Stripe API)."""
         if event["type"] not in {"checkout.session.completed", "checkout.session.async_payment_succeeded"}:
             return None
         obj = event["data"]["object"]

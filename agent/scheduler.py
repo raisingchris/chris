@@ -34,6 +34,7 @@ from zoneinfo import ZoneInfo
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
+from apscheduler.triggers.interval import IntervalTrigger
 
 from agent import gitops, pause
 
@@ -54,6 +55,7 @@ EVAL_AT = "23:15"
 TIDY_AT = "23:05"
 # Once a day, before she wakes, the brain counts what reached anyone outside (agent/outcomes.py).
 OUTCOMES_AT = "06:40"
+INBOUND_POLL_MINUTES = 2
 TIDY_BELOW_BYTES = 2_500_000_000
 TIDY_DAYS = 2
 TIDY_CMD = ("find /tmp -mindepth 1 -maxdepth 1 -user chris -mtime +{days} -exec rm -rf {{}} + ; "
@@ -309,6 +311,29 @@ def make_scheduler(services, run_sitting, run_sleep) -> AsyncIOScheduler:
     add(backup, cron(BACKUP_AT), "backup", "backup")
     sched.add_job(poll_upwork, CronTrigger(minute=UPWORK_POLL_MINUTES, hour=UPWORK_POLL_HOURS, timezone=cfg.tz),
                   id="upwork-poll", name="upwork poll", **JOB_DEFAULTS)
+
+    async def poll_inbound() -> None:
+        # A body with no public URL asks Resend and Stripe instead of being told (agent/inbound.py).
+        from agent import inbound
+
+        try:
+            got = await asyncio.to_thread(inbound.poll_mail, services)
+            if got.get("wake"):
+                request_mail_wake(services, sched)
+        except Exception as exc:  # noqa: BLE001 — a failed poll retries in two minutes
+            log.warning("mail poll failed: %s", exc)
+            services.archive.append("inbound_poll_failed", {"kind": "inbound_poll_failed", "what": "mail",
+                                                            "error": f"{type(exc).__name__}: {str(exc)[:200]}"})
+        try:
+            await asyncio.to_thread(inbound.poll_payments, services)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("payments poll failed: %s", exc)
+            services.archive.append("inbound_poll_failed", {"kind": "inbound_poll_failed", "what": "payments",
+                                                            "error": f"{type(exc).__name__}: {str(exc)[:200]}"})
+
+    if getattr(cfg, "inbound_poll", False):
+        sched.add_job(poll_inbound, IntervalTrigger(minutes=INBOUND_POLL_MINUTES), id="inbound-poll",
+                      name="inbound poll", **JOB_DEFAULTS)
     return sched
 
 

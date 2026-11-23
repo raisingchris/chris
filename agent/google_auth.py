@@ -105,3 +105,60 @@ class GoogleWIF:
             return r.json()
         except ValueError:
             return None
+
+
+TOKEN_URL = "https://oauth2.googleapis.com/token"
+
+
+class GoogleSAKey:
+    """Google access for a body that isn't on Fly (no OIDC socket): a service-account key,
+    held by brain only (env GOOGLE_SA_KEY_B64), signs a short JWT that Google swaps for an
+    access token. Same interface as GoogleWIF. The key, the account address and the project
+    never appear in a message, a tool result or the archive."""
+
+    def __init__(self, key_json: str, http: httpx.Client | None = None):
+        import json
+
+        info = json.loads(key_json)
+        self._email = info["client_email"]
+        self._key_pem = info["private_key"].encode()
+        self._key_id = info.get("private_key_id", "")
+        self._token_url = info.get("token_uri") or TOKEN_URL
+        self._http = http or httpx.Client(timeout=TIMEOUT_S)
+        self._cache: dict[tuple[str, ...], tuple[str, float]] = {}
+
+    def access_token(self, scopes: list[str]) -> str:
+        key = tuple(sorted(scopes))
+        hit = self._cache.get(key)
+        if hit and hit[1] - time.time() > REFRESH_MARGIN_S:
+            return hit[0]
+        token, expires_at = self._mint(list(key))
+        self._cache[key] = (token, expires_at)
+        return token
+
+    def _assertion(self, scopes: list[str]) -> str:
+        import jwt
+
+        now = int(time.time())
+        claims = {"iss": self._email, "scope": " ".join(scopes), "aud": self._token_url,
+                  "iat": now, "exp": now + LIFETIME_S}
+        headers = {"kid": self._key_id} if self._key_id else None
+        return jwt.encode(claims, self._key_pem, algorithm="RS256", headers=headers)
+
+    def _mint(self, scopes: list[str]) -> tuple[str, float]:
+        try:
+            assertion = self._assertion(scopes)
+        except Exception as e:  # noqa: BLE001 — never echo key material
+            raise GoogleAuthError(f"service-account assertion failed: {type(e).__name__}") from None
+        r = self._http.post(self._token_url, data={
+            "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer", "assertion": assertion})
+        if not 200 <= r.status_code < 300:
+            raise GoogleAuthError(f"Google token exchange failed: HTTP {r.status_code}")
+        try:
+            body = r.json()
+        except ValueError:
+            body = {}
+        token = body.get("access_token")
+        if not token:
+            raise GoogleAuthError("Google token exchange returned no access token")
+        return token, time.time() + int(body.get("expires_in") or LIFETIME_S)

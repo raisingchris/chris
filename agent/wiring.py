@@ -21,7 +21,7 @@ from agent.config import Config
 from agent.council import Council
 from agent.analytics import Analytics
 from agent.dataforseo import DataForSEO
-from agent.google_auth import GoogleWIF
+from agent.google_auth import GoogleSAKey, GoogleWIF
 from agent.mail import Mail
 from agent.moltbook import Moltbook
 from agent.x_client import XClient
@@ -53,6 +53,7 @@ class Secrets:
     # project, so they stay here. Property/site ids are what the tools read.
     google_wif_provider: str = ""
     google_metrics_sa: str = ""
+    google_sa_key_b64: str = ""  # off-Fly bodies: a key instead of Fly OIDC (brain only)
     ga4_property_id: str = ""
     gsc_site_url: str = ""
     bing_webmaster_key: str = ""  # a parent account's key; never reaches her shell or the archive
@@ -78,6 +79,7 @@ class Secrets:
             x_handle=e.get("X_HANDLE", ""),
             google_wif_provider=e.get("GOOGLE_WIF_PROVIDER", ""),
             google_metrics_sa=e.get("GOOGLE_METRICS_SA", ""),
+            google_sa_key_b64=e.get("GOOGLE_SA_KEY_B64", ""),
             ga4_property_id=e.get("GA4_PROPERTY_ID", ""),
             gsc_site_url=e.get("GSC_SITE_URL", ""),
             bing_webmaster_key=e.get("BING_WEBMASTER_KEY", ""),
@@ -299,8 +301,13 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
                     weekly_cap=cfg.x_weekly_cap)
 
     google = analytics = None
-    if secrets.google_wif_provider and secrets.google_metrics_sa:
+    if secrets.google_sa_key_b64:
+        import base64
+
+        google = GoogleSAKey(base64.b64decode(secrets.google_sa_key_b64).decode())
+    elif secrets.google_wif_provider and secrets.google_metrics_sa:
         google = GoogleWIF(secrets.google_wif_provider, secrets.google_metrics_sa)
+    if google is not None:
         analytics = Analytics(google, secrets.ga4_property_id, secrets.gsc_site_url, archive.append)
 
     bing = None

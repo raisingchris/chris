@@ -434,30 +434,18 @@ def create_app(services, scheduler=None) -> FastAPI:
         except json.JSONDecodeError:
             raise HTTPException(400, "bad json")
         if payload.get("type") == "email.received":
-            if services.mail.is_owner_mail(payload, getattr(cfg, "owner_aliases", ())):
-                # A parent's account mail (a login or claim link): forwarded to them, never filed for her.
-                await asyncio.to_thread(services.mail.forward_owner_mail, payload)
-                return {"ok": True}
+            from agent import inbound
             from agent.attachments import AttachmentError
             try:
-                path = await asyncio.to_thread(services.mail.ingest, payload)
+                what = await asyncio.to_thread(inbound.handle_received, services, payload)
             except AttachmentError:
                 raise HTTPException(503, "attachments pending; retry delivery") from None
-            from agent import scheduler as scheduler_module
-            from agent.mail import filed_blank, filed_job_alert, filed_report
-
-            try:
-                if filed_blank(path):
-                    # Filed, and listed at the next scheduled sitting; not worth an extra one.
-                    services.archive.append("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": "empty_body"})
-                elif filed_report(path):
-                    services.archive.append("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": "dmarc_report"})
-                elif filed_job_alert(path):
-                    services.archive.append("mail_wake_skipped", {"kind": "mail_wake_skipped", "reason": "job_alert_batched"})
-                else:
+            if what == "filed_wake":
+                from agent import scheduler as scheduler_module
+                try:
                     scheduler_module.request_mail_wake(services, scheduler)
-            except Exception as exc:  # noqa: BLE001 — the mail is already filed; a wake is a bonus
-                log.warning("mail wake failed: %s", exc)
+                except Exception as exc:  # noqa: BLE001 — the mail is already filed; a wake is a bonus
+                    log.warning("mail wake failed: %s", exc)
         return {"ok": True}
 
     @app.post("/webhooks/stripe")
