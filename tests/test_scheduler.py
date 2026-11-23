@@ -43,7 +43,7 @@ def sched(services, calls):
 def test_weekday_jobs(sched):
     # 2026-09-07 is a Monday
     assert due_on(sched, date(2026, 9, 7)) == [
-        "git-pull", "wake", "unseal", "upwork-poll", "sitting-09:00", "sitting-12:00", "sitting-15:00",
+        "outcomes", "git-pull", "wake", "unseal", "upwork-poll", "sitting-09:00", "sitting-12:00", "sitting-15:00",
         "sitting-18:00", "sleep", "backup", "tidy", "eval",
     ]
 
@@ -52,14 +52,14 @@ def test_wednesday_afternoon_is_an_improve_sitting(sched):
     # 2026-09-09 is a Wednesday; Saturday 2026-09-12 matches it.
     for day in (date(2026, 9, 9), date(2026, 9, 12)):
         assert due_on(sched, day) == [
-            "git-pull", "wake", "unseal", "upwork-poll", "sitting-09:00", "sitting-12:00", "improve",
+            "outcomes", "git-pull", "wake", "unseal", "upwork-poll", "sitting-09:00", "sitting-12:00", "improve",
             "sitting-18:00", "sleep", "backup", "tidy", "eval",
         ]
 
 
 def test_sunday_jobs(sched):
     # 2026-09-06 is a Sunday: no wake, no ordinary sittings — one letter home and sleep.
-    assert due_on(sched, date(2026, 9, 6)) == ["git-pull", "unseal", "upwork-poll", "sunday", "sleep", "backup", "tidy", "eval"]
+    assert due_on(sched, date(2026, 9, 6)) == ["outcomes", "git-pull", "unseal", "upwork-poll", "sunday", "sleep", "backup", "tidy", "eval"]
 
 
 async def test_backup_job_runs_unguarded_and_notes_last_run(sched, services, monkeypatch):

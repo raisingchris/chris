@@ -149,6 +149,12 @@ class Services:
             parts.append(self.odometer.render_line(self.birthday()))
         except Exception as exc:
             parts.append(f"Odometer: unavailable ({type(exc).__name__}).")
+        try:
+            from agent import outcomes
+
+            parts.append(outcomes.line(self))
+        except Exception as exc:  # noqa: BLE001
+            parts.append(f"Outcomes: unavailable ({type(exc).__name__}).")
         line = " ".join(parts)
         if self.dataforseo is not None and self.dataforseo_meter is not None:
             line += (f" · DataForSEO this week ${self.dataforseo_meter.spent():.2f} "

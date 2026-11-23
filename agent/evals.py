@@ -746,7 +746,8 @@ async def run_suite(services, craft_text: str, split: str, label: str, query_fn=
             r = TaskResult(id=task.id, split=split, passed=False, kind=task.kind,
                            note=f"not run: {type(exc).__name__}: {str(exc)[:200]}")
         suite.results.append(r)
-        _append(services, "results.jsonl", {"label": label, "split": split, **_public(r, full=True)})
+        _append(services, "results.jsonl", {"label": label, "split": split, "model": services.cfg.model,
+                                            **_public(r, full=True)})
         if keep is not None:
             keep(r)
     return suite
@@ -763,12 +764,97 @@ def _result(d: dict, split: str) -> TaskResult:
 
 
 def decide(base_dev: int, cand_dev: int, base_held: int | None, cand_held: int | None) -> tuple[bool, str]:
+    """The old rule: no score may drop against the last baseline. Used only when there is no history."""
     if cand_dev < base_dev:
         return False, f"dev {cand_dev} < {base_dev}"
     if base_held is not None and cand_held is not None and cand_held < base_held:
         return False, f"held-out {cand_held} < {base_held}"
     return True, f"dev {cand_dev} vs {base_dev}" + (
         f", held-out {cand_held} vs {base_held}" if cand_held is not None else "")
+
+
+# One run per task is a coin flip on the middling tasks (2026-11-23: three dev tasks passed 4/8, 3/8 and
+# 6/8 of the time), and comparing against one lucky baseline night rejected six candidates in a row.
+# So a candidate is compared with what accepted craft has scored on the same tasks over every night it
+# ran, and it fails only if it is clearly worse. The eval is a floor; the outcomes trial decides.
+ALPHA = 0.05  # reject only if accepted craft would score this low less than 5% of the time
+MIN_RUNS = 3  # with fewer accepted-craft runs of a task than this, the old no-drop rule applies
+
+
+def pass_rates(services) -> dict[str, tuple[int, int]]:
+    """{task id: (passes, runs)} over every accepted-craft result the brain has kept."""
+    rates: dict[str, list[int]] = {}
+    try:
+        lines = (eval_state(services) / "results.jsonl").read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return {}
+    for ln in lines:
+        try:
+            r = json.loads(ln)
+        except json.JSONDecodeError:
+            continue
+        if not str(r.get("label", "")).startswith("accepted-") or str(r.get("note", "")).startswith("not run"):
+            continue
+        if r.get("model") not in (None, services.cfg.model):
+            continue
+        pr = rates.setdefault(str(r.get("id")), [0, 0])
+        pr[0] += 1 if r.get("passed") else 0
+        pr[1] += 1
+    return {k: (v[0], v[1]) for k, v in rates.items()}
+
+
+def _rates_for(results: list[TaskResult], rates: dict[str, tuple[int, int]]) -> list[float] | None:
+    """Laplace-smoothed pass chance of accepted craft for each task; None unless every task has history."""
+    if not results or any(rates.get(r.id, (0, 0))[1] < MIN_RUNS for r in results):
+        return None
+    return [(rates[r.id][0] + 1) / (rates[r.id][1] + 2) for r in results]
+
+
+def expected(results: list[TaskResult], rates: dict[str, tuple[int, int]]) -> float | None:
+    ps = _rates_for(results, rates)
+    return None if ps is None else sum(ps)
+
+
+def p_at_most(score: int, ps: list[float]) -> float:
+    """P(passes <= score) if each task passes independently with its own chance (Poisson binomial)."""
+    dist = [1.0]
+    for p in ps:
+        nxt = [0.0] * (len(dist) + 1)
+        for k, q in enumerate(dist):
+            nxt[k] += q * (1 - p)
+            nxt[k + 1] += q * p
+        dist = nxt
+    return sum(dist[: max(0, score) + 1])
+
+
+def floor_ok(score: int, results: list[TaskResult], rates: dict) -> tuple[bool | None, str]:
+    """(ok, why): ok is False only if accepted craft would score this low less than ALPHA of the time."""
+    ps = _rates_for(results, rates)
+    if ps is None:
+        return None, ""
+    p = p_at_most(score, ps)
+    return p >= ALPHA, f"{score} vs expected {sum(ps):.1f} (p={p:.2f})"
+
+
+def decide_floor(dev: SuiteResult, held: SuiteResult | None, rates: dict, base: dict) -> tuple[bool, str]:
+    """A candidate passes unless it is clearly worse than accepted craft has been on the same tasks."""
+    ok_dev, why_dev = floor_ok(dev.score, dev.results, rates)
+    if ok_dev is None:
+        cand_held = held.score if held is not None and held.results else None
+        return decide(base["dev"], dev.score, base.get("heldout"), cand_held)
+    why = "dev " + why_dev
+    if not ok_dev:
+        return False, why + " (clearly worse)"
+    if held is not None and held.results:
+        ok_held, why_held = floor_ok(held.score, held.results, rates)
+        if ok_held is None:
+            ok_held = base.get("heldout") is None or held.score >= base["heldout"]
+            why += f", held-out {held.score} vs {base.get('heldout')}"
+        else:
+            why += ", held-out " + why_held
+        if not ok_held:
+            return False, why + " (clearly worse)"
+    return True, why
 
 
 PARTIAL_FILE = "baseline-partial.json"
@@ -874,6 +960,14 @@ async def nightly(services, query_fn=None, run: Runner = _run, clock: Callable[[
             return out
         if not requested(services):
             return out
+        from agent import outcomes
+
+        t = outcomes.open_trial(services)
+        if t:
+            # One change at a time, or the outcome score can't say which change did it.
+            write_report(services, base, None, None, waiting=f"craft v{t.get('version')} is on an outcomes trial "
+                         f"from {t.get('accepted_on')} ({outcomes.TRIAL_DAYS} days); your candidate waits")
+            return {**out, "candidate": "waiting for trial"}
         (eval_state(services) / "request.json").unlink(missing_ok=True)
         if not craft.has_candidate(services):
             return {**out, "candidate": "none"}
@@ -883,19 +977,32 @@ async def nightly(services, query_fn=None, run: Runner = _run, clock: Callable[[
             craft.log_lineage(services, {"verdict": "rejected", "reason": str(exc), "diff": craft.diff(services)})
             write_report(services, base, None, {"accepted": False, "reason": str(exc)})
             return {**out, "candidate": "over limits"}
+        thrown = craft.reverted_snapshot(services)
+        if thrown and craft.snapshot(craft.working_dir(services)) == thrown:
+            why = "the same craft an outcomes trial reverted; change it before asking again"
+            craft.log_lineage(services, {"verdict": "rejected", "reason": why})
+            write_report(services, base, None, {"accepted": False, "reason": why})
+            return {**out, "candidate": "reverted content"}
         wd = craft.working_dir(services)
         cand_text = craft.render_text(craft._read(wd / craft.APPROACH), craft.load_playbook(wd / craft.PLAYBOOK))
         diff = craft.diff(services)
         dev = await run_suite(services, cand_text, "dev", "candidate", query_fn, run, clock)
+        rates = pass_rates(services)
         held = None
-        if dev.score >= base["dev"]:
+        dev_floor, _ = floor_ok(dev.score, dev.results, rates)
+        if dev_floor or (dev_floor is None and dev.score >= base["dev"]):
             held = await run_suite(services, cand_text, "heldout", "candidate", query_fn, run, clock)
         cand_held = held.score if held is not None and held.results else None
-        ok, why = decide(base["dev"], dev.score, base.get("heldout"), cand_held)
+        ok, why = decide_floor(dev, held, rates, base)
         record = {"diff": diff, "dev": [base["dev"], dev.score], "heldout": [base.get("heldout"), cand_held],
                   "reason": why, "cost_usd": dev.cost + (held.cost if held else 0.0), "model": services.cfg.model}
         if ok:
             v = craft.accept(services, record)
+            for suite_res in (dev, held):
+                for r in (suite_res.results if suite_res is not None else []):
+                    _append(services, "results.jsonl", {"label": f"accepted-v{v}", "split": r.split,
+                                                        "model": services.cfg.model, "copied": True,
+                                                        **_public(r)})
             base = {**base, "version": v, "dev": dev.score, "heldout": cand_held if cand_held is not None
                     else base.get("heldout"), "dev_results": [_public(r, full=True) for r in dev.results], "at": _now()}
             (eval_state(services) / "baseline.json").write_text(json.dumps(base, indent=1))
@@ -927,11 +1034,28 @@ def _public(r: TaskResult, full: bool = False) -> dict:
     return d
 
 
-def write_report(services, base: dict, dev: SuiteResult | None, verdict: dict | None) -> None:
+def _outcomes_line(services) -> str:
+    try:
+        from agent import outcomes
+
+        return outcomes.line(services)
+    except Exception as exc:  # noqa: BLE001 — a bad outcomes row must not cost the report
+        return f"Outcomes: unavailable ({type(exc).__name__})."
+
+
+def write_report(services, base: dict, dev: SuiteResult | None, verdict: dict | None, waiting: str = "") -> None:
     """craft/eval-report.md: what she can learn from. Dev in full; held-out as a count only."""
+    from agent import outcomes
+
     lines = ["# Eval report", "", f"Updated {_now()} by the brain. Model `{base.get('model')}`.", "",
              f"Accepted craft v{base.get('version')}: dev {base.get('dev')}/{base.get('dev_n')}, "
-             f"held-out {base.get('heldout')}/{base.get('heldout_n')}.", ""]
+             f"held-out {base.get('heldout')}/{base.get('heldout_n')}.", "",
+             "The eval is a floor: a candidate is accepted unless it is clearly worse than accepted craft has "
+             "scored on the same tasks across all nights. An accepted version then goes on a "
+             f"{outcomes.TRIAL_DAYS}-day outcomes trial and is reverted if the outcome score falls.", "",
+             _outcomes_line(services), ""]
+    if waiting:
+        lines += [f"Candidate: **waiting** ({waiting}).", ""]
     if verdict is not None:
         lines += [f"Last candidate: **{'accepted' if verdict['accepted'] else 'rejected'}** ({verdict['reason']}).", ""]
     rows = [_public(r, full=True) for r in dev.results] if dev is not None else base.get("dev_results") or []

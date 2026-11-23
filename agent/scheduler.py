@@ -52,6 +52,8 @@ EVAL_AT = "23:15"
 # The image disk (/tmp, her ~/.cache, the eval venvs) is ~8 GB and not backed up. On 2026-10-24 her
 # scratch filled it and the eval scored 0. Before the eval, if it's low, clear her old scratch.
 TIDY_AT = "23:05"
+# Once a day, before she wakes, the brain counts what reached anyone outside (agent/outcomes.py).
+OUTCOMES_AT = "06:40"
 TIDY_BELOW_BYTES = 2_500_000_000
 TIDY_DAYS = 2
 TIDY_CMD = ("find /tmp -mindepth 1 -maxdepth 1 -user chris -mtime +{days} -exec rm -rf {{}} + ; "
@@ -165,6 +167,23 @@ def git_pull(repo_dir: str | Path, run=gitops.git, on_conflict: Callable[[str], 
             log.warning("git pull skipped: a rebase is already half-done; leaving it alone")
             return False
         r = run(repo, "pull", "--rebase", "--quiet", check=False)
+        if getattr(r, "returncode", 0) != 0 and gitops.rebase_in_progress(repo, run):
+            # Replaying old commits one by one can conflict where the end results merge cleanly
+            # (10-29 to 11-23: one appended test). Abort and try a merge once before giving up.
+            run(repo, "rebase", "--abort", check=False)
+            mg = run(repo, "merge", "--no-edit", "--quiet", "@{u}", check=False)
+            if getattr(mg, "returncode", 0) == 0:
+                return True
+            run(repo, "merge", "--abort", check=False)
+            reason = ("git pull at 06:55 conflicted with the parents' commits (both rebase and merge) and was "
+                      "aborted; the repo is back on its branch, their commits have NOT landed, and pushes will "
+                      "be skipped until a parent merges by hand. "
+                      + (str(getattr(r, "stderr", "") or "").strip() + " "
+                         + str(getattr(mg, "stderr", "") or "").strip())[:300]).strip()
+            log.warning(reason)
+            if on_conflict is not None:
+                on_conflict(reason)
+            return False
     except Exception as exc:  # noqa: BLE001 — git missing, timeout
         log.warning("git pull failed: %s", exc)
         return False
@@ -231,6 +250,22 @@ def make_scheduler(services, run_sitting, run_sleep) -> AsyncIOScheduler:
         await asyncio.to_thread(tidy_disk, services)
 
     add(tidy, cron(TIDY_AT), "tidy", "disk tidy")
+
+    async def count_outcomes() -> None:
+        from agent import outcomes
+
+        try:
+            await asyncio.to_thread(outcomes.record_daily, services)
+        except Exception as exc:  # noqa: BLE001 — a failed count must never take the brain down
+            log.warning("outcomes count failed: %s", exc)
+        try:
+            outcomes.judge_trials(services)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("craft trial not judged: %s", exc)
+            services.archive.append("craft_trial_failed", {"kind": "craft_trial_failed",
+                                                           "error": f"{type(exc).__name__}: {str(exc)[:200]}"})
+
+    add(count_outcomes, cron(OUTCOMES_AT), "outcomes", "daily outcomes count")
     add(guarded(services, run_sitting, services, "sunday", name="sunday"),
         cron(SUNDAY_SITTING, "sun"), "sunday", "sunday letter")
     add(guarded(services, run_sleep, services, name="sleep"), cron(cfg.sleep), "sleep", "sleep")

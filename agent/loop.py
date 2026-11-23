@@ -124,6 +124,29 @@ def inbox_subjects(mail) -> list[str]:
     return subjects
 
 
+def open_commitments(text: str) -> str:
+    """The commitments file without closed rows and without its log.
+
+    The whole file grew to 168 KB (2026-11-23), most of it closed rows and compliance logs, and it went
+    into every sitting: about 40k tokens of re-reading before any work. Rules and open rows are what a
+    sitting has to keep; the full file stays in the repo.
+    """
+    head, sep, _log = text.partition("\n## Log")
+    out, dropped = [], 0
+    for ln in head.splitlines():
+        if ln.startswith("| ") and not ln.startswith("| #") and not ln.startswith("|---"):
+            cells = [c.strip() for c in ln.strip().strip("|").split("|")]
+            if len(cells) >= 5 and cells[4].lstrip("*").upper().startswith("CLOSED"):
+                dropped += 1
+                continue
+        out.append(ln)
+    note = []
+    if dropped or sep:
+        note = ["", f"*({dropped} closed rows{' and the log' if sep else ''} left out of this prompt; "
+                    "the full file is memory/wiki/self/commitments.md.)*"]
+    return "\n".join(out + note)
+
+
 def compose_user_prompt(services, kind: str) -> str:
     repo = services.repo_dir
     parts = [_read(PROMPTS / PROMPT_FILE[kind]).rstrip(), "---"]
@@ -137,7 +160,8 @@ def compose_user_prompt(services, kind: str) -> str:
     if (self_dir / "commitments.md").exists():
         # Promises to others live in their own file, not in plan lines (Cairn's advice, 2026-09-09):
         # a promise kept only in a handoff dies in a paraphrase. Read before anything goes out.
-        parts.append("## memory/wiki/self/commitments.md\n" + _rread(services, self_dir / "commitments.md").rstrip())
+        parts.append("## memory/wiki/self/commitments.md (open rows only)\n"
+                     + open_commitments(_rread(services, self_dir / "commitments.md")).rstrip())
     try:
         craft.bootstrap(services)
         craft_block = craft.render(services)

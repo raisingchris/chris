@@ -17,9 +17,12 @@ they are listed from the working copy.
 from __future__ import annotations
 
 import json
+import logging
 import shutil
 from datetime import datetime
 from pathlib import Path
+
+log = logging.getLogger("chris.craft")
 
 CRAFT = Path("craft")
 APPROACH = "approach.md"
@@ -231,11 +234,91 @@ def accept(services, record: dict) -> int:
         same = prev is not None and prev["text"] == b["text"]
         b["helpful"], b["harmful"] = (prev["helpful"], prev["harmful"]) if same else (0, 0)
     acc.mkdir(parents=True, exist_ok=True)
+    prev = int(version(services).get("version", 0) or 0)
+    _save_history(services, prev)
     (acc / APPROACH).write_text(_read(src / APPROACH), encoding="utf-8")
     _write_playbook(acc / PLAYBOOK, new)
-    n = int(version(services).get("version", 0) or 0) + 1
+    n = prev + 1
     _write_version(services, n, "accepted by eval")
     log_lineage(services, {**record, "verdict": "accepted", "version": n})
+    _start_trial(services, n, prev)
+    return n
+
+
+# --- history and trials (outcomes decide whether an accepted version stays) ---------
+
+def _history_dir(services, v: int) -> Path:
+    return Path(services.state_dir) / "craft" / "history" / f"v{int(v)}"
+
+
+def _save_history(services, v: int) -> None:
+    """Keep a copy of accepted version ``v`` so an outcome trial can go back to it."""
+    acc, dest = accepted_dir(services), _history_dir(services, v)
+    dest.mkdir(parents=True, exist_ok=True)
+    for name in (APPROACH, PLAYBOOK):
+        if (acc / name).exists():
+            shutil.copyfile(acc / name, dest / name)
+
+
+def _trial_path(services) -> Path:
+    return Path(services.state_dir) / "craft" / "trial.json"
+
+
+def trial(services) -> dict:
+    try:
+        return json.loads(_trial_path(services).read_text()) or {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def _start_trial(services, v: int, previous: int) -> None:
+    p = _trial_path(services)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps({"version": v, "previous": previous,
+                             "accepted_on": datetime.now().astimezone().date().isoformat()}))
+
+
+def end_trial(services, verdict: str, detail: dict) -> None:
+    t = trial(services)
+    if not t:
+        return
+    t.update(verdict=verdict, detail=detail, ended=datetime.now().astimezone().isoformat(timespec="seconds"))
+    _trial_path(services).write_text(json.dumps(t))
+    log_lineage(services, {"verdict": f"trial {verdict}", "version": t.get("version"), **detail})
+
+
+def reverted_snapshot(services) -> dict:
+    """The content an outcomes trial last threw out ({} if none)."""
+    try:
+        return json.loads((Path(services.state_dir) / "craft" / "reverted.json").read_text()) or {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def revert(services, to_v: int, why: str) -> int:
+    """Put accepted version ``to_v`` back (as a new version number); returns the new number."""
+    src, acc = _history_dir(services, to_v), accepted_dir(services)
+    if not (src / APPROACH).exists() and not (src / PLAYBOOK).exists():
+        raise CraftError(f"no saved copy of v{to_v}")
+    rejected = snapshot(acc)
+    acc.mkdir(parents=True, exist_ok=True)
+    for name in (APPROACH, PLAYBOOK):
+        if (src / name).exists():
+            shutil.copyfile(src / name, acc / name)
+    # Her working copy goes back too, or the reverted change is the next night's candidate again.
+    wd = working_dir(services)
+    try:
+        wd.mkdir(parents=True, exist_ok=True)
+        for name in (APPROACH, PLAYBOOK):
+            if (acc / name).exists():
+                shutil.copyfile(acc / name, wd / name)
+    except OSError as exc:
+        log.warning("working copy not reset after revert: %s", exc)
+    p = Path(services.state_dir) / "craft" / "reverted.json"
+    p.write_text(json.dumps(rejected))
+    n = int(version(services).get("version", 0) or 0) + 1
+    _write_version(services, n, f"reverted to v{to_v}: {why}")
+    log_lineage(services, {"verdict": "reverted", "version": n, "to": to_v, "reason": why})
     return n
 
 

@@ -57,6 +57,7 @@ class Config:
     eval_usd_week: float = 40.0
     eval_task_usd: float = 1.5
     eval_fix_task_usd: float = 3.0
+    github_user: str = "raisingchris2026"
     # Addresses on her domain that belong to her parents as account owners (e.g. the owner login for a
     # service that needs a human to claim her). Mail to these goes to the parents, never to her inbox.
     owner_aliases: list[str] = field(default_factory=lambda: ["owner@raisingchris.com"])
@@ -96,6 +97,7 @@ class Config:
             eval_usd_week=float(g("EVAL_USD_WEEK", "40")),
             eval_task_usd=float(g("EVAL_TASK_USD", "1.5")),
             eval_fix_task_usd=float(g("EVAL_FIX_TASK_USD", "3")),
+            github_user=g("GITHUB_USER", "raisingchris2026"),
             owner_aliases=[a.lower() for a in _csv(g("OWNER_ALIASES", "owner@raisingchris.com"))],
         )
 

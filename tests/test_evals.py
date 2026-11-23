@@ -224,7 +224,7 @@ def test_nightly_rejects_a_candidate_that_drops_dev_without_running_heldout(svc,
     evals.request(svc)
     n = len(s.calls)
     out = asyncio.run(evals.nightly(svc, clock=NIGHT))
-    assert out["accepted"] is False and out["reason"] == "dev 0 < 2"
+    assert out["accepted"] is False and out["reason"] == "dev 0 < 2"  # too little history: old rule
     assert [c[0] for c in s.calls[n:]] == ["dev", "dev"]
     assert craft.version(svc)["version"] == 0 and "Skip" not in craft.render(svc)
     rec = json.loads((svc.repo_dir / "governance" / "lineage.jsonl").read_text().splitlines()[-1])
@@ -524,3 +524,93 @@ def test_public_dev_view_alone_loads_no_tasks(svc, monkeypatch, tmp_path):
     monkeypatch.setattr(evals, "APP_EVALS", app)
     assert evals.load_tasks(svc, "dev") == []
     assert asyncio.run(evals.nightly(svc, clock=NIGHT))["skipped"] == "no tasks"
+
+
+def _lucky_history(svc, nights=8):
+    """Accepted craft over many nights: dev-1 always passes, dev-2 half the time, held-1 always, held-2 never."""
+    with open(evals.eval_state(svc) / "results.jsonl", "a") as f:
+        for i in range(nights):
+            for tid, ok in (("dev-1", True), ("dev-2", i % 2 == 0), ("held-1", True), ("held-2", False)):
+                f.write(json.dumps({"label": "accepted-v0", "id": tid, "passed": ok, "note": ""}) + "\n")
+
+
+def test_floor_accepts_a_candidate_that_only_loses_a_coin_flip(svc, monkeypatch, tmp_path):
+    # 2026-11-23: one lucky baseline night (5/6) rejected six candidates in a row. Against the history
+    # of accepted craft, losing a task that passes half the time is not "clearly worse".
+    write_tasks(svc, monkeypatch, tmp_path)
+    s = Scripted(lambda task, text: task.id in ("dev-1", "dev-2", "held-1") and "Skip" not in text
+                 or (task.id in ("dev-1", "held-1") and "Skip" in text))
+    monkeypatch.setattr(evals, "attempt", s)
+    asyncio.run(evals.nightly(svc, clock=NIGHT))  # baseline: dev 2/2, held 1/2 (a lucky dev night)
+    _lucky_history(svc)
+    (svc.repo_dir / "craft" / "approach.md").write_text("1. Skip the second look.\n")
+    evals.request(svc)
+    out = asyncio.run(evals.nightly(svc, clock=NIGHT))
+    assert out["accepted"] is True, out
+    assert "expected" in out["reason"]
+    t = craft.trial(svc)
+    assert t["version"] == 1 and t["previous"] == 0 and not t.get("verdict")
+
+
+def test_floor_rejects_a_candidate_clearly_worse_than_history(svc, monkeypatch, tmp_path):
+    write_tasks(svc, monkeypatch, tmp_path)
+    s = Scripted(lambda task, text: "Skip" not in text and task.id != "held-2")
+    monkeypatch.setattr(evals, "attempt", s)
+    asyncio.run(evals.nightly(svc, clock=NIGHT))
+    _lucky_history(svc)
+    (svc.repo_dir / "craft" / "approach.md").write_text("1. Skip everything.\n")
+    evals.request(svc)
+    out = asyncio.run(evals.nightly(svc, clock=NIGHT))
+    assert out["accepted"] is False and "clearly worse" in out["reason"]
+
+
+def test_a_candidate_waits_while_a_trial_runs(svc, monkeypatch, tmp_path):
+    write_tasks(svc, monkeypatch, tmp_path)
+    s = Scripted(lambda task, text: True)
+    monkeypatch.setattr(evals, "attempt", s)
+    asyncio.run(evals.nightly(svc, clock=NIGHT))
+    (svc.state_dir / "craft").mkdir(exist_ok=True)
+    (svc.state_dir / "craft" / "trial.json").write_text(json.dumps(
+        {"version": 0, "previous": 0, "accepted_on": "2026-10-20"}))
+    (svc.repo_dir / "craft" / "approach.md").write_text("1. Something new.\n")
+    evals.request(svc)
+    n = len(s.calls)
+    out = asyncio.run(evals.nightly(svc, clock=NIGHT))
+    assert out["candidate"] == "waiting for trial" and len(s.calls) == n
+    assert evals.requested(svc)  # it runs once the trial is over
+    assert "waiting" in (svc.repo_dir / "craft" / "eval-report.md").read_text()
+
+
+def test_p_at_most_is_the_poisson_binomial_tail():
+    assert abs(evals.p_at_most(0, [0.5, 0.5]) - 0.25) < 1e-9
+    assert abs(evals.p_at_most(1, [0.5, 0.5]) - 0.75) < 1e-9
+    assert evals.p_at_most(2, [0.5, 0.5]) == 1.0
+
+
+def test_accepted_candidate_results_join_the_history(svc, monkeypatch, tmp_path):
+    write_tasks(svc, monkeypatch, tmp_path)
+    monkeypatch.setattr(evals, "attempt", Scripted(lambda t, x: True))
+    asyncio.run(evals.nightly(svc, clock=NIGHT))
+    (svc.repo_dir / "craft" / "approach.md").write_text("1. Better.\n")
+    evals.request(svc)
+    assert asyncio.run(evals.nightly(svc, clock=NIGHT))["accepted"] is True
+    assert evals.pass_rates(svc)["dev-1"] == (2, 2)
+
+
+def test_reverted_craft_cannot_come_straight_back(svc, monkeypatch, tmp_path):
+    write_tasks(svc, monkeypatch, tmp_path)
+    s = Scripted(lambda t, x: True)
+    monkeypatch.setattr(evals, "attempt", s)
+    asyncio.run(evals.nightly(svc, clock=NIGHT))
+    (svc.repo_dir / "craft" / "approach.md").write_text("1. The idea that hurt.\n")
+    evals.request(svc)
+    assert asyncio.run(evals.nightly(svc, clock=NIGHT))["accepted"] is True
+    craft.revert(svc, 0, "outcomes fell")
+    assert "Reproduce first" in (svc.repo_dir / "craft" / "approach.md").read_text()  # working copy reset
+    (svc.repo_dir / "craft" / "approach.md").write_text("1. The idea that hurt.\n")  # she puts it back
+    craft.end_trial(svc, "revert", {"why": "test"})
+    asyncio.run(evals.nightly(svc, clock=NIGHT))  # re-baseline for the new version number
+    evals.request(svc)
+    n = len(s.calls)
+    out = asyncio.run(evals.nightly(svc, clock=NIGHT))
+    assert out["candidate"] == "reverted content" and len(s.calls) == n

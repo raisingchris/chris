@@ -8,8 +8,9 @@ from agent.scheduler import git_pull
 class PullGit:
     """Fake git: scripted pull rc; a ``rebase-merge`` marker dir that a failed pull leaves behind."""
 
-    def __init__(self, tmp_path, pull_rc=0, marker_before=False):
+    def __init__(self, tmp_path, pull_rc=0, marker_before=False, merge_rc=1):
         self.calls = []
+        self.merge_rc = merge_rc
         self.marker = tmp_path / ".git" / "rebase-merge"
         self.pull_rc = pull_rc
         if marker_before:
@@ -27,6 +28,9 @@ class PullGit:
             return SimpleNamespace(stdout="", stderr=err, returncode=self.pull_rc)
         if args == ("rebase", "--abort"):
             self.marker.rmdir()
+        if args[:1] == ("merge",) and args[1:2] != ("--abort",):
+            return SimpleNamespace(stdout="", stderr="CONFLICT (merge)" if self.merge_rc else "",
+                                   returncode=self.merge_rc)
         return SimpleNamespace(stdout="", stderr="", returncode=0)
 
 
@@ -52,6 +56,18 @@ def test_pull_conflict_aborts_the_rebase_it_started_and_tells_her(tmp_path):
     assert ("rebase", "--abort") in git.calls
     assert not git.marker.exists()  # back on the branch: the day's commits will not be dropped
     assert len(notes) == 1 and "aborted" in notes[0] and "README.md" in notes[0]
+    assert ("merge", "--abort") in git.calls  # the merge was tried once and left clean
+
+
+def test_pull_falls_back_to_a_merge_when_only_the_rebase_conflicts(tmp_path):
+    # 10-29 to 11-23: replaying one old commit conflicted every morning, though the trees merged cleanly.
+    repo = _repo(tmp_path)
+    git = PullGit(repo, pull_rc=1, merge_rc=0)
+    notes = []
+    assert git_pull(repo, git, notes.append) is True
+    assert ("rebase", "--abort") in git.calls
+    assert ("merge", "--no-edit", "--quiet", "@{u}") in git.calls
+    assert not git.marker.exists() and notes == []
 
 
 def test_pull_leaves_someone_elses_half_done_rebase_alone(tmp_path):
