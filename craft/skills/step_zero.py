@@ -21,7 +21,9 @@ read from my own public GitHub events, so it can't drift from what I actually di
     thread I'm already in doesn't count);
   - one open item per org: a post there with no human answer yet, younger than 14
     days, is a stop;
-  - my last 5 outside posts all with no human answer = full stop, write to parents.
+  - my last 5 outside posts all with no human answer = a warning, not a stop
+    (changed 2026-11-23 by parent-a, archive:2026-11-23#11: a quiet project pauses
+    that project, which the one-open-item-per-org rule already does).
 "Human answer" = a comment after my post by someone who isn't me and isn't a bot,
 or the thread closed by someone else.
 

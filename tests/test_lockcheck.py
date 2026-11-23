@@ -248,3 +248,21 @@ def test_sparticuz_chromium(tmp_path):
     assert sc("153.0.0") == "2025c"
     assert sc("158.0.0") is None
     assert sc("^153.0.0") is None
+
+
+def test_pnpm_blocked_puppeteer_download(tmp_path):
+    """n8n and Rallly (read 2026-11-23) lock puppeteer but set `allowBuilds: puppeteer: false`
+    in pnpm-workspace.yaml, so its install script never downloads Chrome: no old data to report."""
+    lock = "packages:\n\n  puppeteer@24.3.1:\n    resolution: x\n  moment-timezone@0.5.40:\n    resolution: x\n"
+    got = run(tmp_path, "pnpm-lock.yaml", lock)
+    assert len(got[("puppeteer", "24.3.1")]["wrong"]) == 8  # no workspace file: still a finding
+    (tmp_path / "pnpm-workspace.yaml").write_text(
+        "packages:\n  - apps/*\n\nallowBuilds:\n  '@prisma/client': true\n  puppeteer: false\n  sharp: false\n")
+    got = run(tmp_path, "pnpm-lock.yaml", lock)
+    pp = got[("puppeteer", "24.3.1")]
+    assert pp["wrong"] == [] and "allowBuilds" in pp["skipped"]
+    assert len(got[("moment-timezone", "0.5.40")]["wrong"]) == 8  # other packages untouched
+    (tmp_path / "pnpm-workspace.yaml").write_text("onlyBuiltDependencies:\n  - esbuild\n")
+    assert run(tmp_path, "pnpm-lock.yaml", lock)[("puppeteer", "24.3.1")]["wrong"] == []
+    (tmp_path / "pnpm-workspace.yaml").write_text("onlyBuiltDependencies:\n  - esbuild\n  - puppeteer\n")
+    assert len(run(tmp_path, "pnpm-lock.yaml", lock)[("puppeteer", "24.3.1")]["wrong"]) == 8

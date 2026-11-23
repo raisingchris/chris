@@ -359,6 +359,42 @@ def norm(eco, name):
     return name.lower().replace("_", "-") if eco == "pypi" else name
 
 
+# Packages whose old data only arrives through their own install script (a download).
+DOWNLOADS_AT_INSTALL = {"puppeteer"}
+
+
+def pnpm_blocks_install(lockpath, name):
+    """Does a pnpm-workspace.yaml beside this pnpm-lock.yaml stop `name`'s install script?
+    Added 2026-11-23: n8n and Rallly lock puppeteer with `allowBuilds: puppeteer: false`,
+    so no Chrome is downloaded. Returns the reason, or None."""
+    if os.path.basename(lockpath) != "pnpm-lock.yaml":
+        return None
+    ws = os.path.join(os.path.dirname(lockpath) or ".", "pnpm-workspace.yaml")
+    if not os.path.isfile(ws):
+        return None
+    with open(ws, encoding="utf-8", errors="replace") as fh:
+        text = fh.read()
+    blocks, key = {}, None
+    for line in text.splitlines():
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        if not line[0].isspace():
+            key = line.split(":", 1)[0].strip()
+            blocks.setdefault(key, [])
+        elif key:
+            blocks[key].append(line.strip())
+    def names(lines):
+        return {l.lstrip("- ").split(":", 1)[0].strip().strip("'\"") for l in lines}
+    if any(re.fullmatch(r"'?%s'?\s*:\s*false" % re.escape(name), l) for l in blocks.get("allowBuilds", [])):
+        return "pnpm-workspace.yaml sets allowBuilds: %s: false, so its install script (the download) doesn't run" % name
+    for k in ("neverBuiltDependencies", "ignoredBuiltDependencies"):
+        if name in names(blocks.get(k, [])):
+            return "pnpm-workspace.yaml lists %s under %s, so its install script (the download) doesn't run" % (name, k)
+    if "onlyBuiltDependencies" in blocks and name not in names(blocks["onlyBuiltDependencies"]):
+        return "pnpm-workspace.yaml has onlyBuiltDependencies without %s, so its install script (the download) doesn't run" % name
+    return None
+
+
 def check_file(path):
     reader = reader_for(os.path.basename(path), loose=True)
     if reader is None:
@@ -384,10 +420,14 @@ def check_file(path):
                 "check its data by hand", "wrong": [],
             })
             continue
-        findings.append({
+        finding = {
             "file": path, "ecosystem": eco, "package": name, "version": version,
             "where": where, "data": data, "wrong": wrong_zones(data), "note": hit[1],
-        })
+        }
+        skipped = pnpm_blocks_install(path, name) if name in DOWNLOADS_AT_INSTALL else None
+        if skipped:
+            finding.update(wrong=[], skipped=skipped)
+        findings.append(finding)
     return findings
 
 
@@ -413,6 +453,10 @@ def main(argv=None):
                 continue
             if "unknown" in r:
                 print("%s\n  %s %s (%s)  %s" % (r["file"], r["package"], r["version"], r["where"], r["unknown"]))
+                continue
+            if r.get("skipped"):
+                print("%s\n  %s %s (%s)  data %s if downloaded; skipped: %s" % (
+                    r["file"], r["package"], r["version"], r["where"], r["data"], r["skipped"]))
                 continue
             verdict = "OK" if not r["wrong"] else (
                 "ALL EIGHT WRONG" if len(r["wrong"]) == len(FIXES)
