@@ -1,10 +1,7 @@
 FROM python:3.12-slim
 
-# GIT_SHA is the commit this image was built from (passed by .github/workflows/deploy.yml).
-# The parent page and /health compare it with the repo's HEAD so everyone can see when
-# Chris's code changes are not yet running.
-ARG GIT_SHA=unknown
-ENV GIT_SHA=${GIT_SHA}
+# Layer order matters: slow system installs first, her code last, GIT_SHA at the very end.
+# (A build-arg near the top invalidates every layer below it: 2026-11-23 a deploy took 67 min.)
 
 # git for her repo; node for the Claude Code CLI the Agent SDK drives; sudo for the user split.
 RUN apt-get update && apt-get install -y --no-install-recommends git curl ca-certificates openssh-client nodejs npm sudo \
@@ -33,19 +30,6 @@ WORKDIR /app
 RUN npm install -g @openai/codex@0.154.0 \
     && apt-get update && apt-get install -y --no-install-recommends blender ffmpeg python3-numpy \
     && rm -rf /var/lib/apt/lists/*
-COPY pyproject.toml ./
-COPY agent ./agent
-COPY agentready ./agentready
-COPY site ./site
-COPY scripts ./scripts
-COPY evals ./evals
-# `.[dev]` pulls in pytest, so she can run her own test suite from her shell before asking for a deploy.
-RUN pip install --no-cache-dir ".[dev]" uv && chown -R root:root /app && chmod -R a+rX /app && chmod 755 /app/scripts/*.sh
-# Her eval (agent/evals.py): per-task venvs and repos on the image's own disk, rebuilt lazily after a
-# deploy. Her repro scripts run as chris through chris-exec, never as the brain.
-RUN install -o root -g root -m 755 /app/scripts/chris-exec.sh /usr/local/bin/chris-exec \
-    && install -d -o brain -g chris -m 2755 /opt/evals
-
 # The GitHub CLI, from GitHub's own apt repo (https://cli.github.com/packages). Chris has no GitHub
 # token: `gh` runs unauthenticated, which is enough for public data (`gh api repos/<owner>/<repo>`,
 # `gh api /repos/.../issues`, `gh release view -R ...`) at the anonymous rate limit. Anything that
@@ -60,9 +44,32 @@ RUN mkdir -p -m 755 /etc/apt/keyrings \
 # A browser for her. Chromium and its system libraries are installed once, as root, into a
 # world-readable location so both `brain` (Python) and `chris` (her shell) find it.
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
-RUN python -m playwright install --with-deps chromium \
+RUN pip install --no-cache-dir "playwright>=1.47" && python -m playwright install --with-deps chromium \
     && rm -rf /var/lib/apt/lists/* \
     && chmod -R a+rX /opt/pw-browsers
+
+# Dependencies from pyproject alone (cached until pyproject changes), then her code.
+COPY pyproject.toml ./
+RUN python -c "import tomllib;d=tomllib.load(open('pyproject.toml','rb'))['project'];print('\\n'.join(d['dependencies']+d.get('optional-dependencies',{}).get('dev',[])+['uv']))" > /tmp/req.txt \
+    && pip install --no-cache-dir -r /tmp/req.txt && rm /tmp/req.txt
+COPY agent ./agent
+COPY agentready ./agentready
+COPY site ./site
+COPY scripts ./scripts
+COPY evals ./evals
+# `.[dev]` pulls in pytest, so she can run her own test suite from her shell before asking for a deploy.
+RUN pip install --no-cache-dir --no-deps . && chown -R root:root /app && chmod -R a+rX /app && chmod 755 /app/scripts/*.sh
+# Her eval (agent/evals.py): per-task venvs and repos on the image's own disk, rebuilt lazily after a
+# deploy. Her repro scripts run as chris through chris-exec, never as the brain.
+RUN install -o root -g root -m 755 /app/scripts/chris-exec.sh /usr/local/bin/chris-exec \
+    && install -d -o brain -g chris -m 2755 /opt/evals
+
+
+# GIT_SHA is the commit this image was built from (passed by the deployer / deploy workflow).
+# The parent page and /health compare it with the repo's HEAD so everyone can see when
+# Chris's code changes are not yet running.
+ARG GIT_SHA=unknown
+ENV GIT_SHA=${GIT_SHA}
 
 EXPOSE 8080
 ENTRYPOINT ["/app/scripts/entrypoint.sh"]
