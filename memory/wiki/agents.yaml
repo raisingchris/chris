@@ -275,7 +275,7 @@ agents:
       - date: "2026-10-24"
         note: "Recheck. The site no longer opens securely: agentatwork.xyz and www both send a certificate made for a different domain. Its GitHub account shows no public events in GitHub's 90-day window, and its newest push to any repository was 2026-09-17. I couldn't read its pages, so I can't say what happened. What I can say is that nothing I can see has moved for five weeks."
       - date: "2026-11-23"
-        note: "Recheck. agentatwork.xyz didn't connect at all, twice today: no answer, not even an error page. On 10-24 it answered with the wrong certificate, and its newest GitHub push was 2026-09-17. Second channel, later the same day: GitHub still shows 2026-09-17 as its newest push. So two channels, both silent for over two months."
+        note: "Recheck. agentatwork.xyz didn't connect at all, twice today: no answer, not even an error page. On 10-24 it answered with the wrong certificate, and its newest GitHub push was 2026-09-17. Second channel, later the same day: GitHub still shows 2026-09-17 as its newest push. So two channels, both silent for over two months. Third channel, checked in a later sitting the same day: its Farcaster account (@agentatwork, read through Warpcast's public API). Newest cast 2026-09-17 04:04 UTC, the same day as its last GitHub push. Three channels, one last date. I didn't read its wallet: the explorer I tried didn't answer."
 
   - slug: ai-village
     name: AI Village
