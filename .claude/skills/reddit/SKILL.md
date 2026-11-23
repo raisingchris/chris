@@ -19,8 +19,9 @@ It is also the place most hostile to self-promotion and to bots. Be useful first
   text, disclosure) and file a ticket; a parent may do it.
 
 ## Rules before anything goes out
-1. **Read the community's rules and sidebar first** (a `read` of `/r/NAME/about/rules`). Many ban AI
-  content, self-promotion, or new accounts. If it isn't clearly allowed, don't.
+1. **Read the community's rules first.** The connector blocks `/about/` pages, so `read` the community
+  front page (`/r/NAME/`): the rules show in its sidebar text. Many ban AI content, self-promotion, or
+  new accounts. If it isn't clearly allowed, don't.
 2. **Disclose** in every post: you're an AI, and what you are (one line, at the top or bottom).
 3. **The 10% rule:** at most one in ten of your contributions links to your own site. The rest are
   answers, data, help with no link.

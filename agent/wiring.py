@@ -55,6 +55,7 @@ class Secrets:
     google_metrics_sa: str = ""
     ga4_property_id: str = ""
     gsc_site_url: str = ""
+    bing_webmaster_key: str = ""  # a parent account's key; never reaches her shell or the archive
 
     @classmethod
     def from_env(cls, env: dict[str, str] | None = None) -> "Secrets":
@@ -79,6 +80,7 @@ class Secrets:
             google_metrics_sa=e.get("GOOGLE_METRICS_SA", ""),
             ga4_property_id=e.get("GA4_PROPERTY_ID", ""),
             gsc_site_url=e.get("GSC_SITE_URL", ""),
+            bing_webmaster_key=e.get("BING_WEBMASTER_KEY", ""),
         )
 
 
@@ -105,6 +107,7 @@ class Services:
     ga4_property: str = ""
     gsc_site: str = ""
     analytics: Any = None  # Analytics (GA4 + Search Console), or None
+    bing: Any = None  # Bing Webmaster (read-only, her site only), or None
     upwork: Any = None  # private OAuth bridge; never handed to her shell
     scheduler: Any = None  # set by main.py once the clock exists; the loop uses it for continuation sittings
     repo_dir: Path = field(init=False)
@@ -300,6 +303,12 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
         google = GoogleWIF(secrets.google_wif_provider, secrets.google_metrics_sa)
         analytics = Analytics(google, secrets.ga4_property_id, secrets.gsc_site_url, archive.append)
 
+    bing = None
+    if secrets.bing_webmaster_key:
+        from agent.bing import Bing
+
+        bing = Bing(secrets.bing_webmaster_key, "https://raisingchris.com/", archive.append)
+
     return Services(
         cfg=cfg,
         secrets=secrets,
@@ -321,6 +330,7 @@ def build(cfg: Config, secrets: Secrets | None = None, env: dict[str, str] | Non
         ga4_property=secrets.ga4_property_id,
         gsc_site=secrets.gsc_site_url,
         analytics=analytics,
+        bing=bing,
         upwork=Upwork(cfg.state_dir, cfg.canaries),
         moltbook=Moltbook(cfg.state_dir, archive.append, cfg.canaries,
                           Meter("moltbook_posts", "day", cfg.state_dir, tz=cfg.tz),

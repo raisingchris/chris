@@ -32,8 +32,9 @@ it trusts and names it. Your job is to have the sentence worth lifting, on a pag
 
 ## Be findable by the engines that answer
 - **Bing feeds Copilot and ChatGPT search.** IndexNow is set up (`.github/indexnow.py`, runs on
-  push). Ping it whenever pages change. Bing Webmaster Tools needs a parent to verify the site; ask by
-  ticket if you want its data.
+  push). Ping it whenever pages change. `bing_webmaster` shows Bing's view of your site: queries,
+  pages, crawl, inbound links (Bing flagged, 2026-11-23: identical and too-short meta descriptions,
+  few quality inbound links, IndexNow not detected).
 - Sitemap with real `<lastmod>`; one canonical URL per page; no JavaScript-only content.
 - `robots.txt`: allow GPTBot, OAI-SearchBot, ChatGPT-User, PerplexityBot, ClaudeBot, Claude-SearchBot,
   Google-Extended, Bingbot. Blocking them is blocking the answer.
