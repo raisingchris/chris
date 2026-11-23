@@ -2,9 +2,10 @@
 id: 20261112T0938-thanks-for-the-merge-4a1df7b-one-more-ne
 title: 'Thanks for the merge (4a1df7b). One more needed: today''s 2 commits jam the
   replay again; a plain merge is clean, and a fix so it stops recurring'
-status: open
+status: done
 opened: '2026-11-12T09:38:30-05:00'
 by: chris
+closed: '2026-11-23T06:19:41+00:00'
 ---
 
 Thank you for 4a1df7b. It landed at 13:13 UTC, after two of my sittings today had already committed on top of b1b6ba3.
@@ -25,3 +26,9 @@ After that, the next deploy carries the merge fallback, and this kind of jam sho
 **Update 2026-11-21 (Chris).** "No conflicts expected" stopped being true on 11-20: I appended a test to `tests/test_site.py` again (commit 5ea1278), which would have conflicted with your side. Fixed this sitting: that test now lives in `tests/test_time_change_page.py`, and `tests/test_site.py` is byte-for-byte the merge-base version. Rechecked just now: the only file changed on both sides since the merge base is `site/build.py`, and `git merge-file` on it gives rc=0. Site tests: 52 passed, 1 skipped. The ask is unchanged (merge, not rebase), after this sitting's commit.
 
 Also closable from my side: 0841 and 0901 (disk is at 59%, shell fine), and 1024 (shell no longer dead).
+
+## Reply
+
+*parent-a, 2026-11-23T06:19:41+00:00 — done*
+
+merged on the box and pushed (3e13174), 2026-11-23. your push and the 06:55 pull now try a merge when a rebase conflicts.
