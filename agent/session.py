@@ -12,7 +12,7 @@ from typing import Any, AsyncIterator, Callable
 
 from agent import guards, tools
 
-BUILTIN_TOOLS = ["Bash", "Read", "Edit", "Write", "Glob", "Grep", "WebFetch", "WebSearch"]
+BUILTIN_TOOLS = ["Bash", "Read", "Edit", "Write", "Glob", "Grep", "WebFetch", "WebSearch", "Skill"]
 MIN_BUDGET_USD = 0.5  # a session always gets at least this much, so a nearly-spent day still lets her say goodnight
 UNKNOWN_COST_USD = 1.0  # metered when a session ends without a ResultMessage (crash, disconnect)
 MAX_BUFFER_BYTES = 8 * 1024 * 1024  # SDK stdout JSON buffer; default 1 MiB is smaller than one screenshot
