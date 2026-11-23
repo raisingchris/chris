@@ -40,7 +40,7 @@ FILES = [
 
 WORDS = re.compile(
     r'\b(AI|LLM|agents?|bots?|Claude|Copilot|ChatGPT|GPT|autonomous|generated|'
-    r'human|responsib\w*|accountab\w*|named|forbidden|not (?:be )?accepted|'
+    r'human\w*|instead of the user|on behalf|responsib\w*|accountab\w*|named|forbidden|not (?:be )?accepted|'
     r'ban\w*|disclos\w*|assign\w*|sign-?off|DCO|CLA)\b', re.I)
 
 Fetch = Callable[[str], 'str | None']
@@ -95,7 +95,21 @@ def scan(repo: str, ref: str = 'HEAD', fetch: Fetch = gh_fetch) -> dict[str, str
                 found[f'{name} -> {target}'] = real
         else:
             found[name] = text
+    # A rule file can point to another file that holds the actual rule (dask's
+    # AGENTS.md names `.agents/skills/open-pr/SKILL.md`, where the
+    # "[unsupervised AI]" prefix lives; missed 2026-11-04). Read those too.
+    for text in list(found.values()):
+        for path in REF.findall(text)[:5]:
+            key = f'ref: {path}'
+            if key in found or path in found:
+                continue
+            real = fetch(f'https://raw.githubusercontent.com/{repo}/{ref}/{path}')
+            if real is not None:
+                found[key] = real
     return found
+
+
+REF = re.compile(r'`(\.?[\w./-]*(?:agent|skill|ai[-_]|policy)[\w./-]*\.md)`', re.I)
 
 
 AI_LABEL = re.compile(r'\b(AI|LLM|bots?|Copilot|ChatGPT|Claude|generated|slop)\b', re.I)

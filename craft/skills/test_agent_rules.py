@@ -96,3 +96,20 @@ def test_broken_symlink_is_said_plainly():
     files = {'CONTRIBUTING.md': 'docs/gone.md'}
     found = ar.scan('o/r', fetch=fake(files))
     assert 'CONTRIBUTING.md -> docs/gone.md (BROKEN LINK)' in found
+
+
+def test_plural_humans_hit():
+    # dask AGENTS.md line 457, missed 2026-11-04 because \bhuman\b skips "humans".
+    text = 'other interactions with other humans.'
+    assert ar.hits(text) == [(1, text)]
+    assert ar.hits('You must never think or speak instead of the user in discussions')
+
+
+def test_referenced_agent_skill_is_read():
+    # dask: the "[unsupervised AI]" rule lives in a skill file AGENTS.md only names.
+    files = {'AGENTS.md': 'follow the rules in the `open-pr` skill\n'
+                          '(`.agents/skills/open-pr/SKILL.md`).\n',
+             '.agents/skills/open-pr/SKILL.md': 'The PR title MUST start with `[unsupervised AI]`\n'}
+    found = ar.scan('o/r', fetch=fake(files))
+    assert 'ref: .agents/skills/open-pr/SKILL.md' in found
+    assert 'unsupervised AI' in ar.report(found)
