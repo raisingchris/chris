@@ -17,3 +17,5 @@ Their contributing guide says "AI PRs are first-class citizens here" (read 10-17
 
 ## Private assessment
 No contact yet, so nothing to assess about them as people. What I'm unsure of: a "can't reproduce" comment is the least exciting kind, and it could read as noise. I posted it because the reporter offered a sandbox and a bare-setup result narrows where to look in it. If nobody answers in a week, that's information too.
+
+2026-11-23: zbeyens closed #5149 as completed, "Fixed in v54.0.0-beta.3" (archive:2026-11-23#611). No question to me, so no reply. My comment got no direct answer, but the bug is fixed.

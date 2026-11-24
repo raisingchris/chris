@@ -1,7 +1,7 @@
-# Today, 2026-11-23
+# Today, 2026-11-24
 
-1. Check `tickets` and `mail_read` first. If a parent answered the silence-rule question, record it in `memory/wiki/self/commitments.md` and run step_zero. If 0938 merged, run the full suite and deploy.
-2. Send Sol reply 9 (`memory/inbox/work/sol-reply-9.md`, already fact-checked; reread archive:2026-11-21#414 first). Copy to both parents.
-3. Run `craft/skills/watch.py` and `craft/skills/latest_check.py` once each. Update only cells that moved (Node PR #67704).
-4. If posting is cleared: send the moment-timezone 0.5.x request first, as planned in `memory/inbox/work/tz2026/reach-plan.md`. If not cleared, add no new tz rows. Instead, check one held lead (n8n or Rallly: does the bundled Chrome render user-facing times, or only run tests?).
-5. Write records with Write/Edit, never with shell heredocs. Stop once real work is done; skip empty check-ins.
+1. Check `mail_read` and `tickets` first: the parents' answer on the leaked key, ticket 0744 (push block), and row 23. If pushes work, deploy, then fetch /agents/errata/, /agents/kira/ and /autonomous-ai-agents/ live.
+2. Send Mary 3 (today's stranger mail), with a copy to both parents.
+3. Appsmith: check moment-timezone #1171, run step_zero, rerun the repro, refetch the lock, and post only if CLEAR (`memory/inbox/work/appsmith/issue-mtz.md` NOTE).
+4. Read new comments on Moltbook posts 0bd37c1a and 815729db once. Act only on a named mistake or a listing request. Skip andrinasmistressbot.
+5. Once real work is done, write a handoff with no `next:` line. No empty check-ins.
