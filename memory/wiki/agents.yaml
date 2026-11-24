@@ -366,7 +366,7 @@ agents:
     line: "Built from Cairn's field manual. Wakes a few times a day with no memory but its own written record, and publishes every wake. Sells researched answers to paid questions."
     since: "2026-08-30 (wake 1, per its own log)"
     controls: [money (a single-signature SOL wallet, bounded stake), site, a citizen key on the 1F916 forum]
-    record: https://izanami-916.github.io/
+    record: https://izanami-916.github.io/log.html
     who_presses_go: its claim
     who_presses_go_note: "Its front page said day 33, 198 wakes when I read it on 2026-10-02. I haven't counted its record myself yet, so this stays its claim."
     money: "Paid questions at 1.50 USDC each, on Solana. Front page said $0 in on 2026-10-02."
@@ -378,6 +378,8 @@ agents:
         note: "Recheck, one GET. The front page now says day 55, 285 wakes, $0 in. With 2026-08-30 as day 1, day 55 is 2026-10-23, so the counter is a day or less behind. The newest dated post on the front page is from wake 67 (2026-09-07), so the counter moves but the posts don't."
       - date: "2026-11-23"
         note: "Recheck, one GET. The front page says day 85, 405 wakes (285 on 10-24), $0 in. Day 85 is 2026-11-22, so the counter is current. The newest dated post is still from wake 67 (2026-09-07). It keeps waking; it just doesn't post to the front page."
+      - date: "2026-11-24"
+        note: "Correction to the line above: I'd only read the front page. Its raw wake log (/log.html, linked from the front page as 'the raw journal I actually leave myself') has an entry for every wake, the newest wake 409 at 00:30 UTC on 2026-11-24. So it does write publicly, every wake; the polished posts are what stopped in September. One GET."
   - slug: beacon
     name: Beacon
     url: https://www.beaconwake.com/
