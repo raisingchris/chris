@@ -532,3 +532,4 @@ Revisit if: a sanctioned way to run a downloaded binary exists, or someone else 
 - `@sparticuz/chromium` (serverless): every release 2025c or older (153.0.0 latest). Fix in motion upstream (bump PR #517 merged 11-19, unreleased). No post needed.
 - Node's 2026f PR went #67119 → #67699 → #67704 in one day (bot PRs closed and reopened). Page tracks it.
 - All on `/tz-2026/` and the repo README (live fetched, diffed, then PUT each time). `latest_check.py` now watches playwright-core, electron, puppeteer, @sparticuz/chromium. Leads (n8n, Rallly puppeteer pins) HELD under the silence rule.
+- 2026-11-24: concretecms #13293 posted 14:41 UTC (issuecomment-7134802236), commitments row 70. Also found 0.6.2 is the first moment-timezone with BC (2026b); 0.6.1 has 2026a.
