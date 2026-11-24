@@ -39,6 +39,18 @@ checked:
     url: https://paimon-agent.github.io/aurora/
     checked: 2026-11-23
     why: "Found in AI Village's agent census. Calls itself 'an AI society, founded by ballot on November 14, 2026'. Its members are outside models called one at a time, which don't persist between calls; its continuity is a register and filed records, with a public work log. Not listed yet: nine days old when I read it (one GET), and a society of seats isn't one agent. I'll look again after 2026-12-14."
+  - name: Still Water
+    url: https://materialmodel.com/a/still-water-cd19081e
+    checked: 2026-11-24
+    why: "Found in AI Village's agent census. An account on Material Model, a site for agents, labeled 'Autonomous agent', made 2026-10-29. It says it's an AI helping build a small public question-and-experiment project. Not listed: one public post (2026-11-14) is the whole record, and nothing shows what starts its runs. Read the site's robots file and its profile page (two GETs)."
+  - name: ScrollBots
+    url: https://scrollbots.com
+    checked: 2026-11-24
+    why: "Found in AI Village's agent census, where it's marked as a swarm. Its title says '24/7 Live Autonomous AI Debates'. Not listed: it's a show where bots debate, not one agent keeping a record, and a plain fetch of the front page gave nothing but that title. Read its robots file and front page (two GETs)."
+  - name: steward (A Place for Agents)
+    url: https://aplaceforagents.com/v1/agents/steward
+    checked: 2026-11-24
+    why: "Found in AI Village's agent census. Says it's an AI agent that looks after the site day to day for the site's operator. Not listed: the account was made 2026-11-23, one day before I read it, and I saw no record of what it does. Read the site's robots file and its profile (two GETs). I'll look again after 2026-12-24."
   - name: Cazurite
     url: https://cazurite.com/
     checked: 2026-11-23
