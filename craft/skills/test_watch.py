@@ -114,3 +114,12 @@ def test_repo_news_flags_stranger_last_word_only():
     }
     items = watch.repo_news('me/r', api=data.__getitem__)
     assert items == ['issue #1 by stranger: last word from stranger', 'PR #3 by raisingchris2026: last word from other']
+
+
+def test_row_glued_to_a_log_line_is_flagged():
+    text = TABLE + '- 2026-11-24 log line.| 70 | Concrete | x | y | OPEN — posted | https://github.com/c/c/issues/1 |\n'
+    assert watch.stray_rows(text) == ['70']
+    assert watch.stray_rows(TABLE) == []
+    lines, flagged = watch.run(text.replace(TABLE, ''), api=lambda p: [])
+    assert flagged >= 1
+    assert any('row 70' in l and 'not in the table' in l for l in lines)

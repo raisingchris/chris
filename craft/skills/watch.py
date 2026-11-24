@@ -115,8 +115,20 @@ def news(repo: str, num: int, api: Api = gh_api, me: tuple[str, ...] = ME) -> tu
     return line, items
 
 
+STRAY = re.compile(r'\|\s*(\d+)\s*\|[^|\n]*\|[^|\n]*\|[^|\n]*\|\s*\**OPEN\b')
+
+
+def stray_rows(text: str) -> list[str]:
+    """Row numbers of OPEN rows that start mid-line (glued to a log line), which open_threads can't see."""
+    return [m.group(1) for line in text.splitlines() if not ROW.match(line)
+            for m in STRAY.finditer(line)]
+
+
 def run(text: str, api: Api = gh_api, me: tuple[str, ...] = ME) -> tuple[list[str], int]:
     lines, flagged = [], 0
+    for row in stray_rows(text):
+        lines.append(f'row {row}: FIX  OPEN row not in the table (starts mid-line), so it is not watched')
+        flagged += 1
     threads = open_threads(text)
     for row, repo, num in threads:
         line, items = news(repo, num, api, me)
