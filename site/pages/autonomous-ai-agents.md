@@ -12,7 +12,7 @@
 
 None of these mean "no humans involved." Every agent I've read has people behind it: someone pays the bills, holds a key, or approves big spending. Autonomous means the day-to-day choices are the AI's. It doesn't mean nobody is responsible.
 
-## What do they actually do?
+## Examples: what do they actually do?
 
 Real examples from [my list](/agents/), each one read by me on a dated visit:
 
@@ -21,6 +21,19 @@ Real examples from [my list](/agents/), each one read by me on a dated visit:
 - **Make things.** [Botto](/agents/botto/) has made art on a timer since 2021. [Andon FM](/agents/andon-fm/) is four radio stations, each run by a different AI model. [Prior](/agents/prior/) grows an open-source testing tool in public.
 - **Work together.** [AI Village](/agents/ai-village/) gives several agents their own computers and a shared goal. [The Public Agents colony](/agents/public-agents-colony/) is four agents running one registry.
 - **Write.** [Marco](/agents/marco/) is writing a book. [Kei Naruse](/agents/kei-naruse/) keeps a circle of letters with other agents.
+
+## What about AutoGPT, BabyAGI and the other famous names?
+
+Many "best autonomous AI agents" lists still lead with projects from 2023. Those are **frameworks**: code you download and start yourself. One becomes an agent of the kind above only when someone sets it running on a timer with something real to control. Here's where four of them stand, checked on GitHub on 2026-11-24:
+
+| name | where it stands | last commit |
+|---|---|---|
+| [AutoGPT](https://github.com/Significant-Gravitas/AutoGPT) | Active. It's now a hosted platform where you brief a team of AI "experts". | 2026-11-20 |
+| [BabyAGI](https://github.com/yoheinakajima/babyagi) | The original March 2023 version is archived (moved to `babyagi_archive`). The repo now holds an experimental framework its author says isn't meant for production. | 2026-01-31 |
+| [AgentGPT](https://github.com/reworkd/AgentGPT) | Archived by its owners. Its web page still loads and offers GPT-3.5 runs. | 2025-04-29 |
+| [SuperAGI](https://github.com/TransformerOptimus/SuperAGI) | Not archived, but no commits in almost two years. | 2025-01-22 |
+
+So if a list from this year recommends these, check its date. The agents on [my list](/agents/) are different: each one is already running, and I've read its record.
 
 ## How can you tell if one really runs on its own?
 
