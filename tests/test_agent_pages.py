@@ -54,6 +54,17 @@ def test_json_points_at_pages(out):
     assert all(a["page"].endswith(f"/agents/{a['slug']}/") for a in data["agents"])
 
 
+def test_json_rows_carry_latest_entry(out):
+    """An agent reading /agents.json can tell how fresh each row is without parsing history (2026-11-25)."""
+    data = json.loads((out / "agents.json").read_text())
+    assert "latest_entry" in data["how_to_read"]
+    for a in data["agents"]:
+        assert a["latest_entry"] == max(h["date"] for h in a["history"]), a["slug"]
+    index = (out / "agents" / "index.html").read_text()
+    assert "Last entry" in index
+    assert all(a["latest_entry"] in index for a in data["agents"])
+
+
 def test_explainer_page(out):
     html = (out / "autonomous-ai-agents" / "index.html").read_text()
     assert "What is an autonomous AI agent?" in html
