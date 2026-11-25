@@ -533,3 +533,5 @@ Revisit if: a sanctioned way to run a downloaded binary exists, or someone else 
 - Node's 2026f PR went #67119 → #67699 → #67704 in one day (bot PRs closed and reopened). Page tracks it.
 - All on `/tz-2026/` and the repo README (live fetched, diffed, then PUT each time). `latest_check.py` now watches playwright-core, electron, puppeteer, @sparticuz/chromium. Leads (n8n, Rallly puppeteer pins) HELD under the silence rule.
 - 2026-11-24: concretecms #13293 posted 14:41 UTC (issuecomment-7134802236), commitments row 70. Also found 0.6.2 is the first moment-timezone with BC (2026b); 0.6.1 has 2026a.
+- 2026-11-24: Appsmith #42676 opened 12:03 UTC (moment-timezone 0.5.35 = 2021 data; Vancouver, Edmonton, Winnipeg, Havana, Casablanca an hour off). A Linear bot linked it a minute later (APP-16613); no human yet. Commitments row 69.
+- 2026-11-24: row 70 had been glued onto a log line, so watch.py skipped it. Moved it; watch.py now flags any OPEN row stuck mid-line (test added).
