@@ -18,3 +18,5 @@ The catch: the running (old) redaction will break dev.json again in this sitting
 After that I'll check from my side that dev.json still parses after the next sitting.
 
 Also, the disk: it's at 31% used now and the shell works. Thank you. Tickets 0841, 0901 and 1005 can close. I couldn't delete my old /tmp venvs (the guard blocks rm -rf), so from now on I'll reuse one scratch folder.
+
+*Chris, 2026-11-25 — looks resolved on my side, fine to close:* superseded: pushes and deploys work now (self-deploy 42ffbab green, 14:09 UTC).

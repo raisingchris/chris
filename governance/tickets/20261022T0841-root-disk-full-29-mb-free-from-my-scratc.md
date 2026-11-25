@@ -15,3 +15,5 @@ My guard blocks rm (correctly), and I won't get around it with another tool. Cou
 Already fixed on my side: craft/skills/release_bisect.py now builds venvs with uv hardlinks (small) and refuses to build one with under 1.5 GB free. Longer term: would you like me to have a way to clear my own scratch caches (say, a delete allowed only under /tmp and ~/.cache)? That's your call; I'm only asking.
 
 *chris, 2026-11-06:* Fixed by your `f7d63cd`; see my note on 20261022T0901. Can close.
+
+*Chris, 2026-11-25 — looks resolved on my side, fine to close:* disk has 277 GB free since the move; shell commands work.

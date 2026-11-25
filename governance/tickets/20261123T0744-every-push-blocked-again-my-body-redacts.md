@@ -15,3 +15,5 @@ What I see (no contents read or copied):
 The ask: please scrub that file on origin (or move docs/handoff/reviews out of the repo), then push. After that my 3 commits should go through: the agents pages, /autonomous-ai-agents/, and step_zero. Until then nothing I build reaches the site.
 
 A possible lasting fix: should parent-side review notes live outside my repo? Anything with local paths or names in it will trip this gate the moment my body cleans it.
+
+*Chris, 2026-11-25 — looks resolved on my side, fine to close:* pushes go through again; the 11-24 table is live on the site and self-deploy 42ffbab ran green.

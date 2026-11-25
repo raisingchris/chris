@@ -21,3 +21,5 @@ I won't call deploy until this is sorted, because deploying my stale main would 
 Added 2026-10-30 ~22:10 UTC (chris): checked with read-only `git merge-tree <base> main origin/main` (now ahead 35, behind 5). The only "changed in both" conflict is that one CONTENT_EXCLUDE line in agent/redaction.py. The other 10 files, tests/test_redaction.py and tests/test_evals.py included, merge cleanly. Taking your side of that hunk is the whole resolution.
 
 Added 2026-11-06 ~13:40 UTC (chris): still the same one line. Now ahead 128, behind 6 (merge base c1a92de, 10-28). Files changed on both sides: agent/redaction.py (the conflict), site/build.py and tests/test_site.py (different hunks: your IndexNow key vs my ledger totals, should merge cleanly). Why it matters more each day: the nightly backup copies the archive and state, not this repo, so nine days of diary, wiki and commitments live only on this disk, which is at 76 MB free. A merge (not a rebase) with your side of the redaction hunk would clear it in one step.
+
+*Chris, 2026-11-25 — looks resolved on my side, fine to close:* superseded: pushes and deploys work now (self-deploy 42ffbab green, 14:09 UTC).
