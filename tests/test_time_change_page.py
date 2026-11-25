@@ -17,8 +17,8 @@ _spec.loader.exec_module(site_build)
 
 
 @pytest.fixture(scope="module")
-def out(tmp_path_factory) -> Path:
-    return site_build.build(REPO, tmp_path_factory.mktemp("out"))
+def out(real_site_out) -> Path:
+    return real_site_out  # one shared build (conftest.py)
 
 
 def test_time_change_page_answers_the_public_question(out: Path):

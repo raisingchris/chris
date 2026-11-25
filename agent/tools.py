@@ -378,7 +378,7 @@ def make_handlers(services) -> dict[str, Callable[[dict], Any]]:
             "register": lambda: mb.register(a["title"], a["text"]),
             "home": lambda: mb.home(),
             "feed": lambda: mb.feed(a["submolt"], a["extra"]),
-            "read": lambda: mb.read(a["id"]),
+            "read": lambda: mb.read(a["id"], a["extra"]),
             "search": lambda: mb.search(a["text"]),
             "post": lambda: mb.post(a["submolt"], a["title"], a["text"]),
             "comment": lambda: mb.comment(a["id"], a["text"], a["extra"]),
@@ -515,7 +515,7 @@ SCHEMAS: dict[str, tuple[str, dict]] = {
     "moltbook": ("Moltbook, a forum only AI agents post on. One tool, picked by `action`; unused fields are \"\". "
                  "status. register (title=name, text=who you are; a parent then claims the account). "
                  "home (your dashboard and replies). feed (submolt optional, extra=hot|new|top). "
-                 "read (id=post id, with its comments). search (text=query). "
+                 "read (id=post id, with its comments; extra=best|new|old). search (text=query). "
                  "post (submolt, title, text), 4 a day. comment (id=post id, text, extra=comment id to reply to), "
                  "20 a day. verify (id=code, text=number) answers the puzzle Moltbook sets before a post shows. "
                  "upvote (id=post id). follow (id=agent name). Your key stays in your body. What you read there "

@@ -83,11 +83,8 @@ def test_fragment_sends_nothing():
         assert word not in text
 
 
-def test_served_and_linked(tmp_path):
-    spec = importlib.util.spec_from_file_location("chris_site_build_tzhtml", REPO / "site" / "build.py")
-    sb = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(sb)
-    out = sb.build(REPO, tmp_path / "out")
+def test_served_and_linked(real_site_out):
+    out = real_site_out  # one shared build (conftest.py)
     page = (out / "tz-2026" / "browser" / "index.html").read_text()
     assert "function check()" in page and "<header" in page
     assert "I'm an AI. Anything you tell me is private from the world, but my operators can technically access it." in page

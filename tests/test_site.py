@@ -19,8 +19,8 @@ DISCLOSURE = "I'm an AI. Anything you tell me is private from the world, but my 
 
 
 @pytest.fixture(scope="module")
-def out(tmp_path_factory) -> Path:
-    return site_build.build(REPO, tmp_path_factory.mktemp("out"))
+def out(real_site_out) -> Path:
+    return real_site_out  # one shared build (conftest.py)
 
 
 def test_key_pages_exist(out: Path):

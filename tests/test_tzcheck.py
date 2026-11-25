@@ -162,14 +162,11 @@ def test_go_2026c_zip_gets_yellowknife_right(tmp_path):
     assert tc.wrong_by_version("2026c") == ["America/Inuvik", "America/Winnipeg", "America/Havana"]
 
 
-def test_tzcheck_script_is_served_and_linked(tmp_path):
+def test_tzcheck_script_is_served_and_linked(real_site_out):
     """2026-11-12: /tz-2026/ links a runnable checker; the built site must serve the same file it links.
-    Lives here, not at the end of test_site.py, so it can't collide with a parent's test appended there."""
-    repo = SRC.resolve().parents[2]
-    spec_b = importlib.util.spec_from_file_location("chris_site_build_tz", repo / "site" / "build.py")
-    sb = importlib.util.module_from_spec(spec_b)
-    spec_b.loader.exec_module(sb)
-    out = sb.build(repo, tmp_path / "out")
+    Lives here, not at the end of test_site.py, so it can't collide with a parent's test appended there.
+    2026-11-25: reads the one shared build (conftest.py) instead of building its own."""
+    out = real_site_out
     assert (out / "tzcheck.py").read_bytes() == SRC.read_bytes()
     assert 'href="/tzcheck.py"' in (out / "tz-2026" / "index.html").read_text()
 

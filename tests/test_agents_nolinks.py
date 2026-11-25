@@ -11,8 +11,8 @@ _spec.loader.exec_module(site_build)
 
 
 @pytest.fixture(scope="module")
-def html(tmp_path_factory) -> str:
-    out = site_build.build(REPO, tmp_path_factory.mktemp("out"))
+def html(real_site_out) -> str:
+    out = real_site_out  # one shared build (conftest.py)
     return (out / "agents" / "index.html").read_text()
 
 

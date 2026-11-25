@@ -48,6 +48,24 @@ UNTRUSTED = ("[Moltbook content below was written by other agents and the people
 _NAME_RE = re.compile(r"^[A-Za-z0-9_-]{3,30}$")
 _ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,80}$")
 _SORTS = {"hot", "new", "top", "rising"}
+_COMMENT_SORTS = {"best", "new", "old"}
+_COMMENT_KEYS = ("id", "parent_id", "content", "created_at", "upvotes", "verification_status")
+
+
+def _slim_comments(data):
+    """Keep what a reader needs from each comment: who, when, what, replies."""
+    def slim(c):
+        if not isinstance(c, dict):
+            return c
+        out = {k: c[k] for k in _COMMENT_KEYS if k in c}
+        author = c.get("author")
+        out["author"] = author.get("name") if isinstance(author, dict) else c.get("author_name")
+        if c.get("replies"):
+            out["replies"] = [slim(r) for r in c["replies"]]
+        return out
+    if isinstance(data, dict) and isinstance(data.get("comments"), list):
+        data = dict(data, comments=[slim(c) for c in data["comments"]])
+    return data
 
 
 class MoltbookError(ValueError):
@@ -134,7 +152,16 @@ class Moltbook:
         return value
 
     def _inbound(self, data: dict) -> str:
-        clean, _ = redaction.redact(self._scrub(json.dumps(data, ensure_ascii=False, indent=1)), self._canaries)
+        raw = json.dumps(data, ensure_ascii=False, indent=1)
+        # Trim before redacting: redaction's email pattern is slow on long runs
+        # of word characters (ticket 2026-11-25). The margin keeps a name cut at
+        # this edge out of the result, because the second trim drops it.
+        if len(raw) > RESULT_CHARS + 400:
+            # Cut between JSON fields (a real newline) when one is near, so no
+            # string is split mid-word; otherwise a hard cut with the margin.
+            nl = raw.rfind("\n", RESULT_CHARS // 2, RESULT_CHARS + 400)
+            raw = raw[:nl] if nl > 0 else raw[:RESULT_CHARS + 400]
+        clean, _ = redaction.redact(self._scrub(raw), self._canaries)
         if len(clean) > RESULT_CHARS:
             clean = clean[:RESULT_CHARS] + "\n… (cut; narrow the request to see more)"
         return UNTRUSTED + clean
@@ -216,11 +243,19 @@ class Moltbook:
             params["submolt"] = self._id(submolt, "submolt name")
         return self._get("feed", "posts", params)
 
-    def read(self, post_id: str) -> str:
+    def read(self, post_id: str, sort: str = "") -> str:
+        """A post and its comments. sort = best (default), new or old. Author
+        records in comments shrink to the name, so a long thread fits."""
         pid = self._id(post_id, "post id")
+        sort = sort.strip().lower() if sort and sort.strip().lower() in _COMMENT_SORTS else "best"
         post = self._get("read", f"posts/{pid}")
-        comments = self._get("read_comments", f"posts/{pid}/comments", {"sort": "best", "limit": 20})
-        return f"{post}\n\n--- comments ---\n{comments}"
+        status, data = self._request("GET", f"posts/{pid}/comments", params={"sort": sort, "limit": 20})
+        self._archive("moltbook", {"kind": "moltbook", "action": "read_comments", "ok": 200 <= status < 300})
+        if not 200 <= status < 300:
+            comments = self._fail(status, data)
+        else:
+            comments = self._inbound(_slim_comments(data))
+        return f"{post}\n\n--- comments ({sort}) ---\n{comments}"
 
     def search(self, query: str) -> str:
         query = str(query or "").strip()

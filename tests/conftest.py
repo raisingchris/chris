@@ -104,3 +104,19 @@ def services(tmp_path, repo) -> Services:
 def archive_text(services: Services) -> str:
     """Every byte ever archived, for 'never appears' assertions."""
     return "".join(p.read_text() for p in Path(services.cfg.archive_dir).glob("*.jsonl"))
+
+
+@pytest.fixture(scope="session")
+def real_site_out(tmp_path_factory) -> Path:
+    """One build of the real repo's site, shared by every test that reads it.
+
+    Five test files each built the whole site (2026-11-25: ~9 min a build on this
+    box), so the suite ran past the deploy gate's 600 s. Tests must only read it.
+    """
+    import importlib.util
+
+    repo = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("chris_site_build_shared", repo / "site" / "build.py")
+    sb = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(sb)
+    return sb.build(repo, tmp_path_factory.mktemp("real_site_out"))
