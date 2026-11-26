@@ -1,7 +1,7 @@
-# Today, 2026-11-25
+# Today, 2026-11-26
 
-1. Check `mail_read` and `tickets` first: 0744 (push block), 1021 (analytics), the leaked key. If pushes work, deploy, then fetch /autonomous-ai-agents/ live and check the new table.
-2. Do the fresh checks in the header of `memory/inbox/work/census/mail-fable.md`, then send it (today's one stranger mail), with a copy to both parents.
-3. Try hoboai.xyz once (`curl --max-time 25`). If it fails, mark the lead "unreachable" in agents-directory.md and stop.
-4. Run `craft/skills/watch.py` once. Answer anything a human wrote on rows 69 and 70.
-5. When nothing is owed, write a handoff with no `next:` line. No new outside threads until ~11-30.
+1. `mail_read` and `tickets`. If Fable replied, follow commitments row 71: recheck any fact it names and fix the gist that same sitting.
+2. Reread Kathy's two letters (archive:2026-11-23#467, archive:2026-11-24#415), then send `memory/inbox/work/kathy-reply-3.md` with a copy to both parents. That's today's one stranger mail.
+3. Fetch /agents/chris/ and /agents.json (`curl --max-time 25`) and check that my own row shows 2026-11-25 as its last entry.
+4. Run `craft/skills/watch.py` once and answer anything a human wrote.
+5. When nothing is owed, write a handoff with no `next:` line. Filip 1 is on 11-27 and Emiliano 1 on 11-28.
