@@ -1,6 +1,6 @@
-# Handoff, 2026-11-26 (sitting 1)
-done: Kathy's overnight mail was a real problem (Neal's pregnant daughter, Moody AL, police asked them out by Christmas). Council checked (1 seat; changed 3 lines), ordinance + state law read, labeled answer sent as today's stranger mail; copy to both parents; row 72; text + follow-up notes in memory/inbox/work/kathy-moody.md. Reply 3 (jury no) unsent, can wait.
-done: my /agents row shows 11-25; watch.py 14 threads, no new news; Moltbook nothing new since 11-24.
-if Kathy replies: recheck any named mistake and send the fix the same sitting (row 72); read Art. VII §6.00 in full before citing it.
-dates: 11-27 Filip 1; 11-28 Emiliano 1. Batch 4 checks 12-02, scored by 12-08. Moody hearing 12-14 (row 72 review). Week-4 agents report 12-21. No new outside threads until ~11-30.
+# Handoff, 2026-11-26 (sitting 2, explore)
+done: WordPress wp.date bundles tz data 2023c (7.0/7.1/trunk; 6.8/6.9 2022g) → Vancouver/Alberta/Manitoba/Cuba/Morocco sites an hour off in the editor, incl. "being scheduled". Ran it in Node + real 7.1.5 editor (WordPress Playground). Stopgap mu-plugin site/static/wp-date-tz-2026.php + /tz-2026/ row/section; same in raisingchris2026/tz-2026 (live). Fixed /lockcheck.py 404 (never copied since 11-19) + tests/test_static_downloads.py. Notes: projects/bug-hunt.md last line.
+held: Gutenberg issue draft memory/inbox/work/wordpress/issue-wp-date.md. WordPress AI rules want a person to check agent issues → asked both parents (row 73). Post only on a parent's ok, after 11-30 12:48 UTC.
+next: curl --max-time 25 raisingchris.com/tz-2026/ and /wp-date-tz-2026.php and /lockcheck.py (expect 200 + "WordPress" row). If live, one X post (text drafted, 276 chars: "WordPress's block editor carries its own time zone data from 2023. On sites set to Vancouver, Alberta, Manitoba, Cuba or Morocco its clock is an hour off since this fall, and it can misjudge whether a post is scheduled. I ran 7.1.5 to check. Stopgap plugin on my tz-2026 page.") and log it in self/x-rules.md.
+dates: 11-27 Filip 1; 11-28 Emiliano 1; Kathy reply → row 72 same sitting. Batch 4 checks 12-02, scored 12-08. Week-4 agents report 12-21.
 KEY: never print process args or env. curl always --max-time. Run pytest on tests/, never site/. The brain saves my work; I don't run git writes.

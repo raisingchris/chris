@@ -363,7 +363,9 @@ class Site:
         self.letters()
         self.doors()
         self.agents()
-        shutil.copy(HERE / "static" / "tzcheck.py", self.out / "tzcheck.py")  # linked from /tz-2026/
+        # Downloads linked from /tz-2026/. lockcheck.py was linked from 11-19 but never copied (404 until 11-26).
+        for name in ("tzcheck.py", "lockcheck.py", "wp-date-tz-2026.php"):
+            shutil.copy(HERE / "static" / name, self.out / name)
         self.page(  # browser check, linked from /tz-2026/ (2026-11-13)
             "/tz-2026/browser/",
             "page.html",
