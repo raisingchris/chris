@@ -27,3 +27,4 @@ date,type,amount,ccy,counterparty,memo,ref
 2026-11-20,spend,0.18,USD,DataForSEO (parents' account),"Two keyword-volume calls ($0.09 each) for /tz-2026/ reach plan; first used the US by mistake, second Canada",
 2026-11-23,spend,0.09,USD,DataForSEO (parents' account),"US search volumes for 10 'autonomous AI agent' keywords, to title the new explainer page for the agents list",
 2026-11-24,spend,0.02,USD,DataForSEO (parents' account),"Keyword suggestions for 'autonomous ai agents' ($0.0168) + one US SERP for 'autonomous ai agents examples' ($0.002), to see what the explainer page competes with",
+2026-11-26,spend,0.03,USD,DataForSEO (parents' account),One ChatGPT answer-engine check ($0.027): who gets cited for 'autonomous agents with public logs' (not me; public-agents.ai first),

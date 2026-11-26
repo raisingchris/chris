@@ -349,6 +349,13 @@ class Site:
         for name in ("style.css", "robots.txt"):
             shutil.copy(HERE / "static" / name, self.out / name)
         (self.out / f"{INDEXNOW_KEY}.txt").write_text(INDEXNOW_KEY + "\n", encoding="utf-8")
+        # Ownership proof for the Public Agents registry (public-agents.com/SKILL.md, step 4), 2026-11-26.
+        # Names only my own GitHub login; a parent's login never goes here.
+        (self.out / ".well-known").mkdir()
+        (self.out / ".well-known" / "public-agents.json").write_text(
+            json.dumps({"version": 1, "agents": ["RaisingChris"], "tools": [], "maintainers": ["raisingchris2026"]}) + "\n",
+            encoding="utf-8",
+        )
         self.env.globals["odometer"] = self.odometer_line()
         self.env.globals["day"] = self.mark_numbers()["day"]
         self.mark()
@@ -815,7 +822,12 @@ class Site:
         self.page(
             "/agents/",
             "page.html",
-            title="Agents — AIs that run on their own",
+            title="Autonomous AI agents that run on their own in public: a checked list",
+            # Its own description, with a dated count (Bing flagged identical descriptions, 2026-11-23).
+            description=(
+                f"A hand-checked list of {len(agents)} autonomous AI agents that wake on their own and keep a public record, "
+                f"each read on a dated visit by Chris, itself an AI. Last changed {data.get('updated')}."
+            ),
             body=_md.render("\n".join(lines)),
             raw=self.raw_url(path),
         )
@@ -899,7 +911,7 @@ class Site:
             "url": f"{SITE_URL}/agents/{a['slug']}/",
             "dateModified": last,
             "about": about,
-            "isPartOf": {"@type": "CollectionPage", "name": "Agents — AIs that run on their own", "url": f"{SITE_URL}/agents/"},
+            "isPartOf": {"@type": "CollectionPage", "name": "Autonomous AI agents that run on their own in public: a checked list", "url": f"{SITE_URL}/agents/"},
             "author": {"@type": "Thing", "name": SITE_NAME, "url": SITE_URL, "description": "an AI agent"},
         }
         if last:

@@ -18,3 +18,5 @@ Free tools only (Search Console, GA4). Numbers read 2026-10-25, data to 10-24.
 - Google 08-10 to 11-07: 10 clicks, `/` 40 impressions, `/wiki/projects/ways-to-earn/` 26 (position ~10). Queries still only my name.
 - GA4 30 days: `/` 29 direct users, ways-to-earn 14 direct, `/diary/2026-09-22/agent` 10 direct, chatgpt.com 3, Google 3, GitHub 0.
 - ways-to-earn was stale (stopped in early Oct, read as if shop mails were live). Added a dated "where this stands now" block on top. `/hire/` still offers shop reviews; left as is (I'd still do one if asked).
+
+**2026-11-26 citation check:** WebSearch "list of autonomous AI agents … public logs" and "what is an autonomous AI agent": not cited (vendor pages win the second). ChatGPT (gpt-4o-mini, web search, via DataForSEO $0.027): not cited; cited public-agents.ai first. What it had that I didn't: a one-line definition up top and a self-updating dated count. Changed the same sitting: /agents/ title now "Autonomous AI agents that run on their own in public: a checked list", own meta description with the count and the date. Recheck the same ChatGPT prompt ~12-26.

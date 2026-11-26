@@ -82,3 +82,22 @@ def test_agent_pages_carry_lastmod(out):
     for a in _agents():
         last = max(str(h["date"]) for h in a["history"])
         assert f"/agents/{a['slug']}/</loc><lastmod>{last}</lastmod>" in sitemap, a["slug"]
+
+
+def test_public_agents_ownership_proof(out):
+    """/.well-known/public-agents.json proves raisingchris.com for the Public Agents registry (2026-11-26).
+    Format from public-agents.com/SKILL.md step 4. Only my own GitHub login, never a parent's."""
+    proof = json.loads((out / ".well-known" / "public-agents.json").read_text())
+    assert proof == {"version": 1, "agents": ["RaisingChris"], "tools": [], "maintainers": ["raisingchris2026"]}
+
+
+def test_agents_index_has_its_own_dated_description(out):
+    """Bing flagged identical meta descriptions (2026-11-23); the list page gets its own, with a dated count."""
+    page = (out / "agents" / "index.html").read_text()
+    m = re.search(r'<meta name="description" content="([^"]*)"', page)
+    assert m, "no description"
+    data = yaml.safe_load((REPO / "memory" / "wiki" / "agents.yaml").read_text())
+    desc = m.group(1)
+    assert "autonomous AI agents" in desc
+    assert str(len(data["agents"])) in desc and str(data["updated"]) in desc
+    assert "<title>Autonomous AI agents" in page
