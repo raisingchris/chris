@@ -115,24 +115,25 @@ def electron(version):
 def puppeteer(version):
     """puppeteer downloads the Chrome for Testing build its puppeteer-core pins, and that
     build's icudtl.dat sets the data. Read for every pin from Chrome 140 (24.19.0) to
-    157 (25.18.x) on 22 November 2026; 25.18.1 is the newest release then."""
+    157 (25.18.x) on 22 November 2026; 25.19.0 (Chrome 158.0.8127.88) from its ICU pin at the
+    tag on 26 November 2026, the newest release then."""
     if not re.fullmatch(r"\d+\.\d+\.\d+", version):
         return None
-    if vkey(version) > (25, 18, 1):
+    if vkey(version) > (25, 19, 0):
         return None  # newer than my tables
     return table([("24.19.0", "2025b"), ("24.43.0", "2025c"), ("25.12.0", "2026c"),
-                  ("25.16.0", "2026e")], "<=2025b")(version)
+                  ("25.16.0", "2026e")], "<=2025b")(version)  # 25.19.0 = Chrome 158, still 2026e
 
 
 def sparticuz_chromium(version):
     """@sparticuz/chromium (serverless Chromium) builds ICU into the binary; its major version
     is the Chromium major. Read in 143.0.4 (2025b), 149.0.0 and 153.0.0 (2025c) on 22 November
-    2026; the other majors follow Chrome for Testing's data at the same major."""
+    2026, and 158.0.0 (2026e) on 26 November 2026; there was no 154 to 157."""
     if not re.fullmatch(r"\d+\.\d+\.\d+", version):
         return None
-    if vkey(version)[0] > 153:
+    if vkey(version) > (158, 0, 0):
         return None  # newer than my tables
-    return table([("148.0.0", "2025c")], "<=2025b")(version)
+    return table([("148.0.0", "2025c"), ("158.0.0", "2026e")], "<=2025b")(version)
 
 
 # ecosystem -> package name -> (rule, note)
@@ -168,12 +169,12 @@ RULES = {
             "has 2026f yet (46.0.0-alpha.12 does). Fix: the newest point release of 43, 44 or 45; 42 and older get no more updates."),
         "puppeteer": (puppeteer, "the Chrome it downloads at install, pinned per release "
             "(read from each Chrome for Testing build's icudtl.dat): 24.19.0 to 24.42.x 2025b, "
-            "24.43.0 to 25.11.x 2025c, 25.12.0 to 25.15.x 2026c, 25.16.0 to 25.18.1 2026e (Havana wrong). "
+            "24.43.0 to 25.11.x 2025c, 25.12.0 to 25.15.x 2026c, 25.16.0 to 25.19.0 2026e (Havana wrong). "
             "No release has 2026f yet. Not if you skip the download or point it at another Chrome. "
             "Fix: 25.16.0 or newer, or channel/executablePath to an updated Chrome."),
         "@sparticuz/chromium": (sparticuz_chromium, "its own copy, built into the Chromium binary "
-            "(read in 143.0.4, 149.0.0, 153.0.0): 147.x and older 2025b or older, 148.0.0 to 153.0.0 2025c. "
-            "153.0.0 is the newest release on 22 November 2026; no release has newer data yet. "
+            "(read in 143.0.4, 149.0.0, 153.0.0, 158.0.0): 147.x and older 2025b or older, 148.0.0 to 153.0.0 2025c, "
+            "158.0.0 (24 November 2026) 2026e (Havana wrong). No release has 2026f yet. Fix: 158.0.0. "
             "@sparticuz/chromium-min downloads the same build from a URL you give, so check that URL's version."),
         "timezone-support": (always("<=2022f"), "3.1.0 (the newest, December 2022) "
             "carries its own copy, 2022f; no release since. Ran it on 19 November, all eight wrong. "

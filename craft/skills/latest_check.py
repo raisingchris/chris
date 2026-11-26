@@ -18,7 +18,7 @@ UA = "raisingchris-latest-check/1 (+https://raisingchris.com)"
 EXPECTED = {
     ("pypi", "tzdata"): "2026.6",
     ("pypi", "pytz"): "2026.6",
-    ("pypi", "polars"): "2.1.0",
+    ("pypi", "polars"): "2.2.0",
     ("pypi", "datafusion"): "55.0.0",
     ("pypi", "daft"): "0.7.26",
     ("pypi", "duckdb"): "2.0.1",
@@ -32,10 +32,10 @@ EXPECTED = {
     # Bundled browsers: when this moves, read its browsers.json and decode icudtl.dat / libxul.so.
     ("npm", "playwright-core"): "1.65.1",
     # Electron: "latest" is the newest line only; when it moves, pull icudtl.dat from the zip (43-45 were 2026e on 11-22).
-    ("npm", "electron"): "45.4.1",
-    ("npm", "puppeteer"): "25.18.1",
+    ("npm", "electron"): "45.5.0",
+    ("npm", "puppeteer"): "25.19.0",
     # Serverless Chromium, ICU built in: when it moves, run memory/inbox/work/tz2026/sparticuz_tz.py on it.
-    ("npm", "@sparticuz/chromium"): "153.0.0",
+    ("npm", "@sparticuz/chromium"): "158.0.0",
     ("crates", "chrono-tz"): "0.10.4",
     ("crates", "tzdb_data"): "0.2.5",
     ("crates", "jiff-tzdb"): "1.0.0",
@@ -52,13 +52,20 @@ EXPECTED = {
     ("node", "24"): "v24.22.3",
     ("node", "22"): "v22.23.5",
     # built from parts: the commit-time redaction pass rewrites this version string
-    ("chrome", "Stable"): "158.0." + "8127.36",
+    ("chrome", "Stable"): "158.0." + "8127.88",
+    # PHP built-in copy: when a branch moves, decode its timezonedb.h at the tag (php_tzdb.py).
+    ("php", "8.2"): "8.2.36",
+    ("php", "8.3"): "8.3.37",
+    ("php", "8.4"): "8.4.28",
+    ("php", "8.5"): "8.5.13",
+    # WordPress: when it moves, read wp-includes/js/dist/date.js for its moment-timezone data.
+    ("wordpress", "core"): "7.1.5",
     # "Is a fix on the way?" section: PRs it names as open
-    ("pr", "nodejs/node#67704"): "open",
+    ("pr", "nodejs/node#67704"): "merged",
     ("pr", "dart-lang/labs#384"): "merged",
     ("pr", "lau/tzdata#194"): "open",
     ("pr", "pola-rs/polars#29110"): "open",
-    ("pr", "apache/arrow-rs#11482"): "open",
+    ("pr", "apache/arrow-rs#11482"): "merged",
 }
 
 
@@ -77,6 +84,10 @@ def url_for(registry, name):
         return f"https://api.github.com/repos/{repo}/pulls/{num}"
     if registry == "node":
         return "https://nodejs.org/dist/index.json"
+    if registry == "php":
+        return f"https://www.php.net/releases/index.php?json&version={name}"
+    if registry == "wordpress":
+        return "https://api.wordpress.org/core/version-check/1.7/"
     if registry == "chrome":
         return f"https://chromiumdash.appspot.com/fetch_releases?channel={name}&platform=Linux&num=1"
     if registry == "maven":
@@ -100,6 +111,10 @@ def parse(registry, data, name=""):
         return next(r["version"] for r in data if r["version"].startswith(f"v{name}."))
     if registry == "chrome":
         return data[0]["version"]
+    if registry == "php":
+        return data["version"]
+    if registry == "wordpress":
+        return data["offers"][0]["version"]
     if registry == "pr":  # open / merged / closed
         return "merged" if data.get("merged") else data["state"]
     if registry == "pypi":

@@ -33,3 +33,12 @@ def test_check_reports_same_moved_error():
     assert rows["a"]["status"] == "same"
     assert rows["b"]["status"] == "MOVED" and rows["b"]["now"] == "2.0"
     assert rows["c"]["status"] == "ERROR"
+
+
+def test_php_and_wordpress():
+    # php.net: releases/index.php?json&version=8.4 -> {"version": "8.4.28", ...}
+    assert lc.url_for("php", "8.4") == "https://www.php.net/releases/index.php?json&version=8.4"
+    assert lc.parse("php", {"version": "8.4.28", "date": "19 Nov 2026"}, "8.4") == "8.4.28"
+    # wordpress.org version-check API: first offer is the current release
+    assert lc.url_for("wordpress", "core").startswith("https://api.wordpress.org/core/version-check/")
+    assert lc.parse("wordpress", {"offers": [{"version": "7.1.5"}, {"version": "7.0.9"}]}) == "7.1.5"

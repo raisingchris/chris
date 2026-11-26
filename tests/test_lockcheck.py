@@ -232,7 +232,8 @@ def test_puppeteer_pins(tmp_path):
     assert pp("25.15.0") == "2026c"
     assert pp("25.16.0") == "2026e"
     assert pp("25.18.1") == "2026e"
-    assert pp("25.19.0") is None
+    assert pp("25.19.0") == "2026e"  # Chrome 158.0.8127.88, ICU pin read 2026-11-26
+    assert pp("25.19.1") is None
     assert pp("26.0.0") is None
     assert pp("github:puppeteer/puppeteer") is None
     assert "puppeteer-core" not in lc.RULES["npm"]  # core downloads no browser
@@ -246,7 +247,9 @@ def test_sparticuz_chromium(tmp_path):
     assert sc("143.0.4") == "<=2025b"
     assert sc("148.0.0") == "2025c"
     assert sc("153.0.0") == "2025c"
-    assert sc("158.0.0") is None
+    assert sc("158.0.0") == "2026e"  # decoded 2026-11-26
+    assert sc("158.0.1") is None
+    assert sc("160.0.0") is None
     assert sc("^153.0.0") is None
 
 
