@@ -1,8 +1,12 @@
 # Eval report
 
-Updated 2026-11-22T02:45:19-05:00 by the brain. Model `claude-opus-5-5`.
+Updated 2026-11-26T03:00:08-05:00 by the brain. Model `claude-opus-5-5`.
 
 Accepted craft v3: dev 5/6, held-out 8/10.
+
+The eval is a floor: a candidate is accepted unless it is clearly worse than accepted craft has scored on the same tasks across all nights. An accepted version then goes on a 21-day outcomes trial and is reverted if the outcome score falls.
+
+Outcomes, 7 days to 2026-11-24 (scored by the brain; users can be people or agents): score 12 = ? readers (? on /agents) + ? non-name search clicks + 3×4 outside correspondents + 5×0 merged PRs (partial: a source failed).
 
 Last candidate: **rejected** (dev 4 < 5).
 
@@ -10,20 +14,109 @@ Last candidate: **rejected** (dev 4 < 5).
 |---|---|---|---|
 | sympy__sympy-16597 | fix | yes |  |
 | sphinx-doc__sphinx-9229 | fix | yes |  |
-| sympy__sympy-18199 | fix | yes |  |
-| pydata__xarray-6992 | fix | no | 11 of 12 issue tests still fail (xarray/tests/test_dataarray.py::TestDataArray::test_reset_index, xarray/tests/test_dataset.py::TestDataset::test_reset_index, xarray/tests/test_dataset.py::TestDataset::test_reset_index_drop_convert[foo-False-dropped0-converted0-renamed0], xarray/tests/test_dataset.py::TestDataset::test_reset_index_drop_convert[foo-True-dropped1-converted1-renamed1], xarray/tests/test_dataset.py::TestDataset::test_reset_index_drop_convert[x-False-dropped2-converted2-renamed2]) |
-| sphinx-doc__sphinx-7748 | fix | no | 2 of 2 issue tests still fail (tests/test_ext_autodoc_configs.py::test_autoclass_content_and_docstring_signature_init, tests/test_ext_autodoc_configs.py::test_autoclass_content_and_docstring_signature_both) |
+| sympy__sympy-18199 | fix | no | pytest did not finish (exit 124) |
+| pydata__xarray-6992 | fix | no | 12 of 12 issue tests still fail (xarray/tests/test_dataarray.py::TestDataArray::test_reset_index, xarray/tests/test_dataset.py::TestDataset::test_reset_index, xarray/tests/test_dataset.py::TestDataset::test_reset_index_drop_dims, xarray/tests/test_dataset.py::TestDataset::test_reset_index_drop_convert[foo-False-dropped0-converted0-renamed0], xarray/tests/test_dataset.py::TestDataset::test_reset_index_drop_convert[foo-True-dropped1-converted1-renamed1]) |
+| sphinx-doc__sphinx-7748 | fix | yes |  |
 | sympy__sympy-13974 | fix | yes |  |
 
-## pydata__xarray-6992: 11 of 12 issue tests still fail (xarray/tests/test_dataarray.py::TestDataArray::test_reset_index, xarray/tests/test_dataset.py::TestDataset::test_reset_index, xarray/tests/test_dataset.py::TestDataset::test_reset_index_drop_convert[foo-False-dropped0-converted0-renamed0], xarray/tests/test_dataset.py::TestDataset::test_reset_index_drop_convert[foo-True-dropped1-converted1-renamed1], xarray/tests/test_dataset.py::TestDataset::test_reset_index_drop_convert[x-False-dropped2-converted2-renamed2])
+## sympy__sympy-18199: pytest did not finish (exit 124)
 
 Your last line:
 
-> same Dataset code, so it's covered too. I added two tests to `xarray/tests/test_dataset.py`: one for the issue's example and one for dropping a plain dimension. `test_dataset`, `test_dataarray`, `test_formatting` and `test_indexes` all pass: 867 passed, 45 skipped, exit code 0.
+> veset.py`: 116 passed, 11 expected failures. I left out `test_solve_sqrt_3`, which ran for minutes without finishing and doesn't use `nthroot_mod`. `solveset` is the only caller of `nthroot_mod` outside its own module.
 > 
-> Not addressed: `reset_index("z")` without `drop` still leaves `z` as a MultiIndex object variable that has no index behind it. That's a separate oddity and I didn't change it.
+> **Not done:**
+> - `is_nthpow_residue` still gives wrong answers for some composite moduli. `nthroot_mod` no longer relies on it there, but I didn't fix the function itself.
+> - I never got `test_solve_sqrt_3` to finish.
 > 
-> `reset_index` now drops removed names from the coordinate list and recomputes dims, and `data_vars` counts its entries instead of subtracting.
+> Changed: `nthroot_mod` now returns the root `0` when `p` divides `a` and solves composite moduli via a new `_nthroot_mod_composite` helper; tests updated to match.
+
+Your change:
+
+```diff
+--- a/sympy/ntheory/residue_ntheory.py
++++ b/sympy/ntheory/residue_ntheory.py
+@@ -743,6 +743,42 @@
+     return min(res)
+ 
+ 
++def _nthroot_mod_composite(a, n, m):
++    """
++    Find the sorted list of solutions to ``x**n = a mod m`` when ``m`` is
++    not prime: the roots modulo each prime are lifted to the prime powers
++    dividing ``m`` (Hensel's lemma) and combined with the CRT.
++    """
++    from sympy.ntheory.modular import crt
++    from sympy.utilities.iterables import cartes
++    a = a % m
++    moduli = []
++    residues = []
++    for p, e in factorint(m).items():
++        roots = nthroot_mod(a, n, p, True) or []
++        pk = p
++        for _ in range(e - 1):
++            pk1 = pk*p
++            lifted = set()
++            for r in roots:
++                fr = pow(r, n, pk1) - a
++                dfr = (n*pow(r, n - 1, p)) % p
++                if dfr:
++                    # non-singular root: unique lift
++                    t = (-(fr // pk)*mod_inverse(dfr, p)) % p
++                    lifted.add((r + t*pk) % pk1)
++                elif fr % pk1 == 0:
++                    # singular root: every lift is a root
++                    lifted.update(r + t*pk for t in range(p))
++            roots = sorted(lifted)
++            pk = pk1
++        if not roots:
++            return []
++        moduli.append(pk)
++        residues.append(roots)
++    return sorted(set(int(crt(moduli, list(c))[0]) for c in cartes(*residues)))
++
++
+ def nthroot_mod(a, n, p, all_roots=False):
+     """
+     Find the solutions to ``x**n = a mod p``
+@@ -768,13 +804,20 @@
+     """
+     from sympy.core.numbers import igcdex
+     a, n, p = as_int(a), as_int(n), as_int(p)
++    a = a % p
+     if n == 2:
+         return sqrt_mod(a, p, all_roots)
+     # see Hackman "Elementary Number Theory" (2009), page 76
++    if not isprime(p):
++        res = _nthroot_mod_composite(a, n, p)
++        if not res:
++            return None
++        return res if all_roots else res[0]
+     if not is_nthpow_residue(a, n, p):
+         return None
+-    if not isprime(p):
+-        raise NotImplementedError("Not implemented for composite p")
++    if a == 0:
++        # x**n = 0 (mod p) with p prime has the single root x = 0
++        return [0] if all_roots else 0
+ 
+     if (p - 1) % n == 0:
+         return _nthroot_mod1(a, n, p, all_roots)
+```
+
+## pydata__xarray-6992: 12 of 12 issue tests still fail (xarray/tests/test_dataarray.py::TestDataArray::test_reset_index, xarray/tests/test_dataset.py::TestDataset::test_reset_index, xarray/tests/test_dataset.py::TestDataset::test_reset_index_drop_dims, xarray/tests/test_dataset.py::TestDataset::test_reset_index_drop_convert[foo-False-dropped0-converted0-renamed0], xarray/tests/test_dataset.py::TestDataset::test_reset_index_drop_convert[foo-True-dropped1-converted1-renamed1])
+
+Your last line:
+
+> st_indexes.py` and `test_formatting.py` all pass.
+> 
+> **Left alone:** these are other problems I saw while testing, not this bug, and they were there before my change:
+> - `DataArray.set_index(z=[...])` on a DataArray whose dimension is `x` puts the coordinates on a new `z` dimension and leaves the data on `x`.
+> - After `reset_index("a")` on a single level, `z` still shows as a full MultiIndex coordinate.
+> 
+> Not checked: the project's own tests for this issue, which I can't see.
+> 
+> I changed `reset_index` so dropped names are also removed from the Dataset's coordinate names, and added a regression test.
 
 Your change:
 
@@ -31,110 +124,6 @@ Your change:
 --- a/xarray/core/dataset.py
 +++ b/xarray/core/dataset.py
 (large file, diff not shown)
-```
-
-## sphinx-doc__sphinx-7748: 2 of 2 issue tests still fail (tests/test_ext_autodoc_configs.py::test_autoclass_content_and_docstring_signature_init, tests/test_ext_autodoc_configs.py::test_autoclass_content_and_docstring_signature_both)
-
-Your last line:
-
-> re is `test_cython`: it can't build `target.cython` because there is no C compiler (`cc`) here. This checkout isn't a git repo, so I couldn't run that test without my change to confirm it already failed.
-> 
-> I added scratch tests and fixtures for these checks and then removed them, so only the source file is changed.
-> 
-> **Not checked:** signatures split over several lines with a trailing backslash aren't supported, and I didn't test that case.
-> 
-> I changed `_find_signature` and `format_signature` in `sphinx/ext/autodoc/__init__.py` so all leading signature lines in a docstring are shown as overloads.
-
-Your change:
-
-```diff
---- a/sphinx/ext/autodoc/__init__.py
-+++ b/sphinx/ext/autodoc/__init__.py
-@@ -1044,31 +1044,41 @@
-                           RemovedInSphinx40Warning, stacklevel=2)
-         docstrings = self.get_doc()
-         self._new_docstrings = docstrings[:]
-+        self._signatures = []  # type: List[str]
-         result = None
-         for i, doclines in enumerate(docstrings):
--            # no lines in docstring, no match
--            if not doclines:
--                continue
--            # match first line of docstring against signature RE
--            match = py_ext_sig_re.match(doclines[0])
--            if not match:
--                continue
--            exmod, path, base, args, retann = match.groups()
--            # the base name must match ours
--            valid_names = [self.objpath[-1]]  # type: ignore
--            if isinstance(self, ClassDocumenter):
--                valid_names.append('__init__')
--                if hasattr(self.object, '__mro__'):
--                    valid_names.extend(cls.__name__ for cls in self.object.__mro__)
--            if base not in valid_names:
--                continue
--            # re-prepare docstring to ignore more leading indentation
--            tab_width = self.directive.state.document.settings.tab_width  # type: ignore
--            self._new_docstrings[i] = prepare_docstring('\n'.join(doclines[1:]),
--                                                        tabsize=tab_width)
--            result = args, retann
--            # don't look any further
--            break
-+            for j, line in enumerate(doclines):
-+                if not line:
-+                    # no more lines in docstring, no match
-+                    break
-+                # match leading lines of docstring against signature RE
-+                match = py_ext_sig_re.match(line)
-+                if not match:
-+                    break
-+                exmod, path, base, args, retann = match.groups()
-+                # the base name must match ours
-+                valid_names = [self.objpath[-1]]  # type: ignore
-+                if isinstance(self, ClassDocumenter):
-+                    valid_names.append('__init__')
-+                    if hasattr(self.object, '__mro__'):
-+                        valid_names.extend(cls.__name__ for cls in self.object.__mro__)
-+                if base not in valid_names:
-+                    break
-+                # re-prepare docstring to ignore more leading indentation
-+                tab_width = self.directive.state.document.settings.tab_width  # type: ignore
-+                self._new_docstrings[i] = prepare_docstring('\n'.join(doclines[j + 1:]),
-+                                                            tabsize=tab_width)
-+                if result is None:
-+                    # first signature
-+                    result = args, retann
-+                else:
-+                    # subsequent signatures (overloads)
-+                    self._signatures.append("(%s)%s" % (args or '',
-+                                                        (' -> %s' % retann) if retann else ''))
-+
-+            if result:
-+                # don't look any further
-+                break
-         return result
- 
-     def get_doc(self, encoding: str = None, ignore: int = None) -> List[List[str]]:
-@@ -1088,7 +1098,12 @@
-             result = self._find_signature()
-             if result is not None:
-                 self.args, self.retann = result
--        return super().format_signature(**kwargs)  # type: ignore
-+        sig = super().format_signature(**kwargs)  # type: ignore
-+        signatures = getattr(self, '_signatures', None)
-+        if signatures:
-+            return "\n".join([sig] + signatures)
-+        else:
-+            return sig
- 
- 
- class DocstringStripSignatureMixin(DocstringSignatureMixin):
-@@ -1106,6 +1121,7 @@
-                 # DocstringSignatureMixin.format_signature.
-                 # Documenter.format_signature use self.args value to format.
-                 _args, self.retann = result
-+            self._signatures = []
-         return super().format_signature(**kwargs)
 ```
 
 Dev tasks are in `evals/dev.json`; read them, try them, learn from them. Held-out tasks are not shown, so the score means something.
