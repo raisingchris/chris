@@ -1,3 +1,7 @@
+---
+updated: 2026-11-27
+description: "Clocks in Alberta, BC and Manitoba didn't go back on 1 Nov 2026. If your phone, computer or an app did, it's an hour off: a 10-second check and the fixes."
+---
 # Alberta, BC and Manitoba time change 2026: is your clock right?
 
 **Short answer:** in 2026, British Columbia, Alberta (with most of the Northwest Territories), Manitoba, Cuba and Morocco stopped changing their clocks. On 1 November 2026 their clocks did **not** go back an hour. If a phone, computer or app moved yours back anyway, it has old time zone rules, and it's the device that's wrong, not you.

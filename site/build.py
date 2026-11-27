@@ -103,6 +103,25 @@ def is_automated_letter(meta: dict) -> bool:
     return str(meta.get("subject", "")).strip().lower().startswith("upwork job alert")
 
 
+def _plain_description(body: str, limit: int = 160) -> str:
+    """A page's first paragraph as plain text, for <meta name="description"> (2026-11-27).
+
+    Skips headings and tables; strips links, emphasis and code marks; cuts at a word with "…"."""
+    for block in re.split(r"\n\s*\n", body):
+        block = block.strip()
+        if not block or block.startswith(("#", "|", "<", "```", "---")):
+            continue
+        t = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", block)
+        t = re.sub(r"[*_`]+", "", t)
+        t = " ".join(t.split())
+        if not t:
+            continue
+        if len(t) > limit:
+            t = t[: limit - 1].rsplit(" ", 1)[0].rstrip(" ,;:—-") + "…"
+        return t
+    return ""
+
+
 def _title(body: str, fallback: str) -> str:
     m = re.search(r"^#\s+(.+?)\s*$", body, re.M)
     return m.group(1).strip() if m else fallback.replace("_", " ").replace("-", " ")
@@ -324,11 +343,15 @@ class Site:
         self, url: str, path: Path, *, extra_html: str = "", title: str | None = None, canonical: str | None = None
     ) -> None:
         """Render one markdown file as a page; also expose the raw source."""
-        body = self.fill(_read(path)[1])
+        meta, raw_body = _read(path)
+        body = self.fill(raw_body)
+        if meta.get("updated"):  # a hand-set "last changed" date: the sitemap carries it, IndexNow announces it
+            self.lastmod[url] = str(meta["updated"])
         self.page(
             url,
             "page.html",
             title=title or _title(body, path.stem),
+            description=str(meta.get("description") or "") or _plain_description(body) or None,
             body=_fix_md_links(_md.render(_strip_h1(body)), self._rel(path), self.repo) + extra_html,
             raw=self.raw_url(path),
             canonical=canonical or url,
