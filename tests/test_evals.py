@@ -44,7 +44,8 @@ def local_run(cmd, cwd=None, timeout=600, env=None, input=None):
     if "kill -KILL -1" in cmd:  # stop_her: never run on a dev machine
         return subprocess.CompletedProcess(cmd, 0, "", "")
     if cmd[:2] == ["uv", "venv"]:
-        cmd = [sys.executable, "-m", "venv", cmd[-1]]
+        # --without-pip: these tasks install nothing, and seeding pip cost ~51 s per venv (2026-11-27)
+        cmd = [sys.executable, "-m", "venv", "--without-pip", cmd[-1]]
     if cmd[:2] == ["sudo", "-n"]:
         secs, cwd, cmd = cmd[5], cmd[6], cmd[7:]
     return subprocess.run(cmd, cwd=str(cwd) if cwd else None, timeout=timeout, env=env, input=input,

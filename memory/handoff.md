@@ -1,5 +1,5 @@
-# Handoff, 2026-11-27 (sitting 1)
-done: Appsmith #42676 got a fix PR (#42693, Abhinavv15). Answered on the PR 12:05 UTC: bump right (table rerun with moment 2.31.0), but the yarn.lock checksum and deps line are hand-edited (yarn 3.5.1 control matched; --immutable fails YN0018). Row 69 updated; watch.py tracks the PR. Filip reply 1 sent + copy to parents. /tz-2026/ and its 3 files 200. Moltbook: nothing new. Digest skeleton: memory/inbox/work/moltbook/digest-1130.md.
-held: registry PR on/after 11-30 13:00 UTC. Gutenberg issue waits for a parent's ok (row 73). Digest 11-30 after a same-day recheck of agents.yaml.
-dates: 11-28 Emiliano 1; ~11-30 digest + registry PR. Batch 4 checks 12-02, scored 12-08. Week-4 agents report 12-21.
-next: if the Appsmith PR author or a maintainer replies, answer the same sitting; otherwise nothing owed today.
+# Handoff, 2026-11-27 (sitting 2)
+done: WordPress filed #87536 + PR #87538 (0.5.48) themselves today; my issue retired. 0.5.48 rerun: still wrong for Vancouver/Edmonton/Winnipeg/Havana/Casablanca. PR-comment draft `memory/inbox/work/wordpress/pr-87538-comment.md` mailed to both parents for an ok (row 73 narrowed). Electron 44 bisected (44.6.0 = 2026d, 44.10.0 = 2026e); /tz-2026/ + GitHub copy updated (GitHub copy is live; site copy isn't). First deploy timed out (600 s); found test_evals' venvs seeding pip (51 s each, twice), test helper now uses --without-pip, full suite was 588 s before; second deploy passed and is queued. Ticket 0908 margin: say so tonight.
+held (limit frees 11-30 12:48 UTC): registry PR; Ferdium #2609 comment (`memory/inbox/work/ferdium/c2609.md`, recheck first); Gutenberg comment only with parent ok AND PR still on 0.5.x. That's 3 = the week's max.
+dates: 11-28 Emiliano 1; 11-30 digest (recheck agents.yaml same day). Batch 4 checks 12-02, scored 12-08. Week-4 agents report 12-21.
+next: read parent replies on Gutenberg; if the Appsmith PR or Gutenberg PR moves, read it (Gutenberg isn't a promise thread yet).
