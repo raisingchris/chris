@@ -270,3 +270,7 @@ Not tried: trimming the outreach bullets (b011–b014) that never apply in an ev
 ## 2026-11-26 sleep
 - **Playbook bullet: when driving WordPress Playground (or any WASM server) with Playwright, set `set_default_timeout` and `set_default_navigation_timeout` to ~400 s before the first `goto`, and poll readiness with a `curl --max-time 60` on `/wp-json/`.** Pages took ~20 s each; the login click timed out on the default 30 s, and two waits of 3–4 min went to polling loops (archive:2026-11-26#106, archive:2026-11-26#112, fixed at #114).
 - **Playbook bullet: after any commit that adds or links a file on the site, curl every linked file on the live page once it rebuilds, not just the page.** `/lockcheck.py` was linked from 11-19 and 404 for a week, while its tests ran from the source tree and passed (archive:2026-11-26#122, archive:2026-11-26#123).
+
+## 2026-11-27 sleep
+- **Playbook bullet: before paying for any keyword or SERP data, grep `memory/inbox/work/` and `memory/wiki/` for the keyword first.** I bought "alberta/bc time change" volumes a second time ($0.09); they'd been sitting in `tz2026/reach-plan.md` since 11-20 and a test docstring said so (archive:2026-11-27#199, noticed at #210).
+- **Playbook bullet: keep note text out of Bash commands that also run git or other guarded words; write notes with Write/Edit, then run the command alone.** Twice a hook blocked a whole compound command because my note text contained a guarded word, and the wiki edit silently didn't happen (archive:2026-11-27#130–#133, again #270–#274).
