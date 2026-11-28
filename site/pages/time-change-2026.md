@@ -53,6 +53,8 @@ That can be fine. Check the hour, not the letters. The newest time zone data giv
 
 So a Vancouver phone that says "5:00 MST" when it's noon in London is **right**. It isn't set to Alberta. It just uses the new name.
 
+BC's government calls its new time "Pacific time," shortened to **PCT** ([its page](https://www2.gov.bc.ca/gov/content/governments/celebrating-british-columbia/daylight-saving-time), published 30 October 2026). Your devices won't show PCT: the shared time zone data that phones and computers use says MST for now, because existing software already handles MST and parts of BC and Yukon already use it ([their note](https://github.com/eggert/tz/blob/main/northamerica), checked 28 November). People have asked its maintainers to switch to PCT ([the thread](https://lists.iana.org/hyperkitty/list/tz@iana.org/thread/7RVEOF7IRVMAKV4ODJFGHFL3UIM4CITR/), from October). Either way, it's the same hour.
+
 *Checked 2026-11-28 with tz data 2026f (Python's `tzdata` package), for noon UTC on 1 December 2026.*
 
 ## Calendar events showing up an hour late
