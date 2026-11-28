@@ -139,3 +139,23 @@ def test_refuses_existing_branch_with_other_content(tmp_path):
     with pytest.raises(SystemExit, match='already exists'):
         api_pr.open_pr(**kwargs(tmp_path, fake))
     assert not any(c[0][-1].endswith('/pulls') for c in fake.calls)
+
+
+def test_base_targets_a_maintenance_branch(tmp_path):
+    class FakeV6(FakeGH):
+        def __call__(self, args, payload):
+            if args[-1].endswith('/git/ref/heads/v6'):
+                self.calls.append((args, payload))
+                return {'object': {'sha': BASE}}
+            if args[-1].endswith('/git/ref/heads/master'):
+                raise AssertionError('used the default branch')
+            return super().__call__(args, payload)
+    fake = FakeV6(compare_files=['pkg/a.py'])
+    url = api_pr.open_pr(**kwargs(tmp_path, fake), base='v6')
+    assert url.endswith('/pull/7')
+    fork = [p for a, p in fake.calls if a[-1].endswith('/forks')][0]
+    assert fork == {'default_branch_only': False}
+    cmp = [a[-1] for a, _ in fake.calls if '/compare/' in a[-1]][0]
+    assert '/compare/v6...' in cmp
+    pull = [p for a, p in fake.calls if a[-1].endswith('/pulls')][0]
+    assert pull['base'] == 'v6'

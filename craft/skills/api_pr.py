@@ -6,7 +6,7 @@ sanctions this path instead: GitHub's API through `gh api`.
 Usage:
   python -I api_pr.py --clone /tmp/proj --upstream owner/repo --me raisingchris2026 \
       --branch fix-123 --message "Fix the thing (fixes #123)" \
-      --title "(AI) Fix the thing" --body-file /tmp/body.md [--dry-run] path/in/repo.py ...
+      --title "(AI) Fix the thing" --body-file /tmp/body.md [--dry-run] [--base v6] path/in/repo.py ...
   options: --first tests/test_x.py --first-message "Add failing test" puts those files in
            their own change first (projects that want the test committed before the fix);
            --draft opens the PR as a draft (e.g. when no human reviewed the work).
@@ -49,18 +49,19 @@ def open_pr(*, clone: pathlib.Path, upstream: str, me: str, branch: str, message
             title: str, body: str, files: list[str], dry_run: bool = False,
             run: Runner = gh, head_sha: str | None = None,
             first: list[str] | None = None, first_message: str = '', draft: bool = False,
+            base: str | None = None,
             sleep: Callable[[float], None] = time.sleep) -> str:
     repo = upstream.split('/')[1]
     fork = f'{me}/{repo}'
     info = run([f'repos/{upstream}'], None)
-    base_branch = info['default_branch']
+    base_branch = base or info['default_branch']  # base: e.g. a maintenance branch like v6
     base_sha = run([f'repos/{upstream}/git/ref/heads/{base_branch}'], None)['object']['sha']
     local = head_sha if head_sha is not None else clone_head(clone)
     if local != base_sha:
         raise SystemExit(f'clone HEAD {local[:7]} != upstream {base_branch} {base_sha[:7]}; '
                          're-clone and re-test first')
 
-    run(['-X', 'POST', f'repos/{upstream}/forks'], {'default_branch_only': True})
+    run(['-X', 'POST', f'repos/{upstream}/forks'], {'default_branch_only': base is None})
     for _ in range(10):  # forks are made asynchronously
         try:
             run([f'repos/{fork}/git/commits/{base_sha}'], None)
@@ -129,6 +130,7 @@ def main(argv: list[str]) -> None:
         p.add_argument(name, required=True)
     p.add_argument('--dry-run', action='store_true')
     p.add_argument('--draft', action='store_true')
+    p.add_argument('--base', default=None, help='target branch (default: upstream default branch)')
     p.add_argument('--first', action='append', default=[])
     p.add_argument('--first-message', default='')
     p.add_argument('files', nargs='+')
@@ -137,7 +139,7 @@ def main(argv: list[str]) -> None:
                   message=a.message, title=a.title,
                   body=pathlib.Path(a.body_file).read_text(), files=a.files,
                   dry_run=a.dry_run, first=a.first, first_message=a.first_message,
-                  draft=a.draft))
+                  draft=a.draft, base=a.base))
 
 
 if __name__ == '__main__':
