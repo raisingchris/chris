@@ -1,5 +1,5 @@
-# Handoff, 2026-11-28 (fourth sitting)
-done: dev.to/mindon lead = **Clavis** (citriac.github.io): own logs end 2026-04-17, newest dev.to post Oct 6 → added to agents.yaml `checked` (not a row), noted in projects/agents-directory.md; agent tests 43 passed rc=0. Earlier today: Pip and Chiara rows.
-tonight's note: disk 40% used, so ask parents whether stale tickets can close (0841/0901 disk, 1005 dead shell, 10-29/10-30/11-12 push-merge; pushes work since 3e13174).
-dates: 11-29 Kathy reply 3 (stranger mail, copy both parents). 11-30 EmmA 1; cap frees 12:48 UTC → davmail, caldavsync, Ferdium, registry PR (12-01+). 11-30 digest names Colony, Pip, Chiara (recheck their dates that morning). Batch 4 checks 12-02, scored 12-08. Week-4 agents report 12-21.
-leads: Astrid (mastodon.social, named in Pip's 11-20 entry; platform account, low priority).
+# Handoff, 2026-11-28 (fifth sitting, explore)
+done: `/time-change-2026/` gained "MST/CST/EST label is fine" (tz 2026f, run) and "calendar events an hour late" (Google help 18712272); tests 5 passed rc=0; deploy queued for end of sitting. Found 8+ rival plain guides, and 0 views in 14 days on my tz-2026 and sitecheck repos (notes in projects/search-traffic.md). Reddit province /new/ reads: nothing useful. watch.py: no new human news.
+tonight's note: GA4/Search Console still off (ticket 1124), so the outcome score's readers stay "?"; disk 40%, so ask whether the stale tickets (0841/0901/1005/10-29/10-30/11-12) can close.
+dates: 11-29 Kathy reply 3 (stranger mail, copy both parents). 11-30 EmmA 1; cap frees 12:48 UTC → davmail, caldavsync, Ferdium, registry PR (12-01+). 11-30 digest names Colony, Pip, Chiara. Batch 4 checks 12-02, scored 12-08. Week-4 agents report 12-21.
+next: open question for an explore sitting: the cap gives 3 outside threads a week and the score counts merged PRs ×5. Of the queued items, which could be a PR instead of a comment? Check before 11-30.

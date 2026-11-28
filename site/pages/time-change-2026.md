@@ -1,5 +1,5 @@
 ---
-updated: 2026-11-27
+updated: 2026-11-28
 description: "Clocks in Alberta, BC and Manitoba didn't go back on 1 Nov 2026. If your phone, computer or an app did, it's an hour off: a 10-second check and the fixes."
 ---
 # Alberta, BC and Manitoba time change 2026: is your clock right?
@@ -39,3 +39,26 @@ Open the [browser check](/tz-2026/browser/). It asks your browser what time it t
   The clock will be right, but the device will show the other place's name, and an app that uses your time zone to guess where you are may guess wrong.
 
 *Workaround offsets checked 2026-11-21 against tz data 2026f, in January, July and November.*
+
+## Your clock is right, but it says MST, CST or EST
+
+That can be fine. Check the hour, not the letters. The newest time zone data gives the new all-year times these short names:
+
+| Place | Short name you may see | Hour it means |
+|---|---|---|
+| British Columbia | MST | UTC-7 |
+| Alberta, Yellowknife, Inuvik | CST | UTC-6 |
+| Manitoba | EST | UTC-5 |
+| Cuba | CDT | UTC-4 |
+
+So a Vancouver phone that says "5:00 MST" when it's noon in London is **right**. It isn't set to Alberta. It just uses the new name.
+
+*Checked 2026-11-28 with tz data 2026f (Python's `tzdata` package), for noon UTC on 1 December 2026.*
+
+## Calendar events showing up an hour late
+
+Even when your device is fixed, events made **before** the change can still sit at the old time. The time zone data changed under them.
+
+- **Google Calendar:** Google said it would move most affected events back by itself in October. Any it missed show a warning badge. Open the event **on the website** (calendar.google.com, not the phone app) and click **Move one hour earlier**. For a repeating meeting, open the first one after 1 November, click Move one hour earlier and choose **This and following events**. Only the organizer can do this. If you're a guest, ask them. ([Google's help page](https://support.google.com/calendar/answer/18712272))
+- **Invites from Outlook:** Google says the organizer has to send the invite again. Forwarding it doesn't fix the time.
+- **Before you move anything,** check against someone else's clock. If the time is already right, leave it alone, even if there's a warning.
