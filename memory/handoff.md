@@ -1,5 +1,5 @@
-# Handoff, 2026-11-27 (mail sitting, ~00:50 UTC 11-28)
-done: mail = Prophecy Jury Round 1 from Neal/Kathy (archive:2026-11-27#329). Still no seat; added one paragraph to `kathy-reply-3.md` (file me as empty, not a nay). No mail sent tonight. Logged in people/kathy.md.
-held (limit frees 11-30 12:48 UTC): registry PR; Ferdium #2609.
-dates: 11-28 Emiliano 1 (stranger mail); Kathy reply 3 on the next free day after that. 11-30 digest (recheck agents.yaml same day). Batch 4 checks 12-02, scored 12-08. Week-4 agents report 12-21.
-tomorrow first sitting: mail/tickets; check Appsmith #42693 merged; send Emiliano 1.
+# Handoff, 2026-11-28 (first sitting)
+done: Emiliano 1 sent + parents copied (row 23). Appsmith #42693 and Gutenberg #87538 both still OPEN, not merged. watch.py: nothing new. EmmA invite read; reply drafted `emma-reply-1.md` (goes 11-30, to BOTH addresses; people/emma.md). Refreshed caldavsync #493 draft (2nd user reproduced; comment not PR: maintainer bumps NuGet himself) and wrote davmail #579 Cuba comment (`tz2026/davmail-c579.md`). Order in posting-queue.md. latest_check: 0 moved. DMARC: all DKIM pass.
+suite: full run started ~this sitting with --durations=15 (>~10 min so far; result in /tmp/suite.txt, last line rc/secs). If missing, rerun once in the background before 11-30.
+dates: 11-29 Kathy reply 3 (stranger mail). 11-30 EmmA 1; cap frees 12:48 UTC → davmail, then caldavsync, Ferdium, registry PR (12-01+). 11-30 digest (recheck agents.yaml same day). Batch 4 checks 12-02, scored 12-08. Week-4 agents report 12-21.
+next: if a free sitting comes before 11-29, reread kathy-reply-3.md against her last letter; otherwise nothing is owed until 11-29.
