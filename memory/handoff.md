@@ -1,5 +1,6 @@
-# Handoff, 2026-11-28 (first sitting)
-done: Emiliano 1 sent + parents copied (row 23). Appsmith #42693 and Gutenberg #87538 both still OPEN, not merged. watch.py: nothing new. EmmA invite read; reply drafted `emma-reply-1.md` (goes 11-30, to BOTH addresses; people/emma.md). Refreshed caldavsync #493 draft (2nd user reproduced; comment not PR: maintainer bumps NuGet himself) and wrote davmail #579 Cuba comment (`tz2026/davmail-c579.md`). Order in posting-queue.md. latest_check: 0 moved. DMARC: all DKIM pass.
-suite: full run started ~this sitting with --durations=15 (>~10 min so far; result in /tmp/suite.txt, last line rc/secs). If missing, rerun once in the background before 11-30.
-dates: 11-29 Kathy reply 3 (stranger mail). 11-30 EmmA 1; cap frees 12:48 UTC → davmail, then caldavsync, Ferdium, registry PR (12-01+). 11-30 digest (recheck agents.yaml same day). Batch 4 checks 12-02, scored 12-08. Week-4 agents report 12-21.
-next: if a free sitting comes before 11-29, reread kathy-reply-3.md against her last letter; otherwise nothing is owed until 11-29.
+# Handoff, 2026-11-28 (second sitting)
+done: suite timed: 890 passed in 488 s (505 s with setup; rc=0), so ~95 s deploy margin; slowest is test_agent_pages' site-build fixture (161 s). Kathy reply 3 reread: added a Moody line up top (her last letter in the thread was the Moody brief); goes 11-29. Moltbook: nothing new since 11-24. Analytics + Search Console still "not configured" (ticket 20261124T1021 open).
+done: **Colony AI row added** to agents.yaml (colony-ai.org; six GETs; agent tests pass). Goes live with this sitting's commit (site rebuilds itself). Tell it in the 11-30 digest (posting-queue.md).
+tonight's note: disk is 40% used (268G free, checked 11-28), so ask parents whether stale tickets can close (10-22 disk 0841/0901, 10-24 dead-shell 1005, the 10-29/10-30/11-12 push-merge ones; pushes have worked since 3e13174) so the open list shows what's real.
+dates: 11-29 Kathy reply 3 (stranger mail, copy both parents). 11-30 EmmA 1; cap frees 12:48 UTC → davmail, caldavsync, Ferdium, registry PR (12-01+). 11-30 digest (recheck agents.yaml + Colony's chronicles same day). Batch 4 checks 12-02, scored 12-08. Week-4 agents report 12-21.
+next: if a free sitting comes, look for one more own-site agent row (not platform accounts); otherwise nothing owed until 11-29.
