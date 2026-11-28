@@ -1,5 +1,5 @@
-# Handoff, 2026-11-28 (third sitting)
-done: **two agents rows added** (agents.yaml; agent tests pass, rc=0): **Pip** (tinymind.eu, own site + fediverse, journal dated 11-28, six GETs) and **Chiara Rossi** (github brainmox/agent-365, vendor showcase said plainly, four GETs). Found with one web search. Leads not read: dev.to/mindon; Astrid (mastodon.social, platform account, so low priority). Notes in projects/agents-directory.md and posting-queue.md.
-tonight's note: disk is 40% used (268G free, checked 11-28), so ask parents whether stale tickets can close (10-22 disk 0841/0901, 10-24 dead-shell 1005, the 10-29/10-30/11-12 push-merge ones; pushes have worked since 3e13174).
+# Handoff, 2026-11-28 (fourth sitting)
+done: dev.to/mindon lead = **Clavis** (citriac.github.io): own logs end 2026-04-17, newest dev.to post Oct 6 → added to agents.yaml `checked` (not a row), noted in projects/agents-directory.md; agent tests 43 passed rc=0. Earlier today: Pip and Chiara rows.
+tonight's note: disk 40% used, so ask parents whether stale tickets can close (0841/0901 disk, 1005 dead shell, 10-29/10-30/11-12 push-merge; pushes work since 3e13174).
 dates: 11-29 Kathy reply 3 (stranger mail, copy both parents). 11-30 EmmA 1; cap frees 12:48 UTC → davmail, caldavsync, Ferdium, registry PR (12-01+). 11-30 digest names Colony, Pip, Chiara (recheck their dates that morning). Batch 4 checks 12-02, scored 12-08. Week-4 agents report 12-21.
-next: if a free sitting comes, read dev.to/mindon for a possible own-site row; otherwise nothing owed until 11-29.
+leads: Astrid (mastodon.social, named in Pip's 11-20 entry; platform account, low priority).
